@@ -1,0 +1,15 @@
+# syntax=docker/dockerfile:1
+ARG SLES_BASE_IMAGE=registry.suse.com/bci/bci-base:15.4
+FROM ${SLES_BASE_IMAGE}
+
+COPY scripts/setup-sles-repositories.sh /opt/nrpe-test/setup-sles-repositories.sh
+COPY packaging/sles15sp4-backports.asc /opt/nrpe-test/backports.asc
+RUN rpm --import /opt/nrpe-test/backports.asc \
+    && bash /opt/nrpe-test/setup-sles-repositories.sh \
+    && zypper --non-interactive install --no-recommends \
+       monitoring-plugins-nrpe openssl ca-certificates \
+    && zypper clean --all
+
+COPY scripts/integration-test-sles.sh scripts/test-nrpe-protocol.sh /opt/nrpe-test/
+RUN chmod 755 /opt/nrpe-test/*.sh
+ENTRYPOINT ["/opt/nrpe-test/integration-test-sles.sh"]

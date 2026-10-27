@@ -7,14 +7,18 @@ import sys
 from .controller import execute
 from .docker import check_docker
 from .state import ROOT, TARGETS, artifact, reports
-from .targets import package_files
+from .targets import TARGET_CONFIG, package_files
 
 
 def doctor(root):
     print("Checking project files...")
     required = ("compose.yaml", "compose.test.yaml", "Dockerfile", "Dockerfile.test",
                 "scripts/build.sh", "scripts/verify.sh", "scripts/integration-test.sh",
-                "scripts/test-nrpe-protocol.sh", "scripts/setup-debian-repositories.sh")
+                "Dockerfile.sles", "Dockerfile.sles-test", "scripts/build-sles.sh",
+                "scripts/integration-test-sles.sh", "scripts/test-nrpe-protocol.sh",
+                "scripts/sles_source.py", "scripts/setup-sles-repositories.sh",
+                "scripts/setup-debian-repositories.sh",
+                "packaging/sles15sp4-source.json", "packaging/sles15sp4-backports.asc")
     missing = [name for name in required if not (root / name).is_file()]
     if missing:
         raise RuntimeError("Missing project files: " + ", ".join(missing))
@@ -166,6 +170,9 @@ def main(argv=None, root=ROOT):
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
+        for target in targets:
+            if TARGET_CONFIG[target].get("experimental"):
+                print(f"Experimental target: {target}. Review build and integration results before deployment.")
         rebuild = getattr(args, "rebuild", False)
         if args.action in ("build", "verify") and not rebuild:
             existing = [target for target in targets if package_files(root, target)]

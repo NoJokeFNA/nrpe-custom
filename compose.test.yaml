@@ -4,6 +4,15 @@ x-nrpe-test: &nrpe-test
   profiles: [integration]
 
 services:
+  test-sles15sp4:
+    <<: *nrpe-test
+    build:
+      context: .
+      dockerfile: Dockerfile.sles-test
+      args:
+        SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.4}
+    volumes:
+      - ./output/sles15sp4:/packages:ro
   test-debian11:
     <<: *nrpe-test
     build:

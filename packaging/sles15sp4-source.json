@@ -1,0 +1,75 @@
+{
+  "project": "server:monitoring",
+  "package": "nrpe",
+  "revision": "835292739a5736a9d8f0460f670b6f15",
+  "version": "4.1.1",
+  "reported_release": "150400.95.2",
+  "custom_release": "150400.95.2.withargs1",
+  "files": {
+    "README.SUSE": {
+      "sha256": "b97687f8598b61d6fb18159d2cf439c5935e3f0a913a966646af4ef487ec5290",
+      "size": 2586
+    },
+    "README.SUSE.systemd-addon": {
+      "sha256": "f3545318511499383c3d1a6aadd1949ec5321f50e32bc617a46f97120fce82bd",
+      "size": 275
+    },
+    "check_nrpe.cfg": {
+      "sha256": "78e949394b68c2f8e195f8e98245619d0a120eeab81af0b72ce55bd6120bfd2f",
+      "size": 867
+    },
+    "nrpe-4.0.4-silence_wrong_package_version_messages.patch": {
+      "sha256": "d8bc758bb2d0db20a8f53cb02d89749fad4cb545fc9cd604817a10ef26b0d107",
+      "size": 1320
+    },
+    "nrpe-4.1.1.tar.xz": {
+      "sha256": "7689aea570596573919371f7d6a1753eca90213368ede51f477e25782eb1ef9c",
+      "size": 465080
+    },
+    "nrpe-SuSEfirewall2": {
+      "sha256": "c21c3b30970df920683b7526e2e6f69ace3e8626fa10322a1e91fa54b2a5275f",
+      "size": 382
+    },
+    "nrpe-dh.h": {
+      "sha256": "b16ae5cede0b72f29be0a5a18328b33854e3727cc7ae0acb4e622f9f28c71f6c",
+      "size": 2181
+    },
+    "nrpe-implicit_declaration.patch": {
+      "sha256": "a5dcb80c9cee396c44f05d50eb5dcf4f29612c65dc77b5b294764c526cc80283",
+      "size": 307
+    },
+    "nrpe-static_dh_parameters.patch": {
+      "sha256": "ca7da232c9806fdf9cde916ecdd486270c8466311fdd25e6d4d59be67d52136b",
+      "size": 4064
+    },
+    "nrpe.8": {
+      "sha256": "2d81908bb0ce27f22bed5c8cc1ba7ab9387a2802e72c6f771edadb1987fd8464",
+      "size": 1875
+    },
+    "nrpe.changes": {
+      "sha256": "58c5248f320acd6d16ffb33ff4bebcb405093589737413a800c0a6f18dd9c793",
+      "size": 34630
+    },
+    "nrpe.init": {
+      "sha256": "f12bedd04e177bbd948f051177885b9c3b35ecdbc7c957b9c3793c034b0b72e8",
+      "size": 3319
+    },
+    "nrpe.spec": {
+      "sha256": "7f5ff80caa9a4406afb4eb734029de42bcb4f809c625088a067c9e86fb5a2223",
+      "size": 14407
+    },
+    "nrpe.xml": {
+      "sha256": "d41b5b331bf763da29a54e0bb0c05f9508e9608332f872e3deca5de106cf0c74",
+      "size": 315
+    },
+    "usr.sbin.nrpe": {
+      "sha256": "eeacb1b3d6e32b232bd59e4a2f59863ca291a8604669a9b5562b927dddd3dcd2",
+      "size": 1436
+    }
+  },
+  "backports_key": {
+    "url": "https://api.opensuse.org/public/source/openSUSE:Backports/_pubkey",
+    "fingerprint": "637B32FF3D83F07A7AE1C40A9C214D4065176565",
+    "sha256": "427a1fb530e28520f8ef7ef372529e8dc4b0f49cc70100ac0cf7996c81c9cb25"
+  }
+}

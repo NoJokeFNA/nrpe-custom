@@ -5,6 +5,10 @@ TARGET_CONFIG = {
            "prefix": "nagios-nrpe-server_", "suffix": "_amd64.deb"}
     for name in ("debian11", "debian12", "debian13", "debian14")
 }
+TARGET_CONFIG["sles15sp4"] = {
+    "pattern": "nrpe-[0-9]*.x86_64.rpm", "prefix": "nrpe-", "suffix": ".x86_64.rpm",
+    "experimental": True,
+}
 TARGETS = tuple(TARGET_CONFIG)
 
 

@@ -8,6 +8,14 @@ x-nrpe-build: &nrpe-build
       target: /output
 
 services:
+  sles15sp4:
+    <<: *nrpe-build
+    build:
+      context: .
+      dockerfile: Dockerfile.sles
+      args:
+        SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.4}
+    image: nrpe-custom-builder:sles15sp4
   debian11:
     <<: *nrpe-build
     build:

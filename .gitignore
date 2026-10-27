@@ -1,5 +1,7 @@
 .idea/
 output/*/*.deb
+output/*/*.rpm
+output/*/source-manifest.json
 output/*/*.buildinfo
 output/*/SHA256SUMS
 __pycache__/
