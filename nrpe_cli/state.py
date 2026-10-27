@@ -39,21 +39,27 @@ def reports(root):
     return sorted(result, key=lambda item: item.get("started", item["id"]), reverse=True)
 
 
+def _sha256(path):
+    """Hash package payloads without loading entire artifacts into memory."""
+    checksum = hashlib.sha256()
+    with path.open("rb") as source:
+        for block in iter(lambda: source.read(1024 * 1024), b""):
+            checksum.update(block)
+    return checksum.hexdigest()
+
+
 def artifact(root, target):
     directory = root / "output" / target
     packages = package_files(root, target)
     if len(packages) != 1:
         raise RuntimeError(f"{target}: expected one server package, found {len(packages)}. Run build first.")
     path = packages[0]
-    checksum = hashlib.sha256()
-    with path.open("rb") as source:
-        for block in iter(lambda: source.read(1024 * 1024), b""):
-            checksum.update(block)
-    digest = checksum.hexdigest()
-    # The build writes exactly one checksum entry for the exported server package.
+    digest = _sha256(path)
+    # The server checksum must be present; SLES also records its companion RPM.
     expected = f"{digest}  {path.name}"
     checksums = directory / "SHA256SUMS"
-    if not checksums.is_file() or expected not in checksums.read_text(encoding="utf-8").splitlines():
+    entries = checksums.read_text(encoding="utf-8").splitlines() if checksums.is_file() else []
+    if expected not in entries:
         raise RuntimeError(f"{target}: package checksum is missing or incorrect. Rebuild the package.")
     config = TARGET_CONFIG[target]
     result = {"file": path.name, "sha256": digest,
@@ -63,12 +69,8 @@ def artifact(root, target):
         if len(helpers) != 1:
             raise RuntimeError("sles15sp4: expected one companion user-package RPM. Rebuild the target.")
         helper = helpers[0]
-        checksum = hashlib.sha256()
-        with helper.open("rb") as source:
-            for block in iter(lambda: source.read(1024 * 1024), b""):
-                checksum.update(block)
-        helper_digest = checksum.hexdigest()
-        if f"{helper_digest}  {helper.name}" not in checksums.read_text(encoding="utf-8").splitlines():
+        helper_digest = _sha256(helper)
+        if f"{helper_digest}  {helper.name}" not in entries:
             raise RuntimeError("sles15sp4: companion package checksum is missing or incorrect.")
         result["companions"] = [{"file": helper.name, "sha256": helper_digest}]
     return result
