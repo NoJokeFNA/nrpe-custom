@@ -1,273 +1,184 @@
 # nrpe-custom
 
-Build Debian `nagios-nrpe-server` packages and a SLES 15 SP4
-`nrpe` RPM using the distribution packaging recipes, with command arguments
-compiled in and runtime argument handling disabled by default.
+Build and test custom NRPE packages for Debian and SUSE Linux Enterprise Server
+(SLES). Use a keyboard-driven menu or scriptable CLI to rebuild distribution
+packages with command argument support, then verify the result in an isolated
+container.
 
-## Requirements
+**Argument support is compiled in, but remains disabled at runtime by default.**
+Enabling it on a server is an explicit administrator decision. Bash command
+substitution stays disabled.
 
-- Python 3.9 or newer; no third-party Python dependencies.
-- Docker Engine with BuildKit, Linux containers, and Docker Compose 2.17 or newer.
-- Access from containers to the matching Debian or SLES/OBS repositories.
-- Disk space for builder images, source trees, test images, and packages.
-
-Any editor can be used. On Windows, Docker Desktop with Linux containers is a
-suitable Docker runtime. ARM hosts need support for `linux/amd64` emulation.
-Bash is needed inside containers and for optional local shell syntax checks.
+This is an independent project. Its packages are unofficial custom builds, not
+releases supported or certified by Debian, SUSE, or Nagios. Public binary release
+preparation and the project's own license selection are
+[deferred](docs/release-plan.md).
 
 ## Quick start
 
-**Use `nrpe.py` as the main entry point.** It coordinates this project's Compose
-files, checks Docker readiness, and records results. Direct Compose commands
-bypass the controller's checks, logs, and target locks.
-
-From the repository root on Windows, Linux, or macOS:
+Install Git, **Python 3.9+**, and Docker Engine with Linux containers, BuildKit,
+and **Docker Compose 2.17+**. On Windows, start Docker Desktop and wait for its
+Linux engine to become ready. Make sure `python3 --version` works in your shell.
+ARM hosts need `linux/amd64` emulation. Allow disk space for separate builder and
+test images; Docker's `vfs` storage driver can consume considerably more space.
 
 ```sh
+git clone https://github.com/NoJokeFNA/nrpe-custom.git
+cd nrpe-custom
 python3 nrpe.py doctor
 python3 nrpe.py verify debian12
 ```
 
-Ensure that `python3 --version` reports Python 3.9 or newer. On Windows, make
-sure your Python installation provides `python3` in PATH.
+This builds the package and tests its installation and NRPE argument handling.
+Find packages in `output/<target>/` and run reports in `.nrpe/runs/<run-id>/`.
+Builds and tests install packages inside containers, not on your workstation.
 
-Run without arguments for an interactive action and target menu:
+Prefer `nrpe.py`: it coordinates this project's Compose files, checks Docker,
+protects targets against concurrent runs, and records logs and test results.
 
-```powershell
+## Interactive menu
+
+Install the optional menu dependencies in your Python environment:
+
+```sh
+python3 -m pip install -r requirements-menu.txt
 python3 nrpe.py
 ```
 
-The menu performs one selected action and exits. Without an interactive terminal,
-no arguments prints help and does not prompt. All CLI messages are in English.
-Use `--help` or `<command> --help` for command-specific usage.
+Use **↑/↓ and Enter** to navigate, **Space** to toggle targets, **A** to select all,
+and **Esc** to go back. Select build/test actions, diagnose Docker, inspect status,
+or choose a previous run's logs. Select SLES media through a directory browser.
+The menu reviews your choices before running and returns after each command.
+Colors highlight selection and errors; `NO_COLOR` enables monochrome output.
+See [menu installation and controls](docs/menu.md), including virtual environments.
+
+Direct commands do not require the menu dependencies. Without an interactive
+terminal, launching without arguments prints help and never prompts.
+
+## Supported targets
+
+All package outputs target `linux/amd64` (`x86_64` for RPM).
+
+| Target | Distribution | Package | Source policy |
+| --- | --- | --- | --- |
+| `debian11` | Debian 11 Bullseye | `nagios-nrpe-server` `.deb` | Discover through APT; archived security packages |
+| `debian12` | Debian 12 Bookworm | `nagios-nrpe-server` `.deb` | Discover through APT |
+| `debian13` | Debian 13 Trixie | `nagios-nrpe-server` `.deb` | Discover through APT |
+| `debian14` | Debian 14 Forky | `nagios-nrpe-server` `.deb` | Discover through APT; moving testing suite |
+| `sles15sp4` | SLES 15 SP4 | `nrpe` `.rpm` + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
+
+Target availability depends on distribution repositories and image availability.
+A listed target is not a promise of ongoing upstream security maintenance. In
+particular, historical archives do not extend a distribution's support period.
+The SLES recipe uses SLE/Package Hub dependencies and no Leap replacement image
+or repository. An installation ISO is optional; see [the SLES guide](docs/sles15sp4.md).
+
+Debian 11 and SLES 15 SP4 passed build, fresh-container installation, and TLS
+argument tests during initial validation. Use your own run reports to establish
+which exact package bytes have passed; target support is not a passing test badge.
 
 ## Commands
 
-| Command | Purpose |
+| Command | Action |
 | --- | --- |
-| `doctor` | Check required project files, Docker connectivity, Linux container mode, Compose v2, and both Compose configurations |
-| `build <targets>` | Build packages, run in-container package checks, and verify exported checksums |
-| `test <targets>` | Install and test existing packages without rebuilding them |
-| `verify <targets>` | Build and integration-test each target before proceeding to the next |
-| `status` | Show current packages, SHA-256 hashes, matching test results, and target locks without needing Docker |
-| `logs --last` | Display output from the latest recorded workflow run |
-| `logs --run <id>` | Display output from a particular recorded workflow run |
+| `python3 nrpe.py doctor` | Check project files, Docker, Linux containers, and Compose |
+| `python3 nrpe.py verify debian12` | Build, validate, install, and integration-test |
+| `python3 nrpe.py build debian12` | Build and validate the exported package |
+| `python3 nrpe.py test debian12` | Install and test an existing local package |
+| `python3 nrpe.py status` | Show artifacts, matching test results, and locks; no Docker needed |
+| `python3 nrpe.py logs --last` | Show the most recent run's log |
+| `python3 nrpe.py logs --run <id>` | Show a specific run's log |
 
-Select one target, multiple targets, or `all` by itself:
+Commands accept multiple targets or `all` by itself. `all` includes SLES.
+Use `--help` or `<command> --help` for details.
 
-```powershell
-python3 nrpe.py verify debian12 debian13
-python3 nrpe.py verify all
-python3 nrpe.py test debian14
-python3 nrpe.py status
-python3 nrpe.py logs --last
+Existing packages require confirmation before rebuilding. For automation, use
+`--rebuild` explicitly. `--pull` checks for updated base images; it does not check
+whether a built NRPE package is current. Debian source versions are discovered
+when building; SLES sources stay pinned until reviewed and updated.
+
+```sh
+python3 nrpe.py verify debian12 debian13 --pull
+python3 nrpe.py verify sles15sp4 --rebuild
+python3 nrpe.py test debian11
 ```
 
-SLES builds use SLE/Package Hub binary dependencies and pinned OBS sources, with
-no Leap base image or Leap repository added. Original SUSE signatures and source
-checksums are verified. If you want to supply official SP4 Full Media1 as an
-additional package source, extract it outside the checkout and use:
+The compatibility entry point `build.py` still works. See the
+[workflow reference](docs/workflow.md) for flags, outputs, caching, logs,
+checksums, locks, and interruption handling.
 
-```powershell
-python3 nrpe.py verify sles15sp4 --sles-media "C:\SLES15-SP4"
+## How it works
+
+```mermaid
+flowchart TD
+    U[Menu or direct CLI] --> C[Controller: Docker checks and target lock]
+    C --> A{Action}
+    A -->|build or verify| B[Builder: fetch, build, validate, and export]
+    B --> P[Controller: verify artifact identity and checksums]
+    A -->|test existing package| P
+    P --> T{Integration requested?}
+    T -->|test or verify| I[Fresh matching runtime container]
+    I --> D[TLS request: arguments rejected with runtime setting 0]
+    D --> E[TLS requests: exact argument responses with runtime setting 1]
+    E --> R[Artifact-bound report and logs]
+    T -->|build only| R
 ```
 
-The same option is supported by `build`, `test`, and the compatibility wrapper.
-The media are mounted read-only during image builds and container runs. See
-[the SLES guide](docs/sles15sp4.md) for download and repository installation steps.
+Each target has a builder image and a separate runtime test image. This prevents
+compilers and build dependencies from masking missing runtime dependencies.
+Docker reuses cached layers; images do not need to be recreated on every run.
+The client is `check_nrpe`, as used by Nagios; a complete Nagios server is not
+needed to test this protocol. Tests use TLS over loopback, publish no NRPE port,
+and leave the packaged default configuration unchanged.
 
-Use `test` for packages you have already built locally. It checks the bytes in
-`output/`; it does not establish that they were built from the current checkout.
-`doctor` checks local prerequisites, not connectivity to package repositories from
-build containers. If Docker is unavailable on Windows, the controller suggests
-starting Docker Desktop, enabling Linux containers, and waiting for engine
-readiness. It does not start or restart Docker Desktop automatically.
+**Installation success alone does not prove argument handling works.** The test
+must reject arguments with `dont_blame_nrpe=0`, then return exact results for two
+different argument pairs with `dont_blame_nrpe=1`. Tests do not cover a full
+systemd boot, production certificates, or external Nagios connectivity.
 
-If a selected build target already has a server package, the controller asks for
-confirmation in an interactive terminal; the default answer keeps the package.
-Without a terminal it refuses to overwrite existing output unless you explicitly
-pass `--rebuild`:
+See [architecture and file responsibilities](docs/architecture.md) for the
+component map and [network requirements](docs/network.md) for firewall planning.
 
-```powershell
-python3 nrpe.py verify debian12 --rebuild
-python3 nrpe.py verify all --rebuild --pull
-python3 nrpe.py test debian14 --pull
+## Using a built package
+
+On Debian, copy the package to the matching server and install it with APT so
+runtime dependencies are resolved:
+
+```sh
+sudo apt install ./nagios-nrpe-server_<version>_amd64.deb
 ```
 
-`--pull` checks for updated base images before building the selected
-builder/test images. Unchanged layers still use Docker's cache. Without this
-option Docker may reuse a locally available base image. This is separate from
-the NRPE source version: Debian builds discover it through APT, while the
-SLES recipe uses a reviewed, pinned OBS revision. Existing
-packages are not automatically declared current merely because a base image is
-unchanged. The controller does not yet compare a remote source version and full
-build recipe against an existing package to decide whether rebuilding is needed.
-The compatibility wrapper also accepts `--rebuild` and `--pull`.
+For SLES, use the [SLES installation notes](docs/sles15sp4.md), including the
+companion user package and the availability of historical repositories.
 
-The previous commands remain supported through a compatibility wrapper:
+Review the server's configuration before enabling arguments:
 
-| Previous command | Preferred command |
-| --- | --- |
-| `build.py debian12` | `nrpe.py build debian12` |
-| `build.py debian12 --test` | `nrpe.py verify debian12` |
-| `build.py debian12 --test-only` | `nrpe.py test debian12` |
-
-## Targets and package builds
-
-| Target | Distribution | Architecture | Output directory |
-| --- | --- | --- | --- |
-| `debian11` | Debian 11 Bullseye | amd64 | `output/debian11/` |
-| `debian12` | Debian 12 Bookworm | amd64 | `output/debian12/` |
-| `debian13` | Debian 13 Trixie | amd64 | `output/debian13/` |
-| `debian14` | Debian 14 Forky | amd64 | `output/debian14/` |
-| `sles15sp4` | SLES 15 SP4 | x86_64 | `output/sles15sp4/` |
-
-`all` includes every target, including the SLES target. To validate
-only Debian, list `debian11 debian12 debian13 debian14` explicitly.
-
-Debian 11's security package files have moved to `archive.debian.org`; the setup
-helper updates that security repository URL in both builder and test images.
-Suite names, signing keys, signature checks, and validity checks remain enabled.
-Debian 11 has been built and installation/TLS argument tests have passed here
-with `4.0.3-1+withargs1`. This is historical archive availability, not a promise
-of ongoing security updates for this old release.
-
-SLES uses an actual SLES 15 SP4 BCI base, not a Debian or Leap replacement.
-Its RPM recipe, pinned sources, prerequisites, and validation limits
-are documented in [SLES 15 SP4](docs/sles15sp4.md).
-
-Each Debian target uses a corresponding Debian container with a shared Dockerfile.
-The build enables source repositories, installs build dependencies, and fetches
-verified official `nagios-nrpe` sources from the selected suite. Source versions
-are discovered dynamically; Forky is a moving testing suite.
-
-The build changes only the intended configure option in `debian/rules` and the
-custom version entry in `debian/changelog`. It rejects unsupported packaging
-layouts. `dpkg-buildpackage` produces binary packages; the exported server keeps
-the name `nagios-nrpe-server` and uses `${original_version}+withargs1`.
-Do not implement versioning by renaming finished packages. Increment the custom
-revision when changing the recipe for the same official source version.
-
-The build verifies package identity, version, architecture, executable contents,
-and configure macros before exporting the server `.deb`, `SHA256SUMS`, and
-available `.buildinfo`. The client plugin is not exported. Existing valid output
-is retained until a replacement build passes its package checks.
-
-## Installation and argument integration tests
-
-`verify` builds and tests a package; `test` exercises an existing artifact.
-Separate opt-in services in `compose.test.yaml` use `Dockerfile.test` to:
-
-1. Require exactly one server package and verify its checksum, identity,
-   architecture, and custom version suffix.
-2. Install that local `.deb` and its dependencies in a fresh matching distribution
-   container, then check the installed version.
-3. Confirm that the installed package keeps `dont_blame_nrpe=0` by default.
-4. Start NRPE with a disposable configuration and confirm that ordinary requests
-   succeed while argument requests are rejected.
-5. Set `dont_blame_nrpe=1` only in the temporary configuration, restart NRPE, and
-   verify exact responses for the argument pairs `alpha beta` and `gamma delta`.
-
-Debian's `nagios-nrpe-plugin` and SUSE's `monitoring-plugins-nrpe` supply
-`check_nrpe`, the client used by Nagios. A full Nagios scheduler or web interface is unnecessary for this protocol
-test. Client and server run inside the same container over loopback using TLS
-and a short-lived test certificate. No NRPE port is published. Package outputs
-are mounted read-only, and the installed default configuration is unchanged.
-
-Each target has a builder image and a separate minimal test image. Keeping tests
-separate ensures that compiler and build dependencies cannot hide missing runtime
-dependencies during package installation. Common Debian layers are shared by
-Docker, and cached images are reused. Tests do not need a full Nagios server image.
-
-An installation success alone does **not** mean the argument tests passed. The
-log explicitly reports argument rejection with `dont_blame_nrpe=0` and exact
-argument responses with `dont_blame_nrpe=1`.
-
-These tests need Debian repository access and run NRPE directly. They do not
-validate systemd startup, external network access, production certificates, or a
-complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 15 SP4 has also passed a full controller verify run with RPM build,
-installation, and TLS argument tests; see its target notes. Do not interpret passing
-unit tests as successful package builds for every target.
-
-## Results, logs, and concurrent runs
-
-Each build/test/verify invocation receives a unique run ID and writes:
-
-```text
-.nrpe/runs/<run-id>/
-├── report.json
-└── run.log          # Created when a target reaches its workflow phases
-```
-
-The JSON report includes UTC timestamps, action, per-target build/package/test
-outcomes, exit code, and the tested artifact's filename, version from its filename,
-and SHA-256 hash. A summary distinguishes passed, failed, interrupted, running,
-and unrun phases. The first failure stops remaining targets; failed builds never
-test old output files. `logs` also shows errors that occur before container output
-exists. Local state and logs are ignored by Git and may contain paths or build
-output; review them before sharing.
-
-`status` matches test reports to the current package identity and hash. Replacing
-a package with different bytes invalidates its previous passed test status. A
-matching hash describes tested package bytes, not source provenance.
-
-The controller locks the target during each operation, preventing simultaneous
-controller builds or tests of that target. Different targets may run concurrently.
-Direct Compose commands do not participate in these locks; avoid mixing them
-with controller runs that use the same outputs.
-
-`Ctrl+C` stops the run's Compose process and removes only its uniquely named
-container. It does not run `compose down` or stop unrelated containers. If cleanup
-fails, the target lock is retained. After a terminal crash or forced process kill,
-`status` may show a lock and a report may remain `running`. Inspect
-`.nrpe/locks/<target>/owner.json`, the report, and `docker ps -a` before manually
-removing a stale lock directory. Never remove a lock while its run or container
-is still active. Existing Compose networks and builder caches are retained.
-
-## Target server configuration
-
-The custom packages compile argument support while leaving runtime arguments
-disabled. On a real target server, deliberately configure `/etc/nagios/nrpe.cfg`
-on Debian, or `/etc/nrpe.cfg` for this SLES/OBS recipe:
+| Distribution | Configuration | Service |
+| --- | --- | --- |
+| Debian | `/etc/nagios/nrpe.cfg` | `nagios-nrpe-server` |
+| SLES/OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
 
 ```ini
 allowed_hosts=<nagios-server-ip>,127.0.0.1,::1
 dont_blame_nrpe=1
 ```
 
-Replace the placeholder with the permitted Nagios server's address, review
-firewall rules, TLS, command definitions, and argument validation, then restart
-`nagios-nrpe-server` on Debian or `nrpe` on SLES. Bash command substitution must remain disabled. Build and
-test containers never apply these settings to the development host.
+Replace the placeholder, define permitted commands with validated arguments,
+configure trusted TLS certificates, and restrict the firewall to the intended
+monitoring servers before restarting the service. Keep Bash command substitution
+disabled. See [deployment security](docs/security.md).
 
-## Development and validation
+## Development and project documentation
 
-```sh
-python3 -m unittest discover -s tests -v
-bash -n scripts/*.sh
-python3 nrpe.py doctor
-```
+- [Menu guide](docs/menu.md): installation, keys, accessibility, and terminal behavior.
+- [Workflow reference](docs/workflow.md): commands, artifacts, reports, and troubleshooting.
+- [Architecture](docs/architecture.md): control flow and every script's purpose.
+- [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
+- [SLES 15 SP4](docs/sles15sp4.md): provenance, dependencies, media, and installation.
+- [Contributing](CONTRIBUTING.md): development and meaningful validation.
+- [Security](docs/security.md): argument risks and safe issue reporting.
+- [Deferred release plan](docs/release-plan.md): license review and release preparation.
 
-For affected targets, run `python3 nrpe.py verify <target>`. Unit tests cover CLI
-routing, Docker diagnostics, run reports, artifact identity, locking, cleanup,
-and the Debian/RPM recipe transformations without requiring Docker or network access.
-They do not replace real package and integration tests. Windows-specific error
-messages and process handling also need validation on Windows.
-
-Implementation is in `nrpe_cli/`; `nrpe.py` is the public entry point. Docker
-runs build and test scripts from `scripts/`. Root [AGENTS.md](AGENTS.md) and the
-additional [script](scripts/AGENTS.md) and [test](tests/AGENTS.md) instructions apply.
-Write code, comments, documentation, and commits in English; follow
-[Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
-
-## Repeatability and updates
-
-Current Debian sources and mutable image tags give a repeatable method, not
-bit-for-bit reproducible packages. Audit-ready releases require recording or
-pinning image digests, repository snapshots, source versions, and dependencies.
-Retain checksums and build information with released packages. Monitor Debian
-security updates and rebuild custom packages when official sources change; do
-not assume APT automatically replaces every custom version as intended.
-
-Official sources: [Debian NRPE sources](https://sources.debian.org/src/nagios-nrpe/)
-and [source package information](https://packages.debian.org/src:nagios-nrpe).
+These recipes provide a repeatable workflow, not a claim of bit-for-bit
+reproducibility. Sources, image tags, and repositories can change. Review
+upstream security updates and retain provenance with the artifacts you deploy.
