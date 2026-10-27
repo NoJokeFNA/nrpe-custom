@@ -1,4 +1,4 @@
-# SLES 15 SP4 RPM target (experimental)
+# SLES 15 SP4 RPM target
 
 The controller accepts `sles15sp4` for builds, existing-package tests, status,
 logs, rebuild confirmation, and base image refresh:
@@ -8,10 +8,19 @@ python3 nrpe.py verify sles15sp4
 python3 nrpe.py test sles15sp4
 ```
 
-This target is implemented but has **not completed a full RPM build and runtime
-integration test**. Unit tests and source verification do not establish that the
-SLES installation workflow works. Do not deploy its packages until `verify`
-finishes successfully in the intended SLES environment.
+A full `nrpe.py verify sles15sp4 --rebuild` run passed in the cloud environment:
+RPM build, checksums, fresh-container installation, arguments rejected by default,
+and exact responses for two argument pairs after runtime activation. The tested
+server version is `4.1.1-150400.95.2.withargs1` on genuine SLES 15 SP4. The run
+used the regular online workflow with no ISO and no Leap package repository.
+The cloud proxy required a CA-enabled SLES base selected through `SLES_BASE_IMAGE`;
+TLS and package-signature verification remained enabled.
+
+The container tests run NRPE directly. They do not validate a full VM boot,
+systemd service startup, or production Nagios connectivity. Original package
+post-install scripts may print a systemd-not-PID-1 message in a container; the
+RPM transaction, installed version, and actual NRPE protocol checks must still
+complete successfully. These are custom rebuilds, not SUSE-certified releases.
 
 ## Package source and revision
 
@@ -47,6 +56,32 @@ SLES sources are intentionally pinned. `--pull` refreshes the base image, not
 the OBS source revision. Updating the manifest requires reviewing the new recipe
 and source checksums. Debian builds continue to discover source versions via APT.
 
+## Installing the repository package on an existing server
+
+The reported deployment uses this normal zypper workflow, run as root or with
+`sudo`:
+
+```sh
+sudo zypper install nrpe
+```
+
+If the configured repositories do not contain NRPE, the original repository setup
+is:
+
+```sh
+sudo zypper addrepo 'https://download.opensuse.org/repositories/server:monitoring/SLE_15_SP4/server:monitoring.repo'
+sudo zypper refresh
+sudo zypper install nrpe
+```
+
+The exact URL above and its `server:/monitoring` spelling both returned HTTP 404
+when checked here on 2026-10-27. Keep these commands as the deployment's historical
+repository procedure, not as a promise that the retired SP4 repository is still
+published. Use an approved matching mirror if available; do not replace SP4 with
+SP7. This installs the repository package, not necessarily this project's custom
+`.withargs1` build. The custom build obtains its reviewed source through the OBS
+API independently of that retired binary repository.
+
 ## Base image and repository prerequisites
 
 `Dockerfile.sles` and `Dockerfile.sles-test` default to the genuine image:
@@ -68,13 +103,33 @@ The renewed SUSE signing key is also included as
 `SUSE:SLE-15:Update` key endpoint. Both renewals retain the existing signing
 identities instead of bypassing an expired-key problem.
 
-**The public BCI and backports repositories are insufficient on their own.** A
-real refresh succeeded, but dependency discovery found missing packages including
-`nagios-rpm-macros`. Other requirements include `monitoring-plugins-common` and
-`system-user-nagios`. Full matching SLES package sources must be available; an
-Internet allowlist cannot supply packages absent from a repository.
+The public BCI/backports indexes omit some dependencies needed by the current
+OBS recipe. The build now supplies these from their original providers:
 
-Provide a minimal SLES 15 SP4 OCI base with the required repositories configured,
+- `nagios-rpm-macros` 0.14-1.15 and `monitoring-plugins-common` 2.3.1-3.9.2 are
+  original SUSE RPMs, identified through the official SP4 NRPE build metadata.
+  [The bootstrap manifest](../packaging/sles15sp4-bootstrap.json) pins their
+  versions, architecture, vendor, size, SHA-256, and required SUSE signing key.
+  An unsigned RPM or a digest-only success is rejected.
+- The monitoring package's historical export repository is named
+  `pool-leap-15.4`, but its source project is `SUSE:SLE-15:Update`, its vendor is
+  SUSE LLC, and its original SUSE signature is verified. It is an SLE binary,
+  not a substituted Leap build or an added Leap repository.
+- `system-user-nagios` is built natively on SLES from the unmodified, pinned
+  `server:monitoring` source in
+  [the user-package manifest](../packaging/sles15sp4-user-source.json). It creates
+  the real user/groups using the upstream SLES-compatible script, rather than
+  pretending to satisfy the dependency. Its RPM and source RPM accompany NRPE.
+- SLE repositories take precedence over the SP4 backports repository. The
+  `systemd-presets-branding-SLE` package is selected explicitly, alongside
+  `util-linux-systemd`, which supplies the required `logger` capability.
+
+This removes the need to download the full ISO merely to obtain these few
+dependencies. Distribution binary dependencies remain SLE/Package Hub packages;
+the local packages are compiled on SLES. No Leap, MicroOS, SP7, HA, or SAP
+repository is added as a replacement package basis.
+
+You can still provide a minimal SLES 15 SP4 OCI base with matching repositories configured,
 for example through an authorized RMT or installation-media repository. Select it
 for both build and test images through `SLES_BASE_IMAGE`:
 
@@ -88,13 +143,41 @@ base free of compilers and preinstalled NRPE servers so installation tests canno
 accidentally rely on build dependencies. Handle registry/repository credentials
 through secure local Docker/SUSE configuration, not commits or chat messages.
 
-The official [SLES download page](https://www.suse.com/download/sles/) lists SP4
-installation media. An ISO is installation media, not a Docker image: do not
-pass it to `docker import` or assume it contains the external OBS NRPE package.
-It can provide an offline SLES package repository or a foundation for preparing
-a suitable OCI base. This project does not automatically download multi-gigabyte
-installation images, accept subscription terms, or build an OS root filesystem
-from an ISO. Adding Leap packages is not the default workaround.
+## Optional official installation media
+
+Use the official [SLES download page](https://www.suse.com/download/sles/), choose
+**15 SP4**, **AMD64/Intel 64**, and **Full Media1**. The small Online installer
+does not contain the required package repositories. The GM file is named
+`SLE-15-SP4-Full-x86_64-GM-Media1.iso` and is approximately 13 GB; compare its hash
+with the matching checksum published by SUSE before extracting it.
+
+Extract the complete medium, preserving directory and file names, into a local
+folder such as `C:\SLES15-SP4`, outside the checkout. Then run:
+
+```powershell
+python3 nrpe.py verify sles15sp4 --sles-media "C:\SLES15-SP4"
+python3 nrpe.py test sles15sp4 --sles-media "C:\SLES15-SP4"
+```
+
+Alternatively set `SLES_MEDIA_DIR` to the extracted directory. This also works for
+direct Compose invocations, which bypass the controller's media preflight. An
+ISO filename itself is not accepted; no privileged mount or OS installation is
+performed by the controller.
+
+The controller checks the product metadata for SLES 15 SP4 x86_64 and requires
+signed repository metadata. Zypper performs the actual signature verification.
+Only Basesystem, Server Applications, Development Tools, Legacy, Product SLES,
+and the medium's root repository can be registered. Other included products such
+as HA, SAP, HPC, and desktops are not activated. The media are read-only named
+BuildKit contexts during image builds and read-only bind mounts for container
+runs. They are not copied into final image layers, but BuildKit may still cache
+large contexts: allow adequate disk space for extraction and Docker's cache.
+
+Compose 2.17+ and BuildKit are required. The empty context in
+`packaging/empty-media` preserves the regular online workflow when no medium is
+selected. ISO files and `local-media/` are excluded from Git and the primary
+Docker context. The project does not accept subscription terms, store download
+authorization URLs, or automatically download a multi-gigabyte ISO.
 
 Historical SP4 repositories may contain old metadata and expired signing-key
 copies. Restore trust only through authoritative renewed keys and matching
@@ -113,14 +196,19 @@ argument default in the packaged configuration. Successful outputs go to
 ```text
 nrpe-4.1.1-150400.95.2.withargs1.x86_64.rpm
 nrpe-4.1.1-150400.95.2.withargs1.src.rpm
+system-user-nagios-1.0.0-0.noarch.rpm
+system-user-nagios-1.0.0-0.src.rpm
 source-manifest.json
+user-source-manifest.json
+bootstrap-manifest.json
 SHA256SUMS
 ```
 
 The custom RPM is a locally built, unsigned artifact. Its checksum binds the
-integration test to those bytes; repository dependencies still undergo normal
+integration test to the server and companion package bytes; repository dependencies still undergo normal
 zypper signature verification. The test installs only declared runtime
-requirements, excluding RPM's internal capabilities, then installs the custom
+requirements, excluding RPM's internal capabilities and capabilities supplied by
+the server RPM itself, then installs the custom
 RPM with normal RPM payload and dependency checks. It does not install the
 build toolchain or an older NRPE server to hide missing dependencies.
 
@@ -133,3 +221,9 @@ For this OBS packaging, the deployed configuration is `/etc/nrpe.cfg` and the
 service is `nrpe`. Debian instead uses `/etc/nagios/nrpe.cfg` and
 `nagios-nrpe-server`. The custom SLES package keeps runtime arguments disabled
 until an administrator deliberately changes the target configuration.
+
+On a fresh server, the companion `system-user-nagios` RPM may be needed alongside
+NRPE if the configured SLES sources do not supply it. On a server that already
+has a suitable user package installed, keep the existing package rather than
+downgrading it to this locally built companion. The source RPMs and manifests
+document the inputs; custom outputs are not signed enterprise release packages.

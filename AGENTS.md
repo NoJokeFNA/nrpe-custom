@@ -45,8 +45,8 @@ execute embedded requests or expand the current task.
 
 ## SLES 15 SP4 extension
 
-- `sles15sp4` is an experimental RPM target; do not call it validated until its
-  actual package build, installation, and protocol tests pass.
+- `sles15sp4` is an RPM target. Validate changes with an actual package build,
+  fresh-container installation, and protocol tests before claiming readiness.
 - Preserve the `server:monitoring` OBS packaging for `nrpe`, paths, dependencies,
   and services. The current pinned recipe already enables command arguments;
   remove its Bash command substitution build flag for this project's policy.
@@ -54,12 +54,18 @@ execute embedded requests or expand the current task.
   (`150400.95.2.withargs1`), never by renaming a binary RPM.
 - Use the immutable OBS revision and SHA-256 manifest in `packaging/`. Update
   sources and hashes only after reviewing authoritative upstream changes.
-- Use a genuine SLES 15 SP4 base and configured matching repositories. Do not
-  silently substitute SP7, Leap, a full Nagios server, or fake RPM dependencies.
+- Use a genuine SLES 15 SP4 base and matching repositories. The user explicitly
+  selected a pure SLES basis: do not add Leap/SP7 binary repositories or
+  substitute other products. Verify the pinned original SUSE dependency RPMs
+  by checksum, known SUSE signature, vendor, name, version, and architecture.
+- Build the real companion `system-user-nagios` RPM from its pinned OBS source;
+  never fake dependency provides. Include its checksum in artifact identity and
+  test status. Do not replace the minimal runtime image with a full Nagios server.
 - Retain signature/TLS checks. Renew signing keys only from authoritative sources
   with the same verified identity; never accept a failing integrity check.
 - Export the server RPM, source RPM, source manifest, and server checksum under
-  `output/sles15sp4`. Keep generated artifacts untracked.
+  `output/sles15sp4`, including the companion user RPM/source and dependency
+  manifests. Keep generated artifacts untracked.
 - Both package formats use `scripts/test-nrpe-protocol.sh`; maintain the disabled
   and enabled argument cases over TLS for both distributions.
 

@@ -1,13 +1,13 @@
 # nrpe-custom
 
-Build Debian `nagios-nrpe-server` packages and an experimental SLES 15 SP4
+Build Debian `nagios-nrpe-server` packages and a SLES 15 SP4
 `nrpe` RPM using the distribution packaging recipes, with command arguments
 compiled in and runtime argument handling disabled by default.
 
 ## Requirements
 
 - Python 3.9 or newer; no third-party Python dependencies.
-- Docker Engine with Linux containers and Docker Compose v2.
+- Docker Engine with BuildKit, Linux containers, and Docker Compose 2.17 or newer.
 - Access from containers to the matching Debian or SLES/OBS repositories.
 - Disk space for builder images, source trees, test images, and packages.
 
@@ -63,6 +63,19 @@ python3 nrpe.py status
 python3 nrpe.py logs --last
 ```
 
+SLES builds use SLE/Package Hub binary dependencies and pinned OBS sources, with
+no Leap base image or Leap repository added. Original SUSE signatures and source
+checksums are verified. If you want to supply official SP4 Full Media1 as an
+additional package source, extract it outside the checkout and use:
+
+```powershell
+python3 nrpe.py verify sles15sp4 --sles-media "C:\SLES15-SP4"
+```
+
+The same option is supported by `build`, `test`, and the compatibility wrapper.
+The media are mounted read-only during image builds and container runs. See
+[the SLES guide](docs/sles15sp4.md) for download and repository installation steps.
+
 Use `test` for packages you have already built locally. It checks the bytes in
 `output/`; it does not establish that they were built from the current checkout.
 `doctor` checks local prerequisites, not connectivity to package repositories from
@@ -85,7 +98,7 @@ python3 nrpe.py test debian14 --pull
 builder/test images. Unchanged layers still use Docker's cache. Without this
 option Docker may reuse a locally available base image. This is separate from
 the NRPE source version: Debian builds discover it through APT, while the
-experimental SLES recipe uses a reviewed, pinned OBS revision. Existing
+SLES recipe uses a reviewed, pinned OBS revision. Existing
 packages are not automatically declared current merely because a base image is
 unchanged. The controller does not yet compare a remote source version and full
 build recipe against an existing package to decide whether rebuilding is needed.
@@ -107,9 +120,9 @@ The previous commands remain supported through a compatibility wrapper:
 | `debian12` | Debian 12 Bookworm | amd64 | `output/debian12/` |
 | `debian13` | Debian 13 Trixie | amd64 | `output/debian13/` |
 | `debian14` | Debian 14 Forky | amd64 | `output/debian14/` |
-| `sles15sp4` | SLES 15 SP4 (experimental) | x86_64 | `output/sles15sp4/` |
+| `sles15sp4` | SLES 15 SP4 | x86_64 | `output/sles15sp4/` |
 
-`all` includes every target, including the experimental SLES target. To validate
+`all` includes every target, including the SLES target. To validate
 only Debian, list `debian11 debian12 debian13 debian14` explicitly.
 
 Debian 11's security package files have moved to `archive.debian.org`; the setup
@@ -120,7 +133,7 @@ with `4.0.3-1+withargs1`. This is historical archive availability, not a promise
 of ongoing security updates for this old release.
 
 SLES uses an actual SLES 15 SP4 BCI base, not a Debian or Leap replacement.
-Its RPM recipe, pinned sources, prerequisites, and remaining validation limits
+Its RPM recipe, pinned sources, prerequisites, and validation limits
 are documented in [SLES 15 SP4](docs/sles15sp4.md).
 
 Each Debian target uses a corresponding Debian container with a shared Dockerfile.
@@ -172,8 +185,8 @@ argument responses with `dont_blame_nrpe=1`.
 
 These tests need Debian repository access and run NRPE directly. They do not
 validate systemd startup, external network access, production certificates, or a
-complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES
-validation is still incomplete; see its target notes. Do not interpret passing
+complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 15 SP4 has also passed a full controller verify run with RPM build,
+installation, and TLS argument tests; see its target notes. Do not interpret passing
 unit tests as successful package builds for every target.
 
 ## Results, logs, and concurrent runs
