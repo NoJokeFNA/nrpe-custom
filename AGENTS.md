@@ -68,9 +68,9 @@ docker compose -f compose.test.yaml --profile integration config --quiet
 For build changes, validate each affected Debian target with:
 
 ```sh
-python3 build.py debian12 --test
-python3 build.py debian13 --test
-python3 build.py debian14 --test
+python3 nrpe.py verify debian12
+python3 nrpe.py verify debian13
+python3 nrpe.py verify debian14
 ```
 
 Only run applicable commands; report missing files, tools, or Docker access as
@@ -80,9 +80,14 @@ options, and executable contents; use an isolated matching Debian environment
 for package installation and NRPE client/server integration tests. Distinguish
 passed, failed, skipped, and unrun checks in reports.
 
-Prefer `build.py` over direct Compose commands for Docker preflight and build/test
-sequencing. On Windows, use `py -3` instead of `python3`. Use `--test-only` to test
-existing artifacts without rebuilding them; do not claim they match current code.
+Prefer `nrpe.py` over direct Compose commands for Docker diagnostics, workflow
+sequencing, logs, and artifact-bound status. On Windows, use `py -3` instead of
+`python3`. Use `nrpe.py test <target>` for existing artifacts without rebuilding;
+do not claim they match current code. `build.py` is a compatibility wrapper.
+Keep local run reports and locks under ignored `.nrpe/`. Never use project-wide
+container cleanup on interruption or silently override an existing target lock.
+Require explicit confirmation or `--rebuild` before rebuilding existing outputs.
+`--pull` refreshes base images; it does not prove a package's source is current.
 The integration services install the package in a disposable matching Debian
 container and exercise `check_nrpe` over TLS with arguments disabled and enabled.
 They do not validate systemd or a complete Nagios deployment.
