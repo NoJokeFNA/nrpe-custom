@@ -4,7 +4,8 @@ FROM ${SLES_BASE_IMAGE}
 
 COPY scripts/setup-sles-repositories.sh /opt/nrpe-build/setup-sles-repositories.sh
 COPY packaging/sles15sp4-backports.asc /opt/nrpe-build/backports.asc
-RUN rpm --import /opt/nrpe-build/backports.asc \
+COPY packaging/sles15sp4-suse.asc /opt/nrpe-build/suse.asc
+RUN rpm --import /opt/nrpe-build/backports.asc /opt/nrpe-build/suse.asc \
     && bash /opt/nrpe-build/setup-sles-repositories.sh \
     && zypper --non-interactive install --no-recommends \
        gcc make rpm-build cpio patch diffutils findutils tar gzip xz python3 \

@@ -4,7 +4,8 @@ FROM ${SLES_BASE_IMAGE}
 
 COPY scripts/setup-sles-repositories.sh /opt/nrpe-test/setup-sles-repositories.sh
 COPY packaging/sles15sp4-backports.asc /opt/nrpe-test/backports.asc
-RUN rpm --import /opt/nrpe-test/backports.asc \
+COPY packaging/sles15sp4-suse.asc /opt/nrpe-test/suse.asc
+RUN rpm --import /opt/nrpe-test/backports.asc /opt/nrpe-test/suse.asc \
     && bash /opt/nrpe-test/setup-sles-repositories.sh \
     && zypper --non-interactive install --no-recommends \
        monitoring-plugins-nrpe openssl ca-certificates \
