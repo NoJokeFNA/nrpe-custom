@@ -11,8 +11,27 @@ substitution stays disabled.
 
 This is an independent project. Its packages are unofficial custom builds, not
 releases supported or certified by Debian, SUSE, or Nagios. Public binary release
-preparation and the project's own license selection are
-[deferred](docs/release-plan.md).
+preparation is tracked in the [release plan](docs/release-plan.md). Independently
+authored project code and documentation are [MIT licensed](LICENSE); generated
+packages retain their [upstream and distribution licenses](THIRD_PARTY.md).
+
+## Warranty and responsibility
+
+This software and its generated packages are provided **"AS IS", without
+warranty**, including any warranty of fitness for a particular purpose, security,
+availability, or uninterrupted operation. Use them at your own risk. To the
+extent permitted by applicable law, the authors and contributors are not liable
+for losses or damage arising from their use, including data loss, service
+interruptions, or systems becoming unavailable or unresponsive. This notice does
+not exclude liability that cannot lawfully be excluded. See the [MIT license](LICENSE)
+and the applicable third-party license terms.
+
+The source code and build recipes are available for inspection and independent
+compilation. No malicious functionality is intended or knowingly included;
+this is not a guarantee that the project, its dependencies, or generated packages
+are free of defects or vulnerabilities. Review and test the software in your
+environment, retain backups, and plan recovery before production deployment.
+See [deployment security and limitations](docs/security.md).
 
 ## Quick start
 
@@ -151,6 +170,17 @@ See [architecture and file responsibilities](docs/architecture.md) for the
 component map and [network requirements](docs/network.md) for firewall planning.
 
 ## Using a built package
+
+For NRPE installation concepts and server/client setup, consult the
+[official NRPE documentation](https://github.com/NagiosEnterprises/nrpe) and
+the [Nagios Core documentation](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/).
+This project documents installing its custom distribution packages; it does not
+provide a complete Nagios/NRPE deployment guide. Monitoring-server setup,
+`check_nrpe`, plugin installation, check definitions, production TLS, and network
+access must be configured for your environment using the upstream and
+distribution documentation. Upstream source-install instructions describe an
+alternative installation method; do not install over the custom package with
+`make install`.
 
 Follow the [installation guide](docs/installation.md) for step-by-step Debian
 11–14 and SLES 15 SP4 instructions: which files to copy, checksum verification,

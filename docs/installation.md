@@ -5,6 +5,13 @@ checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
 The current SLES target is **SLES 15 SP4 x86_64**, not every SLES 15 service pack.
 
+For the complete NRPE server/client and Nagios setup, use the
+[official NRPE documentation](https://github.com/NagiosEnterprises/nrpe) and
+[Nagios Core documentation](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/).
+This guide covers deployment of the custom packages and essential configuration
+checks; it does not replace those manuals or distribution-specific plugin and
+TLS instructions.
+
 ## Prepare the files
 
 Build and test the selected target on the workstation with, for example,
