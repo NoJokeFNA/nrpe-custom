@@ -10,8 +10,11 @@ and output directory placeholders from the supplied project archive are included
 The documentation and Compose comments use an editor-independent workflow.
 
 Shell syntax checks, all five rules-transformer unit tests, and Compose
-configuration validation pass. Package builds, package installation, and NRPE
-client/server integration require separate validation; see the validation section.
+configuration validation pass. A Debian 12 build was attempted in the cloud
+environment, but failed while installing dependencies because the build container
+could not resolve `deb.debian.org`. No package was produced. Debian 13 and 14
+builds, package installation, and NRPE client/server integration have not been run.
+See the validation section for the required checks.
 
 ## Build targets
 
