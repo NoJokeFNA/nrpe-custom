@@ -48,6 +48,7 @@ python3 nrpe.py
 Use **↑/↓ and Enter** to navigate, **Space** to toggle targets, **A** to select all,
 and **Esc** to go back. Select build/test actions, diagnose Docker, inspect status,
 or choose a previous run's logs. Select SLES media through a directory browser.
+Select an optional company CA certificate through its file browser.
 The menu reviews your choices before running and returns after each command.
 Colors highlight selection and errors; `NO_COLOR` enables monochrome output.
 See [menu installation and controls](docs/menu.md), including virtual environments.
@@ -102,6 +103,16 @@ python3 nrpe.py verify debian12 debian13 --pull
 python3 nrpe.py verify sles15sp4 --rebuild
 python3 nrpe.py test debian11
 ```
+
+For company HTTPS inspection, optionally select a local public CA certificate
+(PEM or DER); TLS verification remains enabled:
+
+```powershell
+python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"
+```
+
+No certificate is required by default or included in the exported NRPE package. See
+[company CA setup and Docker trust limits](docs/network.md#optional-company-ca-certificate).
 
 The compatibility entry point `build.py` still works. See the
 [workflow reference](docs/workflow.md) for flags, outputs, caching, logs,

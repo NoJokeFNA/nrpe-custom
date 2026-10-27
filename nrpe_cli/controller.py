@@ -29,7 +29,7 @@ def stop_process(process):
         process.wait()
 
 
-def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=None):
+def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=None, ca_cert=None):
     name = f"nrpe-{run_id}-{target}-{phase}"
     base = [docker, "compose", "-f",
             "compose.yaml" if phase == "build" else "compose.test.yaml"]
@@ -41,8 +41,16 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=
                     + ([] if pull else ["--build"]) + [service])
     options = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
                if os.name == "nt" else {"start_new_session": True})
+    # Clear inherited certificate variables unless a validated snapshot was supplied.
+    environment = dict(os.environ)
+    environment.pop("NRPE_CA_CERT", None)
+    environment.pop("NRPE_CA_SHA256", None)
     if media is not None:
-        options["env"] = dict(os.environ, SLES_MEDIA_DIR=str(media))
+        environment["SLES_MEDIA_DIR"] = str(media)
+    if ca_cert is not None:
+        environment.update(NRPE_CA_CERT=ca_cert["path"].as_posix(),
+                           NRPE_CA_SHA256=ca_cert["sha256"])
+    options["env"] = environment
     process = None
     try:
         for command in commands:
@@ -83,13 +91,14 @@ def summary(report):
     print(f"Run: {report['id']} ({report['status']})")
 
 
-def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None):
+def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, ca_cert=None):
     run_id = new_id()
     directory = root / ".nrpe" / "runs" / run_id
     directory.mkdir(parents=True)
     report = {"schema": 1, "id": run_id, "action": action, "started": timestamp(),
               "status": "running", "exit_code": None, "rebuild": rebuild, "pull": pull,
               "sles_media": str(media) if media is not None else None,
+              "ca_certificate_sha256": ca_cert["sha256"] if ca_cert else None,
               "targets": {
                   target: {"build": "not run", "package": "not run", "test": "not run"}
                   for target in targets}}
@@ -113,7 +122,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None):
                         print(f"\n[{target}] Building package", flush=True)
                         log.write(f"\n[{target}] Building package\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
-                                         media=media if target == "sles15sp4" else None)
+                                         media=media if target == "sles15sp4" else None, ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break
@@ -131,7 +140,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None):
                         print(f"[{target}] Installing package and testing NRPE arguments", flush=True)
                         log.write(f"\n[{target}] Installing package and testing NRPE arguments\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
-                                         media=media if target == "sles15sp4" else None)
+                                         media=media if target == "sles15sp4" else None, ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break

@@ -12,10 +12,13 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      secrets:
+        - nrpe_ca_cert
       dockerfile: Dockerfile.sles
       additional_contexts:
         nrpe_sles_media: ${SLES_MEDIA_DIR:-./packaging/empty-media}
       args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
         SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.4}
     image: nrpe-custom-builder:sles15sp4
     volumes:
@@ -28,7 +31,10 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      secrets:
+        - nrpe_ca_cert
       args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
         DEBIAN_CODENAME: bullseye
     image: nrpe-custom-builder:bullseye
     environment:
@@ -38,7 +44,10 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      secrets:
+        - nrpe_ca_cert
       args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
         DEBIAN_CODENAME: bookworm
     image: nrpe-custom-builder:bookworm
     environment:
@@ -48,7 +57,10 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      secrets:
+        - nrpe_ca_cert
       args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
         DEBIAN_CODENAME: trixie
     image: nrpe-custom-builder:trixie
     environment:
@@ -58,9 +70,17 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      secrets:
+        - nrpe_ca_cert
       args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
         DEBIAN_CODENAME: forky
     image: nrpe-custom-builder:forky
     environment:
       DEBIAN_CODENAME: forky
       DEBIAN_NUMBER: "14"
+
+# The default is empty; nrpe.py supplies a validated per-run certificate snapshot.
+secrets:
+  nrpe_ca_cert:
+    file: ${NRPE_CA_CERT:-./packaging/empty-ca.pem}

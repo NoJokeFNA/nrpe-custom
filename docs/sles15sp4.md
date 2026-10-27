@@ -182,8 +182,11 @@ authorization URLs, or automatically download a multi-gigabyte ISO.
 Historical SP4 repositories may contain old metadata and expired signing-key
 copies. Restore trust only through authoritative renewed keys and matching
 repositories. Do not disable TLS, package signatures, dependency checks, or
-metadata validation to make a build succeed. Corporate proxies may require
-installing their trusted CA into the base image; keep TLS verification enabled.
+metadata validation to make a build succeed. Corporate proxies may require an additional trusted CA. Use
+`python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"`
+to supply one optional public PEM/DER certificate before repository access.
+See [company CA setup](network.md#optional-company-ca-certificate) for Docker
+daemon trust limits; keep TLS verification enabled.
 
 ## Build and test contract
 

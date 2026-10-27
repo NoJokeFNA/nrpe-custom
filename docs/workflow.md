@@ -76,7 +76,10 @@ additional package source, extract it outside the checkout and use:
 python3 nrpe.py verify sles15sp4 --sles-media "C:\SLES15-SP4"
 ```
 
-The same option is supported by `build`, `test`, and the compatibility wrapper.
+The same media option is supported by `build`, `test`, and the compatibility wrapper.
+All targets also support an optional `--ca-cert FILE` for a company public CA
+in PEM or DER format, or `NRPE_CA_CERT`. See the
+[network guide](network.md#optional-company-ca-certificate).
 The media are mounted read-only during image builds and container runs. See
 [the SLES guide](sles15sp4.md) for download and repository installation steps.
 
@@ -204,7 +207,7 @@ Each build/test/verify invocation receives a unique run ID and writes:
 ```
 
 The JSON report includes UTC timestamps, action, per-target build/package/test
-outcomes, exit code, and the tested artifact's filename, version from its filename,
+outcomes, exit code, an optional normalized company CA SHA-256, and the tested artifact's filename, version from its filename,
 and SHA-256 hash. A summary distinguishes passed, failed, interrupted, running,
 and unrun phases. The first failure stops remaining targets; failed builds never
 test old output files. `logs` also shows errors that occur before container output

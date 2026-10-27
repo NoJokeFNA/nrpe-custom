@@ -35,6 +35,7 @@ flowchart LR
 | `nrpe_cli/docker.py` | Check Docker Engine, Linux container mode, and Compose; give platform-specific failure hints |
 | `nrpe_cli/state.py` | Artifact identity/checksums, run IDs/reports, and per-target locks |
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
+| `nrpe_cli/certificates.py` | Validate optional public PEM/DER CA input and prepare a temporary normalized BuildKit secret |
 | `nrpe_cli/media.py` | Validate extracted SLES product identity, repository layout, and path containment |
 | `compose.yaml` / `compose.test.yaml` | Parameterized builder services and opt-in runtime test services |
 | `Dockerfile` / `Dockerfile.test` | Debian build prerequisites and separate runtime environment |
@@ -103,6 +104,7 @@ the host controller requires Python 3.9+.
 | `setup-sles-repositories.sh` | Both SLES Dockerfiles | Shared SP4 repository setup and media-helper invocation |
 | `setup-sles-media.sh` | SLES repository setup | Validate and register only approved product/module repositories when media is present |
 | `integration-test-sles.sh` | SLES test entry point | RPM artifact/companion checks, dependency installation, then shared protocol test |
+| `install-ca-certificate.sh` | All four Dockerfiles before network package operations | Optional company CA setup, checksum validation, and distribution-specific system trust stores |
 | `test-nrpe-protocol.sh` | Both integration entry points | Single TLS client/server test of disabled and enabled argument handling |
 
 Combining Debian and RPM installation or build scripts would introduce branching

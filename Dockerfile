@@ -2,13 +2,17 @@
 ARG DEBIAN_CODENAME=bookworm
 FROM debian:${DEBIAN_CODENAME}
 
+ARG NRPE_CA_SHA256=none
+
 ARG DEBIAN_CODENAME
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBEMAIL=nrpe-builder@localhost.invalid \
     DEBFULLNAME="NRPE Custom Builder"
 
-COPY scripts/setup-debian-repositories.sh /opt/nrpe-build/setup-debian-repositories.sh
-RUN set -eux; \
+COPY scripts/setup-debian-repositories.sh scripts/install-ca-certificate.sh /opt/nrpe-build/
+RUN --mount=type=secret,id=nrpe_ca_cert \
+    set -eux; \
+    bash /opt/nrpe-build/install-ca-certificate.sh /run/secrets/nrpe_ca_cert "$NRPE_CA_SHA256"; \
     bash /opt/nrpe-build/setup-debian-repositories.sh "$DEBIAN_CODENAME" source; \
     apt-get update; \
     apt-get install -y --no-install-recommends \

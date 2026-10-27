@@ -54,14 +54,18 @@ also available from the run-selection screen or `logs --run <id>`.
 3. Choose whether to check for updated base images. For SLES, optionally browse
    extracted official installation media. The browser shows directories, includes
    a parent entry, and lists available drives on Windows.
-4. Review the action, targets, base-image refresh, media path, and any replacement
+   Optionally choose a company CA certificate from its file browser; only public
+   PEM/DER certificates are accepted.
+4. Review the action, targets, base-image refresh, media/certificate paths, and any replacement
    of existing package outputs. Cancel is selected by default.
 5. Select Run. Existing outputs are rebuilt only after this explicit confirmation.
 6. Read the result and return to the menu.
 
 SLES media selection is validated before use. Selecting the default source resets
 to online repositories plus `SLES_MEDIA_DIR`, if that environment variable is set.
+The certificate default similarly follows `NRPE_CA_CERT`, if configured.
 The menu does not clear inherited environment configuration or download an ISO.
+See [company CA trust](network.md#optional-company-ca-certificate) for scope and image-cache details.
 
 Diagnostics, status, and logs are available directly from the home screen.
 A failed command returns to the menu after its result is acknowledged. Closing

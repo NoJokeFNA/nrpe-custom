@@ -60,6 +60,26 @@ class MenuWorkflowTests(unittest.TestCase):
         self.assertEqual(menu.workflow(self.root, 'test'), ['test', 'sles15sp4'])
         self.assertIn('Wrong product', choose.call_args_list[3].args[0])
 
+    @patch('nrpe_cli.menu.choose', side_effect=['0'])
+    def test_certificate_browser_selects_a_file(self, choose):
+        certificate = self.root / 'company.cer'
+        certificate.touch()
+        (self.root / 'not-a-certificate.txt').touch()
+        self.assertEqual(menu.browse_certificate(self.root), certificate)
+        labels = [label for _, label in choose.call_args.args[1]]
+        self.assertIn('company.cer', labels)
+        self.assertNotIn('not-a-certificate.txt', labels)
+
+    @patch('nrpe_cli.menu.browse_certificate')
+    @patch('nrpe_cli.menu.choose', side_effect=[
+        ['debian12'], 'certificate', 'browse', 'run', True])
+    def test_selected_certificate_is_reviewed_and_forwarded(self, choose, browse):
+        fixture = Path(__file__).parent / 'fixtures/test-ca.pem'
+        browse.return_value = fixture
+        self.assertEqual(menu.workflow(self.root, 'test'),
+                         ['test', 'debian12', '--ca-cert', str(fixture)])
+        self.assertIn(str(fixture), choose.call_args.args[0])
+
     @patch('nrpe_cli.menu.pause')
     @patch('nrpe_cli.menu.choose', side_effect=['doctor', 'status', 'quit'])
     def test_failure_returns_to_menu_and_next_action_runs(self, choose, pause):

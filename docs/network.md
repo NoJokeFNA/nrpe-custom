@@ -100,3 +100,49 @@ It does not probe every remote repository. Inspect the failing phase's log with
 `python3 nrpe.py logs --last` and your proxy/firewall logs to identify an actual
 blocked hostname or redirect. Do not share unredacted authenticated URLs,
 repository credentials, or complete proxy configuration files.
+
+## Optional company CA certificate
+
+If your organization inspects HTTPS traffic, the containers must trust the
+organization's issuing CA. For errors such as `Curl error 60` / `self signed
+certificate in certificate chain`, select the public root or intermediate CA
+provided by your administrator:
+
+```powershell
+python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"
+python3 nrpe.py test debian12 --ca-cert "C:\Certificates\Company-Root.cer"
+```
+
+The option is supported by `build`, `test`, `verify`, and `build.py`, for every
+target. The menu includes a certificate file browser under Workflow options.
+Alternatively set `NRPE_CA_CERT` to the local file path; the explicit `--ca-cert`
+option takes precedence. With neither configured, no extra CA is added.
+
+Supply **one public X.509 certificate**, in PEM or DER format. `.cer`, `.crt`, and
+`.pem` filenames are supported; the contents determine the format. Bundles and
+private keys are rejected. This is a CA for repository HTTPS, not a production
+NRPE client certificate or key. Keep your file outside the checkout, or under the
+ignored `local-certificates/` directory. Do not commit company trust material.
+
+The controller validates and normalizes the certificate into a per-run temporary
+file, passes it as a BuildKit secret, and deletes the temporary file afterwards.
+The normalized SHA-256 is passed separately to invalidate the image cache when
+the certificate changes and is recorded in `report.json`; its contents are not
+logged. Both builder and test images install the selected certificate in their
+system trust stores **before** contacting repositories. Debian's minimal-image
+bootstrap preserves existing roots until the regular CA package regenerates the
+full trust database. TLS, APT/zypper signatures, and source checksums stay enabled.
+
+The installed CA and generated trust database remain in local image layers,
+including Docker caches. Do not publish company-specific builder/test images
+without your organization's approval. The CA is not embedded into the exported
+NRPE package. Run subsequent commands without the option/environment variable
+to build images using only their default trust; existing cached images are not
+modified in place.
+
+The option configures container trust. It cannot fix registry pulls that fail
+**before the Dockerfile runs**, because Docker Desktop/Engine and BuildKit use
+separate trust stores. Configure those through your organization's Docker
+instructions if required. Host pip/Git trust is also separate. Use `nrpe.py` to
+prepare the secret and its cache identity; direct Compose commands do not
+normalize DER input or calculate that identity for you.

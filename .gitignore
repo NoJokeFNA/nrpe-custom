@@ -12,3 +12,4 @@ __pycache__/
 *.iso
 local-media/
 .venv/
+local-certificates/

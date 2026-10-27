@@ -134,23 +134,29 @@ def choose(title, options, *, multiple=False, selected=()):
     return app.run()
 
 
-def browse_directory(start=None):
-    """Navigate directories without asking the user to type a filesystem path."""
+def _browse(start=None, *, select_file=False):
+    """Navigate local directories and optional public certificate files."""
     current = Path(start or Path.home()).expanduser().resolve()
     while True:
         try:
-            children = sorted((p for p in current.iterdir() if p.is_dir()),
-                              key=lambda p: p.name.casefold())
+            children = sorted((p for p in current.iterdir()
+                               if p.is_dir() or (select_file and p.is_file()
+                                   and p.suffix.lower() in (".cer", ".crt", ".pem"))),
+                              key=lambda p: (not p.is_dir(), p.name.casefold()))
         except OSError as exc:
             choose(f'Cannot read {current}: {exc}', [(None, 'Back')])
             return None
-        options = [('use', 'Use this directory'), ('parent', '.. (parent directory)')]
+        options = [('parent', '.. (parent directory)')]
+        if not select_file:
+            options.insert(0, ('use', 'Use this directory'))
         if os.name == 'nt':
             options.extend((f'drive:{drive}', f'{drive}:\\')
                            for drive in string.ascii_uppercase
                            if Path(f'{drive}:\\').is_dir())
-        options.extend((str(index), child.name + '/') for index, child in enumerate(children))
-        answer = choose(f'SLES installation media: {current}', options)
+        options.extend((str(index), child.name + ('/' if child.is_dir() else ''))
+                       for index, child in enumerate(children))
+        label = 'Company CA certificate' if select_file else 'SLES installation media'
+        answer = choose(f'{label}: {current}', options)
         if answer is None:
             return None
         if answer == 'use':
@@ -160,7 +166,21 @@ def browse_directory(start=None):
         elif answer.startswith('drive:'):
             current = Path(answer[-1] + ':\\')
         else:
-            current = children[int(answer)].resolve()
+            selected = children[int(answer)].resolve()
+            if select_file and selected.is_file():
+                return selected
+            current = selected
+
+
+def browse_directory(start=None):
+    return _browse(start)
+
+
+def browse_certificate(start=None):
+    location = Path(start).expanduser() if start else None
+    if location is not None and location.is_file():
+        location = location.parent
+    return _browse(location, select_file=True)
 
 
 def workflow(root, action):
@@ -168,11 +188,13 @@ def workflow(root, action):
     if targets is None:
         return None
     pull = False
+    certificate = os.environ.get("NRPE_CA_CERT")
     media = os.environ.get('SLES_MEDIA_DIR') if 'sles15sp4' in targets else None
     while True:
         options = [
             ('run', 'Continue to review'),
             ('pull', f'Check for updated base images: {"yes" if pull else "no"}'),
+            ('certificate', f'Company CA certificate: {certificate or "none"}'),
         ]
         if 'sles15sp4' in targets:
             options.append(('media', f'SLES media: {media or "none (online repositories)"}'))
@@ -181,6 +203,23 @@ def workflow(root, action):
             return None
         if answer == 'pull':
             pull = not pull
+        elif answer == 'certificate':
+            source = choose('Company CA certificate', [
+                ('default', 'Default (NRPE_CA_CERT if configured; otherwise none)'),
+                ('browse', 'Browse a public .cer/.crt/.pem certificate')])
+            if source == 'default':
+                certificate = os.environ.get('NRPE_CA_CERT')
+                continue
+            if source is None:
+                continue
+            selected = browse_certificate(certificate)
+            if selected is not None:
+                from .certificates import prepared_certificate
+                try:
+                    with prepared_certificate(selected):
+                        certificate = str(selected)
+                except (OSError, RuntimeError) as exc:
+                    choose(f'Invalid CA certificate: {exc}', [(None, 'Back to options')])
         elif answer == 'media':
             source = choose('SLES package source', [
                 ('default', 'Online repositories (plus SLES_MEDIA_DIR if configured)'),
@@ -203,6 +242,7 @@ def workflow(root, action):
     replacing = action in ('build', 'verify') and bool(existing)
     review = (f'Review workflow\nAction: {action}\nTargets: {", ".join(targets)}'
               f'\nUpdate base images: {pull}'
+              + (f'\nCompany CA certificate: {certificate}' if certificate else '')
               + (f'\nSLES media: {media}' if media else '')
               + (f'\nRebuild existing packages: {", ".join(existing)}' if replacing else ''))
     if choose(review, [(False, 'Cancel'), (True, 'Run selected workflow')]) is not True:
@@ -210,6 +250,8 @@ def workflow(root, action):
     arguments = [action, *targets]
     if pull:
         arguments.append('--pull')
+    if certificate:
+        arguments.extend(["--ca-cert", certificate])
     if media:
         arguments.extend(['--sles-media', media])
     if replacing:
