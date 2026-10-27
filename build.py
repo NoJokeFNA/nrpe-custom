@@ -69,18 +69,37 @@ def _connection_hint(message):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target", choices=(*TARGETS, "all"))
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--test", action="store_true",
+        help="build each target, then install and test its package in a fresh container",
+    )
+    mode.add_argument(
+        "--test-only", action="store_true",
+        help="install and test existing output packages without rebuilding them",
+    )
     args = parser.parse_args(argv)
     try:
         docker = check_docker()
         targets = TARGETS if args.target == "all" else (args.target,)
         for target in targets:
-            print(f"Building {target}...", flush=True)
-            result = subprocess.run(
-                [docker, "compose", "run", "--rm", "--build", target],
-                cwd=ROOT, check=False,
-            )
-            if result.returncode != 0:
-                return result.returncode
+            if not args.test_only:
+                print(f"Building {target}...", flush=True)
+                result = subprocess.run(
+                    [docker, "compose", "run", "--rm", "--build", target],
+                    cwd=ROOT, check=False,
+                )
+                if result.returncode != 0:
+                    return result.returncode
+            if args.test or args.test_only:
+                print(f"Testing {target}...", flush=True)
+                result = subprocess.run(
+                    [docker, "compose", "-f", "compose.test.yaml", "run",
+                     "--rm", "--build", f"test-{target}"],
+                    cwd=ROOT, check=False,
+                )
+                if result.returncode != 0:
+                    return result.returncode
         return 0
     except (RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

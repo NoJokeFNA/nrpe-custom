@@ -11,10 +11,10 @@ import build
 
 
 class BuildLauncherTests(unittest.TestCase):
-    def run_main(self, target):
+    def run_main(self, target, *options):
         with contextlib.redirect_stderr(io.StringIO()) as errors:
             with contextlib.redirect_stdout(io.StringIO()):
-                status = build.main([target])
+                status = build.main([target, *options])
         return status, errors.getvalue()
 
     @patch("build.platform.system", return_value="Windows")
@@ -89,6 +89,48 @@ class BuildLauncherTests(unittest.TestCase):
         status, errors = self.run_main("all")
         self.assertEqual(status, 42)
         self.assertEqual(run.call_count, 1)
+
+    @patch("build.check_docker", return_value="docker")
+    @patch("build.subprocess.run")
+    def test_build_and_test_each_target_before_proceeding(self, run, check):
+        run.return_value = subprocess.CompletedProcess([], 0)
+        status, errors = self.run_main("all", "--test")
+        self.assertEqual(status, 0)
+        self.assertEqual(errors, "")
+        self.assertEqual(
+            [call.args[0][-1] for call in run.call_args_list],
+            ["debian12", "test-debian12", "debian13", "test-debian13",
+             "debian14", "test-debian14"],
+        )
+        for call in run.call_args_list[1::2]:
+            self.assertEqual(call.args[0][2:4], ["-f", "compose.test.yaml"])
+            self.assertEqual(call.kwargs["cwd"], build.ROOT)
+
+    @patch("build.check_docker", return_value="docker")
+    @patch("build.subprocess.run")
+    def test_test_only_does_not_rebuild_package(self, run, check):
+        run.return_value = subprocess.CompletedProcess([], 0)
+        status, errors = self.run_main("debian13", "--test-only")
+        self.assertEqual(status, 0)
+        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_args.args[0][-1], "test-debian13")
+
+    @patch("build.check_docker", return_value="docker")
+    @patch("build.subprocess.run")
+    def test_failed_build_does_not_test_stale_artifact(self, run, check):
+        run.return_value = subprocess.CompletedProcess([], 42)
+        status, errors = self.run_main("all", "--test")
+        self.assertEqual(status, 42)
+        self.assertEqual(run.call_count, 1)
+
+    @patch("build.check_docker", return_value="docker")
+    @patch("build.subprocess.run")
+    def test_integration_failure_stops_remaining_builds(self, run, check):
+        run.side_effect = [subprocess.CompletedProcess([], 0),
+                           subprocess.CompletedProcess([], 7)]
+        status, errors = self.run_main("all", "--test")
+        self.assertEqual(status, 7)
+        self.assertEqual(run.call_count, 2)
 
     @patch("build.platform.system", return_value="Linux")
     @patch("build.shutil.which", return_value="docker")
