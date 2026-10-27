@@ -68,6 +68,7 @@ Include relevant logs with private paths, addresses, and credentials removed.
 
 Use GitHub issues for reproducible non-sensitive bugs and feature proposals.
 For security-sensitive reports, follow [the security guidance](docs/security.md).
-Licensing decisions and public binary release automation are deferred in the
-[release plan](docs/release-plan.md); this contribution guide does not select a
-project license or grant new rights to third-party code.
+Independently authored project code and documentation use the [MIT license](LICENSE).
+Retain all third-party notices; see the [license inventory](THIRD_PARTY.md).
+Public binary release preparation follows the [release plan](docs/release-plan.md).
+It does not authorize publication or grant new rights to third-party code.
