@@ -81,8 +81,9 @@ for package installation and NRPE client/server integration tests. Distinguish
 passed, failed, skipped, and unrun checks in reports.
 
 Prefer `nrpe.py` over direct Compose commands for Docker diagnostics, workflow
-sequencing, logs, and artifact-bound status. On Windows, use `py -3` instead of
-`python3`. Use `nrpe.py test <target>` for existing artifacts without rebuilding;
+sequencing, logs, and artifact-bound status. Use `python3` in command examples
+on all platforms, including Windows. Use `nrpe.py test <target>` for existing
+artifacts without rebuilding;
 do not claim they match current code. `build.py` is a compatibility wrapper.
 Keep local run reports and locks under ignored `.nrpe/`. Never use project-wide
 container cleanup on interruption or silently override an existing target lock.

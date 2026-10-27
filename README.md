@@ -20,27 +20,20 @@ Bash is needed inside containers and for optional local shell syntax checks.
 files, checks Docker readiness, and records results. Direct Compose commands
 bypass the controller's checks, logs, and target locks.
 
-From the repository root in Windows PowerShell:
-
-```powershell
-py -3 nrpe.py doctor
-py -3 nrpe.py verify debian12
-```
-
-On Linux or macOS:
+From the repository root on Windows, Linux, or macOS:
 
 ```sh
 python3 nrpe.py doctor
 python3 nrpe.py verify debian12
 ```
 
-If the Windows Python launcher is unavailable, use `python` with Python 3.9+
-installed and available in PATH.
+Ensure that `python3 --version` reports Python 3.9 or newer. On Windows, make
+sure your Python installation provides `python3` in PATH.
 
 Run without arguments for an interactive action and target menu:
 
 ```powershell
-py -3 nrpe.py
+python3 nrpe.py
 ```
 
 The menu performs one selected action and exits. Without an interactive terminal,
@@ -62,11 +55,11 @@ Use `--help` or `<command> --help` for command-specific usage.
 Select one target, multiple targets, or `all` by itself:
 
 ```powershell
-py -3 nrpe.py verify debian12 debian13
-py -3 nrpe.py verify all
-py -3 nrpe.py test debian14
-py -3 nrpe.py status
-py -3 nrpe.py logs --last
+python3 nrpe.py verify debian12 debian13
+python3 nrpe.py verify all
+python3 nrpe.py test debian14
+python3 nrpe.py status
+python3 nrpe.py logs --last
 ```
 
 Use `test` for packages you have already built locally. It checks the bytes in
@@ -82,9 +75,9 @@ Without a terminal it refuses to overwrite existing output unless you explicitly
 pass `--rebuild`:
 
 ```powershell
-py -3 nrpe.py verify debian12 --rebuild
-py -3 nrpe.py verify all --rebuild --pull
-py -3 nrpe.py test debian14 --pull
+python3 nrpe.py verify debian12 --rebuild
+python3 nrpe.py verify all --rebuild --pull
+python3 nrpe.py test debian14 --pull
 ```
 
 `--pull` checks for updated Debian base images before building the selected
