@@ -20,9 +20,9 @@ bundles, and SLES media are outside this scope.
 | Custom package installation instructions | Documented | [Installation guide](installation.md), linked from README and SLES notes; full deployments use upstream manuals |
 | Project license | Adopted | [MIT license](../LICENSE); third-party components retain their own licenses |
 | Warranty and liability notice | Documented | README and [security guidance](security.md), subject to applicable law; no security or availability guarantee |
-| Third-party license inventory | Initial review completed; findings open | [Inspected evidence](../THIRD_PARTY.md); declarations alone do not complete redistribution review |
+| Third-party license inventory | Recorded SLES evidence gaps resolved; candidate review remains | [Inspected evidence](../THIRD_PARTY.md) and [SLES review](sles-license-review.md); actual release assets still need checking |
 | Debian corresponding-source export | Implemented and validated on all four targets | `scripts/export_debian_sources.py`; full verify runs and independent source reconstruction passed |
-| SLES corresponding-source export | Existing payloads inspected; review findings open | Source RPM inputs/specs compared with manifests; OBS history files absent and notice review incomplete |
+| SLES corresponding-source export and notices | Existing payloads inspected; companion notices prepared | [Notice directory](../packaging/licenses/sles15sp4/README.md); OBS history supplement remains a provenance task |
 | Release bundle completeness and test gate | Not implemented | Implement the offline candidate check described below |
 | Public release | Not created | Requires resolved findings, an identified candidate, successful checks, and an explicit publication request |
 
@@ -33,18 +33,22 @@ bundles, and SLES media are outside this scope.
   headers, companion source spec, and exact pinned optional UI wheels.
 - [ ] Review each candidate Debian source's `debian/copyright`, embedded notices,
   full GPL text, and OpenSSL linking terms; versions differ by suite.
-- [ ] Resolve the SLES NRPE/OpenSSL linking basis from authoritative evidence.
-  A Debian copyright exception does not establish permission for the separate
-  SLES source. Record actual texts and applicable component scope.
-- [ ] Establish and include the full companion user-package license grant and
-  notices, not just its RPM `License: MIT` declaration.
+- [x] Resolve the SLES NRPE/OpenSSL linking basis from the pinned source's
+  `src/utils.c:display_license()` and confirm it in the existing custom binary's
+  license output. Retain the GPL text and explicit OpenSSL exemption.
+- [x] Verify the companion's MIT declaration in its hash-checked original source
+  spec, retain the SUSE copyright header, and prepare the full standard MIT text
+  as an explicitly identified downstream companion notice.
+- [x] Read the full ACL headers: both grant GPLv2-or-later, resolving the apparent
+  difference caused by the short GPLv2 headings.
 - [ ] Preserve NRPE `LEGAL`, ACL and `snprintf` notices, Debian/SUSE packaging
   notices, and Autoconf/helper exceptions in the corresponding sources.
 
-The [inventory](../THIRD_PARTY.md) records the concrete remaining findings.
-Do not remove notices, relabel third-party code MIT, or substitute metadata for
-unresolved license evidence. Targets with applicable unresolved findings are not
-publication candidates.
+The [inventory](../THIRD_PARTY.md) and [SLES source review](sles-license-review.md)
+record the evidence and correct the earlier incomplete searches. The previously
+recorded SLES license questions are closed for these pinned inputs. Do not remove
+notices, relabel third-party code MIT, or assume future source versions have the
+same terms. The final candidate must still include and checksum all notices.
 
 ## 2. Complete and validate corresponding sources
 
@@ -113,6 +117,13 @@ The following checks passed on 2026-10-27:
 - Inspection of both existing SLES source RPMs against their manifests; findings
   are recorded in the [inventory](../THIRD_PARTY.md). No fresh SLES build was run
   as part of the Debian-only exporter change. No native Windows run was performed.
+
+The subsequent SLES license review verified the pinned archive and companion spec
+hashes, the full ACL grants, and the existing binary's explicit OpenSSL/GPL
+license output. It retained verbatim GPL and `LEGAL` files and prepared a full
+MIT companion notice with provenance. NRPE's license-display exit status was 3;
+the required text was checked explicitly. These are license-evidence checks, not
+a fresh SLES package build or runtime protocol test.
 
 The first Debian attempt failed because `dpkg-source` was run from the extracted
 tree rather than the directory containing the original archive. The build now

@@ -56,6 +56,13 @@ SLES sources are intentionally pinned. `--pull` refreshes the base image, not
 the OBS source revision. Updating the manifest requires reviewing the new recipe
 and source checksums. Debian builds continue to discover source versions via APT.
 
+The [source license review](sles-license-review.md) records NRPE's explicit
+OpenSSL exemption, its GPLv2-or-later/ACL grants, and the companion user package's
+MIT declaration. The [notice directory](../packaging/licenses/sles15sp4/README.md)
+contains the GPL, OpenSSL, trademark and companion MIT notices to include with
+release assets. These notices accompany the existing packages; they do not
+change the pinned upstream inputs or RPM payloads.
+
 ## Installing the custom package on a server
 
 Use the [installation guide](installation.md#sles-15-sp4) to deploy the exported

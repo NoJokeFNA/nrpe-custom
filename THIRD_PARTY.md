@@ -11,12 +11,12 @@ code, dependencies, or public signing keys.
 | Component | Evidence inspected | Findings and remaining work |
 | --- | --- | --- |
 | Debian `nagios-nrpe` | Actual `debian/copyright` from the reconstructed custom sources for Debian 11 (`4.0.3-1`), 12 (`4.1.0-1`), and 13/14 (`4.1.3-1`); compared with the Debian 12 installed-package notice | These four copyright files are identical. They declare GPL-2-or-later with an explicit OpenSSL linking exception for the main code; separate entries cover ACL code, `snprintf`, and Debian packaging. The full GPL text and upstream notice files are retained in the source archives. Recheck actual sources for every candidate; this is not a blanket approval of future source versions. |
-| SLES NRPE `4.1.1` | [Pinned source manifest](packaging/sles15sp4-source.json), revision `835292739a5736a9d8f0460f670b6f15`; actual `nrpe-4.1.1.tar.xz` and modified `nrpe.spec` in the existing builder | `LICENSE.md` contains GPLv2; `src/nrpe.c` grants GPLv2-or-later. Spec metadata declares `GPL-2.0-or-later`. An explicit NRPE/OpenSSL linking exception was **not established** by searching this archive; Debian's exception must not be assumed to cover this SLES source. Resolve this before binary publication. |
-| NRPE ACL implementation | `include/acl.h` and `src/acl.c` in SLES upstream source; Debian copyright entry | Kaspersky Lab ZAO copyright, 2011. SLES file headers identify GPLv2; Debian's notice identifies GPL-2-or-later. Retain the exact per-file notices and review this difference for the actual release source. |
+| SLES NRPE `4.1.1` | [Pinned source manifest](packaging/sles15sp4-source.json), revision `835292739a5736a9d8f0460f670b6f15`; actual upstream archive, modified spec and existing custom binary's license output | **Resolved:** `src/utils.c:display_license()` explicitly allows compilation, linking and use with OpenSSL and grants GPLv2-or-later. This is evidence from the SLES source itself. The earlier search missed the word "exemption". Preserve the [upstream notice and full GPL text](packaging/licenses/sles15sp4/README.md); see the [source review](docs/sles-license-review.md). |
+| NRPE ACL implementation | Full license notices in `include/acl.h` and `src/acl.c` in the pinned SLES archive; Debian copyright entry | **Resolved:** both full grants explicitly permit GPLv2 or later, consistent with Debian's notice. The short GPLv2 headings did not establish a GPLv2-only restriction. Retain Kaspersky Lab ZAO's 2011 copyright and the full per-file notices. |
 | NRPE `snprintf` implementation | `src/snprintf.c` in SLES upstream source; Debian copyright entry | Patrick Powell, 1995. Permission requires retaining the source attribution notice. Do not replace it with the project's MIT notice. |
 | Autoconf macros and generated helper files in NRPE sources | Actual `macros/LICENSE`, macro headers, `build-aux/config.guess`, and `build-aux/config.sub` in the SLES source archive | GPL notices include file-specific Autoconf/build-output exceptions. Preserve the files and their notices in the source package. These exceptions are not evidence of an OpenSSL linking exception for NRPE. |
 | SUSE NRPE packaging | Actual pinned `nrpe.spec`, including its SUSE LLC 2024 header | Spec header retains contributed changes under the pristine package's license, subject to its stated fallback. Keep the original notice and modified spec in the source RPM; the project MIT license does not replace the spec's terms. |
-| `system-user-nagios` `1.0.0-0` | [Pinned manifest](packaging/sles15sp4-user-source.json), revision `b979817ae6424675519c86e80add617a`; actual spec extracted from the existing companion source RPM | RPM metadata and spec declare MIT; the SUSE LLC 2024 header describes licensing of the spec. The full MIT grant for this component has not yet been established from an included license file. Preserve the spec and README and resolve notice completeness before publishing the companion RPM. |
+| `system-user-nagios` `1.0.0-0` | [Pinned manifest](packaging/sles15sp4-user-source.json), revision `b979817ae6424675519c86e80add617a`; actual original spec extracted from the source RPM and hash-verified | **Resolved:** the source spec itself explicitly declares MIT and retains the SUSE LLC 2024 copyright/licensing header. The missing standalone full text is supplied as a [downstream companion notice](packaging/licenses/sles15sp4/system-user-nagios-MIT.txt), not represented as an original upstream file or a new project license grant. Preserve the spec and README and include that notice in release assets. |
 
 The SLES upstream archive is bound by SHA-256
 `7689aea570596573919371f7d6a1753eca90213368ede51f477e25782eb1ef9c`.
@@ -68,7 +68,13 @@ actual notices from the source packages being distributed. Source archives must
 retain their full upstream and distribution license files. The generic GitHub
 repository source archive does not replace corresponding NRPE sources.
 
+For SLES, include the [prepared notice directory](packaging/licenses/sles15sp4/README.md)
+as separate release assets alongside the unchanged binary and source RPMs.
+The [review](docs/sles-license-review.md) closes the previously recorded SLES
+OpenSSL, ACL-version and companion-MIT evidence gaps. It does not replace final
+candidate completeness and provenance checks.
+
 Keep the project's unofficial-build wording and NRPE's `LEGAL` trademark notice.
 No endorsement or support entitlement from Nagios, Debian, or SUSE is implied.
-Open findings above remain release blockers; metadata labels alone do not close
-them. See the [release plan](docs/release-plan.md).
+Metadata labels alone do not establish that an arbitrary release bundle retains
+all required notices. See the [release plan](docs/release-plan.md).
