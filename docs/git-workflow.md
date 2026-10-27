@@ -19,6 +19,12 @@ from `develop` into `master`; never route a topic directly into `master`.
 Prefer a normal merge for develop-to-master promotion so ancestry remains clear.
 Keep working on topic branches, not directly on either long-lived branch.
 
+Integration ends at `develop` by default. Create or merge a develop-to-master
+promotion PR only when the maintainer explicitly requests promotion to master.
+A request to implement a change or integrate it into develop does not authorize
+a master PR or release. Once an explicitly requested promotion reaches master,
+the automatic release workflow runs as configured.
+
 ## Attribution
 
 Commits carry the existing human author identity. Do not add co-author trailers,
@@ -51,25 +57,32 @@ Legacy branches outside the named prefixes are not automatically removed.
 
 ## Server-side protection: one-time administrator action
 
-The desired [ruleset](../.github/rulesets/long-lived-branches.json) protects both
+The [ruleset template](../.github/rulesets/long-lived-branches.json) protects both
 long-lived branches against deletion and force-pushes, requires PRs and resolved
 review threads, and requires the branch/author policy and all fast CI checks.
 It does not impose an extra reviewer count on a single-maintainer repository.
 
-The connected integration returned HTTP 403 when creating this ruleset. The
-ruleset file is prepared, but server-side protection has **not** been applied
-by that request. An account/token with repository administration permission must
-apply it, for example from the checkout:
+Protection was applied by the repository owner and verified on 2026-10-27:
+[active ruleset 25987752](https://github.com/NoJokeFNA/nrpe-custom/rules/25987752)
+targets `refs/heads/master` and `refs/heads/develop`, with no bypass actors.
+Both branches have deletion/force-push protection, PR and resolved-thread
+requirements, and all six fast status checks from the template. The default
+branch remains `master`; unrestricted automatic head-branch deletion is off.
+
+Inspect effective rules when checking or changing repository settings:
 
 ```sh
-gh api --method POST repos/NoJokeFNA/nrpe-custom/rulesets \
-  --input .github/rulesets/long-lived-branches.json
+gh api repos/NoJokeFNA/nrpe-custom/rules/branches/master
+gh api repos/NoJokeFNA/nrpe-custom/rules/branches/develop
 ```
 
-Alternatively import the JSON through the repository's Rules/Rulesets settings,
-subject to the repository's GitHub plan and permissions. Inspect existing rules
-before importing to avoid duplicates. Keep default branch `master` and global
-head-branch deletion disabled. Repository settings are separate from the workflow
-guards; the latter do not substitute for server-side branch protection.
+For a new repository, an administrator can apply the template through GitHub's
+Rules/Rulesets settings or API, subject to plan and permissions. The connected
+integration returned HTTP 403 for administrative writes; owner configuration
+was required. Inspect existing rules before applying a template to avoid
+duplicates. Keep both target branches selected, the ruleset active, default
+branch `master` and global head-branch deletion disabled. Repository settings
+are separate from workflow guards; verify both rather than assuming that a
+committed template establishes protection.
 
 See [release automation](releases.md) for what a master push does.

@@ -27,6 +27,10 @@ workflow](releases.md) runs the full package/install/protocol matrix on master
 pushes and release-relevant PRs. Workflow configuration is not proof of a pass:
 inspect the actual run for the commit being evaluated.
 
+The [practical validation procedure](practical-validation.md) tracks the separate
+Windows Docker Desktop and Debian/SLES VM checks for console, company CA paths,
+systemd, reboot, plugins and update/rollback behavior.
+
 Historical archives/repositories may become unavailable. Consult [Debian release
 information](https://www.debian.org/releases/) and [SUSE lifecycle information](https://www.suse.com/lifecycle/)
 for current upstream maintenance status. An archived target that still builds
