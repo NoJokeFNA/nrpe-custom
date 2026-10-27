@@ -55,7 +55,9 @@ also available from the run-selection screen or `logs --run <id>`.
    extracted official installation media. The browser shows directories, includes
    a parent entry, and lists available drives on Windows.
    Optionally choose a company CA certificate from its file browser; only public
-   PEM/DER certificates are accepted.
+   PEM/DER certificates are accepted. You can also choose **Enter or paste a
+   certificate path** (or the corresponding installation-media option) without
+   opening the browser.
 4. Review the action, targets, base-image refresh, media/certificate paths, and any replacement
    of existing package outputs. Cancel is selected by default.
 5. Select Run. Existing outputs are rebuilt only after this explicit confirmation.
@@ -72,6 +74,24 @@ A failed command returns to the menu after its result is acknowledged. Closing
 the menu does not turn a failed workflow into a passed run: inspect its exit
 message, report, or status. For automation, use direct commands and their exit
 codes rather than the menu session's exit code.
+
+## Enter or paste a path
+
+Both browsers include **Enter or paste a path...**. In the certificate browser,
+a file selects the certificate and a directory opens that location. In the media
+browser, enter an extracted installation-media directory. You can also enter a
+file/directory path directly from its source-selection menu.
+
+Paste paths as plain text, for example `C:\Certificates\Company Root.cer`, or
+with matching quotes as copied by Explorer's **Copy as path**. Backslashes and
+spaces are preserved; paths are never evaluated as shell commands. `~` and
+native environment-variable syntax are expanded (for example `%USERPROFILE%`
+on Windows). Relative paths entered in a browser are relative to its current
+directory; direct source-menu entry is relative to the process working directory.
+Tab offers path completion. Enter accepts; Escape or an empty value cancels.
+Cancelling returns to the existing browser location. Missing paths and incorrect
+file/directory types show an error with options to retry or cancel. Certificate
+contents and SLES product metadata still undergo their regular validation.
 
 ## Terminal behavior
 

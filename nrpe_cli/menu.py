@@ -134,6 +134,58 @@ def choose(title, options, *, multiple=False, selected=()):
     return app.run()
 
 
+def _prompt_path(title):
+    """Read a literal path with completion; Escape cancels this input only."""
+    from prompt_toolkit import prompt
+    from prompt_toolkit.completion import PathCompleter
+    from prompt_toolkit.key_binding import KeyBindings
+
+    bindings = KeyBindings()
+
+    @bindings.add('escape')
+    def cancel(event):
+        event.app.exit(result=None)
+
+    return prompt(title + ' (Esc to cancel): ',
+                  completer=PathCompleter(expanduser=True), key_bindings=bindings)
+
+
+def _path_text(value):
+    # Accept Explorer's Copy as path and shell-style quoted paths without
+    # interpreting backslashes or treating user input as a shell command.
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+        value = value[1:-1]
+    return value
+
+
+def enter_path(title, *, base=None, kind='any'):
+    """Resolve an existing typed/pasted path without losing browser location."""
+    while True:
+        text = _prompt_path(title)
+        if text is None or not text.strip():
+            return None
+        try:
+            value = _path_text(text)
+            if not value:
+                return None
+            selected = Path(os.path.expandvars(value)).expanduser()
+            if not selected.is_absolute():
+                selected = (base or Path.cwd()) / selected
+            selected = selected.resolve(strict=True)
+            if kind == 'file' and not selected.is_file():
+                raise ValueError('Select a file, not a directory.')
+            if kind == 'directory' and not selected.is_dir():
+                raise ValueError('Select a directory, not a file.')
+            if not selected.is_file() and not selected.is_dir():
+                raise ValueError('Select a regular file or directory.')
+            return selected
+        except (OSError, ValueError, RuntimeError) as exc:
+            if choose(f'Cannot use path: {exc}',
+                      [('retry', 'Enter another path'), (None, 'Cancel')]) is None:
+                return None
+
+
 def _browse(start=None, *, select_file=False):
     """Navigate local directories and optional public certificate files."""
     current = Path(start or Path.home()).expanduser().resolve()
@@ -146,7 +198,8 @@ def _browse(start=None, *, select_file=False):
         except OSError as exc:
             choose(f'Cannot read {current}: {exc}', [(None, 'Back')])
             return None
-        options = [('parent', '.. (parent directory)')]
+        options = [('parent', '.. (parent directory)'),
+                   ('path', 'Enter or paste a path...')]
         if not select_file:
             options.insert(0, ('use', 'Use this directory'))
         if os.name == 'nt':
@@ -161,7 +214,14 @@ def _browse(start=None, *, select_file=False):
             return None
         if answer == 'use':
             return current
-        if answer == 'parent':
+        if answer == 'path':
+            selected = enter_path(label, base=current,
+                                  kind='any' if select_file else 'directory')
+            if selected is not None:
+                if select_file and selected.is_file():
+                    return selected
+                current = selected
+        elif answer == 'parent':
             current = current.parent
         elif answer.startswith('drive:'):
             current = Path(answer[-1] + ':\\')
@@ -206,13 +266,15 @@ def workflow(root, action):
         elif answer == 'certificate':
             source = choose('Company CA certificate', [
                 ('default', 'Default (NRPE_CA_CERT if configured; otherwise none)'),
-                ('browse', 'Browse a public .cer/.crt/.pem certificate')])
+                ('browse', 'Browse a public .cer/.crt/.pem certificate'),
+                ('path', 'Enter or paste a certificate path')])
             if source == 'default':
                 certificate = os.environ.get('NRPE_CA_CERT')
                 continue
             if source is None:
                 continue
-            selected = browse_certificate(certificate)
+            selected = (enter_path('Company CA certificate', kind='file')
+                        if source == 'path' else browse_certificate(certificate))
             if selected is not None:
                 from .certificates import prepared_certificate
                 try:
@@ -223,13 +285,15 @@ def workflow(root, action):
         elif answer == 'media':
             source = choose('SLES package source', [
                 ('default', 'Online repositories (plus SLES_MEDIA_DIR if configured)'),
-                ('browse', 'Browse extracted installation media')])
+                ('browse', 'Browse extracted installation media'),
+                ('path', 'Enter or paste an installation media path')])
             if source == 'default':
                 media = os.environ.get('SLES_MEDIA_DIR')
                 continue
             if source is None:
                 continue
-            directory = browse_directory(media)
+            directory = (enter_path('SLES installation media', kind='directory')
+                         if source == 'path' else browse_directory(media))
             if directory is not None:
                 from .media import validate_media
                 try:

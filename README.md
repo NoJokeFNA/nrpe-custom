@@ -47,8 +47,8 @@ python3 nrpe.py
 
 Use **↑/↓ and Enter** to navigate, **Space** to toggle targets, **A** to select all,
 and **Esc** to go back. Select build/test actions, diagnose Docker, inspect status,
-or choose a previous run's logs. Select SLES media through a directory browser.
-Select an optional company CA certificate through its file browser.
+or choose a previous run's logs. Select SLES media and optional company CA
+certificates through their browsers, or enter/paste a path directly.
 The menu reviews your choices before running and returns after each command.
 Colors highlight selection and errors; `NO_COLOR` enables monochrome output.
 See [menu installation and controls](docs/menu.md), including virtual environments.
