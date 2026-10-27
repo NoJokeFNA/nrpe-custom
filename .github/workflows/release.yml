@@ -1,0 +1,143 @@
+name: Build and release packages
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [develop, master]
+    paths:
+      - '.github/workflows/release.yml'
+      - '.github/workflows/checks.yml'
+      - '.github/workflows/dependency-audit.yml'
+      - 'nrpe_cli/release.py'
+      - 'nrpe_cli/controller.py'
+      - 'nrpe_cli/state.py'
+      - 'scripts/**'
+      - 'docker/**'
+      - 'compose*.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+  dependency-audit:
+    uses: ./.github/workflows/dependency-audit.yml
+  build:
+    name: Verify and package ${{ matrix.target }}
+    needs: [checks, dependency-audit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        target: [debian11, debian12, debian13, debian14, sles15sp4]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Install source inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends dpkg-dev rpm rpm2cpio cpio
+      - name: Build, install and verify arguments over TLS
+        env:
+          TARGET: ${{ matrix.target }}
+        run: python3 nrpe.py verify "$TARGET" --pull
+      - name: Validate sources, notices and exact build evidence
+        env:
+          TARGET: ${{ matrix.target }}
+          COMMIT: ${{ github.sha }}
+        run: >-
+          python3 scripts/prepare_release.py target --target "$TARGET"
+          --commit "$COMMIT" --destination .nrpe/target-bundles
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: target-${{ matrix.target }}
+          path: .nrpe/target-bundles/nrpe-custom-${{ matrix.target }}.tar.gz
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+  assemble:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: target-*
+          merge-multiple: true
+          path: .nrpe/incoming
+      - name: Require all five targets and assemble public assets
+        env:
+          COMMIT: ${{ github.sha }}
+        run: >-
+          python3 scripts/prepare_release.py assemble --commit "$COMMIT"
+          --incoming .nrpe/incoming --destination .nrpe/release
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: release-bundle
+          path: .nrpe/release/*
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: assemble
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: release-bundle
+          path: release
+      - name: Verify checksums and publish a complete immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release
+          sha256sum --check SHA256SUMS
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          expected = {line.split('  ', 1)[1] for line in Path('SHA256SUMS').read_text().splitlines()}
+          assert expected | {'SHA256SUMS'} == {p.name for p in Path('.').iterdir()}
+          assert json.loads(Path('release.json').read_text())['commit'] == os.environ['COMMIT']
+          PY
+          tag="build-${GITHUB_RUN_NUMBER}-${COMMIT:0:12}"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo 'Release already exists; refusing to replace published assets' >&2
+            exit 1
+          fi
+          assets=(*)
+          gh release create "$tag" "${assets[@]}" --draft --target "$COMMIT" \
+            --title "NRPE custom build ${GITHUB_RUN_NUMBER}" --notes-file RELEASE_NOTES.md
+          current_master="$(gh api "repos/$GH_REPO/git/ref/heads/master" --jq .object.sha)"
+          if [[ "$current_master" == "$COMMIT" ]]; then
+            gh release edit "$tag" --draft=false --latest
+          else
+            gh release edit "$tag" --draft=false --latest=false
+          fi

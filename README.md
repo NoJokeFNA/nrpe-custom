@@ -215,6 +215,12 @@ disabled. See [deployment security](docs/security.md).
 
 ## Development and project documentation
 
+`master` is the default/release branch; `develop` is the integration branch.
+Work on `feat/...`, `fix/...`, `refactor/...` or `remove/...` and open a PR into
+`develop`. Never delete `master` or `develop`. See the [Git workflow](docs/git-workflow.md).
+Successful master pushes build/test all five package targets and publish a
+complete [release bundle](docs/releases.md); other branches do not publish.
+
 GitHub Actions provides [Linux/Windows unit and configuration checks](https://github.com/NoJokeFNA/nrpe-custom/actions/workflows/checks.yml)
 and a [scheduled Python dependency audit](https://github.com/NoJokeFNA/nrpe-custom/actions/workflows/dependency-audit.yml).
 These checks do not replace package builds and runtime integration tests.
@@ -226,6 +232,8 @@ These checks do not replace package builds and runtime integration tests.
 - [Configuration examples](docs/configuration-examples.md): fixed checks, TLS and restricted argument profiles.
 - [Support and maintenance](docs/maintenance.md): verification boundaries, dependencies and source updates.
 - [Container layout](docker/README.md): separate build/test recipes under `docker/`.
+- [Git workflow](docs/git-workflow.md): human authorship, integration, promotion and guarded branch cleanup.
+- [Release automation](docs/releases.md): per-master-push packages, sources, licenses and verification.
 - [Architecture](docs/architecture.md): control flow and every script's purpose.
 - [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
 - [SLES 15 SP4](docs/sles15sp4.md): provenance, dependencies, media, and installation.
