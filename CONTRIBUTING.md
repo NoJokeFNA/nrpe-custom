@@ -23,7 +23,7 @@ python3 nrpe.py doctor
 For shell syntax checks in Bash, check each script explicitly:
 
 ```sh
-for script in scripts/*.sh; do bash -n "$script" || exit; done
+for script in scripts/*.sh examples/*.sh; do bash -n "$script" || exit; done
 ```
 
 Without menu dependencies, terminal-input tests are reported as skipped. Workflow
@@ -44,6 +44,16 @@ Native Windows terminal and process behavior need Windows verification; tests on
 Linux do not establish that Windows has been exercised.
 
 ## Design boundaries
+
+GitHub Actions runs the unit suite on Linux/Windows with Python 3.9 and 3.14,
+plus Linux shell syntax and both Compose configuration checks. The separate
+weekly dependency audit checks the optional menu requirements. Neither workflow
+performs package/protocol integration tests. See the [maintenance policy](docs/maintenance.md)
+and inspect actual workflow results for the commit under review.
+
+Container recipes live under `docker/`; their build context remains the repository
+root and Compose files remain at that root. Update Compose, `doctor`, and
+documentation together when moving a recipe.
 
 - Keep UI navigation in `nrpe_cli/menu.py`; use the existing controller for work.
 - Preserve runtime-disabled argument defaults and disabled Bash substitution.

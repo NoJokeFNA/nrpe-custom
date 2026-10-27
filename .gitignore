@@ -13,5 +13,6 @@ __pycache__/
 *.iso
 local-media/
 .venv/
+.venv-audit/
 local-certificates/
 /work/
