@@ -9,11 +9,13 @@ The Dockerfile, Compose configuration, build scripts, rules-transformer tests,
 and output directory placeholders from the supplied project archive are included.
 The documentation and Compose comments use an editor-independent workflow.
 
-Shell syntax checks, all 13 unit tests (rules transformation and Docker
-preflight behavior), and Compose configuration validation pass. A Debian 12 build was attempted in the cloud
-environment, but failed while installing dependencies because the build container
-could not resolve `deb.debian.org`. No package was produced. Debian 13 and 14
-builds, package installation, and NRPE client/server integration have not been run.
+Shell syntax checks, all 17 unit tests (rules transformation, Docker preflight,
+and build/test sequencing), and both Compose configuration validations pass.
+Attempts to build the Debian 12 builder and integration test image in the cloud
+failed while installing dependencies because the containers could not resolve
+the Debian repository host (or the configured proxy). No package was produced
+here. Debian 13 and 14 builds, package installation, and NRPE client/server
+integration have not completed in this environment.
 See the validation section for the required checks.
 
 ## Build targets
@@ -42,24 +44,29 @@ containers through emulation.
 
 ## Usage
 
-Use the build launcher from the repository root. On Windows (PowerShell):
+Prefer `build.py` for this project instead of calling Docker Compose directly.
+It performs the Docker readiness checks and coordinates builds and optional
+integration tests using the project's Compose files.
+
+Run it from the repository root. On Windows (PowerShell):
 
 ```powershell
-py -3 build.py debian12
-py -3 build.py debian13
-py -3 build.py debian14
+py -3 build.py debian12 --test
+py -3 build.py debian13 --test
+py -3 build.py debian14 --test
 ```
 
 On Linux or macOS:
 
 ```sh
-python3 build.py debian12
-python3 build.py debian13
-python3 build.py debian14
+python3 build.py debian12 --test
+python3 build.py debian13 --test
+python3 build.py debian14 --test
 ```
 
 Use `all` instead of a service name to build all targets sequentially, stopping
-at the first failure (for example, `py -3 build.py all` on Windows). If the Windows
+at the first failure (for example, `py -3 build.py all --test` on Windows). Omit
+`--test` for a build without integration testing. If the Windows
 Python launcher is unavailable, use `python build.py debian12` with Python 3
 installed and available in PATH.
 
@@ -72,27 +79,72 @@ It does not start or restart Docker Desktop automatically. A running Desktop
 process alone does not prove that the engine is ready, so the check uses the
 Docker API instead of checking the process list.
 
-Direct Compose commands remain available, but **bypass the launcher's checks**:
+Each build is a one-shot job that should exit successfully when finished. The
+launcher streams its output to the terminal and preserves failures as nonzero
+exit codes. Its disposable containers are removed after each run.
+
+## Integration tests
+
+Build and then test the newly produced package on Windows:
+
+```powershell
+py -3 build.py debian12 --test
+py -3 build.py all --test
+```
+
+If you already built packages, test them without rebuilding:
+
+```powershell
+py -3 build.py debian12 --test-only
+py -3 build.py all --test-only
+```
+
+On Linux or macOS, replace `py -3` with `python3`. `--test` and `--test-only` are
+mutually exclusive. The launcher stops at the first build or test failure. A
+failed build never triggers a test against an older package left in `output/`.
+`--test-only` deliberately tests the artifacts currently in that directory; it
+does not prove they were built from the current checkout.
+
+Each target has a separate test service in `compose.test.yaml`, using
+`Dockerfile.test` and the corresponding Debian base image. Test services are
+opt-in and do not run as part of normal builds. Each run:
+
+1. Requires exactly one server package, checks its SHA-256 checksum, package
+   identity, custom version suffix, and architecture.
+2. Installs that local `.deb` and its dependencies in a fresh Debian container,
+   verifying that the installed version is the supplied custom version.
+3. Checks that the installed package keeps `dont_blame_nrpe=0` by default.
+4. Starts NRPE with a disposable test configuration and verifies that a real
+   `check_nrpe` request succeeds without arguments, while argument requests fail.
+5. Enables arguments only in that temporary configuration, restarts NRPE, and
+   verifies exact responses for two different pairs of arguments.
+
+The minimal Nagios-side component is Debian's official `nagios-nrpe-plugin`
+(`check_nrpe`). This is the client used by Nagios to contact NRPE; a full Nagios
+scheduler or web interface is unnecessary for this protocol test. Client and
+server run in the same isolated container over loopback, using TLS and a
+short-lived test certificate. No NRPE port is published on the host. Outputs are
+mounted read-only, and the packaged configuration remains unchanged.
+
+The test container needs access to Debian repositories to install dependencies.
+It runs NRPE directly rather than booting systemd, so these tests do not validate
+systemd service startup, external networking, production certificates, or a full
+Nagios deployment. On failure the script prints available logs and exits nonzero.
+
+## Advanced: direct Compose commands
+
+These commands **bypass the launcher's Docker readiness checks**. Prefer the
+launcher above for normal use:
 
 ```sh
 docker compose run --rm --build debian12
+docker compose -f compose.test.yaml run --rm --build test-debian12
 ```
 
-Compose cannot run a container-side preflight when its own connection to Docker
-fails. Use the launcher for the friendly error message.
-
-Each service is a one-shot build job that should exit successfully when finished.
-Inspect service logs when a build fails:
-
-```sh
-docker compose logs debian12
-```
-
-Remove the Compose containers after use:
-
-```sh
-docker compose down
-```
+Compose cannot run a container-side preflight when its connection to Docker
+fails. Test containers require a successfully built package in the matching output
+directory. Test services use an opt-in profile; explicitly naming a service in
+`compose run` activates it automatically.
 
 ## Packaging contract
 
@@ -135,12 +187,14 @@ runtime behavior.
 Run lightweight checks from the repository root:
 
 ```sh
-bash -n scripts/build.sh scripts/verify.sh
+bash -n scripts/build.sh scripts/verify.sh scripts/integration-test.sh
 python3 -m unittest discover -s tests -v
 docker compose config --quiet
+docker compose -f compose.test.yaml --profile integration config --quiet
 ```
 
-Then build each affected Debian target and verify the artifacts from that run.
+Then use `build.py <target> --test` for each affected Debian target to build and
+exercise its package in a fresh matching container.
 Unit tests and syntax checks do not substitute for actual package builds,
 installation tests, or runtime integration tests. Report unrun checks explicitly.
 
@@ -173,8 +227,10 @@ nrpe-custom/
 ├── AGENTS.md
 ├── README.md
 ├── Dockerfile
+├── Dockerfile.test                  # Minimal installation and NRPE test image
 ├── build.py                         # Host-side Docker preflight and build launcher
 ├── compose.yaml
+├── compose.test.yaml                # Opt-in test services for each Debian release
 ├── .dockerignore
 ├── .gitattributes
 ├── .gitignore
@@ -182,6 +238,7 @@ nrpe-custom/
 │   ├── AGENTS.md
 │   ├── build.sh
 │   ├── enable_command_args.py
+│   ├── integration-test.sh
 │   └── verify.sh
 ├── tests/
 │   ├── AGENTS.md

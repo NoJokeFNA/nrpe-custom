@@ -59,17 +59,18 @@ Once the application files are present, run relevant checks from the repository
 root:
 
 ```sh
-bash -n scripts/build.sh scripts/verify.sh
+bash -n scripts/build.sh scripts/verify.sh scripts/integration-test.sh
 python3 -m unittest discover -s tests -v
 docker compose config --quiet
+docker compose -f compose.test.yaml --profile integration config --quiet
 ```
 
 For build changes, validate each affected Debian target with:
 
 ```sh
-docker compose run --rm --build debian12
-docker compose run --rm --build debian13
-docker compose run --rm --build debian14
+python3 build.py debian12 --test
+python3 build.py debian13 --test
+python3 build.py debian14 --test
 ```
 
 Only run applicable commands; report missing files, tools, or Docker access as
@@ -78,6 +79,13 @@ or that runtime argument handling works. Validate package metadata, compiled
 options, and executable contents; use an isolated matching Debian environment
 for package installation and NRPE client/server integration tests. Distinguish
 passed, failed, skipped, and unrun checks in reports.
+
+Prefer `build.py` over direct Compose commands for Docker preflight and build/test
+sequencing. On Windows, use `py -3` instead of `python3`. Use `--test-only` to test
+existing artifacts without rebuilding them; do not claim they match current code.
+The integration services install the package in a disposable matching Debian
+container and exercise `check_nrpe` over TLS with arguments disabled and enabled.
+They do not validate systemd or a complete Nagios deployment.
 
 ## Changes and commits
 
