@@ -12,20 +12,24 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from nrpe_cli.signing import sign_release, verify_release
 
 
-def restrict_key_directory(directory):
-    """Set an owner-only Windows ACL before writing private key material."""
-    if os.name != 'nt':
-        return  # TemporaryDirectory already creates a mode-0700 directory on POSIX.
+def windows_owner_sid():
     identity = subprocess.run(['whoami', '/user', '/fo', 'csv', '/nh'],
                               stdin=subprocess.DEVNULL, capture_output=True, timeout=10)
     matches = re.findall(rb'"(S-1-\d+(?:-\d+)+)"', identity.stdout)
     if identity.returncode or len(matches) != 1:
         raise RuntimeError('Cannot determine the Windows signing-key owner SID')
-    result = subprocess.run(['icacls', str(directory), '/inheritance:r', '/grant:r',
-                             '*' + matches[0].decode('ascii') + ':(OI)(CI)F'],
-                            stdin=subprocess.DEVNULL, capture_output=True, timeout=10)
-    if result.returncode:
-        raise RuntimeError('Cannot restrict the temporary Windows signing-key directory ACL')
+    return '*' + matches[0].decode('ascii')
+
+
+def restrict_windows_path(path, sid, directory=False):
+    # Windows may assign the Administrators group as owner of newly created files.
+    # Set the actual user owner as well as the ACL before writing private bytes.
+    grant = sid + (':(OI)(CI)F' if directory else ':F')
+    for arguments in (['/setowner', sid], ['/inheritance:r', '/grant:r', grant]):
+        result = subprocess.run(['icacls', str(path), *arguments],
+                                stdin=subprocess.DEVNULL, capture_output=True, timeout=10)
+        if result.returncode:
+            raise RuntimeError('Cannot restrict the temporary Windows signing-key owner and ACL')
 
 
 def main():
@@ -51,10 +55,15 @@ def main():
                     or not value.isascii()):
                 raise RuntimeError('Signing key must use ASCII OpenSSH private-key format')
             with tempfile.TemporaryDirectory(prefix='nrpe-release-signing-') as temporary:
-                restrict_key_directory(temporary)
+                sid = windows_owner_sid() if os.name == 'nt' else None
+                if sid:
+                    restrict_windows_path(temporary, sid, directory=True)
                 key = Path(temporary) / 'key'
                 descriptor = os.open(key, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-                with os.fdopen(descriptor, 'w', encoding='ascii', newline='\n') as stream:
+                os.close(descriptor)
+                if sid:
+                    restrict_windows_path(key, sid)
+                with key.open('w', encoding='ascii', newline='\n') as stream:
                     stream.write(value)
                 sign_release(args.directory, key, args.allowed_signers)
         print('PASS: authenticated release signature and complete asset checksums')
