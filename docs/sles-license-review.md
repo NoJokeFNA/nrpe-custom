@@ -99,7 +99,8 @@ The two evidence questions are resolved. A SLES candidate must still include:
 - Candidate checksums covering every distributed asset and tests bound to the
   exact server and companion binaries.
 
-The previously observed missing OBS `.changes` history files remain a provenance
-packaging issue if a candidate promises the complete OBS input set. They do not
-change the checked source license declarations. The automatic release bundle
-gate and final candidate review remain open in the [release plan](release-plan.md).
+The previously missing OBS `.changes` history is now retained in the original
+input sets exported by new builds. The release gate verifies the complete OBS
+set and the corresponding SRPMs separately. These additions do not change the
+checked license declarations. See [release automation](releases.md) and the
+[release plan](release-plan.md) for candidate checks and integration state.

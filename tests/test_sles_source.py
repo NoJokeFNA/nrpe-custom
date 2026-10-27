@@ -77,6 +77,14 @@ class SlesSourceTests(unittest.TestCase):
                 fetch_sources(self.manifest(), destination, lambda *args, **kwargs: io.BytesIO(b'corrupt'))
             self.assertFalse((destination / 'nrpe.spec').exists())
 
+    def test_originals_keep_unmodified_recipe_for_release_provenance(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fetch_sources(self.manifest(), root / 'build', lambda *a, **k: io.BytesIO(SPEC.encode()),
+                          originals=root / 'originals')
+            self.assertEqual((root / 'originals/nrpe.spec').read_text(), SPEC)
+            self.assertNotIn('--enable-bash-command-substitution', (root / 'build/nrpe.spec').read_text())
+
     def test_source_manifest_cannot_escape_destination(self):
         manifest = self.manifest()
         manifest['files']['../nrpe.spec'] = manifest['files'].pop('nrpe.spec')

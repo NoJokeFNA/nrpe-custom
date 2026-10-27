@@ -50,6 +50,8 @@ install -m 0644 "${sources[0]}" "${helpers[0]}" "${helper_sources[0]}" "$outdir/
 install -m 0644 /opt/nrpe-build/source.json "$outdir/source-manifest.json"
 install -m 0644 /opt/nrpe-build/user-source.json "$outdir/user-source-manifest.json"
 install -m 0644 /opt/nrpe-build/bootstrap.json "$outdir/bootstrap-manifest.json"
+rm -rf "$outdir/obs-sources"
+cp -a /opt/nrpe-original-inputs "$outdir/obs-sources"
 (
   cd "$outdir"
   sha256sum "${package##*/}" "${helpers[0]##*/}" > SHA256SUMS

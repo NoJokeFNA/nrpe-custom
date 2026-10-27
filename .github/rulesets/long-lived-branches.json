@@ -1,0 +1,59 @@
+{
+  "name": "Protect master and develop",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/master",
+        "refs/heads/develop"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "required_status_checks": [
+          {
+            "context": "Branch and commit policy"
+          },
+          {
+            "context": "Shell and Compose configuration"
+          },
+          {
+            "context": "Unit tests (ubuntu-24.04, Python 3.9)"
+          },
+          {
+            "context": "Unit tests (ubuntu-24.04, Python 3.14)"
+          },
+          {
+            "context": "Unit tests (windows-2022, Python 3.9)"
+          },
+          {
+            "context": "Unit tests (windows-2022, Python 3.14)"
+          }
+        ],
+        "strict_required_status_checks_policy": true
+      }
+    }
+  ]
+}

@@ -4,8 +4,9 @@ on:
   schedule:
     - cron: '23 6 * * 1'
   workflow_dispatch:
+  workflow_call:
   push:
-    branches: [master]
+    branches: [develop]
     paths:
       - 'requirements-*.txt'
       - '.github/workflows/dependency-audit.yml'

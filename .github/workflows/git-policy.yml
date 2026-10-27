@@ -1,0 +1,27 @@
+name: Git policy
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  policy:
+    name: Branch and commit policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check route and human attribution
+        env:
+          BASE_NAME: ${{ github.base_ref }}
+          HEAD_NAME: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: >-
+          python3 scripts/check_git_policy.py
+          --base-name "$BASE_NAME" --head-name "$HEAD_NAME"
+          --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA"
