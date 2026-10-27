@@ -1,0 +1,39 @@
+# Opt-in integration tests; normal Compose builds do not start these services.
+x-nrpe-test: &nrpe-test
+  platform: linux/amd64
+  profiles: [integration]
+
+services:
+  test-debian12:
+    <<: *nrpe-test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        DEBIAN_CODENAME: bookworm
+    environment:
+      DEBIAN_CODENAME: bookworm
+    volumes:
+      - ./output/debian12:/packages:ro
+  test-debian13:
+    <<: *nrpe-test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        DEBIAN_CODENAME: trixie
+    environment:
+      DEBIAN_CODENAME: trixie
+    volumes:
+      - ./output/debian13:/packages:ro
+  test-debian14:
+    <<: *nrpe-test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        DEBIAN_CODENAME: forky
+    environment:
+      DEBIAN_CODENAME: forky
+    volumes:
+      - ./output/debian14:/packages:ro
