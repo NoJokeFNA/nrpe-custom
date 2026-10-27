@@ -9,8 +9,8 @@ The Dockerfile, Compose configuration, build scripts, rules-transformer tests,
 and output directory placeholders from the supplied project archive are included.
 The documentation and Compose comments use an editor-independent workflow.
 
-Shell syntax checks, all five rules-transformer unit tests, and Compose
-configuration validation pass. A Debian 12 build was attempted in the cloud
+Shell syntax checks, all 13 unit tests (rules transformation and Docker
+preflight behavior), and Compose configuration validation pass. A Debian 12 build was attempted in the cloud
 environment, but failed while installing dependencies because the build container
 could not resolve `deb.debian.org`. No package was produced. Debian 13 and 14
 builds, package installation, and NRPE client/server integration have not been run.
@@ -34,7 +34,7 @@ suite, so its sources and dependencies can change frequently.
 - Docker Engine with Linux containers and Docker Compose v2.
 - Access from containers to the official Debian package repositories.
 - Sufficient disk space for builder images, source trees, and generated packages.
-- Python 3 and Bash for running the lightweight checks outside containers.
+- Python 3 for the build launcher and unit tests; Bash for local shell syntax checks.
 
 Any editor or terminal can be used. On Windows, Docker Desktop with Linux
 containers is an option. ARM hosts require support for running `linux/amd64`
@@ -42,19 +42,44 @@ containers through emulation.
 
 ## Usage
 
-Run commands from the repository root. Build one target at a time with:
+Use the build launcher from the repository root. On Windows (PowerShell):
+
+```powershell
+py -3 build.py debian12
+py -3 build.py debian13
+py -3 build.py debian14
+```
+
+On Linux or macOS:
+
+```sh
+python3 build.py debian12
+python3 build.py debian13
+python3 build.py debian14
+```
+
+Use `all` instead of a service name to build all targets sequentially, stopping
+at the first failure (for example, `py -3 build.py all` on Windows). If the Windows
+Python launcher is unavailable, use `python build.py debian12` with Python 3
+installed and available in PATH.
+
+The launcher checks the Docker CLI, Engine connectivity, Linux container mode,
+and Compose v2 before starting a build. On Windows, an unavailable engine produces
+an English message asking you to start Docker Desktop, enable Linux containers,
+and wait for the engine to become ready. It also preserves Docker's error details
+and suggests checking the active Docker context if Desktop is already running.
+It does not start or restart Docker Desktop automatically. A running Desktop
+process alone does not prove that the engine is ready, so the check uses the
+Docker API instead of checking the process list.
+
+Direct Compose commands remain available, but **bypass the launcher's checks**:
 
 ```sh
 docker compose run --rm --build debian12
-docker compose run --rm --build debian13
-docker compose run --rm --build debian14
 ```
 
-Alternatively, start all three build services:
-
-```sh
-docker compose up --build --abort-on-container-failure
-```
+Compose cannot run a container-side preflight when its own connection to Docker
+fails. Use the launcher for the friendly error message.
 
 Each service is a one-shot build job that should exit successfully when finished.
 Inspect service logs when a build fails:
@@ -148,6 +173,7 @@ nrpe-custom/
 ├── AGENTS.md
 ├── README.md
 ├── Dockerfile
+├── build.py                         # Host-side Docker preflight and build launcher
 ├── compose.yaml
 ├── .dockerignore
 ├── .gitattributes
@@ -159,7 +185,8 @@ nrpe-custom/
 │   └── verify.sh
 ├── tests/
 │   ├── AGENTS.md
-│   └── test_enable_command_args.py
+│   ├── test_enable_command_args.py
+│   └── test_build_launcher.py
 └── output/
     ├── debian12/
     ├── debian13/
