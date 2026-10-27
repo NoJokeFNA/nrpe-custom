@@ -5,6 +5,7 @@ import signal
 import subprocess
 
 from .docker import check_docker
+from .diagnostics import TLSFailure
 from .state import ROOT, artifact, new_id, save_report, target_lock, timestamp
 from .targets import package_files
 
@@ -55,17 +56,25 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=
     process = None
     try:
         for command in commands:
+            tls_failure = TLSFailure()
             process = subprocess.Popen(
                 command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, encoding="utf-8", errors="replace", **options,
             )
             for line in process.stdout:
+                tls_failure.observe(line)
                 log.write(line)
                 log.flush()
                 print(line, end="", flush=True)
             code = process.wait()
             process.stdout.close()
             if code:
+                hint = tls_failure.hint(ca_configured=ca_cert is not None)
+                if hint:
+                    message = '\nHINT: ' + hint + '\n'
+                    log.write(message)
+                    log.flush()
+                    print(message, end='', flush=True)
                 return code
         return 0
     finally:

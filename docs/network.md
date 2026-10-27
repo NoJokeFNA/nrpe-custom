@@ -101,6 +101,15 @@ It does not probe every remote repository. Inspect the failing phase's log with
 blocked hostname or redirect. Do not share unredacted authenticated URLs,
 repository credentials, or complete proxy configuration files.
 
+When a Docker command fails and its output contains a recognized TLS/certificate
+error, the CLI prints a troubleshooting hint and saves it in the run log. For
+certificate verification errors it indicates whether a company CA was supplied,
+and points to `--ca-cert` or the menu's certificate selection when none was given.
+A hint identifies a possible cause; it does not prove a company CA is missing.
+Image pulls and Dockerfile frontend downloads require Docker/BuildKit trust
+configuration separately. Successful commands and unrelated failures do not
+produce a TLS hint; the original output and exit code are preserved.
+
 ## Optional company CA certificate
 
 If your organization inspects HTTPS traffic, the containers must trust the
