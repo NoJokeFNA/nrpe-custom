@@ -23,13 +23,20 @@ The SLES upstream archive is bound by SHA-256
 The manifests retain expected sizes and checksums for the original OBS input
 files; the exported source RPM contains the intentionally modified build spec.
 
-The existing NRPE source RPM was unpacked and compared with the pinned manifest:
+The earlier NRPE source RPM was unpacked and compared with the pinned manifest:
 14 entries matched (including the intentionally modified spec), while the OBS
 history file `nrpe.changes` was absent. The companion source RPM matched its spec
 and README; `system-user-nagios.changes` was absent. Record these provenance
-differences explicitly and include the pinned history files separately if a
-candidate promises the complete OBS input set. The comparison is not a fresh
-SLES binary build or a completed license review.
+differences explicitly. New SLES builds now export the complete original OBS
+input sets under `obs-sources/`; release preparation verifies every file against
+the pinned manifests and includes the history alongside the SRPMs. The original
+comparison alone is not evidence of a fresh build.
+
+Reviewed Debian upstream archive and license-file hashes are recorded in
+`packaging/debian-license-review.json`. Automatic publication fails for a new
+source version or changed evidence until it is reviewed; source discovery and
+local builds remain dynamic. This separates successful compilation from license
+review of previously unexamined source bytes.
 
 ## Host-only optional menu dependencies
 

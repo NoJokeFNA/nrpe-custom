@@ -2,14 +2,17 @@ name: Checks
 
 on:
   push:
+    branches-ignore: [master]
   pull_request:
+    branches: [develop, master]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: checks-${{ github.ref }}-${{ github.event_name }}
+  group: checks-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ github.ref == 'refs/heads/master' && github.run_id || 'latest' }}
   cancel-in-progress: true
 
 jobs:

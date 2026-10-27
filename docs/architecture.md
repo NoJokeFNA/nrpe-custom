@@ -37,6 +37,7 @@ flowchart LR
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
 | `nrpe_cli/certificates.py` | Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret |
 | `nrpe_cli/media.py` | Validate extracted SLES product identity, repository layout, and path containment |
+| `nrpe_cli/release.py` | Validate exact workflow/build/source evidence and assemble complete release archives |
 | `compose.yaml` / `compose.test.yaml` | Parameterized builder services and opt-in runtime test services |
 | `docker/debian/build.Dockerfile` / `docker/debian/test.Dockerfile` | Debian build prerequisites and separate runtime environment |
 | `docker/sles15sp4/build.Dockerfile` / `docker/sles15sp4/test.Dockerfile` | Genuine SP4 environments, verified prerequisites, and read-only optional media |
@@ -96,6 +97,8 @@ the host controller requires Python 3.9+.
 | `verify.sh` | `build.sh` | Check Debian package contents/identity and generated configure macros before export |
 | `enable_command_args.py` | `build.sh` | Narrow, independently tested Debian rules transformation |
 | `export_debian_sources.py` | `build.sh` | Validate the matching DSC and every referenced source archive before exporting corresponding sources |
+| `prepare_release.py` | Release workflow / local candidate review | Host-only release staging, source/license validation and five-target completeness gate |
+| `check_git_policy.py` / `delete_merged_topic.py` | PR workflows | Check integration/authorship policy and lease-delete only eligible merged topic heads |
 | `setup-debian-repositories.sh` | Both Debian Dockerfiles | Shared source/binary setup and Bullseye archive adjustment |
 | `integration-test.sh` | Debian test entry point | Debian artifact validation and installation, then shared protocol test |
 | `build-sles.sh` | SLES builder entry point | Native RPM build, packaged defaults, and server/helper export |

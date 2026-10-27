@@ -4,7 +4,8 @@ set -Eeuo pipefail
 workdir="$(mktemp -d /tmp/nrpe-user-build.XXXXXXXX)"
 trap 'rm -rf "$workdir"' EXIT
 mkdir -p "$workdir"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-python3 /opt/nrpe-build/sles_source.py /opt/nrpe-build/user-source.json "$workdir/SOURCES"
+python3 /opt/nrpe-build/sles_source.py /opt/nrpe-build/user-source.json "$workdir/SOURCES" \
+  --originals /opt/nrpe-original-inputs/system-user-nagios
 mv "$workdir/SOURCES/system-user-nagios.spec" "$workdir/SPECS/"
 rpmbuild -ba --define "_topdir $workdir" \
   --define 'vendor nrpe-custom (based on OBS server:monitoring)' \

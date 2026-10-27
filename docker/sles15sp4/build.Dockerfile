@@ -27,7 +27,8 @@ RUN --mount=type=secret,id=nrpe_ca_cert \
     python3 /opt/nrpe-build/fetch_sles_packages.py /opt/nrpe-build/bootstrap.json /tmp/nrpe-suse-rpms build; \
     zypper --non-interactive install --no-recommends /tmp/nrpe-suse-rpms/*.rpm; \
     bash /opt/nrpe-build/build-sles-user.sh; \
-    python3 /opt/nrpe-build/sles_source.py /opt/nrpe-build/source.json /opt/nrpe-sources; \
+    python3 /opt/nrpe-build/sles_source.py /opt/nrpe-build/source.json /opt/nrpe-sources \
+      --originals /opt/nrpe-original-inputs/nrpe; \
     rpmspec --query --buildrequires /opt/nrpe-sources/nrpe.spec > /tmp/nrpe-build-requires; \
     while IFS= read -r requirement; do \
       zypper --non-interactive install --no-recommends "$requirement" || exit; \

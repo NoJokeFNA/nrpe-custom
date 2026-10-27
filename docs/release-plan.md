@@ -1,9 +1,11 @@
 # Release preparation plan
 
-Status: active preparation, updated 2026-10-27. The maintainer has selected MIT
-for independently authored project code and documentation. No public binary
-release is ready or authorized by this plan. Publish only when explicitly
-requested after a concrete candidate has passed the checks below.
+Status: automated release preparation, updated 2026-10-27. MIT is adopted for
+independently authored project work. The maintainer has requested automatic
+package releases for successful pushes to master. The implementation follows
+topic PRs into develop, then a develop-to-master promotion PR. Publication is
+gated on complete five-target verification; repository visibility is unchanged.
+See [Git workflow](git-workflow.md) and [release automation](releases.md).
 
 ## Scope and current state
 
@@ -19,22 +21,24 @@ bundles, and SLES media are outside this scope.
 | TLS failure guidance | Implemented | Missing/supplied CA and other TLS failures; separate Docker/BuildKit trust documented |
 | Custom package installation instructions | Documented | [Installation guide](installation.md), linked from README and SLES notes; full deployments use upstream manuals |
 | Operational and maintenance guidance | Documented | [Update/rollback](updates-and-rollback.md), [configuration examples](configuration-examples.md), and [support policy](maintenance.md) |
-| Fast CI and dependency monitoring | Configured; check actual run results | Linux/Windows Python matrix, Linux shell/Compose checks, weekly dependency audit and Dependabot; no automated package-build claim |
+| Fast CI and dependency monitoring | Configured; check actual run results | Linux/Windows matrix, shell/Compose checks, dependency audit; full release builds use a separate gated workflow |
 | Project license | Adopted | [MIT license](../LICENSE); third-party components retain their own licenses |
 | Warranty and liability notice | Documented | README and [security guidance](security.md), subject to applicable law; no security or availability guarantee |
 | Third-party license inventory | Recorded SLES evidence gaps resolved; candidate review remains | [Inspected evidence](../THIRD_PARTY.md) and [SLES review](sles-license-review.md); actual release assets still need checking |
 | Debian corresponding-source export | Implemented and validated on all four targets | `scripts/export_debian_sources.py`; full verify runs and independent source reconstruction passed |
-| SLES corresponding-source export and notices | Existing payloads inspected; companion notices prepared | [Notice directory](../packaging/licenses/sles15sp4/README.md); OBS history supplement remains a provenance task |
-| Release bundle completeness and test gate | Not implemented | Implement the offline candidate check described below |
-| Public release | Not created | Requires resolved findings, an identified candidate, successful checks, and an explicit publication request |
+| SLES corresponding sources and notices | Original OBS export and validation implemented | Includes history files, both SRPMs and the [notice directory](../packaging/licenses/sles15sp4/README.md) |
+| Release completeness and test gate | Implemented; validate actual runs | `prepare_release.py`, clean source identities, source/binary hashes and complete five-target assembly |
+| GitHub releases | Automatic on successful master pushes after integration | Draft upload then publication; no feature/develop/PR publication, no container/media redistribution |
+| Long-lived branch protection | Ruleset prepared; administrator action required | API creation returned HTTP 403; [setup instructions](git-workflow.md#server-side-protection-one-time-administrator-action) |
 
 ## 1. Finish source and notice review
 
 - [x] Adopt MIT for independent project work and add the root license text.
 - [x] Inventory actual Debian 12 copyright text, the pinned SLES archive and spec
   headers, companion source spec, and exact pinned optional UI wheels.
-- [ ] Review each candidate Debian source's `debian/copyright`, embedded notices,
-  full GPL text, and OpenSSL linking terms; versions differ by suite.
+- [x] Record reviewed Debian source/archive and license hashes in
+  `packaging/debian-license-review.json`. Publication rejects unreviewed versions
+  or changed license evidence; builds still discover the suite's current source.
 - [x] Resolve the SLES NRPE/OpenSSL linking basis from the pinned source's
   `src/utils.c:display_license()` and confirm it in the existing custom binary's
   license output. Retain the GPL text and explicit OpenSSL exemption.
@@ -43,8 +47,8 @@ bundles, and SLES media are outside this scope.
   as an explicitly identified downstream companion notice.
 - [x] Read the full ACL headers: both grant GPLv2-or-later, resolving the apparent
   difference caused by the short GPLv2 headings.
-- [ ] Preserve NRPE `LEGAL`, ACL and `snprintf` notices, Debian/SUSE packaging
-  notices, and Autoconf/helper exceptions in the corresponding sources.
+- [x] Preserve corresponding source archives/SRPMs and original per-file notices,
+  with separate component/project notices checked during release preparation.
 
 The [inventory](../THIRD_PARTY.md) and [SLES source review](sles-license-review.md)
 record the evidence and correct the earlier incomplete searches. The previously
@@ -77,10 +81,10 @@ substitution, and contains all source inputs. Confirm the real companion source
 and notices are present. Retain all three input manifests and required build
 scripts. Keep the pure SLES SP4 dependency policy.
 
-## 3. Implement an offline release candidate gate
+## 3. Offline release candidate gate and automation
 
-Prepare candidates under ignored local storage; do not upload them automatically.
-The checker must fail if any selected target is incomplete or untested:
+Local stage commands do not upload. The master-push workflow uploads only after
+the gate passes. The checker must fail if any target is incomplete or untested:
 
 1. Identify exact binaries, sources, targets, custom versions, and build workflow
    commit. Require clean tracked sources for the workflow archive.
@@ -100,10 +104,12 @@ The checker must fail if any selected target is incomplete or untested:
    values, caches, container images, and SLES media. Review logs and build
    information for local information before including public provenance.
 
-Current run reports bind runtime tests to package bytes, but do not record full
-source/workflow identity. Add that evidence rather than treating the current
-schema as a release attestation. Completeness checks do not resolve license
-findings.
+New reports record workflow identity before and after verification and the full
+exported release-asset hashes. Preparation requires a clean matching commit,
+a fresh successful verify run and unchanged binaries/sources. Legacy reports
+and runtime-only tests are rejected. Local records are not signed attestations;
+the trusted workflow produces and transfers candidate archives within its run.
+Completeness checks do not replace review when source/license evidence changes.
 
 ## Validation recorded during this preparation
 
@@ -159,9 +165,10 @@ arguments by default, disabled Bash substitution, and support/security limits
 of historical distributions. Keep unofficial-build wording; do not imply Debian,
 SUSE, or Nagios endorsement.
 
-Select a project release tag/version separately from distribution package
-versions. Prepare the asset list, checksums, evidence and release notes for
-review. Publishing a release or tag requires an explicit request.
+Automatic build tags use a workflow-run number and commit prefix, separately
+from distribution package versions. Master pushes are the publication trigger
+requested by the maintainer. Other publication methods require a separate
+request. Changes first follow the [integration workflow](git-workflow.md).
 
 ## References
 

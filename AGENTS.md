@@ -127,6 +127,16 @@ They do not validate systemd or a complete Nagios deployment.
 
 ## Changes and commits
 
+- Keep `master` as the default/release branch and `develop` as the integration
+  branch. Never delete either branch. Do not work directly on either branch.
+- Start from current `develop` on `feat/...`, `fix/...`, `refactor/...`, or
+  `remove/...`. Open a PR into `develop`; promote `develop` to `master` by PR.
+- Delete a topic branch only after its PR merged into `develop`, and only if its
+  head still matches the merged PR and no other open PR needs it. Never enable
+  unrestricted automatic head-branch deletion: promotion PRs must retain develop.
+- Use the existing human Git author identity only. Do not add co-author trailers,
+  AI attribution, or generated-with/by lines to commit messages. Do not rewrite
+  existing history. Review and re-author bot update proposals before integration.
 - Inspect Git status first and preserve unrelated user changes.
 - Keep changes focused on the requested task; do not import archives, rewrite
   existing documentation, or change application behavior as incidental cleanup.

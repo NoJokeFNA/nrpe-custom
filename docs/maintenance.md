@@ -22,9 +22,9 @@ Use an upstream-maintained interpreter for production; compatibility testing doe
 not provide security maintenance for an interpreter. Consult the
 [Python version lifecycle](https://devguide.python.org/versions/).
 
-Fast CI runs units, shell syntax and Compose configuration checks. It does not
-run the package build/install/protocol matrix, which is required separately for
-affected targets and candidates. Workflow configuration is not proof of a pass:
+Fast CI runs units, shell syntax and Compose checks. The separate [release
+workflow](releases.md) runs the full package/install/protocol matrix on master
+pushes and release-relevant PRs. Workflow configuration is not proof of a pass:
 inspect the actual run for the commit being evaluated.
 
 Historical archives/repositories may become unavailable. Consult [Debian release
@@ -36,7 +36,9 @@ another suite, SLES service pack, or Leap packages to preserve a passing result.
 ## Automated dependency monitoring
 
 [Dependabot](../.github/dependabot.yml) checks Python requirements and pinned
-GitHub Actions weekly and proposes update PRs, without automatic merging.
+GitHub Actions weekly and proposes update PRs into `develop`, without automatic
+merging. Bot proposals need human-reviewed/authored integration under the
+[Git policy](git-workflow.md).
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
 checkout configuration does not override those settings.
 

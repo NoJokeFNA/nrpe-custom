@@ -70,6 +70,12 @@ useful verification boundaries.
 
 ## Changes and pull requests
 
+Start from `develop` on `feat/...`, `fix/...`, `refactor/...`, or `remove/...`.
+Open a PR into `develop`; promote `develop` to `master` by PR. Never delete either
+long-lived branch or work directly on it. Use only the human commit author, with
+no co-author or generated-with/by attribution. See the [Git workflow](docs/git-workflow.md)
+for route/author checks, guarded topic deletion and required administrator setup.
+
 Keep changes focused and commit independently reviewable changes separately.
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), for
 example `feat(menu): add target navigation` or `docs: clarify firewall rules`.

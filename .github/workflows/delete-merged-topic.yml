@@ -1,0 +1,25 @@
+name: Delete merged topic branch
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop]
+permissions:
+  contents: read
+jobs:
+  cleanup:
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: develop
+      - name: Delete only the unchanged merged topic head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/delete_merged_topic.py
