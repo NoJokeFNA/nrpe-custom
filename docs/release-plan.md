@@ -18,6 +18,8 @@ bundles, and SLES media are outside this scope.
 | Company CA handoff on Windows | Implemented; user confirmed the fix | Environment-backed BuildKit secret, PEM/DER validation and SHA-256 cache identity |
 | TLS failure guidance | Implemented | Missing/supplied CA and other TLS failures; separate Docker/BuildKit trust documented |
 | Custom package installation instructions | Documented | [Installation guide](installation.md), linked from README and SLES notes; full deployments use upstream manuals |
+| Operational and maintenance guidance | Documented | [Update/rollback](updates-and-rollback.md), [configuration examples](configuration-examples.md), and [support policy](maintenance.md) |
+| Fast CI and dependency monitoring | Configured; check actual run results | Linux/Windows Python matrix, Linux shell/Compose checks, weekly dependency audit and Dependabot; no automated package-build claim |
 | Project license | Adopted | [MIT license](../LICENSE); third-party components retain their own licenses |
 | Warranty and liability notice | Documented | README and [security guidance](security.md), subject to applicable law; no security or availability guarantee |
 | Third-party license inventory | Recorded SLES evidence gaps resolved; candidate review remains | [Inspected evidence](../THIRD_PARTY.md) and [SLES review](sles-license-review.md); actual release assets still need checking |
@@ -132,6 +134,14 @@ passed. These local checks are preparation evidence, not a published release
 attestation. Candidate source/workflow identity still needs the gate above.
 
 ## 4. Validate and prepare a reviewable candidate
+
+The subsequent container-layout cleanup passed all five target verify runs
+(Debian 11–14 and SLES 15 SP4), plus 117 local unit tests with the exact pinned
+menu requirements, shell/Compose checks and the Python dependency audit. SLES
+used the existing genuine SP4 cloud base documented in the SLES guide. The
+optional profile example was checked over real NRPE/TLS on Debian 12 with a fake
+load plugin. These checks do not establish production rollback, systemd, native
+Windows Docker Desktop behavior, or hosted CI success; inspect actual CI runs.
 
 Run the repository's unit, shell syntax, and Compose checks. Run every intended
 target with `python3 nrpe.py verify <target>`; use `--rebuild` when intentionally

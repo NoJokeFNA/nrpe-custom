@@ -46,6 +46,11 @@ package-manager prompts about configuration files and dependencies. Preserve
 the site's command definitions, allowed monitoring hosts, and TLS configuration.
 Package installation may start or restart a service.
 
+For an existing deployment, follow [updates and rollback](updates-and-rollback.md)
+before replacing packages. The [configuration examples](configuration-examples.md)
+and [maintenance policy](maintenance.md) describe optional checks and verification
+boundaries.
+
 ## Debian 11, 12, 13, or 14
 
 Check the destination release and architecture:

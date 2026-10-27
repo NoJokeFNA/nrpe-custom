@@ -190,6 +190,12 @@ The guide also explains the unsigned custom RPMs and matching repository
 requirements. See [SLES background](docs/sles15sp4.md) for source provenance and
 historical repository availability.
 
+Before changing an existing server, read [updates and rollback](docs/updates-and-rollback.md).
+Use the [configuration examples](docs/configuration-examples.md) for fixed checks,
+TLS settings and an optional restricted argument-profile wrapper. The
+[support and maintenance policy](docs/maintenance.md) explains tested boundaries,
+dependency monitoring and target deprecation.
+
 Review the server's configuration before enabling arguments:
 
 | Distribution | Configuration | Service |
@@ -209,9 +215,17 @@ disabled. See [deployment security](docs/security.md).
 
 ## Development and project documentation
 
+GitHub Actions provides [Linux/Windows unit and configuration checks](https://github.com/NoJokeFNA/nrpe-custom/actions/workflows/checks.yml)
+and a [scheduled Python dependency audit](https://github.com/NoJokeFNA/nrpe-custom/actions/workflows/dependency-audit.yml).
+These checks do not replace package builds and runtime integration tests.
+
 - [Menu guide](docs/menu.md): installation, keys, accessibility, and terminal behavior.
 - [Workflow reference](docs/workflow.md): commands, artifacts, reports, and troubleshooting.
 - [Installation guide](docs/installation.md): deploy custom Debian/SLES packages and configure services.
+- [Updates and rollback](docs/updates-and-rollback.md): retain packages/configuration and recover deployments.
+- [Configuration examples](docs/configuration-examples.md): fixed checks, TLS and restricted argument profiles.
+- [Support and maintenance](docs/maintenance.md): verification boundaries, dependencies and source updates.
+- [Container layout](docker/README.md): separate build/test recipes under `docker/`.
 - [Architecture](docs/architecture.md): control flow and every script's purpose.
 - [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
 - [SLES 15 SP4](docs/sles15sp4.md): provenance, dependencies, media, and installation.
