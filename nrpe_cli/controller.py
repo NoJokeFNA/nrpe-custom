@@ -28,25 +28,34 @@ def stop_process(process):
         process.wait()
 
 
-def run_phase(docker, root, run_id, target, phase, log, lock):
+def run_phase(docker, root, run_id, target, phase, log, lock, pull=False):
     name = f"nrpe-{run_id}-{target}-{phase}"
-    command = [docker, "compose", "-f",
-               "compose.yaml" if phase == "build" else "compose.test.yaml",
-               "run", "--rm", "--name", name, "--build",
-               target if phase == "build" else f"test-{target}"]
+    base = [docker, "compose", "-f",
+            "compose.yaml" if phase == "build" else "compose.test.yaml"]
+    service = target if phase == "build" else f"test-{target}"
+    commands = []
+    if pull:
+        commands.append(base + ["build", "--pull", service])
+    commands.append(base + ["run", "--rm", "--name", name]
+                    + ([] if pull else ["--build"]) + [service])
     options = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
                if os.name == "nt" else {"start_new_session": True})
     process = None
     try:
-        process = subprocess.Popen(
-            command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True, encoding="utf-8", errors="replace", **options,
-        )
-        for line in process.stdout:
-            log.write(line)
-            log.flush()
-            print(line, end="", flush=True)
-        return process.wait()
+        for command in commands:
+            process = subprocess.Popen(
+                command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, encoding="utf-8", errors="replace", **options,
+            )
+            for line in process.stdout:
+                log.write(line)
+                log.flush()
+                print(line, end="", flush=True)
+            code = process.wait()
+            process.stdout.close()
+            if code:
+                return code
+        return 0
     finally:
         if process is not None:
             stop_process(process)
@@ -71,12 +80,13 @@ def summary(report):
     print(f"Run: {report['id']} ({report['status']})")
 
 
-def execute(action, targets, root=ROOT):
+def execute(action, targets, root=ROOT, rebuild=False, pull=False):
     run_id = new_id()
     directory = root / ".nrpe" / "runs" / run_id
     directory.mkdir(parents=True)
     report = {"schema": 1, "id": run_id, "action": action, "started": timestamp(),
-              "status": "running", "exit_code": None, "targets": {
+              "status": "running", "exit_code": None, "rebuild": rebuild, "pull": pull,
+              "targets": {
                   target: {"build": "not run", "package": "not run", "test": "not run"}
                   for target in targets}}
     save_report(directory, report)
@@ -91,12 +101,14 @@ def execute(action, targets, root=ROOT):
             with target_lock(root, target, run_id) as lock:
                 with (directory / "run.log").open("a", encoding="utf-8") as log:
                     if action in ("build", "verify"):
+                        if not rebuild and list((root / "output" / target).glob("nagios-nrpe-server_*_amd64.deb")):
+                            raise RuntimeError(f"{target}: output already exists. Use --rebuild or test it instead.")
                         phase = "build"
                         active[phase] = "running"
                         save_report(directory, report)
                         print(f"\n[{target}] Building package", flush=True)
                         log.write(f"\n[{target}] Building package\n")
-                        code = run_phase(docker, root, run_id, target, phase, log, lock)
+                        code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break
@@ -113,7 +125,7 @@ def execute(action, targets, root=ROOT):
                         save_report(directory, report)
                         print(f"[{target}] Installing package and testing NRPE arguments", flush=True)
                         log.write(f"\n[{target}] Installing package and testing NRPE arguments\n")
-                        code = run_phase(docker, root, run_id, target, phase, log, lock)
+                        code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break

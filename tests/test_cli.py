@@ -1,6 +1,8 @@
 import contextlib
 import io
 import subprocess
+import tempfile
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -56,6 +58,32 @@ class CliTests(unittest.TestCase):
         self.assertEqual(cli.doctor(cli.ROOT), 0)
         self.assertEqual([call.args[0][3] for call in run.call_args_list],
                          ['compose.yaml', 'compose.test.yaml'])
+
+    @patch('sys.stdin.isatty', return_value=False)
+    @patch('nrpe_cli.cli.execute')
+    def test_existing_output_is_not_silently_rebuilt_in_automation(self, execute, tty):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'output/debian12').mkdir(parents=True)
+            (root / 'output/debian12/nagios-nrpe-server_test_amd64.deb').touch()
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(cli.main(['build', 'debian12'], root), 1)
+            execute.assert_not_called()
+            self.assertEqual(cli.main(['build', 'debian12', '--rebuild', '--pull'], root),
+                             execute.return_value)
+            self.assertEqual(execute.call_args.kwargs, {'rebuild': True, 'pull': True})
+
+    @patch('sys.stdin.isatty', return_value=True)
+    @patch('sys.stdout.isatty', return_value=True)
+    @patch('builtins.input', return_value='')
+    @patch('nrpe_cli.cli.execute')
+    def test_default_confirmation_keeps_existing_packages(self, execute, user_input, out_tty, in_tty):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'output/debian12').mkdir(parents=True)
+            (root / 'output/debian12/nagios-nrpe-server_test_amd64.deb').touch()
+            self.assertEqual(cli.main(['verify', 'debian12'], root), 0)
+            execute.assert_not_called()
 
 
 if __name__ == '__main__':

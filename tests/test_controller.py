@@ -39,7 +39,7 @@ class WorkflowTests(unittest.TestCase):
         for target in state.TARGETS:
             self.package(target)
         phase.return_value = 0
-        self.assertEqual(controller.execute('verify', list(state.TARGETS), self.root), 0)
+        self.assertEqual(controller.execute('verify', list(state.TARGETS), self.root, rebuild=True), 0)
         self.assertEqual([(c.args[3], c.args[4]) for c in phase.call_args_list],
                          [(t, p) for t in state.TARGETS for p in ('build', 'test')])
         for target, result in self.report()['targets'].items():
@@ -50,7 +50,7 @@ class WorkflowTests(unittest.TestCase):
     @patch('nrpe_cli.controller.run_phase', return_value=42)
     def test_failed_build_never_tests_stale_package(self, phase, docker):
         self.package()
-        self.assertEqual(controller.execute('verify', ['debian12', 'debian13'], self.root), 42)
+        self.assertEqual(controller.execute('verify', ['debian12', 'debian13'], self.root, rebuild=True), 42)
         self.assertEqual(phase.call_count, 1)
         report = self.report()
         self.assertEqual(report['targets']['debian12']['test'], 'not run')
@@ -104,7 +104,7 @@ class WorkflowTests(unittest.TestCase):
     @patch('nrpe_cli.controller.run_phase')
     def test_package_changed_during_test_invalidates_result(self, phase, docker):
         self.package()
-        def replace(*args):
+        def replace(*args, **kwargs):
             self.package(data=b'replaced during test')
             return 0
         phase.side_effect = replace
@@ -116,6 +116,33 @@ class WorkflowTests(unittest.TestCase):
         package.write_bytes(b'corrupt')
         with self.assertRaisesRegex(RuntimeError, 'checksum'):
             state.artifact(self.root, 'debian12')
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase')
+    def test_existing_package_requires_explicit_rebuild(self, phase, docker):
+        package = self.package()
+        self.assertEqual(controller.execute('build', ['debian12'], self.root), 1)
+        phase.assert_not_called()
+        self.assertEqual(package.read_bytes(), b'package content')
+
+    @patch('nrpe_cli.controller.subprocess.run')
+    @patch('nrpe_cli.controller.subprocess.Popen')
+    def test_pull_updates_base_before_running_without_rebuilding_twice(self, popen, run):
+        def process(*args, **kwargs):
+            child = MagicMock()
+            child.stdout = io.StringIO('cached layer\n')
+            child.wait.return_value = 0
+            child.poll.return_value = 0
+            return child
+        popen.side_effect = process
+        run.return_value = subprocess.CompletedProcess([], 0, '', '')
+        with state.target_lock(self.root, 'debian12', 'pull') as lock:
+            result = controller.run_phase('docker', self.root, 'pull', 'debian12',
+                                          'build', io.StringIO(), lock, pull=True)
+        self.assertEqual(result, 0)
+        commands = [call.args[0] for call in popen.call_args_list]
+        self.assertEqual(commands[0][-3:], ['build', '--pull', 'debian12'])
+        self.assertNotIn('--build', commands[1])
 
     @patch('nrpe_cli.cli.check_docker', side_effect=AssertionError('Must be offline'))
     def test_status_and_logs_work_without_docker(self, docker):

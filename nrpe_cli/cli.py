@@ -93,6 +93,11 @@ def parser():
     ):
         command = commands.add_parser(action, help=help_text)
         command.add_argument("targets", nargs="+", choices=(*TARGETS, "all"))
+        command.add_argument("--pull", action="store_true",
+                             help="check for updated Debian base images before building images")
+        if action != "test":
+            command.add_argument("--rebuild", action="store_true",
+                                 help="explicitly allow rebuilding existing package outputs")
     commands.add_parser("doctor", help="Diagnose Docker and project configuration")
     commands.add_parser("status", help="Show local packages and recorded test results (no Docker required)")
     logs = commands.add_parser("logs", help="Display output from a recorded run (no Docker required)")
@@ -158,7 +163,23 @@ def main(argv=None, root=ROOT):
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
-        return execute(args.action, targets, root)
+        rebuild = getattr(args, "rebuild", False)
+        if args.action in ("build", "verify") and not rebuild:
+            existing = [target for target in targets if list(
+                (root / "output" / target).glob("nagios-nrpe-server_*_amd64.deb"))]
+            if existing:
+                print("Existing package output: " + ", ".join(existing))
+                if not sys.stdin.isatty() or not sys.stdout.isatty():
+                    raise RuntimeError("Use --rebuild to replace existing packages, or use test to test them.")
+                try:
+                    answer = input("Rebuild the selected targets? [y/N]: ").strip().lower()
+                except EOFError:
+                    answer = ""
+                if answer not in ("y", "yes"):
+                    print("Cancelled; existing packages were kept.")
+                    return 0
+                rebuild = True
+        return execute(args.action, targets, root, rebuild=rebuild, pull=args.pull)
     except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
