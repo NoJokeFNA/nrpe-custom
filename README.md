@@ -5,14 +5,13 @@ support compiled in, while preserving Debian's packaging and runtime defaults.
 
 ## Current status
 
-This checkout currently contains agent instructions and this README. The supplied
-project archive includes a proposed Docker-based implementation, but its
-Dockerfile, Compose configuration, build scripts, and tests have not yet been
-imported. The workflow below describes that intended implementation; its commands
-will only work after those files are added.
+The Dockerfile, Compose configuration, build scripts, rules-transformer tests,
+and output directory placeholders from the supplied project archive are included.
+The documentation and Compose comments use an editor-independent workflow.
 
-No Debian package builds, package installation tests, or NRPE client/server
-integration tests have been validated in this checkout.
+Shell syntax checks, all five rules-transformer unit tests, and Compose
+configuration validation pass. Package builds, package installation, and NRPE
+client/server integration require separate validation; see the validation section.
 
 ## Build targets
 
@@ -27,7 +26,7 @@ The build selects the current official source version from the target suite,
 rather than assuming a fixed historical NRPE version. Forky is a moving testing
 suite, so its sources and dependencies can change frequently.
 
-## Requirements for the intended workflow
+## Requirements
 
 - Docker Engine with Linux containers and Docker Compose v2.
 - Access from containers to the official Debian package repositories.
@@ -38,10 +37,9 @@ Any editor or terminal can be used. On Windows, Docker Desktop with Linux
 containers is an option. ARM hosts require support for running `linux/amd64`
 containers through emulation.
 
-## Intended usage
+## Usage
 
-After the implementation files have been added, run commands from the repository
-root. Build one target at a time with:
+Run commands from the repository root. Build one target at a time with:
 
 ```sh
 docker compose run --rm --build debian12
@@ -70,7 +68,7 @@ docker compose down
 
 ## Packaging contract
 
-The intended build performs these steps inside the target Debian container:
+The build performs these steps inside the target Debian container:
 
 1. Enable official source repositories and install the package's build dependencies.
 2. Download and verify the official `nagios-nrpe` source package through APT.
@@ -87,7 +85,7 @@ The binary package name remains `nagios-nrpe-server`. Do not rename a finished
 package to implement versioning. Keep Debian's installation paths, dependencies,
 systemd integration, and other packaging behavior unchanged. Increment the custom
 `withargs` revision when the build recipe changes for the same Debian source
-version. The client plugin is not an intended exported artifact.
+version. The client plugin is not exported.
 
 ## Security and runtime behavior
 
@@ -104,7 +102,7 @@ Confirm both the disabled runtime default and a real client/server argument
 request before deploying packages. A configure macro check alone does not prove
 runtime behavior.
 
-## Validation after importing the implementation
+## Validation
 
 Run lightweight checks from the repository root:
 
@@ -139,6 +137,31 @@ and make a separate commit for each independently reviewable change.
 
 Repository-wide guidance lives in [AGENTS.md](AGENTS.md), with additional rules
 for [build scripts](scripts/AGENTS.md) and [tests](tests/AGENTS.md).
+
+## Project files
+
+```text
+nrpe-custom/
+├── AGENTS.md
+├── README.md
+├── Dockerfile
+├── compose.yaml
+├── .dockerignore
+├── .gitattributes
+├── .gitignore
+├── scripts/
+│   ├── AGENTS.md
+│   ├── build.sh
+│   ├── enable_command_args.py
+│   └── verify.sh
+├── tests/
+│   ├── AGENTS.md
+│   └── test_enable_command_args.py
+└── output/
+    ├── debian12/
+    ├── debian13/
+    └── debian14/
+```
 
 ## References
 
