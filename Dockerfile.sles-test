@@ -2,27 +2,21 @@
 ARG SLES_BASE_IMAGE=registry.suse.com/bci/bci-base:15.4
 FROM ${SLES_BASE_IMAGE}
 
-COPY scripts/setup-sles-repositories.sh scripts/setup-sles-media.sh /opt/nrpe-test/
-COPY packaging/sles15sp4-backports.asc /opt/nrpe-test/backports.asc
-COPY packaging/sles15sp4-suse.asc /opt/nrpe-test/suse.asc
+COPY scripts/setup-sles-repositories.sh scripts/setup-sles-media.sh \
+     scripts/fetch_sles_packages.py packaging/sles15sp4-bootstrap.json \
+     packaging/sles15sp4-backports.asc packaging/sles15sp4-suse.asc /opt/nrpe-test/
 RUN --mount=from=nrpe_sles_media,target=/mnt/nrpe-sles-media,readonly \
-    rpm --import /opt/nrpe-test/backports.asc /opt/nrpe-test/suse.asc \
-    && bash /opt/nrpe-test/setup-sles-repositories.sh \
-    && zypper --non-interactive install --no-recommends \
-       python3 openssl ca-certificates shadow coreutils grep util-linux
+    set -eu; \
+    rpm --import /opt/nrpe-test/sles15sp4-backports.asc /opt/nrpe-test/sles15sp4-suse.asc; \
+    bash /opt/nrpe-test/setup-sles-repositories.sh; \
+    zypper --non-interactive install --no-recommends \
+      python3 openssl ca-certificates shadow coreutils grep util-linux \
+      systemd-presets-branding-SLE util-linux-systemd; \
+    python3 /opt/nrpe-test/fetch_sles_packages.py /opt/nrpe-test/sles15sp4-bootstrap.json /tmp/nrpe-suse-rpms runtime; \
+    zypper --non-interactive install --no-recommends /tmp/nrpe-suse-rpms/*.rpm; \
+    zypper --non-interactive install --no-recommends monitoring-plugins-nrpe; \
+    rm -rf /tmp/nrpe-suse-rpms; \
+    zypper clean --all
 
-RUN --mount=from=nrpe_sles_media,target=/mnt/nrpe-sles-media,readonly \
-    zypper --non-interactive install --no-recommends systemd-presets-branding-SLE util-linux-systemd
-
-COPY scripts/fetch_sles_packages.py /opt/nrpe-test/fetch_sles_packages.py
-COPY packaging/sles15sp4-bootstrap.json /opt/nrpe-test/bootstrap.json
-RUN --mount=from=nrpe_sles_media,target=/mnt/nrpe-sles-media,readonly \
-    python3 /opt/nrpe-test/fetch_sles_packages.py /opt/nrpe-test/bootstrap.json /tmp/nrpe-suse-rpms runtime \
-    && zypper --non-interactive install --no-recommends /tmp/nrpe-suse-rpms/*.rpm \
-    && zypper --non-interactive install --no-recommends monitoring-plugins-nrpe \
-    && rm -rf /tmp/nrpe-suse-rpms \
-    && zypper clean --all
-
-COPY scripts/integration-test-sles.sh scripts/test-nrpe-protocol.sh /opt/nrpe-test/
-RUN chmod 755 /opt/nrpe-test/*.sh
+COPY --chmod=755 scripts/integration-test-sles.sh scripts/test-nrpe-protocol.sh /opt/nrpe-test/
 ENTRYPOINT ["/opt/nrpe-test/integration-test-sles.sh"]
