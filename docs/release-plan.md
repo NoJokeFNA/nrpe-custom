@@ -42,10 +42,14 @@ bundles, and SLES media are outside this scope.
 - [ ] Complete the [disposable-server checks](practical-validation.md#debian-and-sles-test-vms)
   for systemd, reboot, actual plugins, update and rollback on matching Debian/SLES VMs.
 - [ ] Add publisher authentication through signed checksums or GitHub artifact
-  attestations, with documented consumer verification. Current hashes provide
-  integrity checks, not independent publisher authentication.
+  attestations. [SSH Ed25519 support and consumer verification](release-signing.md)
+  are implemented for develop integration; production key enrollment,
+  owner configuration and a verified signed release remain outstanding.
+  Current published hashes provide integrity checks, not publisher authentication.
 - [ ] Continue the recurring [maintenance review](maintenance.md#human-review-cadence):
   upstream advisories, dependency proposals, source/license updates and target lifecycles.
+  See the [2026-10-27 review](maintenance-reviews/2026-10-27.md) for current findings
+  and follow-up priorities; periodic review is an ongoing task.
 
 Optional later work: compare remote source versions and the complete build recipe
 with existing local outputs before recommending a rebuild. The current CLI does
