@@ -6,6 +6,7 @@ output/*/user-source-manifest.json
 output/*/bootstrap-manifest.json
 output/*/*.buildinfo
 output/*/SHA256SUMS
+output/*/sources/
 __pycache__/
 *.py[cod]
 .nrpe/
@@ -13,3 +14,4 @@ __pycache__/
 local-media/
 .venv/
 local-certificates/
+/work/

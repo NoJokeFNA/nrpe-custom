@@ -95,6 +95,7 @@ the host controller requires Python 3.9+.
 | `build.sh` | Debian builder entry point | APT source discovery, Debian changelog, `dpkg-buildpackage`, and export |
 | `verify.sh` | `build.sh` | Check Debian package contents/identity and generated configure macros before export |
 | `enable_command_args.py` | `build.sh` | Narrow, independently tested Debian rules transformation |
+| `export_debian_sources.py` | `build.sh` | Validate the matching DSC and every referenced source archive before exporting corresponding sources |
 | `setup-debian-repositories.sh` | Both Debian Dockerfiles | Shared source/binary setup and Bullseye archive adjustment |
 | `integration-test.sh` | Debian test entry point | Debian artifact validation and installation, then shared protocol test |
 | `build-sles.sh` | SLES builder entry point | Native RPM build, packaged defaults, and server/helper export |

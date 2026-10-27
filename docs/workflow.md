@@ -157,8 +157,14 @@ revision when changing the recipe for the same official source version.
 
 The build verifies package identity, version, architecture, executable contents,
 and configure macros before exporting the server `.deb`, `SHA256SUMS`, and
-available `.buildinfo`. The client plugin is not exported. Existing valid output
-is retained until a replacement build passes its package checks.
+available `.buildinfo`. It also builds the corresponding source package before
+the binary build. `output/debianXX/sources/` contains the custom `.dsc`, every
+upstream/packaging archive referenced by its SHA-256 fields, and a separate
+`SHA256SUMS`. Export rejects missing files, mismatched versions and hashes, and
+unsafe filenames. Preserve this directory alongside binaries for release
+preparation; the binary-only checksum file used for installation is unchanged.
+The client plugin is not exported. Existing valid output is retained until a
+replacement build passes its package and source checks.
 
 ## Installation and argument integration tests
 

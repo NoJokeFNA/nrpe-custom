@@ -63,6 +63,12 @@ if [[ "$(dpkg-parsechangelog -S Version)" != "$custom_version" ]]; then
   exit 1
 fi
 
+printf '==> Building corresponding Debian source package\n'
+(cd "$workdir"; dpkg-source --build "$src_dir")
+description="$workdir/nagios-nrpe_${custom_version#*:}.dsc"
+python3 /opt/nrpe-build/export_debian_sources.py \
+  "$description" "$workdir/source-export" "$custom_version"
+
 printf '==> Building binary Debian packages\n'
 export DEB_BUILD_OPTIONS="parallel=$(nproc)"
 dpkg-buildpackage --build=binary --unsigned-source --unsigned-changes -rfakeroot
@@ -77,6 +83,8 @@ mkdir -p "$outdir"
 find "$outdir" -maxdepth 1 -type f \
   \( -name 'nagios-nrpe-server_*_amd64.deb' -o -name 'nagios-nrpe_*_amd64.buildinfo' \) -delete
 install -m 0644 "$package" "$outdir/$(basename "$package")"
+rm -rf "$outdir/sources"
+mv "$workdir/source-export" "$outdir/sources"
 (
   cd "$outdir"
   sha256sum "$(basename "$package")" > SHA256SUMS
