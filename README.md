@@ -152,15 +152,13 @@ component map and [network requirements](docs/network.md) for firewall planning.
 
 ## Using a built package
 
-On Debian, copy the package to the matching server and install it with APT so
-runtime dependencies are resolved:
-
-```sh
-sudo apt install ./nagios-nrpe-server_<version>_amd64.deb
-```
-
-For SLES, use the [SLES installation notes](docs/sles15sp4.md), including the
-companion user package and the availability of historical repositories.
+Follow the [installation guide](docs/installation.md) for step-by-step Debian
+11–14 and SLES 15 SP4 instructions: which files to copy, checksum verification,
+APT/zypper installation, the SLES companion user package, service startup, and
+installed-version checks. Run installation commands on the destination server.
+The guide also explains the unsigned custom RPMs and matching repository
+requirements. See [SLES background](docs/sles15sp4.md) for source provenance and
+historical repository availability.
 
 Review the server's configuration before enabling arguments:
 
@@ -183,6 +181,7 @@ disabled. See [deployment security](docs/security.md).
 
 - [Menu guide](docs/menu.md): installation, keys, accessibility, and terminal behavior.
 - [Workflow reference](docs/workflow.md): commands, artifacts, reports, and troubleshooting.
+- [Installation guide](docs/installation.md): deploy custom Debian/SLES packages and configure services.
 - [Architecture](docs/architecture.md): control flow and every script's purpose.
 - [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
 - [SLES 15 SP4](docs/sles15sp4.md): provenance, dependencies, media, and installation.

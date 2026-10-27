@@ -56,6 +56,15 @@ SLES sources are intentionally pinned. `--pull` refreshes the base image, not
 the OBS source revision. Updating the manifest requires reviewing the new recipe
 and source checksums. Debian builds continue to discover source versions via APT.
 
+## Installing the custom package on a server
+
+Use the [installation guide](installation.md#sles-15-sp4) to deploy the exported
+`.withargs1` RPM on a matching SLES 15 SP4 x86_64 server. It covers checksums,
+installation with and without an existing `system-user-nagios` package, unsigned
+local RPM handling, configuration, service startup, and version verification.
+The repository commands in the next section describe the historical upstream
+installation and do not select this project's custom artifact.
+
 ## Installing the repository package on an existing server
 
 The reported deployment uses this normal zypper workflow, run as root or with
