@@ -60,7 +60,7 @@ The publishing job writes the secret to a temporary mode-0600 key file, signs,
 verifies against the reviewed signer list, then removes the temporary key. The
 local CLI restricts the temporary directory to the current Windows SID before
 writing a key on Windows; POSIX uses a mode-0700 directory.
-key is unavailable to PR/build/test jobs. A missing/mismatched key, empty trusted
+The key is unavailable to PR/build/test jobs. A missing/mismatched key, empty trusted
 signer list or unsupported signing mode stops publication when signing is
 enabled; there is no fallback to an unsigned release. An unset variable or
 explicit `off` retains checksum-only publication and logs that signing is off.
