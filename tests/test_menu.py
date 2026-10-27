@@ -22,7 +22,8 @@ class MenuWorkflowTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
-        self.root = Path(self.directory.name)
+        # The browser resolves paths; Windows TEMP may use a short-name alias.
+        self.root = Path(self.directory.name).resolve()
         self.env = patch.dict(os.environ, {}, clear=True)
         self.env.start()
         self.addCleanup(self.env.stop)
