@@ -29,6 +29,8 @@ def ssh(*args, input=None):
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError('SSH signature operation timed out') from exc
     if result.returncode:
+        if b'bad permissions' in result.stderr.lower() or b'unprotected private key' in result.stderr.lower():
+            raise RuntimeError('SSH signature operation failed: private-key file permissions are too open')
         raise RuntimeError('SSH signature operation failed; check the key, trusted signers and OpenSSH support')
     return result.stdout
 

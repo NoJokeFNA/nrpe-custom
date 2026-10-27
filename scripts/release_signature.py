@@ -3,11 +3,29 @@
 import argparse
 import os
 from pathlib import Path
+import re
+import subprocess
 import sys
 import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from nrpe_cli.signing import sign_release, verify_release
+
+
+def restrict_key_directory(directory):
+    """Set an owner-only Windows ACL before writing private key material."""
+    if os.name != 'nt':
+        return  # TemporaryDirectory already creates a mode-0700 directory on POSIX.
+    identity = subprocess.run(['whoami', '/user', '/fo', 'csv', '/nh'],
+                              stdin=subprocess.DEVNULL, capture_output=True, timeout=10)
+    matches = re.findall(rb'"(S-1-\d+(?:-\d+)+)"', identity.stdout)
+    if identity.returncode or len(matches) != 1:
+        raise RuntimeError('Cannot determine the Windows signing-key owner SID')
+    result = subprocess.run(['icacls', str(directory), '/inheritance:r', '/grant:r',
+                             '*' + matches[0].decode('ascii') + ':(OI)(CI)F'],
+                            stdin=subprocess.DEVNULL, capture_output=True, timeout=10)
+    if result.returncode:
+        raise RuntimeError('Cannot restrict the temporary Windows signing-key directory ACL')
 
 
 def main():
@@ -33,6 +51,7 @@ def main():
                     or not value.isascii()):
                 raise RuntimeError('Signing key must use ASCII OpenSSH private-key format')
             with tempfile.TemporaryDirectory(prefix='nrpe-release-signing-') as temporary:
+                restrict_key_directory(temporary)
                 key = Path(temporary) / 'key'
                 descriptor = os.open(key, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
                 with os.fdopen(descriptor, 'w', encoding='ascii', newline='\n') as stream:
@@ -40,7 +59,7 @@ def main():
                 sign_release(args.directory, key, args.allowed_signers)
         print('PASS: authenticated release signature and complete asset checksums')
         return 0
-    except (OSError, RuntimeError, ValueError) as exc:
+    except (OSError, RuntimeError, ValueError, subprocess.TimeoutExpired) as exc:
         print('ERROR: ' + str(exc), file=sys.stderr)
         return 1
 
