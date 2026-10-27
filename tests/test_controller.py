@@ -1,0 +1,165 @@
+import contextlib
+import hashlib
+import io
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import MagicMock, patch
+
+from nrpe_cli import cli, controller, state
+
+
+class WorkflowTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.output = io.StringIO()
+        self.redirect = contextlib.redirect_stdout(self.output)
+        self.redirect.__enter__()
+        self.addCleanup(self.redirect.__exit__, None, None, None)
+
+    def package(self, target='debian12', data=b'package content'):
+        directory = self.root / 'output' / target
+        directory.mkdir(parents=True, exist_ok=True)
+        name = 'nagios-nrpe-server_4.1.3-1+withargs1_amd64.deb'
+        (directory / name).write_bytes(data)
+        digest = hashlib.sha256(data).hexdigest()
+        (directory / 'SHA256SUMS').write_text(f'{digest}  {name}\n')
+        return directory / name
+
+    def report(self):
+        return state.reports(self.root)[0]
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase')
+    def test_verify_runs_build_and_test_in_order_and_binds_hash(self, phase, docker):
+        for target in state.TARGETS:
+            self.package(target)
+        phase.return_value = 0
+        self.assertEqual(controller.execute('verify', list(state.TARGETS), self.root), 0)
+        self.assertEqual([(c.args[3], c.args[4]) for c in phase.call_args_list],
+                         [(t, p) for t in state.TARGETS for p in ('build', 'test')])
+        for target, result in self.report()['targets'].items():
+            self.assertEqual(result['test'], 'passed')
+            self.assertEqual(result['artifact'], state.artifact(self.root, target))
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase', return_value=42)
+    def test_failed_build_never_tests_stale_package(self, phase, docker):
+        self.package()
+        self.assertEqual(controller.execute('verify', ['debian12', 'debian13'], self.root), 42)
+        self.assertEqual(phase.call_count, 1)
+        report = self.report()
+        self.assertEqual(report['targets']['debian12']['test'], 'not run')
+        self.assertEqual(report['targets']['debian13']['build'], 'not run')
+        self.assertFalse((self.root / '.nrpe/locks/debian12').exists())
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase', return_value=7)
+    def test_integration_failure_preserves_exit_code_and_stops(self, phase, docker):
+        self.package()
+        self.assertEqual(controller.execute('test', ['debian12', 'debian13'], self.root), 7)
+        self.assertEqual(phase.call_count, 1)
+        self.assertEqual(self.report()['targets']['debian12']['test'], 'failed')
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase')
+    def test_missing_artifact_fails_before_test_image_build(self, phase, docker):
+        self.assertEqual(controller.execute('test', ['debian12'], self.root), 1)
+        phase.assert_not_called()
+        self.assertEqual(self.report()['targets']['debian12']['package'], 'failed')
+
+    def test_lock_excludes_other_runs_and_preserves_owner(self):
+        with state.target_lock(self.root, 'debian12', 'first') as lock:
+            with self.assertRaisesRegex(RuntimeError, 'locked'):
+                with state.target_lock(self.root, 'debian12', 'second'):
+                    self.fail('Acquired existing lock')
+            self.assertEqual(json.loads((lock / 'owner.json').read_text())['run'], 'first')
+        self.assertFalse(lock.exists())
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase', side_effect=KeyboardInterrupt)
+    def test_interrupt_records_outcome_and_releases_lock(self, phase, docker):
+        self.assertEqual(controller.execute('build', ['debian12'], self.root), 130)
+        self.assertEqual(self.report()['status'], 'interrupted')
+        self.assertEqual(self.report()['targets']['debian12']['build'], 'interrupted')
+        self.assertFalse((self.root / '.nrpe/locks/debian12').exists())
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase', return_value=0)
+    def test_replaced_package_does_not_inherit_passed_test(self, phase, docker):
+        self.package()
+        controller.execute('test', ['debian12'], self.root)
+        self.output.truncate(0)
+        self.output.seek(0)
+        self.package(data=b'new package')
+        cli.show_status(self.root)
+        self.assertIn('not tested', self.output.getvalue())
+        self.assertNotIn('passed (run', self.output.getvalue())
+
+    @patch('nrpe_cli.controller.check_docker', return_value='docker')
+    @patch('nrpe_cli.controller.run_phase')
+    def test_package_changed_during_test_invalidates_result(self, phase, docker):
+        self.package()
+        def replace(*args):
+            self.package(data=b'replaced during test')
+            return 0
+        phase.side_effect = replace
+        self.assertEqual(controller.execute('test', ['debian12'], self.root), 1)
+        self.assertEqual(self.report()['targets']['debian12']['test'], 'failed')
+
+    def test_bad_checksum_is_rejected(self):
+        package = self.package()
+        package.write_bytes(b'corrupt')
+        with self.assertRaisesRegex(RuntimeError, 'checksum'):
+            state.artifact(self.root, 'debian12')
+
+    @patch('nrpe_cli.cli.check_docker', side_effect=AssertionError('Must be offline'))
+    def test_status_and_logs_work_without_docker(self, docker):
+        self.assertEqual(cli.main(['status'], self.root), 0)
+        directory = self.root / '.nrpe/runs/example'
+        directory.mkdir(parents=True)
+        state.save_report(directory, {'schema': 1, 'id': 'example', 'action': 'test',
+                                     'status': 'failed', 'error': 'Test failure'})
+        (directory / 'run.log').write_text('Container diagnostics\n')
+        self.assertEqual(cli.main(['logs', '--last'], self.root), 0)
+        self.assertIn('Container diagnostics', self.output.getvalue())
+        self.assertIn('Test failure', self.output.getvalue())
+
+    @patch('nrpe_cli.controller.subprocess.run')
+    @patch('nrpe_cli.controller.subprocess.Popen')
+    def test_runner_streams_logs_returns_code_and_cleans_only_its_container(self, popen, run):
+        process = MagicMock()
+        process.stdout = io.StringIO('diagnostic output\n')
+        process.wait.return_value = 42
+        process.poll.return_value = 42
+        popen.return_value = process
+        run.return_value = subprocess.CompletedProcess([], 0, '', '')
+        with state.target_lock(self.root, 'debian12', 'run') as lock:
+            log = io.StringIO()
+            code = controller.run_phase('docker', self.root, 'run', 'debian12', 'build', log, lock)
+        self.assertEqual(code, 42)
+        self.assertIn('diagnostic output', log.getvalue())
+        self.assertEqual(run.call_args.args[0], ['docker', 'rm', '-f', 'nrpe-run-debian12-build'])
+        self.assertEqual(popen.call_args.kwargs['cwd'], self.root)
+
+    @patch('nrpe_cli.controller.subprocess.run')
+    @patch('nrpe_cli.controller.subprocess.Popen')
+    def test_failed_cleanup_retains_target_lock(self, popen, run):
+        process = MagicMock()
+        process.stdout = io.StringIO('')
+        process.poll.return_value = 0
+        process.wait.return_value = 0
+        popen.return_value = process
+        run.return_value = subprocess.CompletedProcess([], 1, '', 'Docker disconnected')
+        with self.assertRaisesRegex(RuntimeError, 'lock retained'):
+            with state.target_lock(self.root, 'debian12', 'run') as lock:
+                controller.run_phase('docker', self.root, 'run', 'debian12', 'test', io.StringIO(), lock)
+        self.assertTrue((lock / 'cleanup-required').exists())
+
+
+if __name__ == '__main__':
+    unittest.main()
