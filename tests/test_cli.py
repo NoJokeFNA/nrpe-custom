@@ -19,6 +19,16 @@ class CliTests(unittest.TestCase):
         self.redirect.__enter__()
         self.addCleanup(self.redirect.__exit__, None, None, None)
 
+    def test_help_explains_multiple_targets_without_repeating_choices(self):
+        with self.assertRaises(SystemExit) as exit_status:
+            cli.main(['verify', '--help'], self.root)
+        self.assertEqual(exit_status.exception.code, 0)
+        text = self.output.getvalue()
+        self.assertIn('TARGET [TARGET ...]', text)
+        self.assertIn('one or more targets:', text)
+        self.assertEqual(text.count('debian11'), 1)
+        self.assertNotIn('{debian11', text)
+
     @patch('nrpe_cli.cli.execute', return_value=0)
     def test_multiple_targets_are_deduplicated_in_order(self, execute):
         self.assertEqual(cli.main(['verify', 'debian14', 'debian12', 'debian14'], self.root), 0)

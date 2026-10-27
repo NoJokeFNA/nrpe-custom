@@ -104,7 +104,8 @@ def parser():
         ("verify", "Build packages and run their integration tests"),
     ):
         command = commands.add_parser(action, help=help_text)
-        command.add_argument("targets", nargs="+", choices=(*TARGETS, "all"))
+        command.add_argument("targets", nargs="+", choices=(*TARGETS, "all"), metavar="TARGET",
+                             help="one or more targets: " + ", ".join(TARGETS) + "; or all by itself")
         command.add_argument("--pull", action="store_true",
                              help="check for updated base images before building images")
         command.add_argument("--sles-media", metavar="DIRECTORY",
