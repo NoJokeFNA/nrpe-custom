@@ -1,0 +1,7 @@
+# Shell scripts must retain Linux line endings when edited on Windows.
+*.sh text eol=lf
+*.py text eol=lf
+Dockerfile text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf

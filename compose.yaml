@@ -1,0 +1,40 @@
+# Run with Docker Compose from the repository root.
+# Every service builds natively for linux/amd64, even on ARM workstations.
+x-nrpe-build: &nrpe-build
+  platform: linux/amd64
+  volumes:
+    - type: bind
+      source: ./output
+      target: /output
+
+services:
+  debian12:
+    <<: *nrpe-build
+    build:
+      context: .
+      args:
+        DEBIAN_CODENAME: bookworm
+    image: nrpe-custom-builder:bookworm
+    environment:
+      DEBIAN_CODENAME: bookworm
+      DEBIAN_NUMBER: "12"
+  debian13:
+    <<: *nrpe-build
+    build:
+      context: .
+      args:
+        DEBIAN_CODENAME: trixie
+    image: nrpe-custom-builder:trixie
+    environment:
+      DEBIAN_CODENAME: trixie
+      DEBIAN_NUMBER: "13"
+  debian14:
+    <<: *nrpe-build
+    build:
+      context: .
+      args:
+        DEBIAN_CODENAME: forky
+    image: nrpe-custom-builder:forky
+    environment:
+      DEBIAN_CODENAME: forky
+      DEBIAN_NUMBER: "14"

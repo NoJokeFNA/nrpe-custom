@@ -1,0 +1,6 @@
+.idea/
+output/*/*.deb
+output/*/*.buildinfo
+output/*/SHA256SUMS
+__pycache__/
+*.py[cod]

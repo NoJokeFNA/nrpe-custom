@@ -1,0 +1,6 @@
+.git
+.idea
+output
+*.zip
+__pycache__
+.pytest_cache
