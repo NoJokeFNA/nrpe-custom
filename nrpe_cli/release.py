@@ -2,7 +2,6 @@
 
 import hashlib
 import ast
-import io
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -31,7 +30,8 @@ def snapshot_assets(root, target):
     for path in sorted(directory.rglob('*')):
         if path.is_symlink():
             raise RuntimeError('Release assets must not contain symlinks')
-        if path.is_file() and path.suffix != '.buildinfo':
+        placeholder = path.name == '.gitkeep' and path.parent == directory and path.stat().st_size == 0
+        if path.is_file() and path.suffix != '.buildinfo' and not placeholder:
             result[path.relative_to(directory).as_posix()] = digest(path)
     return result
 
@@ -180,7 +180,8 @@ def validate_sources(root, target, evidence, notices):
             raise RuntimeError('Bootstrap manifest mismatch')
         shutil.copytree(root / 'packaging/licenses/sles15sp4', notices / 'sles15sp4')
     if set(evidence['assets']) != allowed:
-        raise RuntimeError('Missing or unexpected output assets; refusing to publish extra files')
+        raise RuntimeError('Output asset mismatch: missing={}, extra={}'.format(
+            sorted(allowed - set(evidence['assets'])), sorted(set(evidence['assets']) - allowed)))
 
 
 def prepare_target(root, target, commit, destination):

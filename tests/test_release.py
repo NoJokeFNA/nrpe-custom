@@ -86,6 +86,14 @@ class ReleaseTests(unittest.TestCase):
         (self.directory / 'local.buildinfo').write_text('private environment values')
         self.assertFalse(any(n.endswith('.buildinfo') for n in self.evidence()['assets']))
 
+    def test_only_empty_root_placeholders_are_excluded(self):
+        marker = self.directory / '.gitkeep'
+        marker.touch()
+        self.assertNotIn('.gitkeep', self.evidence()['assets'])
+        marker.write_text('unexpected content')
+        with self.assertRaisesRegex(RuntimeError, 'changed'):
+            self.evidence()
+
     def test_unreviewed_debian_source_is_rejected_before_external_tools(self):
         metadata = self.root / 'packaging/debian-license-review.json'
         metadata.parent.mkdir()
