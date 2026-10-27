@@ -119,6 +119,7 @@ stop_server
 # Change only the disposable test configuration, never the packaged default.
 sed -i 's/^dont_blame_nrpe=0$/dont_blame_nrpe=1/' "$runtime/nrpe.cfg"
 start_server
+echo 'Testing with dont_blame_nrpe=1: forwarding two different argument pairs'
 reply="$("${client[@]}" -c check_args -a alpha beta)"
 [[ "$reply" == NRPE_ARGS:alpha:beta ]] || {
   echo "ERROR: Unexpected argument response: $reply" >&2; exit 1;
@@ -127,5 +128,5 @@ reply="$("${client[@]}" -c check_args -a gamma delta)"
 [[ "$reply" == NRPE_ARGS:gamma:delta ]] || {
   echo "ERROR: Arguments did not reach the check correctly: $reply" >&2; exit 1;
 }
-echo 'PASS: check_nrpe receives the exact supplied arguments over TLS'
+echo 'PASS: Arguments enabled (dont_blame_nrpe=1); check_nrpe receives alpha/beta and gamma/delta over TLS'
 echo "PASS: Integration test completed for ${DEBIAN_CODENAME} ($version)"
