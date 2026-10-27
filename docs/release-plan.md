@@ -5,6 +5,8 @@ for independently authored project work. Successful master pushes publish only
 after complete five-target verification. Changes follow topic PRs into develop,
 then a develop-to-master promotion PR. Both long-lived branches are protected;
 repository visibility is unchanged.
+Creating or merging a master promotion requires an explicit maintainer request;
+ordinary implementation and integration stop at develop.
 See [Git workflow](git-workflow.md) and [release automation](releases.md).
 
 ## Scope and current state

@@ -19,6 +19,12 @@ from `develop` into `master`; never route a topic directly into `master`.
 Prefer a normal merge for develop-to-master promotion so ancestry remains clear.
 Keep working on topic branches, not directly on either long-lived branch.
 
+Integration ends at `develop` by default. Create or merge a develop-to-master
+promotion PR only when the maintainer explicitly requests promotion to master.
+A request to implement a change or integrate it into develop does not authorize
+a master PR or release. Once an explicitly requested promotion reaches master,
+the automatic release workflow runs as configured.
+
 ## Attribution
 
 Commits carry the existing human author identity. Do not add co-author trailers,

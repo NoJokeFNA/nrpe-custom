@@ -131,6 +131,9 @@ They do not validate systemd or a complete Nagios deployment.
   branch. Never delete either branch. Do not work directly on either branch.
 - Start from current `develop` on `feat/...`, `fix/...`, `refactor/...`, or
   `remove/...`. Open a PR into `develop`; promote `develop` to `master` by PR.
+- Stop integration at `develop` by default. Create or merge a develop-to-master
+  promotion PR only when the maintainer explicitly requests that promotion.
+  General implementation or develop-merge requests do not authorize promotion.
 - Delete a topic branch only after its PR merged into `develop`, and only if its
   head still matches the merged PR and no other open PR needs it. Never enable
   unrestricted automatic head-branch deletion: promotion PRs must retain develop.
