@@ -42,7 +42,7 @@ def patch_spec(text, version, release):
     return result
 
 
-def fetch_sources(manifest, destination, opener=urllib.request.urlopen):
+def fetch_sources(manifest, destination, opener=urllib.request.urlopen, originals=None):
     destination.mkdir(parents=True, exist_ok=True)
     base = "https://api.opensuse.org/public/source/{}/{}/".format(
         manifest["project"], manifest["package"])
@@ -56,6 +56,9 @@ def fetch_sources(manifest, destination, opener=urllib.request.urlopen):
         if len(data) != expected["size"] or hashlib.sha256(data).hexdigest() != expected["sha256"]:
             raise ValueError("OBS source checksum mismatch: " + name)
         (destination / name).write_bytes(data)
+        if originals is not None:
+            originals.mkdir(parents=True, exist_ok=True)
+            (originals / name).write_bytes(data)
     if manifest["package"] == "nrpe":
         spec = destination / "nrpe.spec"
         spec.write_text(patch_spec(spec.read_text(encoding="utf-8"), manifest["version"],
@@ -73,9 +76,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
     parser.add_argument("destination", type=Path)
+    parser.add_argument("--originals", type=Path)
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    fetch_sources(manifest, args.destination)
+    fetch_sources(manifest, args.destination, originals=args.originals)
     print("PASS: Pinned OBS source checksums and custom RPM recipe verified")
 
 

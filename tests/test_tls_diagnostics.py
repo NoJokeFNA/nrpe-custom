@@ -91,7 +91,8 @@ class TLSWorkflowTests(unittest.TestCase):
         original = 'curl: (60) SSL certificate problem: unable to get local issuer certificate\n'
         popen.return_value = self.process(original, 60)
         run.return_value = subprocess.CompletedProcess([], 0, '', '')
-        self.assertEqual(controller.execute('verify', ['debian12'], self.root), 60)
+        with patch('nrpe_cli.controller.workflow_identity', return_value=None):
+            self.assertEqual(controller.execute('verify', ['debian12'], self.root), 60)
         report = state.reports(self.root)[0]
         self.assertEqual(report['status'], 'failed')
         self.assertEqual(report['exit_code'], 60)

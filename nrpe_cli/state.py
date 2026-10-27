@@ -5,11 +5,26 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import uuid
 from .targets import TARGETS, TARGET_CONFIG, package_files
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def workflow_identity(root):
+    """Record Git provenance when available; ordinary ZIP-based use still works."""
+    try:
+        commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root,
+                                capture_output=True, text=True, timeout=10)
+        status = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=all'],
+                                cwd=root, capture_output=True, text=True, timeout=10)
+        if commit.returncode or status.returncode:
+            return None
+        return {'commit': commit.stdout.strip(), 'dirty': bool(status.stdout.strip())}
+    except (OSError, subprocess.TimeoutExpired):
+        return None
 
 
 def timestamp():

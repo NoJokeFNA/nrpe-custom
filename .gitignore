@@ -7,6 +7,7 @@ output/*/bootstrap-manifest.json
 output/*/*.buildinfo
 output/*/SHA256SUMS
 output/*/sources/
+output/*/obs-sources/
 __pycache__/
 *.py[cod]
 .nrpe/

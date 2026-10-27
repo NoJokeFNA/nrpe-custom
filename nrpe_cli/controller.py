@@ -6,7 +6,8 @@ import subprocess
 
 from .docker import check_docker
 from .diagnostics import TLSFailure
-from .state import ROOT, artifact, new_id, save_report, target_lock, timestamp
+from .state import ROOT, artifact, new_id, save_report, target_lock, timestamp, workflow_identity
+from .release import snapshot_assets
 from .targets import package_files
 
 
@@ -106,6 +107,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
     directory = root / ".nrpe" / "runs" / run_id
     directory.mkdir(parents=True)
     report = {"schema": 1, "id": run_id, "action": action, "started": timestamp(),
+              "workflow_before": workflow_identity(root),
               "status": "running", "exit_code": None, "rebuild": rebuild, "pull": pull,
               "sles_media": str(media) if media is not None else None,
               "ca_certificate_sha256": ca_cert["sha256"] if ca_cert else None,
@@ -141,6 +143,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
                     print(f"[{target}] Checking package checksum", flush=True)
                     before = artifact(root, target)
                     active["artifact"] = before
+                    active['release_assets'] = snapshot_assets(root, target)
                     active[phase] = "passed"
                     save_report(directory, report)
                     if action in ("test", "verify"):
@@ -156,6 +159,8 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
                             break
                         if artifact(root, target) != before:
                             raise RuntimeError(f"{target}: package changed during the test; result is invalid.")
+                        if snapshot_assets(root, target) != active['release_assets']:
+                            raise RuntimeError(f"{target}: source assets changed during the test.")
                     code = 0
             save_report(directory, report)
         report["status"] = "passed" if code == 0 else "failed"
@@ -173,6 +178,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
         print(f"ERROR: {exc}")
     finally:
         report["finished"] = timestamp()
+        report['workflow_after'] = workflow_identity(root)
         report["exit_code"] = code
         save_report(directory, report)
         summary(report)

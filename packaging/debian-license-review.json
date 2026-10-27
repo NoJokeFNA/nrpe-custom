@@ -1,0 +1,45 @@
+{
+  "reviewed": "2026-10-27",
+  "source": "nagios-nrpe",
+  "versions": {
+    "4.0.3-1": {
+      "upstream_archives": {
+        "nagios-nrpe_4.0.3.orig.tar.gz": "82266911b895ed84f6ecac63d2d1356581e7961376ea0ac5f772ec5a7dba3d21"
+      },
+      "license_files": {
+        "debian/copyright": "4d42bab9f89ab35ff25257aef0b404158f866124165dff187d9ca877d9367add",
+        "LICENSE.md": "a343b35d58dccd90b63cd892ce0eae326c796147adaead5057c49b39186388c5",
+        "LEGAL": "ae094e1b4d2dc5c7d8e759365925c934913b1549875bfef90d28da542101352a",
+        "src/utils.c": "75f4ab494d009b09d8358ced0394d80f9476f8ed6f7323c200a007d8cd1a2bd3",
+        "src/acl.c": "73f223aeec851559738d06aa2a4e26319c33300d53082d67f0d8a1fc3ae5ef00",
+        "include/acl.h": "323ca78733e229c77ec4e8a37fdc837b47558af11776660753b98023e83e138a"
+      }
+    },
+    "4.1.0-1": {
+      "upstream_archives": {
+        "nagios-nrpe_4.1.0.orig.tar.gz": "500c1845ddbb57e1df8098d107c860498dbad1ea9e4a42c2d59e8d0c19a87259"
+      },
+      "license_files": {
+        "debian/copyright": "4d42bab9f89ab35ff25257aef0b404158f866124165dff187d9ca877d9367add",
+        "LICENSE.md": "a343b35d58dccd90b63cd892ce0eae326c796147adaead5057c49b39186388c5",
+        "LEGAL": "ae094e1b4d2dc5c7d8e759365925c934913b1549875bfef90d28da542101352a",
+        "src/utils.c": "75f4ab494d009b09d8358ced0394d80f9476f8ed6f7323c200a007d8cd1a2bd3",
+        "src/acl.c": "73f223aeec851559738d06aa2a4e26319c33300d53082d67f0d8a1fc3ae5ef00",
+        "include/acl.h": "323ca78733e229c77ec4e8a37fdc837b47558af11776660753b98023e83e138a"
+      }
+    },
+    "4.1.3-1": {
+      "upstream_archives": {
+        "nagios-nrpe_4.1.3.orig.tar.gz": "5e8947f61e1a4c41b6895c4d64c2dcd70cab32815cb4b49770e1c702b79ed5ed"
+      },
+      "license_files": {
+        "debian/copyright": "4d42bab9f89ab35ff25257aef0b404158f866124165dff187d9ca877d9367add",
+        "LICENSE.md": "a343b35d58dccd90b63cd892ce0eae326c796147adaead5057c49b39186388c5",
+        "LEGAL": "ae094e1b4d2dc5c7d8e759365925c934913b1549875bfef90d28da542101352a",
+        "src/utils.c": "75f4ab494d009b09d8358ced0394d80f9476f8ed6f7323c200a007d8cd1a2bd3",
+        "src/acl.c": "3a618bc080ad300edfd166c37c5051d75d6be9e8ec16d29c669db6638a1b9693",
+        "include/acl.h": "323ca78733e229c77ec4e8a37fdc837b47558af11776660753b98023e83e138a"
+      }
+    }
+  }
+}
