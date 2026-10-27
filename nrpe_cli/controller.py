@@ -41,14 +41,15 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=
                     + ([] if pull else ["--build"]) + [service])
     options = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
                if os.name == "nt" else {"start_new_session": True})
-    # Clear inherited certificate variables unless a validated snapshot was supplied.
+    # Only validated PEM may reach the environment-backed BuildKit secret.
     environment = dict(os.environ)
     environment.pop("NRPE_CA_CERT", None)
     environment.pop("NRPE_CA_SHA256", None)
+    environment["NRPE_CA_PEM"] = ""
     if media is not None:
         environment["SLES_MEDIA_DIR"] = str(media)
     if ca_cert is not None:
-        environment.update(NRPE_CA_CERT=ca_cert["path"].as_posix(),
+        environment.update(NRPE_CA_PEM=ca_cert["pem"],
                            NRPE_CA_SHA256=ca_cert["sha256"])
     options["env"] = environment
     process = None

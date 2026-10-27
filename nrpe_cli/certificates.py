@@ -4,12 +4,11 @@ from contextlib import contextmanager
 import hashlib
 from pathlib import Path
 import ssl
-import tempfile
 
 
 @contextmanager
 def prepared_certificate(value):
-    """Validate PEM or DER and keep a normalized snapshot for this workflow."""
+    """Validate PEM or DER and keep normalized PEM in memory for this workflow."""
     if not value:
         yield None
         return
@@ -38,7 +37,5 @@ def prepared_certificate(value):
     except (ValueError, UnicodeError, ssl.SSLError) as exc:
         raise RuntimeError('Invalid CA certificate. Supply one PEM or DER X.509 certificate (.cer/.crt/.pem).') from exc
     encoded = pem.encode('ascii')
-    with tempfile.TemporaryDirectory(prefix='nrpe-ca-') as directory:
-        snapshot = Path(directory) / 'company-ca.pem'
-        snapshot.write_bytes(encoded)
-        yield {'path': snapshot, 'sha256': hashlib.sha256(encoded).hexdigest()}
+    # Environment-backed BuildKit secrets avoid Windows TEMP paths entirely.
+    yield {'pem': pem, 'sha256': hashlib.sha256(encoded).hexdigest()}

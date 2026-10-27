@@ -1,10 +1,10 @@
-"""Certificate parsing, ephemeral snapshots, and the Docker trust boundary."""
+"""Certificate parsing, in-memory snapshots, and the Docker trust boundary."""
 
 import contextlib
 import hashlib
 import io
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import ssl
 import subprocess
 import tempfile
@@ -32,10 +32,14 @@ class CertificateTests(unittest.TestCase):
         der.write_bytes(ssl.PEM_cert_to_DER_cert(FIXTURE.read_text()))
         with prepared_certificate(FIXTURE) as pem, prepared_certificate(der) as binary:
             self.assertEqual(pem['sha256'], binary['sha256'])
-            self.assertEqual(pem['path'].read_bytes(), binary['path'].read_bytes())
-            self.assertEqual(hashlib.sha256(pem['path'].read_bytes()).hexdigest(), pem['sha256'])
-            path = pem['path']
-        self.assertFalse(path.exists())
+            self.assertEqual(pem['pem'], binary['pem'])
+            self.assertEqual(hashlib.sha256(pem['pem'].encode('ascii')).hexdigest(), pem['sha256'])
+            self.assertNotIn('path', pem)
+
+    @patch('tempfile.TemporaryDirectory', side_effect=AssertionError('No TEMP path may be used'))
+    def test_certificate_preparation_does_not_use_system_temp(self, temporary):
+        with prepared_certificate(FIXTURE) as certificate:
+            self.assertEqual(certificate['pem'], FIXTURE.read_text())
 
     def test_rejects_missing_empty_invalid_oversized_and_private_key_files(self):
         for data in (b'', b'not a certificate', b'x' * (1024 * 1024 + 1),
@@ -58,15 +62,15 @@ class CertificateTests(unittest.TestCase):
                 self.fail('Accepted a bundle')
 
     @patch('nrpe_cli.cli.execute', return_value=0)
-    def test_cli_passes_live_snapshot_and_cleans_it_after_execution(self, execute):
+    def test_cli_passes_normalized_pem_snapshot(self, execute):
         def inspect(*args, **kwargs):
             certificate = kwargs['ca_cert']
-            self.assertTrue(certificate['path'].is_file())
+            self.assertEqual(certificate['pem'], FIXTURE.read_text())
             return 0
         execute.side_effect = inspect
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(cli.main(['build', 'sles15sp4', '--ca-cert', str(FIXTURE)], self.root), 0)
-        self.assertFalse(execute.call_args.kwargs['ca_cert']['path'].exists())
+        self.assertNotIn('path', execute.call_args.kwargs['ca_cert'])
 
     @patch('nrpe_cli.cli.execute')
     def test_invalid_certificate_fails_before_docker(self, execute):
@@ -97,6 +101,43 @@ class CertificateTests(unittest.TestCase):
                                  'test', io.StringIO(), lock, pull=True, ca_cert=certificate), 0)
             for call in popen.call_args_list:
                 environment = call.kwargs['env']
-                self.assertEqual(environment['NRPE_CA_CERT'], certificate['path'].as_posix())
+                self.assertEqual(environment['NRPE_CA_PEM'], certificate['pem'])
+                self.assertNotIn('NRPE_CA_CERT', environment)
                 self.assertEqual(environment['NRPE_CA_SHA256'], certificate['sha256'])
-                self.assertNotIn(str(certificate['path']), call.args[0])
+                self.assertNotIn(certificate['pem'], call.args[0])
+
+    @patch('nrpe_cli.controller.subprocess.run')
+    @patch('nrpe_cli.controller.subprocess.Popen')
+    def test_secret_handoff_ignores_windows_paths_and_inherited_pem(self, popen, run):
+        run.return_value = subprocess.CompletedProcess([], 0, '', '')
+        root = PureWindowsPath('D:/Work/NRPE project')
+        certificate = {'pem': FIXTURE.read_text(), 'sha256': 'validated-digest'}
+        for phase in ('build', 'test'):
+            for pull in (False, True):
+                with self.subTest(phase=phase, pull=pull):
+                    popen.reset_mock()
+                    def process(*args, **kwargs):
+                        child = MagicMock()
+                        child.stdout = io.StringIO('')
+                        child.wait.return_value = 0
+                        child.poll.return_value = 0
+                        return child
+                    popen.side_effect = process
+                    with patch.dict(os.environ, {'NRPE_CA_CERT': r'C:\Users\Old\Temp\ca.pem',
+                                                 'NRPE_CA_PEM': 'unvalidated', 'NRPE_CA_SHA256': 'stale'}):
+                        controller.run_phase('docker', root, 'ca', 'debian12', phase,
+                                             io.StringIO(), self.root, pull=pull, ca_cert=certificate)
+                    self.assertEqual(popen.call_count, 2 if pull else 1)
+                    for call in popen.call_args_list:
+                        self.assertNotIn('NRPE_CA_CERT', call.kwargs['env'])
+                        self.assertEqual(call.kwargs['env']['NRPE_CA_PEM'], certificate['pem'])
+                        self.assertEqual(call.kwargs['env']['NRPE_CA_SHA256'], 'validated-digest')
+                    with patch.dict(os.environ, {'NRPE_CA_CERT': r'C:\Temp\ca.pem',
+                                                 'NRPE_CA_PEM': 'unvalidated', 'NRPE_CA_SHA256': 'stale'}):
+                        controller.run_phase('docker', root, 'ca', 'debian12', phase,
+                                             io.StringIO(), self.root, pull=pull)
+                        environment = popen.call_args.kwargs['env']
+                        self.assertEqual(environment['NRPE_CA_PEM'], '')
+                        self.assertNotIn('NRPE_CA_SHA256', environment)
+                        self.assertNotIn('NRPE_CA_CERT', environment)
+                        self.assertEqual(os.environ['NRPE_CA_PEM'], 'unvalidated')

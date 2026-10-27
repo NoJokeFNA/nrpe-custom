@@ -124,8 +124,11 @@ private keys are rejected. This is a CA for repository HTTPS, not a production
 NRPE client certificate or key. Keep your file outside the checkout, or under the
 ignored `local-certificates/` directory. Do not commit company trust material.
 
-The controller validates and normalizes the certificate into a per-run temporary
-file, passes it as a BuildKit secret, and deletes the temporary file afterwards.
+The controller validates and normalizes the certificate in memory and passes its
+PEM contents through the child process environment as a BuildKit secret. No
+temporary certificate file or Windows TEMP path enters the Compose-to-Bake
+handoff. The internal `NRPE_CA_PEM` variable is set only for the Docker child
+process, using the validated certificate (or an empty value without a CA).
 The normalized SHA-256 is passed separately to invalidate the image cache when
 the certificate changes and is recorded in `report.json`; its contents are not
 logged. Both builder and test images install the selected certificate in their

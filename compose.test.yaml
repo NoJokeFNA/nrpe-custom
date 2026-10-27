@@ -79,7 +79,7 @@ services:
     volumes:
       - ./output/debian14:/packages:ro
 
-# The default is empty; nrpe.py supplies a validated per-run certificate snapshot.
+# nrpe.py supplies validated PEM; an empty value adds no extra CA.
 secrets:
   nrpe_ca_cert:
-    file: ${NRPE_CA_CERT:-./packaging/empty-ca.pem}
+    environment: NRPE_CA_PEM
