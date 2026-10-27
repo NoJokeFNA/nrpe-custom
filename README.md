@@ -10,8 +10,9 @@ Enabling it on a server is an explicit administrator decision. Bash command
 substitution stays disabled.
 
 This is an independent project. Its packages are unofficial custom builds, not
-releases supported or certified by Debian, SUSE, or Nagios. Public binary release
-preparation is tracked in the [release plan](docs/release-plan.md). Independently
+releases supported or certified by Debian, SUSE, or Nagios. Successful master
+pushes publish [verified package releases](docs/releases.md); remaining work and
+release evidence are tracked in the [release plan](docs/release-plan.md). Independently
 authored project code and documentation are [MIT licensed](LICENSE); generated
 packages retain their [upstream and distribution licenses](THIRD_PARTY.md).
 
