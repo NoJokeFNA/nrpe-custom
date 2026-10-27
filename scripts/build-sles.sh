@@ -38,17 +38,21 @@ rpm2cpio "$package" > "$workdir/package.cpio"
 grep -Eq '^dont_blame_nrpe=0[[:space:]]*$' "$workdir/extracted/etc/nrpe.cfg"
 
 outdir=/output/sles15sp4
+sources=("$workdir"/SRPMS/nrpe-*.src.rpm)
+helpers=(/opt/nrpe-user-package/system-user-nagios-*.noarch.rpm)
+helper_sources=(/opt/nrpe-user-package/system-user-nagios-*.src.rpm)
+(( ${#sources[@]} == 1 && ${#helpers[@]} == 1 && ${#helper_sources[@]} == 1 ))
 mkdir -p "$outdir"
 # Replace old outputs only after the build and package checks passed.
-find "$outdir" -maxdepth 1 -type f -name 'nrpe-*.rpm' -delete
+find "$outdir" -maxdepth 1 -type f \( -name 'nrpe-*.rpm' -o -name 'system-user-nagios-*.rpm' \) -delete
 install -m 0644 "$package" "$outdir/"
-sources=("$workdir"/SRPMS/nrpe-*.src.rpm)
-(( ${#sources[@]} == 1 ))
-install -m 0644 "${sources[0]}" "$outdir/"
+install -m 0644 "${sources[0]}" "${helpers[0]}" "${helper_sources[0]}" "$outdir/"
 install -m 0644 /opt/nrpe-build/source.json "$outdir/source-manifest.json"
+install -m 0644 /opt/nrpe-build/user-source.json "$outdir/user-source-manifest.json"
+install -m 0644 /opt/nrpe-build/bootstrap.json "$outdir/bootstrap-manifest.json"
 (
   cd "$outdir"
-  sha256sum "${package##*/}" > SHA256SUMS
+  sha256sum "${package##*/}" "${helpers[0]##*/}" > SHA256SUMS
 )
 echo "PASS: nrpe $expected x86_64; command arguments enabled, Bash substitution disabled"
 echo "SUCCESS: $outdir/${package##*/}"

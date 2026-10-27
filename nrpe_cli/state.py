@@ -56,8 +56,22 @@ def artifact(root, target):
     if not checksums.is_file() or expected not in checksums.read_text(encoding="utf-8").splitlines():
         raise RuntimeError(f"{target}: package checksum is missing or incorrect. Rebuild the package.")
     config = TARGET_CONFIG[target]
-    return {"file": path.name, "sha256": digest,
-            "version": path.name[len(config["prefix"]):-len(config["suffix"])]}
+    result = {"file": path.name, "sha256": digest,
+              "version": path.name[len(config["prefix"]):-len(config["suffix"])]}
+    if target == "sles15sp4":
+        helpers = sorted(directory.glob("system-user-nagios-*.noarch.rpm"))
+        if len(helpers) != 1:
+            raise RuntimeError("sles15sp4: expected one companion user-package RPM. Rebuild the target.")
+        helper = helpers[0]
+        checksum = hashlib.sha256()
+        with helper.open("rb") as source:
+            for block in iter(lambda: source.read(1024 * 1024), b""):
+                checksum.update(block)
+        helper_digest = checksum.hexdigest()
+        if f"{helper_digest}  {helper.name}" not in checksums.read_text(encoding="utf-8").splitlines():
+            raise RuntimeError("sles15sp4: companion package checksum is missing or incorrect.")
+        result["companions"] = [{"file": helper.name, "sha256": helper_digest}]
+    return result
 
 
 @contextmanager

@@ -19,13 +19,24 @@ version="$(rpm -qp --queryformat '%{VERSION}-%{RELEASE}' "$package")"
 [[ "$version" =~ \.withargs[0-9]+$ ]] || {
   echo "ERROR: Not a custom RPM version: $version" >&2; exit 1;
 }
+helpers=(/packages/system-user-nagios-*.noarch.rpm)
+(( ${#helpers[@]} == 1 )) || { echo 'ERROR: Companion user-package RPM missing' >&2; exit 1; }
+helper="${helpers[0]}"
+grep -Fx -- "$(sha256sum "${helper##*/}")" SHA256SUMS > /dev/null
+[[ "$(rpm -qp --queryformat '%{NAME} %{VERSION}-%{RELEASE} %{ARCH}' "$helper")" == 'system-user-nagios 1.0.0-0 noarch' ]]
+rpm --upgrade --verbose "$helper"
+getent passwd nagios > /dev/null
 
 # Install only declared runtime requirements, not the build toolchain or an old
 # NRPE server. rpmlib capabilities are supplied by RPM and checked at installation.
 requirements="$(rpm -qp --requires "$package")"
+provides="$(rpm -qp --provides "$package")"
 dependencies=()
 while IFS= read -r requirement; do
-  [[ "$requirement" == rpmlib\(* ]] || dependencies+=("$requirement")
+  if [[ "$requirement" == rpmlib\(* ]] || grep -Fxq -- "$requirement" <<< "$provides"; then
+    continue
+  fi
+  dependencies+=("$requirement")
 done <<< "$requirements"
 zypper --non-interactive --gpg-auto-import-keys refresh
 if (( ${#dependencies[@]} )); then

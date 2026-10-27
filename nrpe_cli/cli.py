@@ -20,9 +20,11 @@ def doctor(root):
                 "scripts/integration-test-sles.sh", "scripts/test-nrpe-protocol.sh",
                 "scripts/sles_source.py", "scripts/setup-sles-repositories.sh",
                 "scripts/setup-sles-media.sh",
+                "scripts/build-sles-user.sh", "scripts/fetch_sles_packages.py",
                 "scripts/setup-debian-repositories.sh",
                 "packaging/sles15sp4-source.json", "packaging/sles15sp4-backports.asc",
-                "packaging/sles15sp4-suse.asc")
+                "packaging/sles15sp4-suse.asc", "packaging/sles15sp4-user-source.json",
+                "packaging/sles15sp4-bootstrap.json")
     missing = [name for name in required if not (root / name).is_file()]
     if missing:
         raise RuntimeError("Missing project files: " + ", ".join(missing))

@@ -102,6 +102,10 @@ class SlesSourceTests(unittest.TestCase):
             (directory / 'nrpe-debuginfo-4.1.1.x86_64.rpm').touch()
             (directory / 'nrpe-4.1.1.src.rpm').touch()
             (directory / 'SHA256SUMS').write_text(hashlib.sha256(data).hexdigest() + '  ' + name + '\n')
+            helper = 'system-user-nagios-1.0.0-0.noarch.rpm'
+            (directory / helper).write_bytes(b'user package')
+            with (directory / 'SHA256SUMS').open('a') as checksums:
+                checksums.write(hashlib.sha256(b'user package').hexdigest() + '  ' + helper + '\n')
             result = artifact(root, 'sles15sp4')
             self.assertEqual(result['file'], name)
             self.assertEqual(result['version'], '4.1.1-150400.95.2.withargs1')

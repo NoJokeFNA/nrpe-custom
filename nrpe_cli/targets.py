@@ -7,7 +7,6 @@ TARGET_CONFIG = {
 }
 TARGET_CONFIG["sles15sp4"] = {
     "pattern": "nrpe-[0-9]*.x86_64.rpm", "prefix": "nrpe-", "suffix": ".x86_64.rpm",
-    "experimental": True,
 }
 TARGETS = tuple(TARGET_CONFIG)
 

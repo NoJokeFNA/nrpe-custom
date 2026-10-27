@@ -1,0 +1,21 @@
+{
+  "project": "server:monitoring",
+  "package": "system-user-nagios",
+  "revision": "b979817ae6424675519c86e80add617a",
+  "version": "1.0.0",
+  "release": "0",
+  "files": {
+    "README.SUSE": {
+      "size": 333,
+      "sha256": "26157223131acbeb2306e8f110a2eb76b52dd8803118a4ba5589363fdad1be48"
+    },
+    "system-user-nagios.changes": {
+      "size": 167,
+      "sha256": "3ab81690d80fa6a4d9fd1fd3bb7b3cd187c5303b01fe8edad5ed70912de76d18"
+    },
+    "system-user-nagios.spec": {
+      "size": 2964,
+      "sha256": "36e678f60dd314addc9098421d432bac932c23f19a7ce8b048cf06b6b9cbc1b7"
+    }
+  }
+}
