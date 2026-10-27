@@ -3,5 +3,7 @@
 .idea
 output
 *.zip
+*.iso
+local-media
 __pycache__
 .pytest_cache

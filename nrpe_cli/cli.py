@@ -1,6 +1,7 @@
 """User-facing commands for the NRPE workflow."""
 
 import argparse
+import os
 import subprocess
 import sys
 
@@ -8,6 +9,7 @@ from .controller import execute
 from .docker import check_docker
 from .state import ROOT, TARGETS, artifact, reports
 from .targets import TARGET_CONFIG, package_files
+from .media import validate_media
 
 
 def doctor(root):
@@ -17,6 +19,7 @@ def doctor(root):
                 "Dockerfile.sles", "Dockerfile.sles-test", "scripts/build-sles.sh",
                 "scripts/integration-test-sles.sh", "scripts/test-nrpe-protocol.sh",
                 "scripts/sles_source.py", "scripts/setup-sles-repositories.sh",
+                "scripts/setup-sles-media.sh",
                 "scripts/setup-debian-repositories.sh",
                 "packaging/sles15sp4-source.json", "packaging/sles15sp4-backports.asc",
                 "packaging/sles15sp4-suse.asc")
@@ -102,6 +105,8 @@ def parser():
         command.add_argument("targets", nargs="+", choices=(*TARGETS, "all"))
         command.add_argument("--pull", action="store_true",
                              help="check for updated base images before building images")
+        command.add_argument("--sles-media", metavar="DIRECTORY",
+                             help="use extracted official SLES 15 SP4 Full Media1 repositories")
         if action != "test":
             command.add_argument("--rebuild", action="store_true",
                                  help="explicitly allow rebuilding existing package outputs")
@@ -171,6 +176,13 @@ def main(argv=None, root=ROOT):
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
+        if args.sles_media and "sles15sp4" not in targets:
+            command_parser.error("--sles-media requires the sles15sp4 target (or all).")
+        media = None
+        if "sles15sp4" in targets:
+            location = args.sles_media or os.environ.get("SLES_MEDIA_DIR")
+            if location:
+                media = validate_media(location)
         for target in targets:
             if TARGET_CONFIG[target].get("experimental"):
                 print(f"Experimental target: {target}. Review build and integration results before deployment.")
@@ -189,7 +201,10 @@ def main(argv=None, root=ROOT):
                     print("Cancelled; existing packages were kept.")
                     return 0
                 rebuild = True
-        return execute(args.action, targets, root, rebuild=rebuild, pull=args.pull)
+        options = {"rebuild": rebuild, "pull": args.pull}
+        if media is not None:
+            options["media"] = media
+        return execute(args.action, targets, root, **options)
     except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1

@@ -9,10 +9,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.sles-test
+      additional_contexts:
+        nrpe_sles_media: ${SLES_MEDIA_DIR:-./packaging/empty-media}
       args:
         SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.4}
     volumes:
       - ./output/sles15sp4:/packages:ro
+      - type: bind
+        source: ${SLES_MEDIA_DIR:-./packaging/empty-media}
+        target: /mnt/nrpe-sles-media
+        read_only: true
   test-debian11:
     <<: *nrpe-test
     build:

@@ -15,11 +15,13 @@ def main(argv=None):
     mode.add_argument("--test-only", action="store_true", help="test existing packages")
     parser.add_argument("--rebuild", action="store_true", help="allow replacing existing packages")
     parser.add_argument("--pull", action="store_true", help="check for updated base images")
+    parser.add_argument("--sles-media", metavar="DIRECTORY", help="extracted SLES 15 SP4 Full Media1")
     args = parser.parse_args(argv)
     action = "test" if args.test_only else "verify" if args.test else "build"
     print("Compatibility mode: prefer 'nrpe.py " + action + " " + args.target + "'.")
     options = (["--rebuild"] if args.rebuild and action != "test" else [])
     options += ["--pull"] if args.pull else []
+    options += ["--sles-media", args.sles_media] if args.sles_media else []
     return controller_main([action, args.target, *options])
 
 

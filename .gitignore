@@ -7,3 +7,5 @@ output/*/SHA256SUMS
 __pycache__/
 *.py[cod]
 .nrpe/
+*.iso
+local-media/

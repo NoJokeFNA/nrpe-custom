@@ -29,7 +29,7 @@ def stop_process(process):
         process.wait()
 
 
-def run_phase(docker, root, run_id, target, phase, log, lock, pull=False):
+def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=None):
     name = f"nrpe-{run_id}-{target}-{phase}"
     base = [docker, "compose", "-f",
             "compose.yaml" if phase == "build" else "compose.test.yaml"]
@@ -41,6 +41,8 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False):
                     + ([] if pull else ["--build"]) + [service])
     options = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
                if os.name == "nt" else {"start_new_session": True})
+    if media is not None:
+        options["env"] = dict(os.environ, SLES_MEDIA_DIR=str(media))
     process = None
     try:
         for command in commands:
@@ -81,12 +83,13 @@ def summary(report):
     print(f"Run: {report['id']} ({report['status']})")
 
 
-def execute(action, targets, root=ROOT, rebuild=False, pull=False):
+def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None):
     run_id = new_id()
     directory = root / ".nrpe" / "runs" / run_id
     directory.mkdir(parents=True)
     report = {"schema": 1, "id": run_id, "action": action, "started": timestamp(),
               "status": "running", "exit_code": None, "rebuild": rebuild, "pull": pull,
+              "sles_media": str(media) if media is not None else None,
               "targets": {
                   target: {"build": "not run", "package": "not run", "test": "not run"}
                   for target in targets}}
@@ -109,7 +112,8 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False):
                         save_report(directory, report)
                         print(f"\n[{target}] Building package", flush=True)
                         log.write(f"\n[{target}] Building package\n")
-                        code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull)
+                        code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
+                                         media=media if target == "sles15sp4" else None)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break
@@ -126,7 +130,8 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False):
                         save_report(directory, report)
                         print(f"[{target}] Installing package and testing NRPE arguments", flush=True)
                         log.write(f"\n[{target}] Installing package and testing NRPE arguments\n")
-                        code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull)
+                        code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
+                                         media=media if target == "sles15sp4" else None)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break
