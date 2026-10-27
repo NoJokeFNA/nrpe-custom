@@ -5,7 +5,7 @@ set -Eeuo pipefail
 : "${DEBIAN_CODENAME:?Set DEBIAN_CODENAME via compose.yaml}"
 
 case "${DEBIAN_NUMBER}:${DEBIAN_CODENAME}" in
-  12:bookworm|13:trixie|14:forky) ;;
+  11:bullseye|12:bookworm|13:trixie|14:forky) ;;
   *) echo "ERROR: Invalid Debian target: ${DEBIAN_NUMBER}:${DEBIAN_CODENAME}" >&2; exit 2 ;;
 esac
 

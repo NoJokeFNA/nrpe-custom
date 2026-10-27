@@ -7,16 +7,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     DEBEMAIL=nrpe-builder@localhost.invalid \
     DEBFULLNAME="NRPE Custom Builder"
 
-# Enable Debian source repositories present in the official Debian image.
-# This also includes the security source repositories where applicable.
+COPY scripts/setup-debian-repositories.sh /opt/nrpe-build/setup-debian-repositories.sh
 RUN set -eux; \
-    if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
-      sed -i -E '/^Types: / { /deb-src/! s/$/ deb-src/; }' /etc/apt/sources.list.d/debian.sources; \
-    elif [ -f /etc/apt/sources.list ]; then \
-      sed -n '/^deb /s/^deb /deb-src /p' /etc/apt/sources.list > /etc/apt/sources.list.d/nrpe-source.list; \
-    else \
-      echo 'ERROR: Debian apt sources layout not recognized' >&2; exit 1; \
-    fi; \
+    bash /opt/nrpe-build/setup-debian-repositories.sh "$DEBIAN_CODENAME" source; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
       build-essential ca-certificates devscripts dpkg-dev fakeroot python3; \

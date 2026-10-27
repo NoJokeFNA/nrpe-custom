@@ -1,18 +1,21 @@
 # syntax=docker/dockerfile:1
 ARG DEBIAN_CODENAME=bookworm
 FROM debian:${DEBIAN_CODENAME}
+ARG DEBIAN_CODENAME
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+COPY scripts/setup-debian-repositories.sh /opt/nrpe-test/setup-debian-repositories.sh
 # Package installation must not start a background service in the test image.
-RUN printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d \
+RUN bash /opt/nrpe-test/setup-debian-repositories.sh "$DEBIAN_CODENAME" binary \
+    && printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d \
     && chmod 755 /usr/sbin/policy-rc.d \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
        ca-certificates nagios-nrpe-plugin openssl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY scripts/integration-test.sh /opt/nrpe-test/integration-test.sh
-RUN chmod 755 /opt/nrpe-test/integration-test.sh
+COPY scripts/integration-test.sh scripts/test-nrpe-protocol.sh /opt/nrpe-test/
+RUN chmod 755 /opt/nrpe-test/*.sh
 
 ENTRYPOINT ["/opt/nrpe-test/integration-test.sh"]

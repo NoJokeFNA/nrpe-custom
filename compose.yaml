@@ -8,6 +8,16 @@ x-nrpe-build: &nrpe-build
       target: /output
 
 services:
+  debian11:
+    <<: *nrpe-build
+    build:
+      context: .
+      args:
+        DEBIAN_CODENAME: bullseye
+    image: nrpe-custom-builder:bullseye
+    environment:
+      DEBIAN_CODENAME: bullseye
+      DEBIAN_NUMBER: "11"
   debian12:
     <<: *nrpe-build
     build:

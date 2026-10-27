@@ -9,6 +9,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from nrpe_cli import cli, controller, state
+from nrpe_cli.targets import TARGET_CONFIG
 
 
 class WorkflowTests(unittest.TestCase):
@@ -24,7 +25,8 @@ class WorkflowTests(unittest.TestCase):
     def package(self, target='debian12', data=b'package content'):
         directory = self.root / 'output' / target
         directory.mkdir(parents=True, exist_ok=True)
-        name = 'nagios-nrpe-server_4.1.3-1+withargs1_amd64.deb'
+        config = TARGET_CONFIG[target]
+        name = config['prefix'] + '4.1.3-1+withargs1' + config['suffix']
         (directory / name).write_bytes(data)
         digest = hashlib.sha256(data).hexdigest()
         (directory / 'SHA256SUMS').write_text(f'{digest}  {name}\n')

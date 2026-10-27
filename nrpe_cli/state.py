@@ -6,9 +6,9 @@ import hashlib
 import json
 from pathlib import Path
 import uuid
+from .targets import TARGETS, TARGET_CONFIG, package_files
 
 
-TARGETS = ("debian12", "debian13", "debian14")
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -41,7 +41,7 @@ def reports(root):
 
 def artifact(root, target):
     directory = root / "output" / target
-    packages = sorted(directory.glob("nagios-nrpe-server_*_amd64.deb"))
+    packages = package_files(root, target)
     if len(packages) != 1:
         raise RuntimeError(f"{target}: expected one server package, found {len(packages)}. Run build first.")
     path = packages[0]
@@ -55,8 +55,9 @@ def artifact(root, target):
     checksums = directory / "SHA256SUMS"
     if not checksums.is_file() or expected not in checksums.read_text(encoding="utf-8").splitlines():
         raise RuntimeError(f"{target}: package checksum is missing or incorrect. Rebuild the package.")
+    config = TARGET_CONFIG[target]
     return {"file": path.name, "sha256": digest,
-            "version": path.name[len("nagios-nrpe-server_"):-len("_amd64.deb")]}
+            "version": path.name[len(config["prefix"]):-len(config["suffix"])]}
 
 
 @contextmanager

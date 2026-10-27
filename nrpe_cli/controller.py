@@ -6,6 +6,7 @@ import subprocess
 
 from .docker import check_docker
 from .state import ROOT, artifact, new_id, save_report, target_lock, timestamp
+from .targets import package_files
 
 
 def stop_process(process):
@@ -101,7 +102,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False):
             with target_lock(root, target, run_id) as lock:
                 with (directory / "run.log").open("a", encoding="utf-8") as log:
                     if action in ("build", "verify"):
-                        if not rebuild and list((root / "output" / target).glob("nagios-nrpe-server_*_amd64.deb")):
+                        if not rebuild and package_files(root, target):
                             raise RuntimeError(f"{target}: output already exists. Use --rebuild or test it instead.")
                         phase = "build"
                         active[phase] = "running"

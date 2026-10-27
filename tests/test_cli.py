@@ -39,7 +39,7 @@ class CliTests(unittest.TestCase):
 
     @patch('sys.stdin.isatty', return_value=True)
     @patch('sys.stdout.isatty', return_value=True)
-    @patch('builtins.input', side_effect=['invalid', '1', '4 1', '1 3'])
+    @patch('builtins.input', side_effect=['invalid', '1', 'all debian12', 'debian12 debian14'])
     @patch('nrpe_cli.cli.execute', return_value=0)
     def test_interactive_menu_validates_action_and_targets(self, execute, user_input, out_tty, in_tty):
         self.assertEqual(cli.main([]), 0)

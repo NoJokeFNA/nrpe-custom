@@ -4,11 +4,12 @@
 import argparse
 
 from nrpe_cli.cli import main as controller_main
+from nrpe_cli.state import TARGETS
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("target", choices=("debian12", "debian13", "debian14", "all"))
+    parser.add_argument("target", choices=(*TARGETS, "all"))
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--test", action="store_true", help="build and run integration tests")
     mode.add_argument("--test-only", action="store_true", help="test existing packages")

@@ -4,6 +4,17 @@ x-nrpe-test: &nrpe-test
   profiles: [integration]
 
 services:
+  test-debian11:
+    <<: *nrpe-test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        DEBIAN_CODENAME: bullseye
+    environment:
+      DEBIAN_CODENAME: bullseye
+    volumes:
+      - ./output/debian11:/packages:ro
   test-debian12:
     <<: *nrpe-test
     build:

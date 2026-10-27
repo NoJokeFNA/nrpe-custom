@@ -7,12 +7,14 @@ import sys
 from .controller import execute
 from .docker import check_docker
 from .state import ROOT, TARGETS, artifact, reports
+from .targets import package_files
 
 
 def doctor(root):
     print("Checking project files...")
     required = ("compose.yaml", "compose.test.yaml", "Dockerfile", "Dockerfile.test",
-                "scripts/build.sh", "scripts/verify.sh", "scripts/integration-test.sh")
+                "scripts/build.sh", "scripts/verify.sh", "scripts/integration-test.sh",
+                "scripts/test-nrpe-protocol.sh", "scripts/setup-debian-repositories.sh")
     missing = [name for name in required if not (root / name).is_file()]
     if missing:
         raise RuntimeError("Missing project files: " + ", ".join(missing))
@@ -27,7 +29,7 @@ def doctor(root):
         if result.returncode:
             raise RuntimeError(f"Invalid {filename}: {result.stderr.strip()}")
     print("PASS: Local prerequisites and Compose configuration are ready.")
-    print("This does not check Debian repository access from build containers.")
+    print("This does not check package repository access from build containers.")
     return 0
 
 
@@ -84,7 +86,7 @@ def show_logs(root, run_id=None):
 
 
 def parser():
-    result = argparse.ArgumentParser(description="Build, test, and inspect custom Debian NRPE packages.")
+    result = argparse.ArgumentParser(description="Build, test, and inspect custom NRPE packages.")
     commands = result.add_subparsers(dest="action")
     for action, help_text in (
         ("build", "Build packages and check their exported artifacts"),
@@ -94,7 +96,7 @@ def parser():
         command = commands.add_parser(action, help=help_text)
         command.add_argument("targets", nargs="+", choices=(*TARGETS, "all"))
         command.add_argument("--pull", action="store_true",
-                             help="check for updated Debian base images before building images")
+                             help="check for updated base images before building images")
         if action != "test":
             command.add_argument("--rebuild", action="store_true",
                                  help="explicitly allow rebuilding existing package outputs")
@@ -123,8 +125,9 @@ def interactive_menu():
         print("Choose an action from 1 to 6, or q to quit.")
     if action not in ("build", "test", "verify"):
         return [action]
-    print("Targets: 1. Debian 12   2. Debian 13   3. Debian 14   4. All")
-    aliases = dict(zip(("1", "2", "3", "4"), (*TARGETS, "all")))
+    labels = [f"{index}. {target}" for index, target in enumerate((*TARGETS, "all"), 1)]
+    print("Targets: " + "   ".join(labels))
+    aliases = {str(index): target for index, target in enumerate((*TARGETS, "all"), 1)}
     while True:
         answer = input("Targets (space-separated numbers or names; q to quit): ").strip().lower()
         if answer in ("q", "quit"):
@@ -133,7 +136,7 @@ def interactive_menu():
         if (targets and all(item in (*TARGETS, "all") for item in targets)
                 and ("all" not in targets or targets == ["all"])):
             return [action, *targets]
-        print("Choose Debian targets, or all by itself.")
+        print("Choose targets, or all by itself.")
 
 
 def main(argv=None, root=ROOT):
@@ -165,8 +168,7 @@ def main(argv=None, root=ROOT):
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
         rebuild = getattr(args, "rebuild", False)
         if args.action in ("build", "verify") and not rebuild:
-            existing = [target for target in targets if list(
-                (root / "output" / target).glob("nagios-nrpe-server_*_amd64.deb"))]
+            existing = [target for target in targets if package_files(root, target)]
             if existing:
                 print("Existing package output: " + ", ".join(existing))
                 if not sys.stdin.isatty() or not sys.stdout.isatty():
