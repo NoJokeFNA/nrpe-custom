@@ -121,43 +121,15 @@ def parser():
     return result
 
 
-def interactive_menu():
-    print("NRPE package controller")
-    actions = {"1": "verify", "2": "build", "3": "test", "4": "doctor",
-               "5": "status", "6": "logs"}
-    print("1. Build and test\n2. Build only\n3. Test existing packages\n"
-          "4. Diagnose Docker\n5. Show status\n6. Show latest log\nq. Quit")
-    while True:
-        answer = input("Action: ").strip().lower()
-        if answer in ("q", "quit"):
-            return None
-        action = actions.get(answer)
-        if action:
-            break
-        print("Choose an action from 1 to 6, or q to quit.")
-    if action not in ("build", "test", "verify"):
-        return [action]
-    labels = [f"{index}. {target}" for index, target in enumerate((*TARGETS, "all"), 1)]
-    print("Targets: " + "   ".join(labels))
-    aliases = {str(index): target for index, target in enumerate((*TARGETS, "all"), 1)}
-    while True:
-        answer = input("Targets (space-separated numbers or names; q to quit): ").strip().lower()
-        if answer in ("q", "quit"):
-            return None
-        targets = [aliases.get(item, item) for item in answer.split()]
-        if (targets and all(item in (*TARGETS, "all") for item in targets)
-                and ("all" not in targets or targets == ["all"])):
-            return [action, *targets]
-        print("Choose targets, or all by itself.")
-
-
 def main(argv=None, root=ROOT):
     argv = sys.argv[1:] if argv is None else argv
     if not argv and sys.stdin.isatty() and sys.stdout.isatty():
         try:
-            argv = interactive_menu()
-            if argv is None:
-                return 0
+            from .menu import run_menu
+            return run_menu(root, lambda arguments: main(arguments, root))
+        except (OSError, RuntimeError) as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
         except EOFError:
             return 0
         except KeyboardInterrupt:

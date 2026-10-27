@@ -42,16 +42,19 @@ class CliTests(unittest.TestCase):
 
     @patch('sys.stdin.isatty', return_value=True)
     @patch('sys.stdout.isatty', return_value=True)
-    @patch('builtins.input', side_effect=['invalid', '1', 'all debian12', 'debian12 debian14'])
-    @patch('nrpe_cli.cli.execute', return_value=0)
-    def test_interactive_menu_validates_action_and_targets(self, execute, user_input, out_tty, in_tty):
+    @patch('nrpe_cli.menu.run_menu', return_value=0)
+    def test_interactive_session_uses_shared_command_dispatch(self, menu, out_tty, in_tty):
         self.assertEqual(cli.main([], self.root), 0)
-        self.assertEqual(execute.call_args.args[:2], ('verify', ['debian12', 'debian14']))
+        root, dispatch = menu.call_args.args
+        self.assertEqual(root, self.root)
+        with patch('nrpe_cli.cli.execute', return_value=7) as execute:
+            self.assertEqual(dispatch(['test', 'debian12']), 7)
+        self.assertEqual(execute.call_args.args[:2], ('test', ['debian12']))
 
     @patch('sys.stdin.isatty', return_value=True)
     @patch('sys.stdout.isatty', return_value=True)
-    @patch('builtins.input', side_effect=EOFError)
-    def test_end_of_input_exits_without_work(self, user_input, out_tty, in_tty):
+    @patch('nrpe_cli.menu.run_menu', side_effect=EOFError)
+    def test_end_of_input_exits_without_work(self, menu, out_tty, in_tty):
         self.assertEqual(cli.main([], self.root), 0)
 
     @patch('nrpe_cli.cli.check_docker', return_value='docker')

@@ -84,11 +84,17 @@ Once the application files are present, run relevant checks from the repository
 root:
 
 ```sh
-bash -n scripts/*.sh
+for script in scripts/*.sh; do bash -n "$script" || exit; done
 python3 -m unittest discover -s tests -v
 docker compose config --quiet
 docker compose -f compose.test.yaml --profile integration config --quiet
 ```
+
+Install `requirements-menu.txt` to run the optional terminal-input tests. Keep
+direct CLI commands free of mandatory UI dependencies. Put terminal navigation
+in `nrpe_cli/menu.py` and dispatch through the existing CLI/controller; do not
+create another workflow engine. Test keyboard input, cancellation, command
+failures, and explicit consent before replacing package outputs.
 
 For build changes, validate each affected Debian target with:
 
