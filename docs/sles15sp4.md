@@ -100,7 +100,7 @@ API independently of that retired binary repository.
 
 ## Base image and repository prerequisites
 
-`Dockerfile.sles` and `Dockerfile.sles-test` default to the genuine image:
+`docker/sles15sp4/build.Dockerfile` and `docker/sles15sp4/test.Dockerfile` default to the genuine image:
 
 ```text
 registry.suse.com/bci/bci-base:15.4

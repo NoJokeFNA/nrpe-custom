@@ -8,4 +8,6 @@ local-media
 __pycache__
 .pytest_cache
 .venv/
+.venv-audit/
+work/
 local-certificates/

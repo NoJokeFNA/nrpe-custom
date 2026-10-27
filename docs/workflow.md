@@ -169,7 +169,7 @@ replacement build passes its package and source checks.
 ## Installation and argument integration tests
 
 `verify` builds and tests a package; `test` exercises an existing artifact.
-Separate opt-in services in `compose.test.yaml` use `Dockerfile.test` to:
+Separate opt-in services in `compose.test.yaml` use `docker/debian/test.Dockerfile` to:
 
 1. Require exactly one server package and verify its checksum, identity,
    architecture, and custom version suffix.

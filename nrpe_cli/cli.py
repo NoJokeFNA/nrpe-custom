@@ -15,9 +15,11 @@ from .media import validate_media
 
 def doctor(root):
     print("Checking project files...")
-    required = ("compose.yaml", "compose.test.yaml", "Dockerfile", "Dockerfile.test",
-                "scripts/build.sh", "scripts/verify.sh", "scripts/integration-test.sh",
-                "Dockerfile.sles", "Dockerfile.sles-test", "scripts/build-sles.sh",
+    required = ("compose.yaml", "compose.test.yaml",
+                "docker/debian/build.Dockerfile", "docker/debian/test.Dockerfile",
+                "docker/sles15sp4/build.Dockerfile", "docker/sles15sp4/test.Dockerfile",
+                "scripts/build.sh", "scripts/export_debian_sources.py", "scripts/verify.sh",
+                "scripts/integration-test.sh", "scripts/build-sles.sh",
                 "scripts/integration-test-sles.sh", "scripts/test-nrpe-protocol.sh",
                 "scripts/sles_source.py", "scripts/setup-sles-repositories.sh",
                 "scripts/setup-sles-media.sh",

@@ -35,11 +35,11 @@ flowchart LR
 | `nrpe_cli/docker.py` | Check Docker Engine, Linux container mode, and Compose; give platform-specific failure hints |
 | `nrpe_cli/state.py` | Artifact identity/checksums, run IDs/reports, and per-target locks |
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
-| `nrpe_cli/certificates.py` | Validate optional public PEM/DER CA input and prepare a temporary normalized BuildKit secret |
+| `nrpe_cli/certificates.py` | Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret |
 | `nrpe_cli/media.py` | Validate extracted SLES product identity, repository layout, and path containment |
 | `compose.yaml` / `compose.test.yaml` | Parameterized builder services and opt-in runtime test services |
-| `Dockerfile` / `Dockerfile.test` | Debian build prerequisites and separate runtime environment |
-| `Dockerfile.sles` / `Dockerfile.sles-test` | Genuine SP4 environments, verified prerequisites, and read-only optional media |
+| `docker/debian/build.Dockerfile` / `docker/debian/test.Dockerfile` | Debian build prerequisites and separate runtime environment |
+| `docker/sles15sp4/build.Dockerfile` / `docker/sles15sp4/test.Dockerfile` | Genuine SP4 environments, verified prerequisites, and read-only optional media |
 | `packaging/*.json` and `*.asc` | Pinned SLES source/dependency manifests and verified signing-key identities |
 | `output/<target>/` | Generated packages, checksums, and available provenance; not tracked |
 | `.nrpe/` | Local reports, logs, and locks; not tracked |

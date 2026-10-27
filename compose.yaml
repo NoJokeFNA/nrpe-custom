@@ -12,9 +12,9 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      dockerfile: docker/sles15sp4/build.Dockerfile
       secrets:
         - nrpe_ca_cert
-      dockerfile: Dockerfile.sles
       additional_contexts:
         nrpe_sles_media: ${SLES_MEDIA_DIR:-./packaging/empty-media}
       args:
@@ -31,6 +31,7 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      dockerfile: docker/debian/build.Dockerfile
       secrets:
         - nrpe_ca_cert
       args:
@@ -44,6 +45,7 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      dockerfile: docker/debian/build.Dockerfile
       secrets:
         - nrpe_ca_cert
       args:
@@ -57,6 +59,7 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      dockerfile: docker/debian/build.Dockerfile
       secrets:
         - nrpe_ca_cert
       args:
@@ -70,6 +73,7 @@ services:
     <<: *nrpe-build
     build:
       context: .
+      dockerfile: docker/debian/build.Dockerfile
       secrets:
         - nrpe_ca_cert
       args:
