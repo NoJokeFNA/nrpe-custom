@@ -79,6 +79,9 @@ At least monthly during active maintenance, and before a release:
 
 This is a maintainer procedure, not an installed reminder or a claim of continuous
 security-feed monitoring on behalf of users.
+The [2026-10-27 review](maintenance-reviews/2026-10-27.md) records actual upstream,
+advisory, dependency and lifecycle findings, with outstanding actions and the next
+review date. Record later reviews separately rather than overwriting that evidence.
 
 ## Reviewing source and recipe updates
 

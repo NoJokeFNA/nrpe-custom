@@ -29,6 +29,11 @@ manual workflow dispatch is also validation-only.
 
 Only the master push publishing job receives write permission. No bot commits
 are created: a release tag points to the already-reviewed workflow commit.
+Optional [SSH release signing](release-signing.md) authenticates the checksum
+manifest before publication when explicitly configured. Enrollment and actual
+signed-release validation are separate from implementing the helper; see its
+rollout status. Creating or merging a master promotion requires an explicit
+maintainer request; routine integration stops at develop.
 
 ## Assets and naming
 
@@ -43,6 +48,8 @@ Release assets are:
 - `nrpe-custom-sles15sp4.tar.gz`.
 - `workflow-source.tar.gz`, `LICENSE`, `THIRD_PARTY.md`, `release.json`,
   `RELEASE_NOTES.md`, and `SHA256SUMS`.
+- `SHA256SUMS.sig` when SSH signing is enabled. This detached signature is not
+  part of its own signed checksum manifest.
 
 Target archives contain the original package filenames, installation checksum
 manifest, corresponding sources, component license notices and a sanitized

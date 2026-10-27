@@ -40,6 +40,10 @@ Continue only if every entry reports `OK`. Copy the checksum file through a
 trusted channel alongside the packages; checksums detect changes but do not
 authenticate the publisher by themselves. Keep both SLES binary RPMs available
 for this check even if the destination already has the user package installed.
+For releases that include `SHA256SUMS.sig`, first perform the
+[release authentication check](release-signing.md#consumer-verification) using
+an independently trusted maintainer key before extracting/installing packages.
+The first published release has no signature.
 
 If NRPE is already installed, back up its configuration before updating. Review
 package-manager prompts about configuration files and dependencies. Preserve

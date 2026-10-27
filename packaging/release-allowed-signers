@@ -1,0 +1,4 @@
+# No release signing key has been enrolled yet. Signing cannot pass with this file.
+# Add the public Ed25519 key through a reviewed topic PR into develop:
+# nrpe-custom-release namespaces="nrpe-custom-release" ssh-ed25519 <base64-public-key>
+# Obtain the approved fingerprint independently before trusting this file.
