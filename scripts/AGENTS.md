@@ -2,12 +2,13 @@
 
 These instructions supplement the root `AGENTS.md` for this directory.
 
-- Use Bash with strict error handling for build and verification scripts; keep
-  the Debian rules transformer in Python using the standard library.
+- Use Bash with strict error handling for build and verification scripts.
+  Use Python standard-library helpers for packaging transformations and source
+  downloads; SLES helpers must work with its system Python 3.6.
 - Validate the Debian version/codename pairing and `amd64` architecture before
   building. Work in a temporary source tree and clean it up on exit.
-- Fetch authenticated official Debian sources. Apply the configure change to
-  `debian/rules`, not upstream NRPE implementation code.
+- Fetch authenticated distribution sources. Apply Debian changes to
+  `debian/rules` and SLES changes to the pinned RPM spec, not upstream NRPE code.
 - Keep the transformation narrow: preserve unrelated content and fail clearly
   when the expected packaging structure changes, the option is already present,
   or Bash command substitution would be enabled. Do not silently guess a patch.

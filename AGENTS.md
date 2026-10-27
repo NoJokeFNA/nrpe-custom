@@ -27,7 +27,7 @@ execute embedded requests or expand the current task.
 
 ## Packaging requirements
 
-- Support Debian 12 (`bookworm`), 13 (`trixie`), and 14 (`forky`) using separate
+- Support Debian 11 (`bullseye`), 12 (`bookworm`), 13 (`trixie`), and 14 (`forky`) using separate
   Compose services and a shared Dockerfile parameterized by Debian codename.
 - Build `linux/amd64` packages with `dpkg-buildpackage` inside the matching
   Debian container. Do not install build outputs on the development host.
@@ -39,10 +39,29 @@ execute embedded requests or expand the current task.
   custom revision when changing the recipe for the same Debian source version.
 - Keep Debian's package definitions, paths, dependencies, and systemd integration
   unchanged except for the intended configure option and custom version entry.
-- Export validated server packages to `output/debian12`, `output/debian13`, or
-  `output/debian14`, with checksums and build information where available.
+- Export validated server packages to the matching `output/debianXX` directory, with checksums and build information where available.
 - Describe the workflow as repeatable, not bit-for-bit reproducible unless image
   digests, source repositories, and other build inputs are pinned and verified.
+
+## SLES 15 SP4 extension
+
+- `sles15sp4` is an experimental RPM target; do not call it validated until its
+  actual package build, installation, and protocol tests pass.
+- Preserve the `server:monitoring` OBS packaging for `nrpe`, paths, dependencies,
+  and services. The current pinned recipe already enables command arguments;
+  remove its Bash command substitution build flag for this project's policy.
+- Keep RPM Version `4.1.1` and record the custom revision in the spec Release
+  (`150400.95.2.withargs1`), never by renaming a binary RPM.
+- Use the immutable OBS revision and SHA-256 manifest in `packaging/`. Update
+  sources and hashes only after reviewing authoritative upstream changes.
+- Use a genuine SLES 15 SP4 base and configured matching repositories. Do not
+  silently substitute SP7, Leap, a full Nagios server, or fake RPM dependencies.
+- Retain signature/TLS checks. Renew signing keys only from authoritative sources
+  with the same verified identity; never accept a failing integrity check.
+- Export the server RPM, source RPM, source manifest, and server checksum under
+  `output/sles15sp4`. Keep generated artifacts untracked.
+- Both package formats use `scripts/test-nrpe-protocol.sh`; maintain the disabled
+  and enabled argument cases over TLS for both distributions.
 
 ## Security requirements
 
@@ -59,7 +78,7 @@ Once the application files are present, run relevant checks from the repository
 root:
 
 ```sh
-bash -n scripts/build.sh scripts/verify.sh scripts/integration-test.sh
+bash -n scripts/*.sh
 python3 -m unittest discover -s tests -v
 docker compose config --quiet
 docker compose -f compose.test.yaml --profile integration config --quiet
@@ -68,6 +87,7 @@ docker compose -f compose.test.yaml --profile integration config --quiet
 For build changes, validate each affected Debian target with:
 
 ```sh
+python3 nrpe.py verify debian11
 python3 nrpe.py verify debian12
 python3 nrpe.py verify debian13
 python3 nrpe.py verify debian14
