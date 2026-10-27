@@ -24,7 +24,10 @@ class MenuWorkflowTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         # The browser resolves paths; Windows TEMP may use a short-name alias.
         self.root = Path(self.directory.name).resolve()
-        self.env = patch.dict(os.environ, {}, clear=True)
+        # Windows Python needs these to initialize OS services in child processes.
+        system_environment = {name: os.environ[name] for name in ('SystemRoot', 'WINDIR')
+                              if name in os.environ}
+        self.env = patch.dict(os.environ, system_environment, clear=True)
         self.env.start()
         self.addCleanup(self.env.stop)
 
