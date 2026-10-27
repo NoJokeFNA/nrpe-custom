@@ -11,6 +11,8 @@ on:
       - 'nrpe_cli/release.py'
       - 'nrpe_cli/controller.py'
       - 'nrpe_cli/state.py'
+      - 'nrpe_cli/signing.py'
+      - 'packaging/release-allowed-signers'
       - 'scripts/**'
       - 'docker/**'
       - 'compose*.yaml'
@@ -105,14 +107,16 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           name: release-bundle
           path: release
-      - name: Verify checksums and publish a complete immutable release
+      - name: Verify the complete assembled bundle
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
           COMMIT: ${{ github.sha }}
         shell: bash
         run: |
@@ -127,6 +131,36 @@ jobs:
           assert expected | {'SHA256SUMS'} == {p.name for p in Path('.').iterdir()}
           assert json.loads(Path('release.json').read_text())['commit'] == os.environ['COMMIT']
           PY
+      - name: Sign and authenticate the checksum manifest when configured
+        env:
+          SIGNING_MODE: ${{ vars.NRPE_RELEASE_SIGNING }}
+          NRPE_RELEASE_SIGNING_KEY: ${{ secrets.NRPE_RELEASE_SIGNING_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${SIGNING_MODE:-off}" in
+            off)
+              echo 'Release signing is not enabled; this release has checksum integrity only.'
+              ;;
+            ssh-ed25519)
+              python3 scripts/release_signature.py sign --directory release \
+                --allowed-signers packaging/release-allowed-signers \
+                --key-env NRPE_RELEASE_SIGNING_KEY
+              ;;
+            *)
+              echo 'Unsupported NRPE_RELEASE_SIGNING setting; refusing publication.' >&2
+              exit 1
+              ;;
+          esac
+      - name: Publish a complete immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release
           tag="build-${GITHUB_RUN_NUMBER}-${COMMIT:0:12}"
           if gh release view "$tag" > /dev/null 2>&1; then
             echo 'Release already exists; refusing to replace published assets' >&2
