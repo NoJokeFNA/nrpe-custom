@@ -1,9 +1,9 @@
-# SLES 15 SP3 license notices
+# SLES 12 SP3 license notices
 
 These files accompany the pinned NRPE and `system-user-nagios` packages. They
 retain upstream terms and are not relicensed under the project's MIT license.
 Include this directory with a SLES release candidate alongside the binaries,
-both source RPMs, the input manifests, and build scripts.
+all three source RPMs, the input manifests, and build scripts.
 
 | File | Origin and scope |
 | --- | --- |
@@ -19,7 +19,7 @@ it did, a new permission from this project, or a license change. The declaration
 comes from the original spec, not from this project's choice of MIT.
 
 The input archive and companion spec were checked against their respective
-[NRPE](../../sles15sp3-source.json) and [user-package](../../sles15sp3-user-source.json)
+[NRPE](../../sles12sp3-source.json) and [user-package](../../sles12sp3-user-source.json)
 manifests. The full [review and source references](../../../docs/sles-license-review.md)
 explain the evidence and remaining release work.
 
@@ -28,3 +28,8 @@ Keep the original source-package copyright headers as well, including the ACL,
 replace either corresponding source RPM. Include all notice assets in the release
 checksum manifest. Existing RPM payloads and upstream manifests are unchanged;
 notices accompany them as separate release assets.
+
+The native nagios-rpm-macros build uses BSD-3-Clause sources at pinned OBS
+revision `a911087cc73b87e04465861110d43754`. `nagios-rpm-macros-BSD.txt` is the
+verbatim upstream COPYING file (Lars Vogdt, 2011). Its source RPM and original
+inputs accompany the SLE-12 rebuild; the build-only macro binary is not shipped.

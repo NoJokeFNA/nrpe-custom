@@ -30,12 +30,13 @@ class WorkflowTests(unittest.TestCase):
         (directory / name).write_bytes(data)
         digest = hashlib.sha256(data).hexdigest()
         (directory / 'SHA256SUMS').write_text(f'{digest}  {name}\n')
-        if target == 'sles15sp3':
-            helper_name = 'system-user-nagios-1.0.0-0.noarch.rpm'
-            helper_data = b'user package'
-            (directory / helper_name).write_bytes(helper_data)
-            with (directory / 'SHA256SUMS').open('a') as checksums:
-                checksums.write(hashlib.sha256(helper_data).hexdigest() + '  ' + helper_name + '\n')
+        if target == 'sles12sp3':
+            for helper_name in ('system-user-nagios-1.0.0-0.noarch.rpm',
+                                'monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm'):
+                helper_data = helper_name.encode()
+                (directory / helper_name).write_bytes(helper_data)
+                with (directory / 'SHA256SUMS').open('a') as checksums:
+                    checksums.write(hashlib.sha256(helper_data).hexdigest() + '  ' + helper_name + '\n')
         return directory / name
 
     def report(self):
@@ -128,23 +129,23 @@ class WorkflowTests(unittest.TestCase):
     @patch('nrpe_cli.controller.check_docker', return_value='docker')
     @patch('nrpe_cli.controller.run_phase', return_value=0)
     def test_changed_companion_package_invalidates_sles_test_status(self, phase, docker):
-        self.package('sles15sp3')
-        self.assertEqual(controller.execute('test', ['sles15sp3'], self.root), 0)
-        original = state.artifact(self.root, 'sles15sp3')
-        directory = self.root / 'output/sles15sp3'
+        self.package('sles12sp3')
+        self.assertEqual(controller.execute('test', ['sles12sp3'], self.root), 0)
+        original = state.artifact(self.root, 'sles12sp3')
+        directory = self.root / 'output/sles12sp3'
         helper = directory / 'system-user-nagios-1.0.0-0.noarch.rpm'
         helper.write_bytes(b'changed user package')
         checksums = directory / 'SHA256SUMS'
-        server_line = checksums.read_text().splitlines()[0]
+        server_line = '\n'.join(line for line in checksums.read_text().splitlines() if not line.endswith('  ' + helper.name))
         checksums.write_text(server_line + '\n' + hashlib.sha256(helper.read_bytes()).hexdigest()
                              + '  ' + helper.name + '\n')
-        current = state.artifact(self.root, 'sles15sp3')
+        current = state.artifact(self.root, 'sles12sp3')
         self.assertEqual(original['sha256'], current['sha256'])
         self.assertNotEqual(original['companions'], current['companions'])
         self.output.truncate(0)
         self.output.seek(0)
         cli.show_status(self.root)
-        line = next(line for line in self.output.getvalue().splitlines() if line.startswith('sles15sp3'))
+        line = next(line for line in self.output.getvalue().splitlines() if line.startswith('sles12sp3'))
         self.assertIn('not tested', line)
 
     @patch('nrpe_cli.controller.check_docker', return_value='docker')

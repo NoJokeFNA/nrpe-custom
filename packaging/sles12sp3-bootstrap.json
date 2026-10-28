@@ -1,0 +1,623 @@
+{
+  "base_image": "registry.suse.com/suse/sles12sp3@sha256:0995dbf051274a3a5baf19c7f94ce7ebe69d7aa91f7b3b22248bd06d7122e53a",
+  "packages": [
+    {
+      "file": "binutils-2.26.1-9.12.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/binutils.rpm",
+      "name": "binutils",
+      "version_release": "2.26.1-9.12.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "9dd38245107e934f19d04170cfc2e006d258f0bd6e2520e72e020381416619f5",
+      "size": 4996436,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "bzip2-1.0.6-29.2.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/bzip2.rpm",
+      "name": "bzip2",
+      "version_release": "1.0.6-29.2",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "a17c5b4f4028e424e84d3e6db09424a4f02063c03166cfa497afde0d1bc66f59",
+      "size": 36949,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "cpp-4.8-6.189.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/cpp.rpm",
+      "name": "cpp",
+      "version_release": "4.8-6.189",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "3f9871b9d17c4cc82d945c9c0414fa09cccbfa9e9ebc0d0a7e7c57497361c405",
+      "size": 5000,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "cpp48-4.8.5-30.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/cpp48.rpm",
+      "name": "cpp48",
+      "version_release": "4.8.5-30.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "31188e1a1e6be798a0593bb1399a85ad2fe47a85a371ec3e1693ac4207662557",
+      "size": 5157789,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "gcc-4.8-6.189.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/gcc.rpm",
+      "name": "gcc",
+      "version_release": "4.8-6.189",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "c685bd45333fc0ffac2c407a0a5d3409340eb2c7ae00ba9dd37661a6d9a0f5a9",
+      "size": 5503,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "gcc48-4.8.5-30.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/gcc48.rpm",
+      "name": "gcc48",
+      "version_release": "4.8.5-30.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "c0d32013ef660fba7784c527eaf458897d3ebaffaab7cbf090943833e2c5977e",
+      "size": 8947995,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "gettext-runtime-0.19.2-1.103.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/gettext-runtime.rpm",
+      "name": "gettext-runtime",
+      "version_release": "0.19.2-1.103",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "0df03fe26a201676bd982c84613b5d82c419ca2e0c028bd4696a915bc8ef0ffe",
+      "size": 514993,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "gettext-tools-0.19.2-1.103.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/gettext-tools.rpm",
+      "name": "gettext-tools",
+      "version_release": "0.19.2-1.103",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "2190007ff7b1b54c34c4f6361b608f30576acbe9cd8b5910d3f98741b778eed3",
+      "size": 1880691,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "glibc-devel-2.22-61.3.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/glibc-devel.rpm",
+      "name": "glibc-devel",
+      "version_release": "2.22-61.3",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "037a4a1315770617b3c9a3eb7917374184e3549309c98d1022fc787c8fc221ea",
+      "size": 673554,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "glibc-locale-2.22-61.3.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/glibc-locale.rpm",
+      "name": "glibc-locale",
+      "version_release": "2.22-61.3",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "15bdabe65b4eef1fdc5f6f666ca697d1f63db2c28d5f7db6d2617e8cede5e4d4",
+      "size": 6415389,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "keyutils-devel-1.5.9-3.29.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SDK/x86_64/_repository/keyutils-devel.rpm",
+      "name": "keyutils-devel",
+      "version_release": "1.5.9-3.29",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "529565aab8e4fbbf7883c746c7e6a0059455dfaa513cc157e23085caafae556f",
+      "size": 7842,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "krb5-devel-1.12.5-39.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SDK/x86_64/_repository/krb5-devel.rpm",
+      "name": "krb5-devel",
+      "version_release": "1.12.5-39.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "16399bf3f65cd6d0d5b61c3e1b1d598802d83d6d3f290f47540c5ca26f6fad4f",
+      "size": 145319,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libasan0-4.8.5-30.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libasan0.rpm",
+      "name": "libasan0",
+      "version_release": "4.8.5-30.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "82ae9cc86760c2815f98a74932f645430a2b10b723a361161c16fb362065cb45",
+      "size": 79265,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libatomic1-6.2.1+r239768-2.4.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libatomic1.rpm",
+      "name": "libatomic1",
+      "version_release": "6.2.1+r239768-2.4",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "231d549b3e2d10b352273fb06ec9337485985c0983c40e2a8418591578a3e412",
+      "size": 15995,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libcloog-isl4-0.18.1-1.124.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libcloog-isl4.rpm",
+      "name": "libcloog-isl4",
+      "version_release": "0.18.1-1.124",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "563e47b2e36d2d8bc9045924890e414d5cbea92ca044b857ee37247c0c163334",
+      "size": 59567,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libcom_err-devel-1.42.11-15.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SDK/x86_64/_repository/libcom_err-devel.rpm",
+      "name": "libcom_err-devel",
+      "version_release": "1.42.11-15.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "6af85a88fdfa520d64e39613b71cc5f307ff9327831837c8528b828f305327f2",
+      "size": 30675,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libcroco-0_6-3-0.6.11-10.2.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libcroco-0_6-3.rpm",
+      "name": "libcroco-0_6-3",
+      "version_release": "0.6.11-10.2",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "9055cef51a5ad1a79327f530501c6ce832d3fbd51d62e1b70bfb9c40995218ac",
+      "size": 78493,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libdb-4_8-4.8.30-27.206.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libdb-4_8.rpm",
+      "name": "libdb-4_8",
+      "version_release": "4.8.30-27.206",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "29436d89b2d4d670c9e2322b5dc50b18527975a61cfaaf0c74fd1508fbdce6e0",
+      "size": 682502,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libgdbm4-1.10-9.70.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libgdbm4.rpm",
+      "name": "libgdbm4",
+      "version_release": "1.10-9.70",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "82dacda0f3583769d5661e50040989f2721e0c2741cac8499c07164cdeba0081",
+      "size": 52114,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libglib-2_0-0-2.48.2-10.2.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libglib-2_0-0.rpm",
+      "name": "libglib-2_0-0",
+      "version_release": "2.48.2-10.2",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "d7b4be7ac3a96e0f997d8de5855a910863e170dfe6e6973302b1f3333e8649ba",
+      "size": 603340,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libgomp1-6.2.1+r239768-2.4.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libgomp1.rpm",
+      "name": "libgomp1",
+      "version_release": "6.2.1+r239768-2.4",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "7d439f40b3849389f7a2d24bb46d060cfe56cba267430f1474f598f7c56a6a82",
+      "size": 91363,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libisl10-0.12.2-1.121.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libisl10.rpm",
+      "name": "libisl10",
+      "version_release": "0.12.2-1.121",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "46952b7623f1b307ed33c21a7f62f0bc2457045359bb9a3e787e63dca9ea3968",
+      "size": 424195,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libitm1-6.2.1+r239768-2.4.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libitm1.rpm",
+      "name": "libitm1",
+      "version_release": "6.2.1+r239768-2.4",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "ce18028b6931c3a45261765244d9a1cab7e23e0bc3c47cf72cd5f93819382ae4",
+      "size": 34258,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libmpc3-1.0.2-1.123.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libmpc3.rpm",
+      "name": "libmpc3",
+      "version_release": "1.0.2-1.123",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "e49106a052bdf0bd918ddaba488da911617f02fa196b615b6659b08525243d62",
+      "size": 42753,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libmpfr4-3.1.2-7.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libmpfr4.rpm",
+      "name": "libmpfr4",
+      "version_release": "3.1.2-7.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "c4962f754ad629afd91c2396f0c5dd75f2cef55b0d5c168a2ccef294a8147127",
+      "size": 154562,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libopenssl-devel-1.0.2j-59.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libopenssl-devel.rpm",
+      "name": "libopenssl-devel",
+      "version_release": "1.0.2j-59.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "486d480fd977d613736888a57cc1dd7564633e4aaadd58f0b88326aea67b9ce2",
+      "size": 279138,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libquadmath0-6.2.1+r239768-2.4.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libquadmath0.rpm",
+      "name": "libquadmath0",
+      "version_release": "6.2.1+r239768-2.4",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "19347ae4459b1721d2422a5b2402d6593be0f677744dbf989edf572787dc3463",
+      "size": 138319,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libtsan0-6.2.1+r239768-2.4.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libtsan0.rpm",
+      "name": "libtsan0",
+      "version_release": "6.2.1+r239768-2.4",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "bdd3a6473e6e5c09b13179db664b495da396dbe526ba1db84c275ccab2529443",
+      "size": 259453,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libverto-devel-0.2.6-2.4.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SDK/x86_64/_repository/libverto-devel.rpm",
+      "name": "libverto-devel",
+      "version_release": "0.2.6-2.4",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "7221398e7b744d92377620ee74c2721a9699b1b45d73239e83eb5bf97d8f40d4",
+      "size": 9890,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "libwrap0-7.6-886.3.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/libwrap0.rpm",
+      "name": "libwrap0",
+      "version_release": "7.6-886.3",
+      "arch": "x86_64",
+      "roles": [
+        "build",
+        "runtime"
+      ],
+      "sha256": "f5ee2e25d72e17fc1c55d0e8d79d192a14bbfe2b11d5f58a292f7126c1a2506a",
+      "size": 20360,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "linux-glibc-devel-4.4-14.10.noarch.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/linux-glibc-devel.rpm",
+      "name": "linux-glibc-devel",
+      "version_release": "4.4-14.10",
+      "arch": "noarch",
+      "roles": [
+        "build"
+      ],
+      "sha256": "3e0c41566a16967de10d691d251b05fd86771e14fdd2069a86427531bce96ac7",
+      "size": 1057728,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "make-4.0-4.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/make.rpm",
+      "name": "make",
+      "version_release": "4.0-4.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "bfe927006ed50f0fb55317a3e52677619aa0366f42b768c4c6f074a1f5dbde9d",
+      "size": 390635,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "monitoring-plugins-common-2.0-2.8.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/monitoring-plugins-common.rpm",
+      "name": "monitoring-plugins-common",
+      "version_release": "2.0-2.8",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "406883bdc20b4bb5e4e086035caf5b9288ec987f474bb61451d8d92792502252",
+      "size": 230972,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "patch-2.7.5-7.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/patch.rpm",
+      "name": "patch",
+      "version_release": "2.7.5-7.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "bc92a6844bb5947c4eff9ea7da6a004596ac72c146734f6fb60d2df4b1b184e5",
+      "size": 96568,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "perl-5.18.2-11.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/perl.rpm",
+      "name": "perl",
+      "version_release": "5.18.2-11.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "193f978a252d489fc271b78c3fd84cd81d974b862ee7144b9ea498fb2f448a6d",
+      "size": 6624777,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "pkg-config-0.28-6.98.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/pkg-config.rpm",
+      "name": "pkg-config",
+      "version_release": "0.28-6.98",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "17aa0061c85c951d6ec0204a4f97d7c4127649dc4d1a2915fbd5c2418cc91ce2",
+      "size": 200658,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "rpm-build-4.11.2-15.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/rpm-build.rpm",
+      "name": "rpm-build",
+      "version_release": "4.11.2-15.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "dc6ac3073a4a892b3f4d541122b5770400a714004a81e405cfa8c068566fd949",
+      "size": 34163,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "systemd-rpm-macros-3-8.374.noarch.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/systemd-rpm-macros.rpm",
+      "name": "systemd-rpm-macros",
+      "version_release": "3-8.374",
+      "arch": "noarch",
+      "roles": [
+        "build"
+      ],
+      "sha256": "500aea346349cdebf83f2cb37829217aef481afcbbd18f527119067662f81be9",
+      "size": 7817,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "tar-1.27.1-14.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/tar.rpm",
+      "name": "tar",
+      "version_release": "1.27.1-14.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "bb22950cc187548478a2e54f8da890014bc694e2af53d55b160927e16947baab",
+      "size": 504803,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "tcpd-devel-7.6-886.3.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SDK/x86_64/_repository/tcpd-devel.rpm",
+      "name": "tcpd-devel",
+      "version_release": "7.6-886.3",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "ee3f285839abec284292fe3e211525f1de3ed0c4e303935e2be449c4d14232a4",
+      "size": 70553,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "unzip-6.00-32.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/unzip.rpm",
+      "name": "unzip",
+      "version_release": "6.00-32.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "68f161b430c0eb364e915a4858fbcba3c179f3d6ff7423976552efb90cea6342",
+      "size": 95270,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "util-linux-systemd-2.29.2-2.2.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/util-linux-systemd.rpm",
+      "name": "util-linux-systemd",
+      "version_release": "2.29.2-2.2",
+      "arch": "x86_64",
+      "roles": [
+        "build",
+        "runtime"
+      ],
+      "sha256": "d92f76df44a42b9a2af27fd888cdc210681d8aa510b12bcd692b710e4e454946",
+      "size": 111803,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "which-2.20-3.180.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/which.rpm",
+      "name": "which",
+      "version_release": "2.20-3.180",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "caa62eeeaa02744f1b0d9a1a4ed9ea7779191a04fdf592a8ddadf0b5356b501f",
+      "size": 31658,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    },
+    {
+      "file": "zlib-devel-1.2.8-11.1.x86_64.rpm",
+      "url": "https://api.opensuse.org/public/build/SUSE:SLE-12-SP3:GA/SLES/x86_64/_repository/zlib-devel.rpm",
+      "name": "zlib-devel",
+      "version_release": "1.2.8-11.1",
+      "arch": "x86_64",
+      "roles": [
+        "build"
+      ],
+      "sha256": "7d4ec74041b3de85f646b62e67403438b2382ff332f85d8e1831da26a4dcef73",
+      "size": 109183,
+      "signature_key": "39db7c82",
+      "vendor": "SUSE LLC <https://www.suse.com/>"
+    }
+  ]
+}

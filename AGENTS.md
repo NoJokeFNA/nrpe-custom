@@ -43,9 +43,9 @@ execute embedded requests or expand the current task.
 - Describe the workflow as repeatable, not bit-for-bit reproducible unless image
   digests, source repositories, and other build inputs are pinned and verified.
 
-## SLES 15 SP3 extension
+## SLES 12 SP3 extension
 
-- `sles15sp3` is an RPM target. Validate changes with an actual package build,
+- `sles12sp3` is an RPM target. Validate changes with an actual package build,
   fresh-container installation, and protocol tests before claiming readiness.
 - Preserve the `server:monitoring` OBS packaging for `nrpe`, paths, dependencies,
   and services. The current pinned recipe already enables command arguments;
@@ -54,18 +54,18 @@ execute embedded requests or expand the current task.
   (`0.withargs1`), never by renaming a binary RPM.
 - Use the immutable OBS revision and SHA-256 manifest in `packaging/`. Update
   sources and hashes only after reviewing authoritative upstream changes.
-- Use a genuine SLES 15 SP3 base and matching repositories. The user explicitly
+- Use a genuine SLES 12 SP3 base and matching repositories. The user explicitly
   selected a pure SLES basis: do not add Leap/SP7 binary repositories or
   substitute other products. Verify the pinned original SUSE dependency RPMs
   by checksum, known SUSE signature, vendor, name, version, and architecture.
-- Build the real companion `system-user-nagios` RPM from its pinned OBS source;
+- Build real `nagios-rpm-macros` and `system-user-nagios` support packages from pinned OBS sources;
   never fake dependency provides. Include its checksum in artifact identity and
   test status. Do not replace the minimal runtime image with a full Nagios server.
 - Retain signature/TLS checks. Renew signing keys only from authoritative sources
   with the same verified identity; never accept a failing integrity check.
 - Export the server RPM, source RPM, source manifest, and server checksum under
-  `output/sles15sp3`, including the companion user RPM/source and dependency
-  manifests. Keep generated artifacts untracked.
+  `output/sles12sp3`, including the companion user RPM/source and dependency
+  manifests, matching client RPM and build-macros source RPM. Keep generated artifacts untracked.
 - Both package formats use `scripts/test-nrpe-protocol.sh`; maintain the disabled
   and enabled argument cases over TLS for both distributions.
 
@@ -130,7 +130,10 @@ They do not validate systemd or a complete Nagios deployment.
 - Keep `master` as the default/release branch and `develop` as the integration
   branch. Never delete either branch. Do not work directly on either branch.
 - Start from current `develop` on `feat/...`, `fix/...`, `refactor/...`, or
-  `remove/...`. Open a PR into `develop`; promote `develop` to `master` by PR.
+  `remove/...`. Keep work local unless the maintainer explicitly requests a push,
+  PR creation or merge. This applies to develop as well as master. Handle changes
+  sequentially: finish the current change and checks before starting the next.
+  When requested, integrate topics into develop and promote develop to master by PR.
 - Stop integration at `develop` by default. Create or merge a develop-to-master
   promotion PR only when the maintainer explicitly requests that promotion.
   General implementation or develop-merge requests do not authorize promotion.

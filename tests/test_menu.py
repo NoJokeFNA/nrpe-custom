@@ -48,21 +48,7 @@ class MenuWorkflowTests(unittest.TestCase):
     def test_test_action_never_requests_rebuild(self, choose):
         self.assertEqual(menu.workflow(self.root, 'test'), ['test', 'debian12'])
 
-    @patch('nrpe_cli.menu.choose', side_effect=[['sles15sp3'], 'run', True])
-    def test_inherited_media_is_visible_and_forwarded(self, choose):
-        with patch.dict(os.environ, {'SLES_MEDIA_DIR': str(self.root)}):
-            self.assertEqual(menu.workflow(self.root, 'test'),
-                             ['test', 'sles15sp3', '--sles-media', str(self.root)])
-        self.assertIn(str(self.root), choose.call_args.args[0])
 
-    @patch('nrpe_cli.media.validate_media', side_effect=RuntimeError('Wrong product'))
-    @patch('nrpe_cli.menu.browse_directory')
-    @patch('nrpe_cli.menu.choose', side_effect=[
-        ['sles15sp3'], 'media', 'browse', None, 'run', True])
-    def test_invalid_browsed_media_is_not_forwarded(self, choose, browse, validate):
-        browse.return_value = self.root
-        self.assertEqual(menu.workflow(self.root, 'test'), ['test', 'sles15sp3'])
-        self.assertIn('Wrong product', choose.call_args_list[3].args[0])
 
     @patch('nrpe_cli.menu.choose', side_effect=['0'])
     def test_certificate_browser_selects_a_file(self, choose):

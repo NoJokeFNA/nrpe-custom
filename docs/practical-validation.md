@@ -9,7 +9,8 @@ and [update/rollback procedure](updates-and-rollback.md) for deployment details.
 
 As of 2026-10-27, the first release passed all five container build/install/TLS
 tests and Linux/Windows Python unit tests. The Windows Docker Desktop and real
-VM scenarios below are **not run**. The available Linux cloud environment has
+VM scenarios below are **not run**. That first release covered SLES 15 SP4;
+the later SLES-12-SP3 migration has separate container evidence in the target guide. The available Linux cloud environment has
 no Windows/Docker Desktop host, QEMU/libvirt, `/dev/kvm`, or supplied test-VM
 access. Containers and hosted Windows unit tests do not establish these results.
 
@@ -76,7 +77,7 @@ container cleanup. Install `requirements-menu.txt` to exercise the optional menu
 
 ## Debian and SLES test VMs
 
-Use disposable amd64 VMs for Debian 11, 12, 13, 14 and genuine SLES 15 SP3.
+Use disposable amd64 VMs for Debian 11, 12, 13, 14 and genuine SLES 12 SP3.
 Keep matching signed repositories available and take a recoverable baseline
 snapshot. Use a separate monitoring client for remote TLS checks. Do not
 substitute Leap or another SLES service pack. Forky results apply to the tested

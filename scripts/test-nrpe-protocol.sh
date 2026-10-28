@@ -11,6 +11,14 @@ server_binary="$3"
 version="$4"
 target="$5"
 package_name="$6"
+tls_version="${NRPE_TEST_TLS_VERSION:-TLSv1.2+}"
+case "$tls_version" in TLSv1.2|TLSv1.2+|TLSv1.3|TLSv1.3+) ;; *) echo 'ERROR: Unsupported test TLS policy' >&2; exit 1 ;; esac
+tls_dh_policy='ssl_use_adh=0'
+if [[ "$target" == sles12sp3 ]]; then
+  # NRPE 4.1.1 initializes finite-field DH only with ssl_use_adh enabled.
+  # Exclude anonymous authentication explicitly while allowing signed DHE-RSA.
+  tls_dh_policy=$'ssl_use_adh=1\nssl_cipher_list=DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL'
+fi
 
 grep -Eq '^[[:space:]]*dont_blame_nrpe=0[[:space:]]*$' "$installed_config" || {
   echo 'ERROR: Installed package does not keep argument handling disabled by default' >&2; exit 1;
@@ -59,8 +67,8 @@ ssl_cert_file=$runtime/cert.pem
 ssl_privatekey_file=$runtime/key.pem
 ssl_cacert_file=$runtime/cert.pem
 ssl_client_certs=2
-ssl_use_adh=0
-ssl_version=TLSv1.2+
+$tls_dh_policy
+ssl_version=$tls_version
 command_timeout=10
 connection_timeout=10
 command[check_ready]=/usr/bin/printf 'NRPE_READY\n'
@@ -71,7 +79,7 @@ chown -R nagios:nagios "$runtime"
 chmod 700 "$runtime"
 chmod 600 "$runtime/key.pem"
 
-client=("$client_binary" -H 127.0.0.1 -t 5 -d 0
+client=("$client_binary" -S "$tls_version" -H 127.0.0.1 -t 5 -d 0
   -A "$runtime/cert.pem" -C "$runtime/cert.pem" -K "$runtime/key.pem")
 start_server() {
   "$server_binary" -f -c "$runtime/nrpe.cfg" >> "$runtime/server.log" 2>&1 &
@@ -111,5 +119,5 @@ reply="$("${client[@]}" -c check_args -a gamma delta)"
 [[ "$reply" == NRPE_ARGS:gamma:delta ]] || {
   echo "ERROR: Arguments did not reach the check correctly: $reply" >&2; exit 1;
 }
-echo 'PASS: Arguments enabled (dont_blame_nrpe=1); check_nrpe receives alpha/beta and gamma/delta over TLS'
+echo "PASS: Arguments enabled (dont_blame_nrpe=1); check_nrpe receives alpha/beta and gamma/delta over $tls_version with client certificates"
 echo "PASS: Integration test completed for ${target} ($version)"

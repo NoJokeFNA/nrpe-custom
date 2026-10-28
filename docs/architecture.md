@@ -29,18 +29,17 @@ flowchart LR
 | --- | --- |
 | `nrpe.py` | Public entry point; dispatches to `nrpe_cli.cli.main` |
 | `build.py` | Compatibility wrapper for older commands; no separate build engine |
-| `nrpe_cli/cli.py` | Parse commands, diagnose Compose, show status/logs, validate media and rebuild consent |
+| `nrpe_cli/cli.py` | Parse commands, diagnose Compose, show status/logs, validate certificates and rebuild consent |
 | `nrpe_cli/menu.py` | Optional terminal rendering, selection, directory browsing, and command review |
 | `nrpe_cli/controller.py` | Sequence targets/phases, stream logs, persist outcomes, and clean up only the owned container |
 | `nrpe_cli/docker.py` | Check Docker Engine, Linux container mode, and Compose; give platform-specific failure hints |
 | `nrpe_cli/state.py` | Artifact identity/checksums, run IDs/reports, and per-target locks |
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
 | `nrpe_cli/certificates.py` | Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret |
-| `nrpe_cli/media.py` | Validate extracted SLES product identity, repository layout, and path containment |
 | `nrpe_cli/release.py` | Validate exact workflow/build/source evidence and assemble complete release archives |
 | `compose.yaml` / `compose.test.yaml` | Parameterized builder services and opt-in runtime test services |
 | `docker/debian/build.Dockerfile` / `docker/debian/test.Dockerfile` | Debian build prerequisites and separate runtime environment |
-| `docker/sles15sp3/build.Dockerfile` / `docker/sles15sp3/test.Dockerfile` | Genuine SP3 environments, verified prerequisites, and read-only optional media |
+| `docker/sles12sp3/build.Dockerfile` / `docker/sles12sp3/test.Dockerfile` | Genuine SP3 environments, verified prerequisites, and pinned original SLE-12 inputs |
 | `packaging/*.json` and `*.asc` | Pinned SLES source/dependency manifests and verified signing-key identities |
 | `output/<target>/` | Generated packages, checksums, and available provenance; not tracked |
 | `.nrpe/` | Local reports, logs, and locks; not tracked |
@@ -78,7 +77,7 @@ checkout. Targets run sequentially within a command and the first failure stops
 the remaining targets. Different target runs can proceed independently.
 
 A pass is attached to the artifact's identity and SHA-256, including the SLES
-companion user RPM. Replacing either invalidates the matching result. Run reports
+user and matching client RPMs. Replacing any invalidates the matching result. Run reports
 are local records, not cryptographically signed attestations. See the
 [workflow reference](workflow.md#results-logs-and-concurrent-runs) for cleanup,
 stale locks, and report limitations.
@@ -88,8 +87,8 @@ stale locks, and report limitations.
 All existing shell/Python scripts have active callers. The review retained the
 package-format boundaries and the already-shared TLS protocol test. Shell is
 used for native package tools; Python is used for structured metadata and narrow
-source transformations. SLES container helpers must remain Python 3.6 compatible;
-the host controller requires Python 3.9+.
+source transformations. Download/source preparation uses a modern Python stage;
+target compilation and installation use native SLES 12 tools without Python.
 
 | Script | Caller | Why it remains separate |
 | --- | --- | --- |
@@ -105,17 +104,16 @@ the host controller requires Python 3.9+.
 | `build-sles-user.sh` | SLES builder image setup | Real independently packaged system user/group dependency; needed before NRPE build |
 | `sles_source.py` | SLES Dockerfile and user-package builder | Pinned source fetch/verification and appropriate recipe transformation |
 | `fetch_sles_packages.py` | Both SLES Dockerfiles | Verify original SUSE bootstrap RPM hashes, signatures, vendor, and identity |
-| `setup-sles-repositories.sh` | Both SLES Dockerfiles | Shared SP3 repository setup and media-helper invocation |
-| `setup-sles-media.sh` | SLES repository setup | Validate and register only approved product/module repositories when media is present |
 | `integration-test-sles.sh` | SLES test entry point | RPM artifact/companion checks, dependency installation, then shared protocol test |
 | `install-ca-certificate.sh` | All four Dockerfiles before network package operations | Optional company CA setup, checksum validation, and distribution-specific system trust stores |
 | `test-nrpe-protocol.sh` | Both integration entry points | Single TLS client/server test of disabled and enabled argument handling |
 
-Combining Debian and RPM installation or build scripts would introduce branching
-around unrelated package managers and verification rules. Combining the two
-SLES download helpers would mix source transformation with RPM signature policy.
-The small repeated temporary-directory setup does not justify that coupling.
-No package script was deleted or merged as part of this review.
+SLES 12 downloads are prepared separately, then verified and installed with the
+native RPM implementation before any target code is built. `prepare_sles_inputs.py`
+produces only pinned inputs, not target binaries. `verify-sles-packages.sh`
+requires exact hash/signature/vendor/version coverage; `verify-sles-environment.sh`
+checks the actual 12.3 identity and clean runtime base. The support-package build
+creates genuine macros/user RPMs; no dependency provides are faked.
 
 The actual consolidation in this change is the host menu: the previous inline
 number/text menu has been removed from `cli.py` and replaced by one frontend in

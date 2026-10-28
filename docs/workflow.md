@@ -1,6 +1,6 @@
 # Workflow reference
 
-Build Debian `nagios-nrpe-server` packages and a SLES 15 SP3
+Build Debian `nagios-nrpe-server` packages and a SLES 12 SP3
 `nrpe` RPM using the distribution packaging recipes, with command arguments
 compiled in and runtime argument handling disabled by default.
 
@@ -67,57 +67,11 @@ python3 nrpe.py status
 python3 nrpe.py logs --last
 ```
 
-SLES builds use SLE/Package Hub binary dependencies and pinned OBS sources, with
-no Leap base image or Leap repository added. Original SUSE signatures and source
-checksums are verified. If you want to supply official SP3 Full Media1 as an
-additional package source, extract it outside the checkout and use:
-
-```powershell
-python3 nrpe.py verify sles15sp3 --sles-media "C:\SLES15-SP3"
-```
-
-The same media option is supported by `build`, `test`, and the compatibility wrapper.
-All targets also support an optional `--ca-cert FILE` for a company public CA
-in PEM or DER format, or `NRPE_CA_CERT`. See the
-[network guide](network.md#optional-company-ca-certificate).
-The media are mounted read-only during image builds and container runs. See
-[the SLES guide](sles15sp3.md) for download and repository installation steps.
-
-Use `test` for packages you have already built locally. It checks the bytes in
-`output/`; it does not establish that they were built from the current checkout.
-`doctor` checks local prerequisites, not connectivity to package repositories from
-build containers. If Docker is unavailable on Windows, the controller suggests
-starting Docker Desktop, enabling Linux containers, and waiting for engine
-readiness. It does not start or restart Docker Desktop automatically.
-
-If a selected build target already has a server package, the controller asks for
-confirmation in an interactive terminal; the default answer keeps the package.
-Without a terminal it refuses to overwrite existing output unless you explicitly
-pass `--rebuild`:
-
-```powershell
-python3 nrpe.py verify debian12 --rebuild
-python3 nrpe.py verify all --rebuild --pull
-python3 nrpe.py test debian14 --pull
-```
-
-`--pull` checks for updated base images before building the selected
-builder/test images. Unchanged layers still use Docker's cache. Without this
-option Docker may reuse a locally available base image. This is separate from
-the NRPE source version: Debian builds discover it through APT, while the
-SLES recipe uses a reviewed, pinned OBS revision. Existing
-packages are not automatically declared current merely because a base image is
-unchanged. The controller does not yet compare a remote source version and full
-build recipe against an existing package to decide whether rebuilding is needed.
-The compatibility wrapper also accepts `--rebuild` and `--pull`.
-
-The previous commands remain supported through a compatibility wrapper:
-
-| Previous command | Preferred command |
-| --- | --- |
-| `build.py debian12` | `nrpe.py build debian12` |
-| `build.py debian12 --test` | `nrpe.py verify debian12` |
-| `build.py debian12 --test-only` | `nrpe.py test debian12` |
+SLES 12 SP3 uses a genuine digest-pinned 12.3 image and a hash-pinned set of
+original SLE-12 Server/SDK RPMs. A modern input stage downloads sources; native
+SLES tools verify package signatures and compile/install the result. No SLE-15
+binary or ISO layout is used, and the obsolete `--sles-media` option is removed.
+See the [SLES guide](sles12sp3.md).
 
 ## Targets and package builds
 
@@ -127,7 +81,7 @@ The previous commands remain supported through a compatibility wrapper:
 | `debian12` | Debian 12 Bookworm | amd64 | `output/debian12/` |
 | `debian13` | Debian 13 Trixie | amd64 | `output/debian13/` |
 | `debian14` | Debian 14 Forky | amd64 | `output/debian14/` |
-| `sles15sp3` | SLES 15 SP3 | x86_64 | `output/sles15sp3/` |
+| `sles12sp3` | SLES 12 SP3 | x86_64 | `output/sles12sp3/` |
 
 `all` includes every target, including the SLES target. To validate
 only Debian, list `debian11 debian12 debian13 debian14` explicitly.
@@ -139,9 +93,9 @@ Debian 11 has been built and installation/TLS argument tests have passed here
 with `4.0.3-1+withargs1`. This is historical archive availability, not a promise
 of ongoing security updates for this old release.
 
-SLES uses an actual SLES 15 SP3 BCI base, not a Debian or Leap replacement.
+SLES uses an actual SLES 12 SP3 base, not a Debian or Leap replacement.
 Its RPM recipe, pinned sources, prerequisites, and validation limits
-are documented in [SLES 15 SP3](sles15sp3.md).
+are documented in [SLES 12 SP3](sles12sp3.md).
 
 Each Debian target uses a corresponding Debian container with a shared Dockerfile.
 The build enables source repositories, installs build dependencies, and fetches
@@ -181,7 +135,7 @@ Separate opt-in services in `compose.test.yaml` use `docker/debian/test.Dockerfi
 5. Set `dont_blame_nrpe=1` only in the temporary configuration, restart NRPE, and
    verify exact responses for the argument pairs `alpha beta` and `gamma delta`.
 
-Debian's `nagios-nrpe-plugin` and SUSE's `monitoring-plugins-nrpe` supply
+Debian's `nagios-nrpe-plugin` and the natively built SLES `monitoring-plugins-nrpe` supply
 `check_nrpe`, the client used by Nagios. A full Nagios scheduler or web interface is unnecessary for this protocol
 test. Client and server run inside the same container over loopback using TLS
 and a short-lived test certificate. No NRPE port is published. Package outputs
@@ -198,7 +152,7 @@ argument responses with `dont_blame_nrpe=1`.
 
 These tests need the target distribution's repository access and run NRPE directly. They do not
 validate systemd startup, external network access, production certificates, or a
-complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 15 SP3 has also passed a full controller verify run with RPM build,
+complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 12 SP3 has also passed a full controller verify run with RPM build,
 installation, and TLS argument tests; see its target notes. Do not interpret passing
 unit tests as successful package builds for every target.
 

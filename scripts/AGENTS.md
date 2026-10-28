@@ -4,7 +4,8 @@ These instructions supplement the root `AGENTS.md` for this directory.
 
 - Use Bash with strict error handling for build and verification scripts.
   Use Python standard-library helpers for packaging transformations and source
-  downloads; SLES helpers must work with its system Python 3.6.
+  downloads. SLES download/source helpers run in the modern input stage; no Python
+  runtime is required in the SLES 12 target image.
 - Validate the Debian version/codename pairing and `amd64` architecture before
   building. Work in a temporary source tree and clean it up on exit.
 - Fetch authenticated distribution sources. Apply Debian changes to

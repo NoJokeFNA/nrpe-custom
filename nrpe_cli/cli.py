@@ -10,25 +10,22 @@ from .controller import execute
 from .docker import check_docker
 from .state import ROOT, TARGETS, artifact, reports
 from .targets import TARGET_CONFIG, package_files
-from .media import validate_media
 
 
 def doctor(root):
     print("Checking project files...")
     required = ("compose.yaml", "compose.test.yaml",
                 "docker/debian/build.Dockerfile", "docker/debian/test.Dockerfile",
-                "docker/sles15sp3/build.Dockerfile", "docker/sles15sp3/test.Dockerfile",
+                "docker/sles12sp3/build.Dockerfile", "docker/sles12sp3/test.Dockerfile",
                 "scripts/build.sh", "scripts/export_debian_sources.py", "scripts/verify.sh",
-                "scripts/integration-test.sh", "scripts/build-sles.sh",
-                "scripts/integration-test-sles.sh", "scripts/test-nrpe-protocol.sh",
-                "scripts/sles_source.py", "scripts/setup-sles-repositories.sh",
-                "scripts/setup-sles-media.sh",
-                "scripts/build-sles-user.sh", "scripts/fetch_sles_packages.py",
+                "scripts/integration-test.sh", "scripts/test-nrpe-protocol.sh",
+                "scripts/build-sles.sh", "scripts/build-sles-user.sh", "scripts/integration-test-sles.sh",
+                "scripts/prepare_sles_inputs.py", "scripts/sles_source.py", "scripts/fetch_sles_packages.py",
+                "scripts/verify-sles-packages.sh", "scripts/verify-sles-environment.sh",
                 "scripts/setup-debian-repositories.sh", "scripts/install-ca-certificate.sh",
-                "packaging/empty-ca.pem",
-                "packaging/sles15sp3-source.json", "packaging/sles15sp3-backports.asc",
-                "packaging/sles15sp3-suse.asc", "packaging/sles15sp3-user-source.json",
-                "packaging/sles15sp3-bootstrap.json")
+                "packaging/empty-ca.pem", "packaging/sles12sp3-source.json",
+                "packaging/sles12sp3-user-source.json", "packaging/sles12sp3-macros-source.json",
+                "packaging/sles12sp3-bootstrap.json", "packaging/sles12sp3-suse.asc")
     missing = [name for name in required if not (root / name).is_file()]
     if missing:
         raise RuntimeError("Missing project files: " + ", ".join(missing))
@@ -114,8 +111,6 @@ def parser():
                              help="check for updated base images before building images")
         command.add_argument("--ca-cert", metavar="FILE",
                              help="optional company CA in PEM or DER format (.cer/.crt/.pem); or set NRPE_CA_CERT")
-        command.add_argument("--sles-media", metavar="DIRECTORY",
-                             help="use extracted official SLES 15 SP3 Full Media1 repositories")
         if action != "test":
             command.add_argument("--rebuild", action="store_true",
                                  help="explicitly allow rebuilding existing package outputs")
@@ -157,13 +152,6 @@ def main(argv=None, root=ROOT):
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
-        if args.sles_media and "sles15sp3" not in targets:
-            command_parser.error("--sles-media requires the sles15sp3 target (or all).")
-        media = None
-        if "sles15sp3" in targets:
-            location = args.sles_media or os.environ.get("SLES_MEDIA_DIR")
-            if location:
-                media = validate_media(location)
         for target in targets:
             if TARGET_CONFIG[target].get("experimental"):
                 print(f"Experimental target: {target}. Review build and integration results before deployment.")
@@ -183,8 +171,6 @@ def main(argv=None, root=ROOT):
                     return 0
                 rebuild = True
         options = {"rebuild": rebuild, "pull": args.pull}
-        if media is not None:
-            options["media"] = media
         with prepared_certificate(args.ca_cert or os.environ.get("NRPE_CA_CERT")) as certificate:
             if certificate is not None:
                 options["ca_cert"] = certificate
