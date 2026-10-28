@@ -1,0 +1,49 @@
+{
+  "project": "server:monitoring",
+  "package": "nagios-rpm-macros",
+  "revision": "a911087cc73b87e04465861110d43754",
+  "version": "0.14",
+  "release": "0",
+  "files": {
+    "macros.check_mk": {
+      "sha256": "d7d6f5bba9383fa0802b1aa6a8ca69cdf0ed8d15a7eae329a8dec601687f834a",
+      "size": 1565
+    },
+    "macros.icinga": {
+      "sha256": "ebec2c6e3ba66d640e3d06ad49a4fcbab14940c1297d888f0b77295c3cb4629b",
+      "size": 3477
+    },
+    "macros.icinga2": {
+      "sha256": "13e2ff90c92f9735836ecd8198428baf8635fc22660aa7b4d3996c219da68b6e",
+      "size": 3575
+    },
+    "macros.nagios": {
+      "sha256": "e8da5b660cf15f80cb1306a5008c95d4305ccd03138ecba1996f6387512ba9c3",
+      "size": 2433
+    },
+    "macros.nagiosgrapher": {
+      "sha256": "c2985176eee3d4a66b0fd42adf3966a017f9654689eb9ed95390c556d7ce3a67",
+      "size": 104
+    },
+    "macros.pnp4nagios": {
+      "sha256": "53485ba0e44efe4678dd167dc88b9c1ab07500a45820773b32e7da96a7e28c70",
+      "size": 657
+    },
+    "nagios-rpm-macros-COPYING": {
+      "sha256": "b326eaf951d4413dda71914c6d39e0bff6ac72a4dd33fdf84e84610663c5a131",
+      "size": 1526
+    },
+    "nagios-rpm-macros-README": {
+      "sha256": "d191693bb4b8205b8ed5523fb7751174c4923a087a2929fc84badc5820299422",
+      "size": 559
+    },
+    "nagios-rpm-macros.changes": {
+      "sha256": "cf7bf8625334da0fd968e2d699def298273b470c5ff6fc62b810dd947564e74a",
+      "size": 4721
+    },
+    "nagios-rpm-macros.spec": {
+      "sha256": "b400a79a9a0d0f2678d30d782afa963756da2f24633f46e13ead657fbd1bbcb2",
+      "size": 2159
+    }
+  }
+}

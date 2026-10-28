@@ -31,7 +31,7 @@ def stop_process(process):
         process.wait()
 
 
-def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=None, ca_cert=None):
+def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, ca_cert=None):
     name = f"nrpe-{run_id}-{target}-{phase}"
     base = [docker, "compose", "-f",
             "compose.yaml" if phase == "build" else "compose.test.yaml"]
@@ -48,8 +48,6 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, media=
     environment.pop("NRPE_CA_CERT", None)
     environment.pop("NRPE_CA_SHA256", None)
     environment["NRPE_CA_PEM"] = ""
-    if media is not None:
-        environment["SLES_MEDIA_DIR"] = str(media)
     if ca_cert is not None:
         environment.update(NRPE_CA_PEM=ca_cert["pem"],
                            NRPE_CA_SHA256=ca_cert["sha256"])
@@ -102,14 +100,13 @@ def summary(report):
     print(f"Run: {report['id']} ({report['status']})")
 
 
-def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, ca_cert=None):
+def execute(action, targets, root=ROOT, rebuild=False, pull=False, ca_cert=None):
     run_id = new_id()
     directory = root / ".nrpe" / "runs" / run_id
     directory.mkdir(parents=True)
     report = {"schema": 1, "id": run_id, "action": action, "started": timestamp(),
               "workflow_before": workflow_identity(root),
               "status": "running", "exit_code": None, "rebuild": rebuild, "pull": pull,
-              "sles_media": str(media) if media is not None else None,
               "ca_certificate_sha256": ca_cert["sha256"] if ca_cert else None,
               "targets": {
                   target: {"build": "not run", "package": "not run", "test": "not run"}
@@ -134,7 +131,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
                         print(f"\n[{target}] Building package", flush=True)
                         log.write(f"\n[{target}] Building package\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
-                                         media=media if target == "sles15sp3" else None, ca_cert=ca_cert)
+                                         ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break
@@ -153,7 +150,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
                         print(f"[{target}] Installing package and testing NRPE arguments", flush=True)
                         log.write(f"\n[{target}] Installing package and testing NRPE arguments\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
-                                         media=media if target == "sles15sp3" else None, ca_cert=ca_cert)
+                                         ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break

@@ -69,7 +69,7 @@ class CertificateTests(unittest.TestCase):
             return 0
         execute.side_effect = inspect
         with contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(cli.main(['build', 'sles15sp3', '--ca-cert', str(FIXTURE)], self.root), 0)
+            self.assertEqual(cli.main(['build', 'sles12sp3', '--ca-cert', str(FIXTURE)], self.root), 0)
         self.assertNotIn('path', execute.call_args.kwargs['ca_cert'])
 
     @patch('nrpe_cli.cli.execute')
@@ -96,8 +96,8 @@ class CertificateTests(unittest.TestCase):
         popen.side_effect = process
         run.return_value = subprocess.CompletedProcess([], 0, '', '')
         with prepared_certificate(FIXTURE) as certificate:
-            with state.target_lock(self.root, 'sles15sp3', 'ca') as lock:
-                self.assertEqual(controller.run_phase('docker', self.root, 'ca', 'sles15sp3',
+            with state.target_lock(self.root, 'sles12sp3', 'ca') as lock:
+                self.assertEqual(controller.run_phase('docker', self.root, 'ca', 'sles12sp3',
                                  'test', io.StringIO(), lock, pull=True, ca_cert=certificate), 0)
             for call in popen.call_args_list:
                 environment = call.kwargs['env']

@@ -127,25 +127,35 @@ def validate_sources(root, target, evidence, notices):
                 data = (extracted / name).read_bytes()
                 (notices / Path(name).name).write_bytes(data)
     else:
-        allowed = {'SHA256SUMS', 'source-manifest.json', 'user-source-manifest.json', 'bootstrap-manifest.json'}
-        pairs = [('nrpe', 'source-manifest.json', 'sles15sp3-source.json'),
-                 ('system-user-nagios', 'user-source-manifest.json', 'sles15sp3-user-source.json')]
+        allowed = {'SHA256SUMS', 'source-manifest.json', 'user-source-manifest.json', 'macros-source-manifest.json', 'bootstrap-manifest.json'}
+        pairs = [('nrpe', 'source-manifest.json', 'sles12sp3-source.json'),
+                 ('system-user-nagios', 'user-source-manifest.json', 'sles12sp3-user-source.json'),
+                 ('nagios-rpm-macros', 'macros-source-manifest.json', 'sles12sp3-macros-source.json')]
         for package, manifest_name, pinned_name in pairs:
             manifest = json.loads((root / 'packaging' / pinned_name).read_text())
             if json.loads((directory / manifest_name).read_text()) != manifest:
                 raise RuntimeError('SLES manifest differs from the workflow inputs')
             source = one(directory, package + '-*.src.rpm')
-            binary = (directory / evidence['artifact']['file'] if package == 'nrpe'
-                      else one(directory, package + '-*.noarch.rpm'))
-            binary_info, source_info = rpm_fields(binary), rpm_fields(source)
-            expected_version = (manifest['version'] + '-' + manifest.get('custom_release', manifest.get('release', '')))
-            if package == 'nrpe' and version != expected_version:
-                raise RuntimeError('RPM filename and source version mismatch')
-            if (binary_info[:2] != [package, expected_version]
-                    or binary_info[2] != source.name or source_info[:2] != binary_info[:2]
-                    or source_info[3] != '1'):
-                raise RuntimeError('RPM binary/source identity mismatch')
-            allowed.update((source.name, binary.name))
+            expected_version = manifest['version'] + '-' + manifest.get('custom_release', manifest.get('release', ''))
+            source_info = rpm_fields(source)
+            if source_info[:2] != [package, expected_version] or source_info[3] != '1':
+                raise RuntimeError('RPM source identity mismatch')
+            allowed.add(source.name)
+            if package != 'nagios-rpm-macros':
+                binary = (directory / evidence['artifact']['file'] if package == 'nrpe'
+                          else one(directory, package + '-*.noarch.rpm'))
+                binary_info = rpm_fields(binary)
+                if binary_info[:2] != source_info[:2] or binary_info[2] != source.name:
+                    raise RuntimeError('RPM binary/source identity mismatch')
+                allowed.add(binary.name)
+            if package == 'nrpe':
+                if version != expected_version:
+                    raise RuntimeError('RPM filename and source version mismatch')
+                client = one(directory, 'monitoring-plugins-nrpe-*.x86_64.rpm')
+                client_info = rpm_fields(client)
+                if client_info[:3] != ['monitoring-plugins-nrpe', expected_version, source.name]:
+                    raise RuntimeError('NRPE client does not match the server source')
+                allowed.add(client.name)
             for name, expected in manifest['files'].items():
                 if Path(name).name != name or '\\' in name:
                     raise RuntimeError('Unsafe manifest filename')
@@ -164,21 +174,25 @@ def validate_sources(root, target, evidence, notices):
                     prefix = 'nrpe-' + manifest['version'] + '/'
                     for source_name, notice_name in [('LICENSE.md', 'NRPE-GPL-2.0.md'), ('LEGAL', 'NRPE-LEGAL.txt')]:
                         data = source_tar.extractfile(prefix + source_name).read()
-                        if data != (root / 'packaging/licenses/sles15sp3' / notice_name).read_bytes():
+                        if data != (root / 'packaging/licenses/sles12sp3' / notice_name).read_bytes():
                             raise RuntimeError('SLES license text changed; update the review and notices')
                     utils = source_tar.extractfile(prefix + 'src/utils.c').read().decode()
                     section = utils.split('void display_license(void)', 1)[1]
                     notice = ''.join(ast.literal_eval(s) for s in re.findall(r'printf\(("(?:[^"\\]|\\.)*")\)', section))
-                    if notice != (root / 'packaging/licenses/sles15sp3/NRPE-license-notice.txt').read_text():
+                    if notice != (root / 'packaging/licenses/sles12sp3/NRPE-license-notice.txt').read_text():
                         raise RuntimeError('SLES OpenSSL/GPL notice changed')
-            else:
+            elif package == 'system-user-nagios':
                 header = (directory / 'obs-sources/system-user-nagios/system-user-nagios.spec').read_text().split('%if', 1)[0]
-                if header != (root / 'packaging/licenses/sles15sp3/system-user-nagios-spec-header.txt').read_text():
+                if header != (root / 'packaging/licenses/sles12sp3/system-user-nagios-spec-header.txt').read_text():
                     raise RuntimeError('Companion source copyright/licensing header changed')
+            elif package == 'nagios-rpm-macros':
+                original = directory / 'obs-sources/nagios-rpm-macros/nagios-rpm-macros-COPYING'
+                if original.read_bytes() != (root / 'packaging/licenses/sles12sp3/nagios-rpm-macros-BSD.txt').read_bytes():
+                    raise RuntimeError('Nagios macros license notice changed')
         bootstrap = json.loads((directory / 'bootstrap-manifest.json').read_text())
-        if bootstrap != json.loads((root / 'packaging/sles15sp3-bootstrap.json').read_text()):
+        if bootstrap != json.loads((root / 'packaging/sles12sp3-bootstrap.json').read_text()):
             raise RuntimeError('Bootstrap manifest mismatch')
-        shutil.copytree(root / 'packaging/licenses/sles15sp3', notices / 'sles15sp3')
+        shutil.copytree(root / 'packaging/licenses/sles12sp3', notices / 'sles12sp3')
     if set(evidence['assets']) != allowed:
         raise RuntimeError('Output asset mismatch: missing={}, extra={}'.format(
             sorted(allowed - set(evidence['assets'])), sorted(set(evidence['assets']) - allowed)))
@@ -260,15 +274,19 @@ def verify_archive(path, target, commit):
                 raise RuntimeError('Missing corresponding Debian source')
         required = ['licenses/LICENSE.md', 'licenses/LEGAL', 'licenses/copyright']
     else:
-        required = ['licenses/sles15sp3/' + n for n in (
+        required = ['licenses/sles12sp3/' + n for n in (
             'NRPE-GPL-2.0.md', 'NRPE-LEGAL.txt', 'NRPE-license-notice.txt',
-            'system-user-nagios-MIT.txt', 'system-user-nagios-spec-header.txt')]
+            'system-user-nagios-MIT.txt', 'system-user-nagios-spec-header.txt', 'nagios-rpm-macros-BSD.txt')]
         for name in ('source-manifest.json', 'user-source-manifest.json', 'bootstrap-manifest.json',
-                     'obs-sources/nrpe/nrpe.changes', 'obs-sources/system-user-nagios/system-user-nagios.changes'):
+                     'macros-source-manifest.json', 'obs-sources/nrpe/nrpe.changes',
+                     'obs-sources/system-user-nagios/system-user-nagios.changes',
+                     'obs-sources/nagios-rpm-macros/nagios-rpm-macros.changes'):
             if name not in assets:
                 raise RuntimeError('Missing SLES source provenance')
-        if sum(n.endswith('.src.rpm') for n in assets) != 2:
-            raise RuntimeError('Both SLES source RPMs are required')
+        if sum(n.endswith('.src.rpm') for n in assets) != 3:
+            raise RuntimeError('All three SLES source RPMs are required')
+        if not any(n.startswith('monitoring-plugins-nrpe-') and n.endswith('.x86_64.rpm') for n in assets):
+            raise RuntimeError('Matching SLES NRPE client is required')
     if not all(name in actual for name in required):
         raise RuntimeError('Missing component license notices')
     return manifest

@@ -34,7 +34,7 @@ For a changed build or installation path, run the appropriate targets:
 
 ```sh
 python3 nrpe.py verify debian12
-python3 nrpe.py verify sles15sp3
+python3 nrpe.py verify sles12sp3
 ```
 
 Use `--rebuild` only when replacing existing artifacts intentionally. Validate all

@@ -12,14 +12,18 @@ import urllib.request
 import urllib.parse
 
 
-def fetch_packages(manifest, destination, role):
+def download_packages(manifest, destination, role):
+    """Download hash-checked RPMs; signature verification must precede installation."""
     destination.mkdir(parents=True, exist_ok=True)
+    seen = set()
     for package in manifest["packages"]:
         if role not in package["roles"]:
             continue
         name = package["file"]
-        if Path(name).name != name or not name.endswith(".rpm") or "\\" in name:
+        if (not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._+~-]*\.rpm', name)
+                or name in seen):
             raise ValueError("Invalid SUSE RPM filename")
+        seen.add(name)
         url = urllib.parse.urlsplit(package["url"])
         if url.scheme != "https" or url.hostname != "api.opensuse.org" or url.username or url.password:
             raise ValueError("Expected an authenticated HTTPS source from the public OBS API")
@@ -29,6 +33,12 @@ def fetch_packages(manifest, destination, role):
             raise ValueError("Original SUSE RPM checksum mismatch: " + name)
         path = destination / name
         path.write_bytes(data)
+        yield package, path
+
+
+def fetch_packages(manifest, destination, role):
+    for package, path in download_packages(manifest, destination, role):
+        name = package['file']
         try:
             environment = dict(os.environ, LC_ALL="C")
             signature = subprocess.check_output(

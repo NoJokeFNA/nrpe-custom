@@ -93,7 +93,7 @@ class SlesSourceTests(unittest.TestCase):
                 fetch_sources(manifest, Path(temporary))
 
     def test_pinned_source_manifest_describes_known_version(self):
-        path = Path(__file__).resolve().parents[1] / 'packaging/sles15sp3-source.json'
+        path = Path(__file__).resolve().parents[1] / 'packaging/sles12sp3-source.json'
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest['version'], '4.1.1')
         self.assertIn('nrpe-4.1.1.tar.xz', manifest['files'])
@@ -102,7 +102,7 @@ class SlesSourceTests(unittest.TestCase):
     def test_rpm_artifact_detection_ignores_source_and_debug_rpms(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            directory = root / 'output/sles15sp3'
+            directory = root / 'output/sles12sp3'
             directory.mkdir(parents=True)
             name = 'nrpe-4.1.1-0.withargs1.x86_64.rpm'
             data = b'test artifact'
@@ -114,7 +114,11 @@ class SlesSourceTests(unittest.TestCase):
             (directory / helper).write_bytes(b'user package')
             with (directory / 'SHA256SUMS').open('a') as checksums:
                 checksums.write(hashlib.sha256(b'user package').hexdigest() + '  ' + helper + '\n')
-            result = artifact(root, 'sles15sp3')
+            client = 'monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm'
+            (directory / client).write_bytes(b'client package')
+            with (directory / 'SHA256SUMS').open('a') as checksums:
+                checksums.write(hashlib.sha256(b'client package').hexdigest() + '  ' + client + '\n')
+            result = artifact(root, 'sles12sp3')
             self.assertEqual(result['file'], name)
             self.assertEqual(result['version'], '4.1.1-0.withargs1')
 

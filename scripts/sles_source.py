@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fetch pinned OBS sources and narrowly adjust their RPM build recipe.
 
-This helper is compatible with the Python 3.6 interpreter in SLES 15 SP3.
+Sources are prepared in the download stage; the SLES 12 target needs no Python.
 """
 
 import argparse
@@ -63,11 +63,11 @@ def fetch_sources(manifest, destination, opener=urllib.request.urlopen, original
         spec = destination / "nrpe.spec"
         spec.write_text(patch_spec(spec.read_text(encoding="utf-8"), manifest["version"],
                                    manifest["custom_release"]), encoding="utf-8")
-    elif manifest["package"] == "system-user-nagios":
-        text = (destination / "system-user-nagios.spec").read_text(encoding="utf-8")
+    elif manifest["package"] in ("system-user-nagios", "nagios-rpm-macros"):
+        text = (destination / (manifest['package'] + '.spec')).read_text(encoding="utf-8")
         if (re.findall(r"(?m)^Version:[ \t]+(\S+)[ \t]*$", text) != [manifest["version"]]
                 or re.findall(r"(?m)^Release:[ \t]+(\S+)[ \t]*$", text) != [manifest["release"]]):
-            raise ValueError("Unexpected user-package version or release")
+            raise ValueError("Unexpected support-package version or release")
     else:
         raise ValueError("Unsupported pinned source package")
 

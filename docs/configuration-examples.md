@@ -22,6 +22,26 @@ ssl_cert_file=/etc/nrpe-tls/server.pem
 ssl_privatekey_file=/etc/nrpe-tls/server.key
 ```
 
+For this project's **SLES 12 SP3 NRPE 4.1.1** build with RSA certificates,
+replace the `ssl_version` and `ssl_use_adh` settings above with all three lines:
+
+```ini
+ssl_version=TLSv1.2
+ssl_use_adh=1
+ssl_cipher_list=DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL
+```
+
+Keep the CA, server key/certificate and mandatory client-certificate settings.
+On this NRPE/OpenSSL combination, `ssl_use_adh=0` also skips initialization of
+certificate-authenticated finite-field DH. The explicit cipher list permits
+only authenticated DHE-RSA with AES-256-GCM and excludes anonymous and null
+ciphers even though the initialization switch is enabled. This policy passed
+with 2048-bit DH and an OpenSSL 3.5.7 client using its default security level,
+server hostname/chain verification and a separate client certificate. Missing
+client certificates were rejected. Do not use `ssl_use_adh=1` without the
+restrictive cipher list, and confirm that the actual monitoring client supports
+the chosen suite. These options do not apply to the old NRPE 2.15 daemon.
+
 The server certificate needs an appropriate identity and certificate chain. Give
 the NRPE service account the permissions necessary to read its key, without
 making that key readable by other users. Restrict incoming TCP 5666 to the actual

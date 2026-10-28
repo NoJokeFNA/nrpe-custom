@@ -25,6 +25,11 @@ A request to implement a change or integrate it into develop does not authorize
 a master PR or release. Once an explicitly requested promotion reaches master,
 the automatic release workflow runs as configured.
 
+By default, work remains on a local topic branch. Pushing, opening a PR or
+merging into develop requires an explicit maintainer request. Master promotion
+requires its own explicit request. Complete the current change and checks before
+starting the next integration.
+
 ## Attribution
 
 Commits carry the existing human author identity. Do not add co-author trailers,

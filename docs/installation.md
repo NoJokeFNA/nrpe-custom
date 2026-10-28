@@ -3,7 +3,7 @@
 Run these commands on the destination Linux server. Python, Docker, and this
 checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
-The current SLES target is **SLES 15 SP3 x86_64**, not every SLES 15 service pack.
+The current SLES target is **SLES 12 SP3 x86_64**, not every SLES 15 service pack.
 
 For the complete NRPE server/client and Nagios setup, use the
 [official NRPE documentation](https://github.com/NagiosEnterprises/nrpe) and
@@ -15,7 +15,7 @@ TLS instructions.
 ## Prepare the files
 
 Build and test the selected target on the workstation with, for example,
-`python3 nrpe.py verify debian12` or `python3 nrpe.py verify sles15sp3`.
+`python3 nrpe.py verify debian12` or `python3 nrpe.py verify sles12sp3`.
 Copy the following files into a dedicated directory on the destination server:
 
 | Destination | Build output directory | Files to copy |
@@ -24,7 +24,7 @@ Copy the following files into a dedicated directory on the destination server:
 | Debian 12 | `output/debian12/` | `nagios-nrpe-server_*_amd64.deb`, `SHA256SUMS` |
 | Debian 13 | `output/debian13/` | `nagios-nrpe-server_*_amd64.deb`, `SHA256SUMS` |
 | Debian 14 | `output/debian14/` | `nagios-nrpe-server_*_amd64.deb`, `SHA256SUMS` |
-| SLES 15 SP3 | `output/sles15sp3/` | `nrpe-*.x86_64.rpm`, `system-user-nagios-*.noarch.rpm`, `SHA256SUMS` |
+| SLES 12 SP3 | `output/sles12sp3/` | `nrpe-*.x86_64.rpm`, `system-user-nagios-*.noarch.rpm`, `monitoring-plugins-nrpe-*.x86_64.rpm`, `SHA256SUMS` |
 
 Keep exactly one server package version in that directory so the wildcards below
 select the intended package. Source RPMs, manifests, and Debian build information
@@ -38,7 +38,7 @@ sha256sum --check SHA256SUMS
 
 Continue only if every entry reports `OK`. Copy the checksum file through a
 trusted channel alongside the packages; checksums detect changes but do not
-authenticate the publisher by themselves. Keep both SLES binary RPMs available
+authenticate the publisher by themselves. Keep all three SLES binary RPMs available
 for this check even if the destination already has the user package installed.
 For releases that include `SHA256SUMS.sig`, first perform the
 [release authentication check](release-signing.md#consumer-verification) using
@@ -95,7 +95,7 @@ If startup fails, inspect the service log:
 sudo journalctl -u nagios-nrpe-server -n 100 --no-pager
 ```
 
-## SLES 15 SP3
+## SLES 12 SP3
 
 Check the destination release and architecture:
 
@@ -104,48 +104,69 @@ cat /etc/os-release
 uname -m
 ```
 
-Expect SLES `15.3` and `x86_64`. The current pinned build produces:
+Expect SLES `12.3` and `x86_64`. The current pinned build produces:
 
 ```text
 nrpe-4.1.1-0.withargs1.x86_64.rpm
 system-user-nagios-1.0.0-0.noarch.rpm
 ```
 
-The destination needs matching, reachable SLES SP3 repositories or an approved
-mirror to resolve runtime dependencies. The historical OBS SP3 NRPE repository
-may no longer exist; see [SLES repository availability](sles15sp3.md#base-image-and-matching-dependencies).
-Do not replace the SP3 dependency basis with SP7 or Leap packages.
+The destination must actually be SLES **12.3** x86_64. Do not install a SLE-15
+package or replace the system OpenSSL. Retain the old NRPE 2.15 package and back
+up the main configuration, includes, plugins and TLS files before upgrading.
+The newer package retains `/etc/nrpe.cfg` as a configuration file; review package
+prompts and any `.rpmnew`/`.rpmsave` files rather than assuming that defaults
+replace an existing deployment's policy.
 
-From the directory with the verified RPMs, check whether the real Nagios user
-package is already installed and refresh repository metadata:
+Use your authorized matching SLES-12 repositories for missing runtime dependencies.
+Review the package requirements and user package first:
 
 ```sh
+rpm -qp --requires ./nrpe-4.1.1-0.withargs1.x86_64.rpm
 rpm -q system-user-nagios
+```
+
+The minimal test image additionally needs original `libwrap0` and
+`util-linux-systemd`; a full server may already provide them. Resolve missing
+prerequisites using the destination's matching repositories, for example:
+
+```sh
 sudo zypper refresh
+sudo zypper install libwrap0 util-linux-systemd shadow netcfg grep sed coreutils
 ```
 
-If a suitable `system-user-nagios` package is already installed, keep it and
-install only the custom NRPE RPM:
+Then install the verified local artifacts with normal RPM dependency and payload
+checks. If no suitable user package exists, install the companion and server
+in one transaction:
 
 ```sh
-sudo zypper install --allow-unsigned-rpm \
-  ./nrpe-4.1.1-0.withargs1.x86_64.rpm
-```
-
-If the user package is missing, install the companion and server together:
-
-```sh
-sudo zypper install --allow-unsigned-rpm \
+sudo rpm --upgrade --verbose --hash \
   ./system-user-nagios-1.0.0-0.noarch.rpm \
   ./nrpe-4.1.1-0.withargs1.x86_64.rpm
 ```
 
-These custom RPMs are currently unsigned local artifacts, which is why these
-commands explicitly allow unsigned RPMs. Use them only for the files whose
-checksums you verified above. Keep repository signature verification enabled;
-do not use a global `--no-gpg-checks` setting. Do not downgrade an existing user
-package to the companion merely to match this example. Zypper resolves remaining
-runtime dependencies; do not use `rpm --nodeps` to bypass missing dependencies.
+If a suitable user package is already installed, keep it and install the server:
+
+```sh
+sudo rpm --upgrade --verbose --hash ./nrpe-4.1.1-0.withargs1.x86_64.rpm
+```
+
+These are locally built unsigned RPMs. Verify their hashes through a trusted
+channel (or the optional release signature when enabled) before installation.
+Never use `--nodeps`, `--nosignature` or global repository signature bypasses.
+This project's test does not bypass missing dependencies. SLES 12's zypper does
+not provide the newer `--allow-unsigned-rpm` option used in some SLE-15 examples.
+
+The matching client RPM is available for a **SLES 12 SP3 monitoring host**:
+
+```sh
+sudo rpm --upgrade --verbose --hash ./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm
+```
+
+It needs the same real Nagios user and matching runtime libraries. Do not install
+that client RPM on another distribution; use its native client package instead.
+All three binary files are needed to check the unchanged `SHA256SUMS`, even when
+only the server/user package will be installed on the monitored host.
 
 Confirm the installed server and user:
 
@@ -178,7 +199,7 @@ sudo journalctl -u nrpe -n 100 --no-pager
 | Distribution | Configuration | Service |
 | --- | --- | --- |
 | Debian | `/etc/nagios/nrpe.cfg` | `nagios-nrpe-server` |
-| SLES 15 SP3 / OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
+| SLES 12 SP3 / OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
 
 Argument support is compiled in, but `dont_blame_nrpe=0` remains the packaged
 default. Keep it at `0` if the monitoring server should not supply arguments.

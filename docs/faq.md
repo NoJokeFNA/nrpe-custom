@@ -1,16 +1,31 @@
 # Frequently asked questions
 
-## Which SLES service pack does this project target?
+## Which SLES version does this project target?
 
-The maintainer corrected the affected deployment to **SLES 15 SP3** on
-2026-10-28. The earlier automation targeted SP4, not SP5. The SLES build now uses
-a genuine SP3 base and matching dependencies; see the
-[SLES target guide](sles15sp3.md) for actual validation evidence.
+**SLES 12 SP3**, confirmed by `/etc/os-release`. Earlier references to SLES 15
+SP3/SP4 were based on an incorrect platform assumption. Neither their RPMs nor
+their successful tests establish compatibility with SLES 12. The active target
+is `sles12sp3`; see the [native build guide](sles12sp3.md).
 
-Service startup and compiled argument support are separate concerns. The service
-checks below help diagnose startup problems; they do not establish that a custom
-build is unnecessary on SP3. Historical SP4 release assets are not overwritten
-or relabeled as SP3 packages.
+The reported server runs NRPE `2.15-4.24`, linked to OpenSSL's 1.0 ABI. That old
+NRPE advertises anonymous DH, not modern certificate authentication. A newer
+NRPE/client built for SLES 12 can use certificate-authenticated TLS 1.2 with the
+original OpenSSL 1.0.2 library. TLS 1.3 requires a newer TLS library and is not
+provided by this build. `disable_syslog=0` is unknown to the old daemon;
+commenting it out removes the warning but does not fix TLS compatibility.
+
+The message `Could not complete SSL handshake. 1` alone does not identify a
+specific cipher, certificate or trust failure. Compare the actual server/client
+versions, command, TLS settings and simultaneous logs. Do not disable encryption
+or certificate verification to hide the error. Build-time `--ca-cert` affects
+source downloads, not the deployed NRPE certificate configuration.
+
+For NRPE 4.1.1 on SLES 12, also review the
+[authenticated DHE-RSA example](configuration-examples.md#hosts-tls-and-fixed-commands).
+With this old OpenSSL integration, `ssl_use_adh=0` skips DH initialization and
+can produce `no shared cipher` with modern clients. Use the complete documented
+policy, which explicitly excludes anonymous ciphers, rather than enabling ADH
+alone. It was tested against OpenSSL 3.5.7 with certificate verification intact.
 
 ## Which services must run on a combined Nagios and NRPE server?
 

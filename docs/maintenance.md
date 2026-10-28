@@ -9,7 +9,7 @@ distribution's lifecycle. See the [warranty notice](../README.md#warranty-and-re
 | Area | Project scope and verification |
 | --- | --- |
 | Debian 11–14, `amd64` | Matching build/runtime containers, source export, package validation and TLS tests; a successful run verifies its exact package bytes |
-| SLES 15 SP3, `x86_64` | Genuine SP3 basis, pinned OBS sources, server and real companion user RPM; other SLES service packs are not covered |
+| SLES 12 SP3, `x86_64` | Genuine SP3 basis, pinned OBS sources, server/client, real user RPM and build-macros source; other SLES service packs are not covered |
 | Linux host CLI | Standard-library CLI and optional menu; hosted unit-test CI |
 | Windows host CLI | Hosted Python unit tests; Docker Desktop Linux-container operation and actual console behavior need separate practical verification |
 | macOS / ARM hosts | Linux/amd64 emulation may work; outside the hosted host matrix and not verified by Linux/Windows results |

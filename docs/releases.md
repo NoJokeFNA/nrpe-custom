@@ -9,7 +9,7 @@ manual workflow dispatch is also validation-only.
 
 1. Run the Linux/Windows unit matrix, shell/Compose checks and dependency audit.
 2. Build all five targets on separate fresh Ubuntu runners: Debian 11, 12, 13,
-   14 and SLES 15 SP3. Apply this project's packaging changes through the normal
+   14 and SLES 12 SP3. Apply this project's packaging changes through the normal
    builders. Install each package in its matching disposable runtime container
    and test disabled/enabled arguments over TLS. All targets are attempted even
    if one fails; no release is published unless every target succeeds.
@@ -17,7 +17,7 @@ manual workflow dispatch is also validation-only.
    of binaries and exported source assets. A runtime-only test, dirty checkout,
    stale report, changed artifact or missing source/notice fails preparation.
 4. Validate Debian DSC references, source/binary versions, reconstructed rules
-   and license files. Validate both SLES source RPMs against binary identities
+   and license files. Validate all three SLES source RPMs against binary identities
    and pinned original inputs. Export all original OBS files, including `.changes`
    history, alongside the modified source RPMs.
 5. Package each target, then require exactly the five expected target archives.
@@ -45,7 +45,7 @@ by Debian changelog/SLES spec, including the project's custom revision.
 Release assets are:
 
 - `nrpe-custom-debian11.tar.gz` through `nrpe-custom-debian14.tar.gz`.
-- `nrpe-custom-sles15sp3.tar.gz`.
+- `nrpe-custom-sles12sp3.tar.gz`.
 - `workflow-source.tar.gz`, `LICENSE`, `THIRD_PARTY.md`, `release.json`,
   `RELEASE_NOTES.md`, and `SHA256SUMS`.
 - `SHA256SUMS.sig` when SSH signing is enabled. This detached signature is not
@@ -53,8 +53,8 @@ Release assets are:
 
 Target archives contain the original package filenames, installation checksum
 manifest, corresponding sources, component license notices and a sanitized
-verification manifest. SLES includes its real companion binary/source RPM and
-original OBS input set. Debian includes its custom DSC and referenced original
+verification manifest. SLES includes matching server/client RPMs, the real user package, the build-only
+macros source RPM and all three original OBS input sets. Debian includes its custom DSC and referenced original
 and packaging archives. The workflow source includes the required build scripts,
 recipes, manifests and original per-file notices.
 
