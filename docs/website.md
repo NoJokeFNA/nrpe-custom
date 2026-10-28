@@ -11,6 +11,21 @@ documentation. The initial SLES note uses only reported observations, not an
 invented testimonial or production TLS claim. New reports follow the
 [field-note guide](../website/content/contributing-a-note.md).
 
+## Homepage content and CLI capture
+
+The homepage links to GitHub's latest release rather than hardcoding a release
+version. Its supported-target table is derived from the README table, keeping
+target names and package formats in one source. The project story summarizes
+the reported troubleshooting; it does not claim a successful production upgrade.
+
+`website/assets/cli-help.png` shows actual `python3 nrpe.py --help` output
+captured from application revision `8a2b3d33c0fa`. It is a static terminal view,
+not a live session or a successful build result. Refresh it when the command
+list changes: capture that command's output, render it as plain escaped text in
+a local terminal-style browser view, and take a screenshot. Keep machine names,
+paths and private infrastructure out of the capture. No screenshot tooling is
+required to build or use the website.
+
 ## Local preview
 
 Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
