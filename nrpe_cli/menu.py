@@ -499,6 +499,162 @@ def workflow(root, action, session=None):
             return arguments
 
 
+class OutputTail:
+    """Bounded UI text; complete Docker output remains in the controller log."""
+    def __init__(self):
+        from collections import deque
+        self.lines = deque(maxlen=5)
+        self.pending = ''
+
+    def write(self, text):
+        parts = (self.pending + text).split('\n')
+        for line in parts[:-1]:
+            self.lines.append(safe(line)[-1000:])
+        self.pending = parts[-1][-1000:]
+        return len(text)
+
+    def flush(self):
+        pass
+
+    def isatty(self):
+        return False
+
+
+class LiveWorkflow:
+    """Render events while dispatch and signal handling stay on the main thread."""
+    def __init__(self, action):
+        import time
+        self.action = action
+        self.started = time.monotonic()
+        self.phase_started = self.started
+        self.phase = 'Preparing workflow'
+        self.run_id = None
+        self.states = {}
+        self.output = OutputTail()
+
+    def event(self, kind, values):
+        import time
+        if kind == 'log':
+            self.output.write(values['text'])
+        elif kind == 'run':
+            self.run_id = values['run_id']
+        elif kind == 'phase':
+            target, phase, status = values['target'], values['phase'], values['status']
+            self.states = {**self.states, (target, phase): status}
+            if status == 'running':
+                self.phase = f'{target} / {phase}'
+                self.phase_started = time.monotonic()
+        elif kind == 'complete':
+            report = values['report']
+            self.phase = 'Finished / ' + report['status']
+            self.states = {(target, phase): result.get(phase, 'not run')
+                           for target, result in report['targets'].items()
+                           for phase in ('build', 'package', 'test')}
+
+    def render(self, width=90):
+        import time
+        elapsed = int(time.monotonic() - self.started)
+        phase_elapsed = int(time.monotonic() - self.phase_started)
+        lines = [f'NRPE CUSTOM / {self.action.upper()} / {elapsed}s elapsed',
+                 f'Run: {self.run_id or "preparing"}', f'Current: {self.phase} ({phase_elapsed}s)', '']
+        states = self.states
+        targets = list(dict.fromkeys(target for target, _ in states if target != 'Docker'))
+        for target in targets:
+            lines.append(target + '  ' + '  '.join(
+                phase + ': ' + states.get((target, phase), 'not run') for phase in ('build', 'package', 'test')))
+        lines += ['', 'Recent output (full output is retained in the run log):']
+        lines += list(self.output.lines)
+        if self.output.pending:
+            lines.append(self.output.pending)
+        lines += ['', 'Ctrl+C: cancel safely / no estimated percentages']
+        return '\n'.join(compact(line, max(12, width - 2)) for line in lines)
+
+
+def dispatch_workflow(action, arguments, dispatch):
+    """Optional live display; never move workflow/cancellation into a worker."""
+    import contextlib
+    import sys
+    if not (sys.stdout.isatty() and sys.stdin.isatty()):
+        return dispatch(arguments), None
+    import threading
+    from prompt_toolkit.application import Application
+    from prompt_toolkit.input import create_pipe_input
+    from prompt_toolkit.output import create_output, ColorDepth
+    from prompt_toolkit.layout import Layout, Window
+    from prompt_toolkit.layout.controls import FormattedTextControl
+    from .progress import listen
+
+    display = LiveWorkflow(action)
+    output = create_output()
+    ready = threading.Event()
+    failures = []
+    with create_pipe_input() as pipe:
+        app = Application(input=pipe, output=output, full_screen=False, refresh_interval=0.25,
+                          layout=Layout(Window(FormattedTextControl(
+                              lambda: display.render(output.get_size().columns)), wrap_lines=False)),
+                          color_depth=ColorDepth.DEPTH_1_BIT if 'NO_COLOR' in os.environ or os.environ.get('TERM') == 'dumb' else None)
+
+        def render():
+            try:
+                app.run(pre_run=ready.set, handle_sigint=False)
+            except Exception as exc:
+                failures.append(exc)
+            finally:
+                ready.set()
+
+        thread = threading.Thread(target=render, daemon=True)
+        thread.start()
+        try:
+            if not ready.wait(5) or failures:
+                raise RuntimeError('Could not start the live display; use a direct CLI command.')
+            with contextlib.redirect_stdout(display.output), listen(display.event):
+                code = dispatch(arguments)
+        finally:
+            if app.is_running:
+                app.loop.call_soon_threadsafe(app.exit)
+            thread.join(timeout=5)
+        if failures:
+            print('Live display was unavailable; inspect the recorded result and full logs.')
+        return code, display.run_id
+
+
+def result_menu(root, dispatch, run_id, code):
+    history = reports(root)
+    report = next((item for item in history if item['id'] == run_id), None)
+    if report is None:
+        pause(code)
+        return
+    state = {}
+    while True:
+        options = [(None, 'Return to workspace'), ('logs', 'View full run logs'),
+                   ('diagnose', 'Explain this run log'), ('details', 'Show complete result and paths')]
+        for target, result in report.get('targets', {}).items():
+            label = target + ' / ' + ' / '.join(phase + ': ' + result.get(phase, 'not run')
+                                               for phase in ('build', 'package', 'test'))
+            options.append(('target:' + target, label, 'Enter shows package identity and recorded evidence.'))
+        answer = choose(f'Result: {report["status"]} / exit {code}\nRun: {run_id}', options,
+                        state=state, description=report.get('hint') or report.get('error') or
+                        'Recorded results identify tested package bytes, not automatically the current source checkout.')
+        if answer is None:
+            return
+        if answer == 'logs':
+            pause(dispatch(['logs', '--run', run_id]))
+        elif answer == 'diagnose':
+            log = root / '.nrpe' / 'runs' / run_id / 'run.log'
+            if not log.is_file():
+                choose('No run log is available', [(None, 'Back')])
+                continue
+            arguments = ['diagnose', str(log)]
+            if report.get('ca_certificate_sha256'):
+                arguments.append('--ca-configured')
+            pause(dispatch(arguments))
+        else:
+            import json
+            data = report.get('targets', {}).get(answer[7:], {}) if answer.startswith('target:') else report
+            text = json.dumps(data, indent=2) + '\n\nRun directory: ' + str(root / '.nrpe/runs' / run_id)
+            view_text('Recorded result', text)
+
+
 def run_menu(root, dispatch):
     """Keep returning to the menu after each command, including failures."""
     actions = [('verify', 'Build and test packages', 'Build, validate and test arguments over TLS in containers.'),
@@ -538,6 +694,13 @@ def run_menu(root, dispatch):
                 arguments = ['logs', '--run', run]
             else:
                 arguments = [action]
+            if action in ('verify', 'build', 'test'):
+                code, run_id = dispatch_workflow(action, arguments, dispatch)
+                if run_id:
+                    result_menu(root, dispatch, run_id, code)
+                else:
+                    pause(code)
+                continue
             code = dispatch(arguments)
             if action == 'doctor':
                 docker_status = 'passed last explicit check' if code == 0 else 'last explicit check failed'
