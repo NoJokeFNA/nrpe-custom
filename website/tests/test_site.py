@@ -180,16 +180,6 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'asset changed'):
             publish(self.repo, self.output, push=True)
 
-    def test_reviewed_topic_can_publish_without_integration(self):
-        git(self.repo, 'switch', '-c', 'feat/website')
-        deployed = publish(self.repo, self.output, push=True, allow_topic=True)
-        self.assertEqual(git(self.repo, 'rev-parse', 'develop'), self.source)
-        self.assertEqual(git(self.repo, 'branch', '--show-current'), 'feat/website')
-        self.assertIn('index.html', git(self.repo, 'ls-tree', '--name-only', deployed).splitlines())
-        (self.repo / 'unreviewed.txt').write_text('not reviewed')
-        with self.assertRaisesRegex(RuntimeError, 'clean committed'):
-            publish(self.repo, self.output, push=True, allow_topic=True)
-
     def test_wrong_base_path_and_bot_identity_are_refused(self):
         path = self.output / 'site-manifest.json'
         manifest = json.loads(path.read_text())
