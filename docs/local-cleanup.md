@@ -16,6 +16,8 @@ enough. Running, malformed and unrecognized evidence is left for inspection.
 
 The newest report for each current target and the newest test report matching
 its current package bytes are retained even with `--keep-runs 0`. Current target
+package bytes also retain their newest complete successful `verify` report,
+even if a newer runtime-only test exists. Current target
 output directories, release candidates, downloaded releases, locks, certificates
 and arbitrary working directories are never cleanup candidates. Back up evidence
 you need beyond that retention policy before deleting it.
@@ -31,6 +33,7 @@ tool recalculates the plan under a maintenance guard; changed candidates abort
 the operation. Active or unresolved target locks block deletion. New controller
 workflows cannot acquire target locks during cleanup. Symlinks, Windows reparse
 points and special files in traversed cleanup paths are rejected.
+Mounted candidate directories and nested mount points are rejected too.
 
 Cleanup is sequential, not a filesystem transaction: an I/O or Docker error can
 leave a partially completed cleanup. Already removed paths are reported. Inspect

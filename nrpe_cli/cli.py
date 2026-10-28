@@ -120,8 +120,10 @@ def parser():
     commands.add_parser("doctor", help="Diagnose Docker and project configuration")
     commands.add_parser("status", help="Show local packages and recorded test results (no Docker required)")
     cleanup = commands.add_parser('clean', help='Preview expired local runs; delete only with --apply')
-    cleanup.add_argument('--older-than', type=int, default=30, metavar='DAYS')
-    cleanup.add_argument('--keep-runs', type=int, default=5, metavar='COUNT')
+    cleanup.add_argument('--older-than', type=int, default=30, metavar='DAYS',
+                         help='minimum age of completion and files in days (default: 30)')
+    cleanup.add_argument('--keep-runs', type=int, default=5, metavar='COUNT',
+                         help='retain at least this many newest runs, plus current evidence (default: 5)')
     cleanup.add_argument('--retired-outputs', action='store_true', help='Include expired SLES-15 output directories')
     cleanup.add_argument('--image', action='append', default=[], metavar='REFERENCE',
                          help='Explicit project image tag to remove; may be repeated')

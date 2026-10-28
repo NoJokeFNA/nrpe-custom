@@ -31,9 +31,15 @@ def ordinary(path):
 
 def tree(path):
     ordinary(path)
+    if os.path.ismount(path):
+        raise RuntimeError('Cleanup refuses mounted directories: ' + str(path))
     for directory, children, files in os.walk(path, followlinks=False):
         for name in children + files:
-            yield ordinary(Path(directory) / name)
+            child = Path(directory) / name
+            info = ordinary(child)
+            if stat.S_ISDIR(info.st_mode) and os.path.ismount(child):
+                raise RuntimeError('Cleanup refuses mounted directories: ' + str(child))
+            yield info
 
 
 def checked_roots(root):
@@ -72,6 +78,13 @@ def plan(root, older_than=30, keep_runs=5, retired_outputs=False, now=None):
                          and r['targets'][target].get('test') in ('passed', 'failed', 'interrupted')), None)
         if matching:
             protected.add(matching['id'])
+        verified = next((r for r in candidates if r.get('action') == 'verify'
+                         and r.get('status') == 'passed'
+                         and r['targets'][target].get('artifact') == current
+                         and all(r['targets'][target].get(phase) == 'passed'
+                                 for phase in ('build', 'package', 'test'))), None)
+        if verified:
+            protected.add(verified['id'])
     result = []
     for report in history:
         run_id = report['id']

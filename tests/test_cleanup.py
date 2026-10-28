@@ -91,6 +91,22 @@ class CleanupTests(CleanupFixture, unittest.TestCase):
         self.assertFalse(directories[1].exists())
         self.assertTrue(all(p.exists() for p in directories[2:]))
 
+    def test_runtime_only_test_does_not_discard_full_verify_evidence(self):
+        current = {'file': 'current.deb', 'sha256': 'a' * 64}
+        verified = self.report(1, artifact=current)
+        data = json.loads((verified / 'report.json').read_text())
+        data['action'] = 'verify'
+        data['targets']['debian12'].update(build='passed', package='passed')
+        (verified / 'report.json').write_text(json.dumps(data))
+        self.age(verified)
+        expired = self.report(2)
+        runtime = self.report(3, artifact=current)
+        with patch('nrpe_cli.cleanup.artifact', return_value=current):
+            cleanup.clean(self.root, keep_runs=0, apply=True)
+        self.assertTrue(verified.exists())
+        self.assertTrue(runtime.exists())
+        self.assertFalse(expired.exists())
+
     def test_retired_outputs_require_explicit_selection_and_age(self):
         expired = self.root / 'output/sles15sp3'
         expired.mkdir(parents=True)
@@ -156,6 +172,14 @@ class CleanupTests(CleanupFixture, unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'links'):
             cleanup.clean(self.root, apply=True)
         self.assertTrue(destination.exists())
+
+    def test_mounted_run_is_not_traversed_or_deleted(self):
+        expired = self.report(1)
+        self.report(2)
+        with patch('nrpe_cli.cleanup.os.path.ismount', side_effect=lambda path: Path(path) == expired):
+            with self.assertRaisesRegex(RuntimeError, 'mounted'):
+                cleanup.clean(self.root, keep_runs=0, apply=True)
+        self.assertTrue((expired / 'run.log').exists())
 
     def test_changed_plan_is_rejected_before_deletion(self):
         expired = self.report(1)
