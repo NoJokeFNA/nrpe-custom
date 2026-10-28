@@ -62,7 +62,7 @@ def sources(root):
 
 
 def page_url(slug, base):
-    return base + ('/' if not slug else '/' + slug.strip('/') + '/')
+    return base + ('/' if not slug else '/' + quote(slug.strip('/'), safe='/') + '/')
 
 
 class Links(Treeprocessor):

@@ -100,12 +100,12 @@ class SiteTests(unittest.TestCase):
             shutil.copyfile(PROJECT / name, source / name)
         for name in ('docs', 'website/assets', 'website/content', 'packaging/licenses/sles12sp3'):
             shutil.copytree(PROJECT / name, source / name)
-        (source / 'website/content/test-observation.md').write_text(
+        (source / 'website/content/test observation.md').write_text(
             '# A fixture observation\n\n**Test fixture only**\n\nAn example used by an isolated unit test.\n')
         build(self.output, root=source)
         listing = (self.output / 'field-notes/index.html').read_text()
         self.assertIn('A fixture observation', listing)
-        self.assertIn('/nrpe-custom/field-notes/test-observation/', listing)
+        self.assertIn('/nrpe-custom/field-notes/test%20observation/', listing)
 
 
 class PublicationTests(unittest.TestCase):
