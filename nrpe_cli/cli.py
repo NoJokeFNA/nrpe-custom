@@ -2,14 +2,17 @@
 
 import argparse
 import os
+from pathlib import Path
 import subprocess
 import sys
 
 from .certificates import prepared_certificate
 from .controller import execute
+from .cleanup import clean
 from .docker import check_docker
-from .state import ROOT, TARGETS, artifact, reports
-from .targets import TARGET_CONFIG, package_files
+from .diagnostics import FailureDiagnostics
+from .state import ROOT, artifact, reports
+from .targets import TARGETS, package_files
 
 
 def doctor(root):
@@ -23,7 +26,7 @@ def doctor(root):
                 "scripts/prepare_sles_inputs.py", "scripts/sles_source.py", "scripts/fetch_sles_packages.py",
                 "scripts/verify-sles-packages.sh", "scripts/verify-sles-environment.sh",
                 "scripts/setup-debian-repositories.sh", "scripts/install-ca-certificate.sh",
-                "packaging/empty-ca.pem", "packaging/sles12sp3-source.json",
+                "packaging/sles12sp3-source.json",
                 "packaging/sles12sp3-user-source.json", "packaging/sles12sp3-macros-source.json",
                 "packaging/sles12sp3-bootstrap.json", "packaging/sles12sp3-suse.asc")
     missing = [name for name in required if not (root / name).is_file()]
@@ -93,6 +96,8 @@ def show_logs(root, run_id=None):
         print("No container output was recorded.")
     if report.get("error"):
         print(f"ERROR: {report['error']}")
+    if report.get('hint'):
+        print('HINT: ' + report['hint'])
     return 0
 
 
@@ -116,6 +121,20 @@ def parser():
                                  help="explicitly allow rebuilding existing package outputs")
     commands.add_parser("doctor", help="Diagnose Docker and project configuration")
     commands.add_parser("status", help="Show local packages and recorded test results (no Docker required)")
+    cleanup = commands.add_parser('clean', help='Preview expired local runs; delete only with --apply')
+    cleanup.add_argument('--older-than', type=int, default=30, metavar='DAYS',
+                         help='minimum age of completion and files in days (default: 30)')
+    cleanup.add_argument('--keep-runs', type=int, default=5, metavar='COUNT',
+                         help='retain at least this many newest runs, plus current evidence (default: 5)')
+    cleanup.add_argument('--retired-outputs', action='store_true', help='Include expired SLES-15 output directories')
+    cleanup.add_argument('--image', action='append', default=[], metavar='REFERENCE',
+                         help='Explicit project image tag to remove; may be repeated')
+    cleanup.add_argument('--apply', action='store_true', help='Perform the displayed cleanup instead of previewing')
+    diagnose = commands.add_parser('diagnose', help='Explain recognized failures in a local log without executing it')
+    diagnose.add_argument('file', type=Path, metavar='FILE')
+    diagnose.add_argument('--context', choices=('build', 'nrpe'), default='build',
+                          help='build/download errors (default) or a deployed NRPE/client log')
+    diagnose.add_argument('--ca-configured', action='store_true', help='A build CA was supplied for the recorded run')
     logs = commands.add_parser("logs", help="Display output from a recorded run (no Docker required)")
     selection = logs.add_mutually_exclusive_group()
     selection.add_argument("--last", action="store_true", help="Show the latest run (default)")
@@ -149,12 +168,19 @@ def main(argv=None, root=ROOT):
             return show_status(root)
         if args.action == "logs":
             return show_logs(root, args.run)
+        if args.action == 'clean':
+            return clean(root, args.older_than, args.keep_runs, args.retired_outputs, args.image, args.apply)
+        if args.action == 'diagnose':
+            diagnostics = FailureDiagnostics()
+            with args.file.open(encoding='utf-8', errors='replace') as log:
+                for line in iter(lambda: log.readline(65536), ''):
+                    diagnostics.observe(line)
+            print(diagnostics.hint(args.ca_configured, args.context)
+                  or 'No recognized failure found. This does not establish a successful run.')
+            return 0
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
-        for target in targets:
-            if TARGET_CONFIG[target].get("experimental"):
-                print(f"Experimental target: {target}. Review build and integration results before deployment.")
         rebuild = getattr(args, "rebuild", False)
         if args.action in ("build", "verify") and not rebuild:
             existing = [target for target in targets if package_files(root, target)]
@@ -175,7 +201,7 @@ def main(argv=None, root=ROOT):
             if certificate is not None:
                 options["ca_cert"] = certificate
             return execute(args.action, targets, root, **options)
-    except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
+    except (OSError, RuntimeError, subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:

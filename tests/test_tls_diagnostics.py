@@ -135,4 +135,4 @@ class TLSWorkflowTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(popen.call_count, 1)
         self.assertIn('A CA certificate was supplied', log.getvalue())
-        self.assertIn('--ca-cert configures container trust only', log.getvalue())
+        self.assertIn('--ca-cert configures container or input-download trust only', log.getvalue())

@@ -1,6 +1,6 @@
 # SLES 12 SP3 license notices
 
-These files accompany the pinned NRPE and `system-user-nagios` packages. They
+These files accompany the pinned NRPE, `system-user-nagios` and build-macros sources. They
 retain upstream terms and are not relicensed under the project's MIT license.
 Include this directory with a SLES release candidate alongside the binaries,
 all three source RPMs, the input manifests, and build scripts.
@@ -12,6 +12,7 @@ all three source RPMs, the input manifests, and build scripts.
 | [NRPE-LEGAL.txt](NRPE-LEGAL.txt) | Verbatim upstream `LEGAL` file, including trademark and warranty notices |
 | [system-user-nagios-spec-header.txt](system-user-nagios-spec-header.txt) | Verbatim copyright/licensing header from the pinned companion spec |
 | [system-user-nagios-MIT.txt](system-user-nagios-MIT.txt) | Standard MIT terms matching the companion spec's explicit `License: MIT` declaration, with the SUSE LLC 2024 copyright from that spec |
+| [nagios-rpm-macros-BSD.txt](nagios-rpm-macros-BSD.txt) | Verbatim upstream COPYING from the pinned macros source; BSD-3-Clause, Lars Vogdt 2011 |
 
 The standalone companion MIT file is supplied here as a downstream notice. The
 upstream source RPM did not ship that standalone file; this is not a claim that
@@ -25,7 +26,7 @@ explain the evidence and remaining release work.
 
 Keep the original source-package copyright headers as well, including the ACL,
 `snprintf`, Autoconf, and SUSE packaging notices. These companion notices do not
-replace either corresponding source RPM. Include all notice assets in the release
+replace the corresponding source RPMs. Include all notice assets in the release
 checksum manifest. Existing RPM payloads and upstream manifests are unchanged;
 notices accompany them as separate release assets.
 

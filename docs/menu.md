@@ -3,6 +3,10 @@
 The menu is an optional frontend to the same controller used by direct commands.
 It does not implement separate build, locking, or cleanup behavior.
 
+Local retention cleanup is available through `python3 nrpe.py clean`; see the
+[cleanup reference](local-cleanup.md). Its preview is read-only, and deletion
+requires a separate CLI invocation with `--apply`.
+
 ## Install and start
 
 From the repository root, install the pinned host-only dependencies:
