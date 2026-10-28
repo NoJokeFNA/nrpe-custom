@@ -48,9 +48,9 @@ class WorkflowTests(unittest.TestCase):
         for target in TARGETS:
             self.package(target)
         phase.return_value = 0
-        self.assertEqual(controller.execute('verify', list(state.TARGETS), self.root, rebuild=True), 0)
+        self.assertEqual(controller.execute('verify', list(TARGETS), self.root, rebuild=True), 0)
         self.assertEqual([(c.args[3], c.args[4]) for c in phase.call_args_list],
-                         [(t, p) for t in state.TARGETS for p in ('build', 'test')])
+                         [(t, p) for t in TARGETS for p in ('build', 'test')])
         for target, result in self.report()['targets'].items():
             self.assertEqual(result['test'], 'passed')
             self.assertEqual(result['artifact'], state.artifact(self.root, target))
