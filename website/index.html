@@ -48,11 +48,14 @@ documentation. The initial SLES note uses only reported observations, not an
 invented testimonial or production TLS claim. New reports follow the
 <a href="/nrpe-custom/field-notes/contributing-a-note/">field-note guide</a>.</p>
 <h2 id="homepage-content-and-cli-capture">Homepage content and CLI capture</h2>
-<p>The hero's "Built from real problems." line reveals one letter every 85 ms and
-repeats every 10 seconds, leaving the complete sentence visible between cycles.
-Letter spacing stays reserved so the heading does not move while typing. A pause
-button stops the effect; reduced-motion preferences and missing JavaScript keep
-the full heading static. Animation also stops while the tab or heading is hidden.
+<p>The hero's "Built from real problems." line gently fades out, then reveals letters
+70 ms apart with a 180 ms fade and small vertical transition per letter. Cycles
+start 60 seconds apart, leaving the complete sentence visible between cycles.
+Letter spacing stays reserved so the heading does not move while typing.
+Reduced-motion preferences and missing JavaScript keep the full heading static.
+Animation stops while the tab or heading is hidden. Returning to the heading
+preserves the scheduled interval; an elapsed interval starts a fresh 60-second
+wait instead of immediately replaying. There is no visible animation control.
 Screen readers receive the complete sentence once, without repeated announcements.</p>
 <p>The homepage links to GitHub's latest release rather than hardcoding a release
 version. Its supported-target table is derived from the README table, keeping
@@ -80,7 +83,7 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9068996408ce98f1d9db58ba8e3e5e398e879260/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
@@ -119,7 +122,7 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/9068996408ce98f1d9db58ba8e3e5e398e879260/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -141,7 +144,7 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 9068996</span>
+<span>Source e4ce000</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

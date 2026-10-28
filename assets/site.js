@@ -1,8 +1,7 @@
 const base = document.body.dataset.base || '';
 // Keep the heading's accessible name and layout stable throughout each cycle.
 const typewriter = document.querySelector('[data-typewriter]');
-const animationToggle = document.querySelector('[data-typewriter-toggle]');
-if (typewriter && animationToggle && typeof typewriter.animate === 'function') {
+if (typewriter && typeof typewriter.animate === 'function') {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const characters = [];
   const words = typewriter.textContent.split(/(\s+)/);
@@ -16,6 +15,7 @@ if (typewriter && animationToggle && typeof typewriter.animate === 'function') {
     group.className = 'typewriter-word';
     for (const letter of word) {
       const character = document.createElement('span');
+      character.className = 'typewriter-letter';
       character.textContent = letter;
       group.append(character);
       characters.push(character);
@@ -24,30 +24,36 @@ if (typewriter && animationToggle && typeof typewriter.animate === 'function') {
   }
   let timer;
   let animations = [];
-  let paused = false;
   let inView = true;
+  const interval = 60000;
+  let nextCycle = performance.now() + 600;
   const stop = () => {
     clearTimeout(timer);
     for (const animation of animations) animation.cancel();
     animations = [];
   };
-  const cycle = () => {
+  const cycle = async () => {
     stop();
+    nextCycle = performance.now() + interval;
+    const fade = typewriter.animate([{ opacity: 1 }, { opacity: 0 }],
+      { duration: 180, fill: 'forwards', easing: 'ease-out' });
+    animations = [fade];
+    try { await fade.finished; } catch { return; }
     animations = characters.map((character, index) => character.animate(
-      [{ opacity: 0 }, { opacity: 1 }],
-      { duration: 1, delay: index * 85, fill: 'both' }
+      [{ opacity: 0, transform: 'translateY(2px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: 180, delay: index * 70, fill: 'both', easing: 'ease-out' }
     ));
-    timer = setTimeout(cycle, 10000);
+    fade.cancel();
+    timer = setTimeout(cycle, Math.max(0, nextCycle - performance.now()));
   };
   const update = () => {
     stop();
-    animationToggle.hidden = motion.matches;
-    animationToggle.textContent = paused ? 'Resume animation' : 'Pause animation';
-    if (!motion.matches && !paused && !document.hidden && inView) {
-      timer = setTimeout(cycle, 600);
+    if (!motion.matches && !document.hidden && inView) {
+      // Returning to the heading must not trigger another immediate reveal.
+      if (nextCycle <= performance.now()) nextCycle = performance.now() + interval;
+      timer = setTimeout(cycle, nextCycle - performance.now());
     }
   };
-  animationToggle.addEventListener('click', () => { paused = !paused; update(); });
   motion.addEventListener('change', update);
   document.addEventListener('visibilitychange', update);
   if ('IntersectionObserver' in window) {
