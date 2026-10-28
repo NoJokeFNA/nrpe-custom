@@ -165,9 +165,18 @@ def layout(title, content, pages, slug, base, toc='', source=None, commit=None, 
     return template('layout.html', title=esc(title), body=body, nav=nav, meta=esc(meta), base=base, docs_toggle=toggle)
 
 
-def homepage(base):
-    return template('home.html', **{key + '_url': page_url(slug, base) for key, slug in (
+def homepage(base, root=ROOT):
+    # Keep the supported-target data in the README, rather than a second table.
+    readme = (root / 'README.md').read_text(encoding='utf-8')
+    target_section = readme.split('## Supported targets\n', 1)[1].split('\n## ', 1)[0]
+    rows = [line for line in target_section.splitlines() if line.startswith('|')]
+    compact = ['| ' + ' | '.join(line.split('|')[1:4]) + ' |' for line in rows]
+    supported_targets = markdown.markdown('\n'.join(compact), extensions=['tables'])
+    return template('home.html', supported_targets=supported_targets, base=base,
+                    **{key + '_url': page_url(slug, base) for key, slug in (
         ('overview', 'overview'), ('installation', 'installation'), ('faq', 'faq'),
+        ('workflow', 'workflow'), ('menu', 'menu'), ('releases', 'releases'),
+        ('contributing', 'contributing'), ('note_guide', 'field-notes/contributing-a-note'),
         ('troubleshooting', 'troubleshooting'), ('field_note', 'field-notes/sles12-handshake'),
         ('validation', 'practical-validation'))})
 
@@ -224,7 +233,7 @@ def build(output, root=ROOT, base=BASE):
                  + page_url('field-notes/contributing-a-note', base)
                  + '">how to contribute a field note</a>. We do not publish unverified testimonials or production credentials.</p>')
         write('field-notes', layout('Notes from the field', notes, pages, 'field-notes', base, commit=commit, dirty=dirty))
-        write('', layout('Custom NRPE builds. Clear, practical docs.', homepage(base), pages, '', base, commit=commit, dirty=dirty, home=True))
+        write('', layout('Custom NRPE builds. Clear, practical docs.', homepage(base, root), pages, '', base, commit=commit, dirty=dirty, home=True))
         (stage / '404.html').write_text(layout('That page is not here', '<p>The address may have changed. <a href="' + page_url('overview', base) + '">Browse the documentation</a> or use search to find the next step.</p>', pages, '404', base, commit=commit, dirty=dirty), encoding='utf-8')
         (stage / 'assets/search-index.json').write_text(json.dumps(search, ensure_ascii=False), encoding='utf-8')
         notices = stage / 'notices'

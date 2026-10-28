@@ -93,7 +93,7 @@ class SiteTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'dedicated output'):
             build(PROJECT / '.nrpe')
 
-    def test_new_reviewed_story_is_automatically_indexed(self):
+    def test_reviewed_content_and_readme_target_changes_are_reflected(self):
         source = self.root / 'source'
         source.mkdir()
         for name in ('README.md', 'CONTRIBUTING.md', 'THIRD_PARTY.md', 'LICENSE'):
@@ -102,7 +102,12 @@ class SiteTests(unittest.TestCase):
             shutil.copytree(PROJECT / name, source / name)
         (source / 'website/content/test observation.md').write_text(
             '# A fixture observation\n\n**Test fixture only**\n\nAn example used by an isolated unit test.\n')
+        readme = source / 'README.md'
+        readme.write_text(readme.read_text().replace('Debian 12 Bookworm', 'Debian 12 fixture label'))
         build(self.output, root=source)
+        homepage = (self.output / 'index.html').read_text()
+        self.assertIn('Debian 12 fixture label', homepage)
+        self.assertNotIn('Debian 12 Bookworm', homepage)
         listing = (self.output / 'field-notes/index.html').read_text()
         self.assertIn('A fixture observation', listing)
         self.assertIn('/nrpe-custom/field-notes/test%20observation/', listing)
