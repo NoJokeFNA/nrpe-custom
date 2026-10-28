@@ -74,6 +74,12 @@ notices. See [license evidence](sles-license-review.md) and the
 
 ## TLS and the original handshake failure
 
+The operator later clarified that starting the missing `nrpe.service` restored
+the checks in their combined Nagios/NRPE setup. Check the
+[services-first FAQ](faq.md#nrpe-checks-on-sles-services-first-then-ssltls) before
+replacing packages. That service-state fix did not require a custom build and
+is separate from the old binary's certificate-authentication limitations.
+
 For the user-performed pre-upgrade diagnostic with NRPE 2.15 and `check_nrpe`
 4.1.0, see [isolating an NRPE TLS handshake failure](sles12sp3-plaintext-diagnostic.md).
 It documents a separate temporary plaintext instance, the successful result and

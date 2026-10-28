@@ -24,9 +24,69 @@ The [cleanup command](local-cleanup.md#retired-sles-output) still recognizes old
 local output names solely to remove them explicitly; CLI tests reject those
 names as build targets. These references do not restore SLES-15 support.
 
-## Why does the old SLES 12 NRPE daemon fail its SSL handshake?
+## NRPE checks on SLES: services first, then SSL/TLS
 
-The reported server runs NRPE `2.15-4.24`, linked to OpenSSL's 1.0 ABI. That old
+These questions belong to the same troubleshooting sequence. The operator later
+clarified that starting the missing `nrpe.service` resolved the checks in their
+combined Nagios/NRPE setup. A custom package was not needed for that service
+availability problem.
+
+Start with the intended service and listening process, then investigate TLS only
+if the connection still fails. A stopped daemon cannot itself negotiate TLS;
+an SSL-handshake message from an NRPE process shows that a process was running
+at that time. Historical logs, a manually started daemon and the current systemd
+state can describe different moments or different listeners.
+
+### Which services must run on a combined Nagios and NRPE server?
+
+When Nagios Core and the NRPE daemon are installed on the same SLES server, and
+the installed units are named `nagios.service` and `nrpe.service`, enable and
+start each service:
+
+```sh
+sudo systemctl enable --now nagios.service
+sudo systemctl enable --now nrpe.service
+systemctl is-active nagios.service nrpe.service
+```
+
+`enable --now` configures startup at boot and starts the service immediately.
+Both should report `active` for this combined setup. Nagios schedules checks;
+NRPE independently listens for and executes remote plugin requests. If a unit is missing or
+fails, inspect the installed unit names and logs before replacing packages:
+
+```sh
+systemctl list-unit-files nagios.service nrpe.service
+sudo systemctl status nagios.service nrpe.service --no-pager
+sudo journalctl -u nagios.service -u nrpe.service -n 100 --no-pager
+```
+
+Package-provided service names vary. For the custom Debian server package in
+this project, the NRPE unit is `nagios-nrpe-server.service`:
+
+```sh
+sudo systemctl enable --now nagios-nrpe-server.service
+```
+
+Follow the [official Nagios Core documentation](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/)
+and [NRPE documentation](https://github.com/NagiosEnterprises/nrpe) for complete
+installation and deployment configuration. Enabling a service does not install
+missing plugins, provision TLS credentials or configure monitoring checks.
+
+Before interpreting an SSL error, also confirm which process owns port 5666:
+
+```sh
+sudo ss -ltnp 'sport = :5666'
+```
+
+If a manual test daemon still owns the port, an enabled systemd unit alone does
+not prove it is serving requests. Restore the intended managed instance before
+retrying the same check from the monitoring server. For a persistent failure,
+continue with the version/TLS checks below.
+
+### Why does the old SLES 12 NRPE daemon fail its SSL handshake?
+
+If the managed daemon is active and requests still fail, compare versions and
+TLS policy. The original reported server ran NRPE `2.15-4.24`, linked to OpenSSL's 1.0 ABI. That old
 NRPE advertises anonymous DH, not modern certificate authentication. A newer
 NRPE/client built for SLES 12 can use certificate-authenticated TLS 1.2 with the
 original OpenSSL 1.0.2 library. TLS 1.3 requires a newer TLS library and is not
@@ -51,40 +111,6 @@ With this old OpenSSL integration, `ssl_use_adh=0` skips DH initialization and
 can produce `no shared cipher` with modern clients. Use the complete documented
 policy, which explicitly excludes anonymous ciphers, rather than enabling ADH
 alone. It was tested against OpenSSL 3.5.7 with certificate verification intact.
-
-## Which services must run on a combined Nagios and NRPE server?
-
-When Nagios Core and the NRPE daemon are installed on the same SLES server, and
-the installed units are named `nagios.service` and `nrpe.service`, enable and
-start each service:
-
-```sh
-sudo systemctl enable --now nagios.service
-sudo systemctl enable --now nrpe.service
-systemctl is-active nagios.service nrpe.service
-```
-
-`enable --now` configures startup at boot and starts the service immediately.
-Both should report `active` for this combined setup. If a unit is missing or
-fails, inspect the installed unit names and logs before replacing packages:
-
-```sh
-systemctl list-unit-files nagios.service nrpe.service
-sudo systemctl status nagios.service nrpe.service --no-pager
-sudo journalctl -u nagios.service -u nrpe.service -n 100 --no-pager
-```
-
-Package-provided service names vary. For the custom Debian server package in
-this project, the NRPE unit is `nagios-nrpe-server.service`:
-
-```sh
-sudo systemctl enable --now nagios-nrpe-server.service
-```
-
-Follow the [official Nagios Core documentation](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/)
-and [NRPE documentation](https://github.com/NagiosEnterprises/nrpe) for complete
-installation and deployment configuration. Enabling a service does not install
-missing plugins, provision TLS credentials or configure monitoring checks.
 
 ## Does a separate NRPE agent also need Nagios Core locally?
 
