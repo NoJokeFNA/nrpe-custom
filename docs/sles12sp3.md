@@ -74,6 +74,12 @@ notices. See [license evidence](sles-license-review.md) and the
 
 ## TLS and the original handshake failure
 
+For the user-performed pre-upgrade diagnostic with NRPE 2.15 and `check_nrpe`
+4.1.0, see [isolating an NRPE TLS handshake failure](sles12sp3-plaintext-diagnostic.md).
+It documents a separate temporary plaintext instance, the successful result and
+cleanup using anonymized hosts and documentation addresses, without modifying
+the production service or reloading systemd.
+
 NRPE 2.15 uses legacy anonymous DH. Merely enabling services or adding modern
 configuration directives does not add certificate support to that old binary.
 This build supplies NRPE 4.1.1 and a matching client against the existing OpenSSL

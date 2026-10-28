@@ -20,6 +20,12 @@ versions, command, TLS settings and simultaneous logs. Do not disable encryption
 or certificate verification to hide the error. Build-time `--ca-cert` affects
 source downloads, not the deployed NRPE certificate configuration.
 
+To isolate this on SLES 12 SP3 before upgrading, the
+[temporary plaintext diagnostic](sles12sp3-plaintext-diagnostic.md) documents the
+user's successful NRPE 2.15 / `check_nrpe` 4.1.0 test on a separate port. It
+includes anonymized examples, the encountered errors and cleanup; it does not
+recommend disabling TLS in production.
+
 For NRPE 4.1.1 on SLES 12, also review the
 [authenticated DHE-RSA example](configuration-examples.md#hosts-tls-and-fixed-commands).
 With this old OpenSSL integration, `ssl_use_adh=0` skips DH initialization and

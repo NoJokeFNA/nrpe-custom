@@ -243,6 +243,7 @@ These checks do not replace package builds and runtime integration tests.
 - [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
 - [FAQ](docs/faq.md): Nagios/NRPE service startup and when a custom build is needed.
 - [SLES 12 SP3](docs/sles12sp3.md): provenance, dependencies, build inputs, TLS 1.2 and installation.
+- [SLES 12 SP3 handshake diagnostic](docs/sles12sp3-plaintext-diagnostic.md): anonymized temporary NRPE 2.15 plaintext test and cleanup, without changing the production service.
 - [Contributing](CONTRIBUTING.md): development and meaningful validation.
 - [Security](docs/security.md): argument risks and safe issue reporting.
 - [Deferred release plan](docs/release-plan.md): license review and release preparation.
