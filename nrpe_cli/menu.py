@@ -2,16 +2,29 @@
 
 import os
 from pathlib import Path
-import string
 
 from .state import reports
 from .targets import TARGETS, package_files
 
 
-def choose(title, options, *, multiple=False, selected=()):
-    """Select values using arrows/Enter, returning None on Back/Escape."""
+def safe(value):
+    """Render local paths and logs as plain text, never terminal instructions."""
+    return ''.join(char if char.isprintable() else '?' for char in str(value))
+
+
+def compact(value, width=74):
+    text = safe(value)
+    if len(text) <= width:
+        return text
+    left = max(1, (width - 3) // 3)
+    return text[:left] + '...' + text[-(width - left - 3):]
+
+
+def choose(title, options, *, multiple=False, selected=(), state=None, description=''):
+    """Keyboard selection with filtering, contextual help and retained focus."""
     try:
         from prompt_toolkit.application import Application
+        from prompt_toolkit.filters import Condition
         from prompt_toolkit.formatted_text import to_formatted_text
         from prompt_toolkit.key_binding import KeyBindings
         from prompt_toolkit.layout import HSplit, Layout, Window
@@ -21,86 +34,133 @@ def choose(title, options, *, multiple=False, selected=()):
         from prompt_toolkit.styles import Style
     except ImportError as exc:
         raise RuntimeError(
-            "The arrow-key menu requires its optional dependencies. Run "
-            "python3 -m pip install -r requirements-menu.txt, or use "
-            "python3 nrpe.py --help for dependency-free commands."
+            'The arrow-key menu requires its optional dependencies. Run '
+            'python3 -m pip install -r requirements-menu.txt, or use '
+            'python3 nrpe.py --help for dependency-free commands.'
         ) from exc
-
-    # Titles and labels may contain filesystem names or report data. Render them
-    # as plain formatted text, never as HTML or ANSI escape sequences.
-    def safe(value):
-        return ''.join(char if char.isprintable() else '?' for char in str(value))
-
+    state = state if state is not None else {}
+    options = [(option[0], option[1], option[2] if len(option) > 2 else '') for option in options]
+    query = state.get('query', '')
     position = 0
     marked = set(selected)
     message = ''
+    filtering = False
+    help_open = False
     bindings = KeyBindings()
 
+    def visible():
+        return [item for item in options if query.casefold() in (safe(item[1]) + ' ' + safe(item[2])).casefold()]
+
+    def remember():
+        items = visible()
+        state['focus'] = items[position][0] if items else None
+        state['query'] = query
+
+    items = visible()
+    position = next((index for index, item in enumerate(items)
+                     if 'focus' in state and item[0] == state['focus']), 0)
+
     def render():
+        items = visible()
+        if not items:
+            return [('class:muted', '  No matches. Backspace edits the filter; Esc clears it.')]
         lines = []
-        for index, (value, label) in enumerate(options):
+        for index, (value, label, _) in enumerate(items):
             active = index == position
             if active:
                 lines.append(('[SetCursorPosition]', ''))
             prefix = ('[x] ' if value in marked else '[ ] ') if multiple else ''
             lines.append(('class:selected' if active else '',
-                          ('> ' if active else '  ') + prefix + safe(label) + '\n'))
+                          (' > ' if active else '   ') + prefix + safe(label) + '\n'))
         return to_formatted_text(lines)
 
     @bindings.add('up')
-    def up(event):
-        nonlocal position
-        position = (position - 1) % len(options)
-
     @bindings.add('down')
-    def down(event):
-        nonlocal position
-        position = (position + 1) % len(options)
-
     @bindings.add('home')
-    def first(event):
-        nonlocal position
-        position = 0
-
     @bindings.add('end')
-    def last(event):
+    def move(event):
         nonlocal position
-        position = len(options) - 1
+        count = len(visible())
+        if count:
+            key = event.key_sequence[-1].key
+            position = (0 if key == 'home' else count - 1 if key == 'end'
+                        else (position + (-1 if key == 'up' else 1)) % count)
+            remember()
 
-    @bindings.add(' ')
+    @bindings.add(' ', filter=Condition(lambda: not filtering))
     def toggle(event):
         nonlocal message
-        if multiple:
+        items = visible()
+        if multiple and items:
             message = ''
-            value = options[position][0]
-            if value in marked:
-                marked.remove(value)
-            else:
-                marked.add(value)
+            value = items[position][0]
+            marked.symmetric_difference_update({value})
 
-    @bindings.add('a')
-    @bindings.add('A')
+    @bindings.add('a', filter=Condition(lambda: not filtering))
+    @bindings.add('A', filter=Condition(lambda: not filtering))
     def select_all(event):
         nonlocal message
         if multiple:
             message = ''
-            marked.update(value for value, _ in options)
+            marked.update(value for value, _, _ in visible())
+
+    @bindings.add('/', filter=Condition(lambda: not filtering))
+    def begin_filter(event):
+        nonlocal filtering
+        filtering = True
+
+    @bindings.add('<any>', filter=Condition(lambda: filtering))
+    def type_filter(event):
+        nonlocal query, position
+        query += ''.join(char for char in event.data if char.isprintable())
+        position = 0
+        remember()
+
+    @bindings.add('tab', filter=Condition(lambda: filtering))
+    def finish_filter(event):
+        nonlocal filtering
+        filtering = False
+
+    @bindings.add('backspace')
+    def erase_filter(event):
+        nonlocal query, position
+        query = query[:-1]
+        position = 0
+        remember()
+
+    @bindings.add('?', filter=Condition(lambda: not filtering))
+    def show_help(event):
+        nonlocal help_open
+        help_open = not help_open
 
     @bindings.add('enter')
     def accept(event):
         nonlocal message
+        remember()
         if multiple:
-            values = [value for value, _ in options if value in marked]
+            values = [value for value, _, _ in options if value in marked]
             if not values:
                 message = 'Select at least one target with Space.'
                 return
             event.app.exit(result=values)
-        else:
-            event.app.exit(result=options[position][0])
+        elif visible():
+            event.app.exit(result=visible()[position][0])
 
     @bindings.add('escape')
-    @bindings.add('q')
+    def escape(event):
+        nonlocal query, filtering, position, help_open
+        if help_open:
+            help_open = False
+        elif filtering or query:
+            query, filtering, position = '', False, 0
+            remember()
+        else:
+            remember()
+            event.app.exit(result=None)
+
+    @bindings.add('q', filter=Condition(lambda: not filtering))
     def back(event):
+        remember()
         event.app.exit(result=None)
 
     @bindings.add('c-c')
@@ -111,23 +171,38 @@ def choose(title, options, *, multiple=False, selected=()):
     def eof(event):
         event.app.exit(exception=EOFError())
 
+    def detail():
+        items = visible()
+        text = description
+        if items:
+            text = items[position][2] or description
+        if help_open:
+            text = ('Type / to filter, Backspace to edit, Tab to keep the filter; Esc clears it before going back. '
+                    'Home/End jump. ' + ('Space toggles; A selects visible items. ' if multiple else '')
+                    + 'Ctrl+C exits; no action starts before Enter.')
+        return [('class:muted', safe(text))]
+
     control = FormattedTextControl(render, focusable=True, show_cursor=False)
-    keys = 'Up/Down: move   Enter: select   Esc/Q: back   Ctrl+C: quit'
+    keys = 'Arrows: move  Enter: select  /: filter  ?: help  Esc: back'
     if multiple:
-        keys = 'Arrows: move   Space: toggle   A: all   Enter: continue   Esc: back'
-    heading = '\n'.join(safe(line) for line in title.splitlines())
+        keys = 'Arrows: move  Space: toggle  A: visible  Enter: next  Esc: back'
     layout = Layout(HSplit([
-        Window(FormattedTextControl([('class:title', heading)]),
-               wrap_lines=True, dont_extend_height=True, height=Dimension(min=2, max=10)),
-        Window(control, wrap_lines=True, allow_scroll_beyond_bottom=False),
+        Window(FormattedTextControl([('class:brand', ' NRPE CUSTOM  /  PACKAGE WORKSTATION')]), height=1),
+        Window(FormattedTextControl([('class:title', '\n'.join(safe(line) for line in title.splitlines()))]),
+               wrap_lines=True, dont_extend_height=True, height=Dimension(min=1, max=6)),
+        Window(FormattedTextControl(lambda: [('class:muted',
+            f' Filter: {safe(query)}' + ('_' if filtering else '') +
+            (f'   Selected: {len(marked)}' if multiple else ''))]), height=1),
+        Window(control, wrap_lines=False, allow_scroll_beyond_bottom=False),
+        Window(FormattedTextControl(detail), wrap_lines=True, height=Dimension(min=1, max=3)),
         Window(FormattedTextControl(lambda: [('class:error', message)]), height=1),
-        Window(FormattedTextControl(keys), height=1),
+        Window(FormattedTextControl(keys), wrap_lines=True, height=Dimension(min=1, max=2)),
     ]), focused_element=control)
     monochrome = 'NO_COLOR' in os.environ or os.environ.get('TERM') == 'dumb'
     app = Application(
         layout=layout, key_bindings=bindings, full_screen=True,
-        style=Style.from_dict({'title': 'bold ansicyan', 'selected': 'reverse',
-                              'error': 'bold ansired'}),
+        style=Style.from_dict({'brand': 'bold ansigreen', 'title': 'bold',
+                              'selected': 'reverse', 'muted': 'ansibrightblack', 'error': 'bold ansired'}),
         color_depth=ColorDepth.DEPTH_1_BIT if monochrome else None,
         mouse_support=False,
     )
@@ -186,54 +261,121 @@ def enter_path(title, *, base=None, kind='any'):
                 return None
 
 
-def _browse(start=None, *, select_file=False):
-    """Navigate local directories and optional public certificate files."""
+def is_windows():
+    return os.name == 'nt'
+
+
+def windows_drives():
+    """Enumerate root letters once on demand, without probing each filesystem."""
+    if not is_windows():
+        return []
+    import ctypes
+    mask = ctypes.windll.kernel32.GetLogicalDrives()
+    return [f'{chr(65 + index)}:\\' for index in range(26) if mask & (1 << index)]
+
+
+def drive_selector(current, state=None):
+    drives = windows_drives()
+    options = [(drive, drive + (' (current)' if Path(drive) == Path(current.anchor) else ''))
+               for drive in drives]
+    return choose('Switch drive', options + [(None, 'Back to directory')], state=state,
+                  description='Use / to filter drive letters. A drive is opened only after selection.')
+
+
+def view_text(title, text):
+    """Scrollable, searchable plain text, including complete long paths."""
+    from prompt_toolkit.application import Application
+    from prompt_toolkit.key_binding import KeyBindings
+    from prompt_toolkit.layout import HSplit, Layout, Window
+    from prompt_toolkit.layout.controls import FormattedTextControl
+    from prompt_toolkit.widgets import TextArea, SearchToolbar
+    from prompt_toolkit.output import ColorDepth
+
+    search = SearchToolbar()
+    area = TextArea(text='\n'.join(safe(line) for line in text.splitlines()), read_only=True,
+                    scrollbar=True, wrap_lines=True, search_field=search)
+    bindings = KeyBindings()
+
+    @bindings.add('escape', eager=True)
+    @bindings.add('c-c')
+    def close(event):
+        event.app.exit()
+
+    Application(layout=Layout(HSplit([
+        Window(FormattedTextControl(safe(title)), height=1), area, search,
+        Window(FormattedTextControl('Arrows/PageUp/PageDown: scroll  Ctrl+F: search  Esc: back'), height=1),
+    ]), focused_element=area), key_bindings=bindings, full_screen=True,
+        color_depth=ColorDepth.DEPTH_1_BIT if 'NO_COLOR' in os.environ or os.environ.get('TERM') == 'dumb' else None).run()
+
+
+def _browse(start=None, *, select_file=False, extensions=None):
+    """Keep drives out of ordinary directory listings and retain each location."""
     current = Path(start or Path.home()).expanduser().resolve()
+    extensions = ('.cer', '.crt', '.pem') if extensions is None else extensions
+    states, drive_state = {}, {}
     while True:
         try:
             children = sorted((p for p in current.iterdir()
                                if p.is_dir() or (select_file and p.is_file()
-                                   and p.suffix.lower() in (".cer", ".crt", ".pem"))),
+                                   and (not extensions or p.suffix.lower() in extensions))),
                               key=lambda p: (not p.is_dir(), p.name.casefold()))
         except OSError as exc:
-            choose(f'Cannot read {current}: {exc}', [(None, 'Back')])
+            choose(f'Cannot read {compact(current)}: {exc}', [(None, 'Back')])
             return None
         options = [('parent', '.. (parent directory)'),
-                   ('path', 'Enter or paste a path...')]
+                   ('path', 'Enter or paste a path...'), ('full-path', 'Show complete current path')]
         if not select_file:
             options.insert(0, ('use', 'Use this directory'))
-        if os.name == 'nt':
-            options.extend((f'drive:{drive}', f'{drive}:\\')
-                           for drive in string.ascii_uppercase
-                           if Path(f'{drive}:\\').is_dir())
+        if is_windows():
+            options.append(('drives', 'Switch drive...'))
         options.extend((str(index), child.name + ('/' if child.is_dir() else ''))
                        for index, child in enumerate(children))
-        label = 'Company CA certificate' if select_file else 'Directory'
-        answer = choose(f'{label}: {current}', options)
+        label = 'Select a file' if select_file and not extensions else 'Company CA certificate' if select_file else 'Directory'
+        answer = choose(f'{label}\n{compact(current)}', options,
+                        state=states.setdefault(str(current), {}),
+                        description='Only this directory is listed. / filters entries; paste a path for direct access.')
         if answer is None:
             return None
         if answer == 'use':
             return current
+        if answer == 'full-path':
+            view_text('Complete directory path', str(current))
+            continue
+        candidate = None
         if answer == 'path':
-            selected = enter_path(label, base=current,
-                                  kind='any' if select_file else 'directory')
-            if selected is not None:
-                if select_file and selected.is_file():
-                    return selected
-                current = selected
+            candidate = enter_path(label, base=current,
+                                   kind='any' if select_file else 'directory')
+        elif answer == 'drives':
+            drive = drive_selector(current, drive_state)
+            if drive is not None:
+                candidate = Path(drive)
         elif answer == 'parent':
-            current = current.parent
-        elif answer.startswith('drive:'):
-            current = Path(answer[-1] + ':\\')
+            candidate = current.parent
         else:
-            selected = children[int(answer)].resolve()
-            if select_file and selected.is_file():
-                return selected
-            current = selected
+            candidate = children[int(answer)]
+        if candidate is None:
+            continue
+        try:
+            candidate = candidate.resolve(strict=True)
+            if select_file and candidate.is_file():
+                return candidate
+            if not candidate.is_dir():
+                raise OSError('The selected directory is unavailable.')
+            # Open only the selected location. Failed/disconnected drives retain
+            # the old location and its focus rather than abandoning the browser.
+            next(candidate.iterdir(), None)
+        except (OSError, RuntimeError) as exc:
+            choose(f'Cannot open {compact(candidate)}: {exc}', [(None, 'Back to directory')])
+            continue
+        current = candidate
 
 
 def browse_directory(start=None):
     return _browse(start)
+
+
+def browse_file(start=None):
+    return _browse(start, select_file=True, extensions=())
 
 
 def browse_certificate(start=None):
@@ -303,13 +445,23 @@ def workflow(root, action):
 
 def run_menu(root, dispatch):
     """Keep returning to the menu after each command, including failures."""
-    actions = [('verify', 'Build and test packages'), ('build', 'Build packages'),
-               ('test', 'Test existing packages'), ('doctor', 'Diagnose Docker'),
-               ('status', 'Show package and test status'), ('logs', 'View run logs'),
+    actions = [('verify', 'Build and test packages', 'Build, validate and test arguments over TLS in containers.'),
+               ('build', 'Build packages', 'Build and check exported artifacts without integration tests.'),
+               ('test', 'Test existing packages', 'Test existing bytes; never rebuild packages.'),
+               ('doctor', 'Diagnose Docker', 'Explicitly check local Docker and Compose readiness.'),
+               ('status', 'Show package and test status', 'Validate package checksums and match recorded evidence.'),
+               ('logs', 'View run logs', 'Select a recorded run; / filters its date, targets and result.'),
                ('quit', 'Quit')]
+    home_state = {}
+    docker_status = 'not checked'
     try:
         while True:
-            action = choose('NRPE package controller', actions)
+            history = reports(root)
+            count = sum(bool(package_files(root, target)) for target in TARGETS)
+            last = (f"{history[0]['action']} / {history[0]['status']}" if history else 'no recorded runs')
+            heading = (f'Workspace overview\nPackages present: {count}/{len(TARGETS)} (not verified here)'
+                       f'\nLatest run: {last}\nDocker readiness: {docker_status}')
+            action = choose(heading, actions, state=home_state)
             if action is None or action == 'quit':
                 return 0
             if action in ('verify', 'build', 'test'):
@@ -330,6 +482,8 @@ def run_menu(root, dispatch):
             else:
                 arguments = [action]
             code = dispatch(arguments)
+            if action == 'doctor':
+                docker_status = 'passed last explicit check' if code == 0 else 'last explicit check failed'
             # Output remains in terminal scrollback. This is a short non-fullscreen
             # pause so long logs can be read before the next screen is displayed.
             pause(code)
