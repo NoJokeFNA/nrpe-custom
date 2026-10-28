@@ -249,14 +249,14 @@ def workflow(root, action):
         return None
     pull = False
     certificate = os.environ.get("NRPE_CA_CERT")
-    media = os.environ.get('SLES_MEDIA_DIR') if 'sles15sp4' in targets else None
+    media = os.environ.get('SLES_MEDIA_DIR') if 'sles15sp3' in targets else None
     while True:
         options = [
             ('run', 'Continue to review'),
             ('pull', f'Check for updated base images: {"yes" if pull else "no"}'),
             ('certificate', f'Company CA certificate: {certificate or "none"}'),
         ]
-        if 'sles15sp4' in targets:
+        if 'sles15sp3' in targets:
             options.append(('media', f'SLES media: {media or "none (online repositories)"}'))
         answer = choose('Workflow options', options)
         if answer is None:

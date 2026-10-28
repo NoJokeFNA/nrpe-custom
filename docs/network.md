@@ -28,14 +28,14 @@ work around a firewall rejection.
 | `github.com` | TCP 443 | Git client | Clone/update this repository; GitHub releases if used later |
 | `registry-1.docker.io`, `auth.docker.io` | TCP 443 | Docker/BuildKit | Official Debian base images and Dockerfile frontend image/authentication |
 | `production.cloudflare.docker.com`, `production.cloudfront.docker.com` | TCP 443 | Docker/BuildKit | Possible Docker Hub blob/CDN destinations; actual endpoints may differ |
-| `registry.suse.com` | TCP 443 | Docker/BuildKit | SLES SP4 BCI base image; follow authorized registry authentication/blob endpoints |
+| `registry.suse.com` | TCP 443 | Docker/BuildKit | SLES SP3 BCI base image; follow authorized registry authentication/blob endpoints |
 | `deb.debian.org`, `security.debian.org` | TCP 80 and/or 443, matching image APT sources | Debian containers | Package indexes, NRPE source, build and runtime dependencies |
 | `archive.debian.org` | TCP 80 in the current Bullseye security rewrite | Debian 11 containers | Archived security packages; APT authenticity checks remain enabled |
-| `download.opensuse.org` | TCP 443 plus approved mirror redirects | SLES containers | SP4 backports repository and package downloads |
-| `updates.suse.com` | TCP 443 | SLES containers | Repository configured in the current SP4 BCI base; custom bases can differ |
+| `download.opensuse.org` | TCP 443 plus approved mirror redirects | SLES containers | SP3 backports repository and package downloads |
+| `updates.suse.com` | TCP 443 | SLES containers | Repository configured in the current SP3 BCI base; custom bases can differ |
 | `api.opensuse.org` | TCP 443 | SLES builder and runtime-image setup | Pinned OBS sources, original SUSE bootstrap RPMs; authoritative signing keys during reviewed updates |
 | `pypi.org`, `files.pythonhosted.org` | TCP 443 | Host pip, only when installing the optional menu | prompt_toolkit and wcwidth |
-| `www.suse.com` and authorized SUSE download hosts | TCP 443 | Administrator, optional | Download official SP4 installation media; not needed by the standard online build |
+| `www.suse.com` and authorized SUSE download hosts | TCP 443 | Administrator, optional | Download official SP3 installation media; not needed by the standard online build |
 
 SLES base-image repositories can add destinations such as `updates.suse.com`;
 inspect `/etc/zypp/repos.d/` in the selected base for its actual URLs. A custom
@@ -118,7 +118,7 @@ certificate in certificate chain`, select the public root or intermediate CA
 provided by your administrator:
 
 ```powershell
-python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"
+python3 nrpe.py verify sles15sp3 --ca-cert "C:\Certificates\Company-Root.cer"
 python3 nrpe.py test debian12 --ca-cert "C:\Certificates\Company-Root.cer"
 ```
 

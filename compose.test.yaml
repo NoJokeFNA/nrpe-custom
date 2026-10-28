@@ -4,20 +4,20 @@ x-nrpe-test: &nrpe-test
   profiles: [integration]
 
 services:
-  test-sles15sp4:
+  test-sles15sp3:
     <<: *nrpe-test
     build:
       context: .
       secrets:
         - nrpe_ca_cert
-      dockerfile: docker/sles15sp4/test.Dockerfile
+      dockerfile: docker/sles15sp3/test.Dockerfile
       additional_contexts:
         nrpe_sles_media: ${SLES_MEDIA_DIR:-./packaging/empty-media}
       args:
         NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
-        SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.4}
+        SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.3}
     volumes:
-      - ./output/sles15sp4:/packages:ro
+      - ./output/sles15sp3:/packages:ro
       - type: bind
         source: ${SLES_MEDIA_DIR:-./packaging/empty-media}
         target: /mnt/nrpe-sles-media

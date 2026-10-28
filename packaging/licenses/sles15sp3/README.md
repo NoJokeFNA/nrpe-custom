@@ -1,4 +1,4 @@
-# SLES 15 SP4 license notices
+# SLES 15 SP3 license notices
 
 These files accompany the pinned NRPE and `system-user-nagios` packages. They
 retain upstream terms and are not relicensed under the project's MIT license.
@@ -19,7 +19,7 @@ it did, a new permission from this project, or a license change. The declaration
 comes from the original spec, not from this project's choice of MIT.
 
 The input archive and companion spec were checked against their respective
-[NRPE](../../sles15sp4-source.json) and [user-package](../../sles15sp4-user-source.json)
+[NRPE](../../sles15sp3-source.json) and [user-package](../../sles15sp3-user-source.json)
 manifests. The full [review and source references](../../../docs/sles-license-review.md)
 explain the evidence and remaining release work.
 

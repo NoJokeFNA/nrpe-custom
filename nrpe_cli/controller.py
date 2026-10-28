@@ -134,7 +134,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
                         print(f"\n[{target}] Building package", flush=True)
                         log.write(f"\n[{target}] Building package\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
-                                         media=media if target == "sles15sp4" else None, ca_cert=ca_cert)
+                                         media=media if target == "sles15sp3" else None, ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break
@@ -153,7 +153,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, media=None, c
                         print(f"[{target}] Installing package and testing NRPE arguments", flush=True)
                         log.write(f"\n[{target}] Installing package and testing NRPE arguments\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
-                                         media=media if target == "sles15sp4" else None, ca_cert=ca_cert)
+                                         media=media if target == "sles15sp3" else None, ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
                         if code:
                             break

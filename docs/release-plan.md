@@ -1,6 +1,6 @@
 # Release preparation plan
 
-Status: first automated release published, verified 2026-10-27. MIT is adopted
+Status: SP3 target migration locally verified, updated 2026-10-28. MIT is adopted
 for independently authored project work. Successful master pushes publish only
 after complete five-target verification. Changes follow topic PRs into develop,
 then a develop-to-master promotion PR. Both long-lived branches are protected;
@@ -9,10 +9,19 @@ Creating or merging a master promotion requires an explicit maintainer request;
 ordinary implementation and integration stop at develop.
 See [Git workflow](git-workflow.md) and [release automation](releases.md).
 
+The affected deployment was corrected to SLES 15 SP3 on 2026-10-28. The
+previous implementation targeted SP4, not SP5. New SP3 builds use a genuine
+15.3 base and matching dependencies; historical SP4 release bytes are unchanged.
+See the [SLES target guide](sles15sp3.md) and [service FAQ](faq.md).
+Local run `20261028T073123-23a6dc86` passed SP3 build, package installation and
+disabled/enabled argument checks over TLS for `4.1.1-0.withargs1`. Hosted checks
+for the migration must pass before integration into develop. No master promotion
+or release publication is authorized by the target correction.
+
 ## Scope and current state
 
 The intended assets are unofficial custom Debian server packages and the SLES
-15 SP4 NRPE/user packages, with corresponding sources, notices, build scripts,
+15 SP3 NRPE/user packages, with corresponding sources, notices, build scripts,
 checksums, and artifact-bound test results. Container images, dependency package
 bundles, and SLES media are outside this scope.
 
@@ -28,7 +37,7 @@ bundles, and SLES media are outside this scope.
 | Warranty and liability notice | Documented | README and [security guidance](security.md), subject to applicable law; no security or availability guarantee |
 | Third-party license inventory | Reviewed inputs and first release validated | [Inspected evidence](../THIRD_PARTY.md) and [SLES review](sles-license-review.md); repeat review for changed source/license evidence |
 | Debian corresponding-source export | Implemented and validated on all four targets | `scripts/export_debian_sources.py`; full verify runs and independent source reconstruction passed |
-| SLES corresponding sources and notices | Original OBS export and validation implemented | Includes history files, both SRPMs and the [notice directory](../packaging/licenses/sles15sp4/README.md) |
+| SLES corresponding sources and notices | Original OBS export and validation implemented | Includes history files, both SRPMs and the [notice directory](../packaging/licenses/sles15sp3/README.md) |
 | Release completeness and test gate | Passed for the first published release | Clean source identities, source/binary hashes, complete five-target assembly and independent downloaded-asset checks |
 | GitHub releases | Active; first release published | Draft upload then publication; no feature/develop/PR publication, no container/media redistribution |
 | Long-lived branch protection | Active and verified on both branches | Deletion/force-push protection, PR requirement, resolved review threads, required fast checks and no bypass actors; [verification](git-workflow.md#server-side-protection-one-time-administrator-action) |
@@ -100,10 +109,10 @@ Old packages built before source export do not gain corresponding sources by
 passing a later runtime-only test.
 
 For SLES, inspect both exported `.src.rpm` files. Confirm the NRPE spec records
-`150400.95.2.withargs1`, retains command argument support, removes Bash command
+`0.withargs1`, retains command argument support, removes Bash command
 substitution, and contains all source inputs. Confirm the real companion source
 and notices are present. Retain all three input manifests and required build
-scripts. Keep the pure SLES SP4 dependency policy.
+scripts. Keep the pure SLES SP3 dependency policy.
 
 ## 3. Offline release candidate gate and automation
 

@@ -26,8 +26,8 @@ def validate_media(value):
     text = "\n".join(chunks)
     if not re.search(r"(?:SUSE.*Linux.*Enterprise|\bSLE[-_ ])", text, re.I):
         raise RuntimeError("The media directory has no SLES product metadata. Extract the full official medium.")
-    if not re.search(r"\b15[. _-]*(?:SP[ _-]*)?4\b", text, re.I):
-        raise RuntimeError("The installation medium must identify SLES 15 SP4.")
+    if not re.search(r"\b15[. _-]*(?:SP[ _-]*)?3\b", text, re.I):
+        raise RuntimeError("The installation medium must identify SLES 15 SP3.")
     if re.search(r"\bopenSUSE\b", text, re.I):
         raise RuntimeError("openSUSE installation media are not accepted for this pure SLES target.")
     if not re.search(r"\bx86_64\b", text):

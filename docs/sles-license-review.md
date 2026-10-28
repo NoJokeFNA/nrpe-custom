@@ -1,6 +1,8 @@
-# SLES 15 SP4 source license review
+# SLES pinned-source license review
 
-Reviewed on 2026-10-27. The two previously recorded SLES license-evidence gaps
+Reviewed on 2026-10-27. The same exact upstream and companion source inputs
+are reused for the SP3 migration on 2026-10-28. Binary observations below were
+recorded on SP4 and do not establish SP3 runtime validation. The two previously recorded SLES license-evidence gaps
 are closed for the pinned inputs below. The review also resolves the apparent
 ACL license-version discrepancy. Release completeness, provenance and packaging
 checks still apply; this does not approve redistribution of SLES images,
@@ -30,7 +32,7 @@ The checked `src/utils.c` has SHA-256:
 The first review searched for "exception" and "permission to link" but missed
 the word "exemption" in this function. The earlier unresolved finding was an
 incomplete search, not evidence that an exception was absent. The notice is
-now retained in [NRPE-license-notice.txt](../packaging/licenses/sles15sp4/NRPE-license-notice.txt),
+now retained in [NRPE-license-notice.txt](../packaging/licenses/sles15sp3/NRPE-license-notice.txt),
 alongside the original full GPL and `LEGAL` texts.
 
 The existing custom RPM was checksum-checked and its binary extracted in an
@@ -63,7 +65,7 @@ The exact source declaration is in the
 [pinned original OBS spec](https://api.opensuse.org/public/source/server:monitoring/system-user-nagios/system-user-nagios.spec?rev=b979817ae6424675519c86e80add617a&expand=1),
 not merely in rebuilt RPM metadata. Its source revision is
 `b979817ae6424675519c86e80add617a`. The spec is bound by the
-[input manifest](../packaging/sles15sp4-user-source.json) to SHA-256:
+[input manifest](../packaging/sles15sp3-user-source.json) to SHA-256:
 
 ```text
 36e678f60dd314addc9098421d432bac932c23f19a7ce8b048cf06b6b9cbc1b7
@@ -82,7 +84,7 @@ The original source package has no standalone full MIT text. This is a missing
 notice asset, not an unidentified license or a need for this project to grant
 rights on SUSE's behalf. The
 [standard MIT terms](https://spdx.org/licenses/MIT.html) are now supplied in
-[system-user-nagios-MIT.txt](../packaging/licenses/sles15sp4/system-user-nagios-MIT.txt),
+[system-user-nagios-MIT.txt](../packaging/licenses/sles15sp3/system-user-nagios-MIT.txt),
 with the original copyright and the original source header kept separately.
 That file is explicitly identified as a downstream companion notice. Standard
 short identifiers identify license texts; see
@@ -93,7 +95,7 @@ short identifiers identify license texts; see
 The two evidence questions are resolved. A SLES candidate must still include:
 
 - Both complete corresponding source RPMs, manifests and required build scripts.
-- The [notice directory](../packaging/licenses/sles15sp4/README.md), including the
+- The [notice directory](../packaging/licenses/sles15sp3/README.md), including the
   original GPL text, OpenSSL notice, trademark notice and companion MIT terms.
 - Original per-file copyright and license notices inside the source packages.
 - Candidate checksums covering every distributed asset and tests bound to the

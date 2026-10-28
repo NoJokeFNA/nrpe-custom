@@ -39,7 +39,7 @@ dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' nagios-nrpe-server |
 printf 'Backup directory: %s\n' "$nrpe_backup_dir"
 ```
 
-For SLES 15 SP4:
+For SLES 15 SP3:
 
 ```sh
 nrpe_backup_dir="/var/backups/nrpe-custom/$(date -u +%Y%m%dT%H%M%SZ)"
@@ -105,7 +105,7 @@ remove snippets introduced by the failed update; inspect and reconcile those
 before restarting. Restore separately backed-up TLS files, wrappers and service
 overrides as needed. Package scripts may restart the service during rollback too.
 
-## SLES 15 SP4 rollback
+## SLES 15 SP3 rollback
 
 From the saved `previous/` directory:
 

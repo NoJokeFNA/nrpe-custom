@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 . /etc/os-release
-[[ "$ID" == sles && "$VERSION_ID" == 15.4 && "$(uname -m)" == x86_64 ]] || {
-  echo 'ERROR: Expected SLES 15 SP4 on x86_64' >&2; exit 1;
+[[ "$ID" == sles && "$VERSION_ID" == 15.3 && "$(uname -m)" == x86_64 ]] || {
+  echo 'ERROR: Expected SLES 15 SP3 on x86_64' >&2; exit 1;
 }
 workdir="$(mktemp -d /tmp/nrpe-rpm-build.XXXXXXXX)"
 trap 'rm -rf "$workdir"' EXIT
@@ -37,7 +37,7 @@ rpm2cpio "$package" > "$workdir/package.cpio"
 (cd "$workdir/extracted"; cpio -id --quiet './etc/nrpe.cfg' < "$workdir/package.cpio")
 grep -Eq '^dont_blame_nrpe=0[[:space:]]*$' "$workdir/extracted/etc/nrpe.cfg"
 
-outdir=/output/sles15sp4
+outdir=/output/sles15sp3
 sources=("$workdir"/SRPMS/nrpe-*.src.rpm)
 helpers=(/opt/nrpe-user-package/system-user-nagios-*.noarch.rpm)
 helper_sources=(/opt/nrpe-user-package/system-user-nagios-*.src.rpm)

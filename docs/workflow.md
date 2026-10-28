@@ -1,6 +1,6 @@
 # Workflow reference
 
-Build Debian `nagios-nrpe-server` packages and a SLES 15 SP4
+Build Debian `nagios-nrpe-server` packages and a SLES 15 SP3
 `nrpe` RPM using the distribution packaging recipes, with command arguments
 compiled in and runtime argument handling disabled by default.
 
@@ -69,11 +69,11 @@ python3 nrpe.py logs --last
 
 SLES builds use SLE/Package Hub binary dependencies and pinned OBS sources, with
 no Leap base image or Leap repository added. Original SUSE signatures and source
-checksums are verified. If you want to supply official SP4 Full Media1 as an
+checksums are verified. If you want to supply official SP3 Full Media1 as an
 additional package source, extract it outside the checkout and use:
 
 ```powershell
-python3 nrpe.py verify sles15sp4 --sles-media "C:\SLES15-SP4"
+python3 nrpe.py verify sles15sp3 --sles-media "C:\SLES15-SP3"
 ```
 
 The same media option is supported by `build`, `test`, and the compatibility wrapper.
@@ -81,7 +81,7 @@ All targets also support an optional `--ca-cert FILE` for a company public CA
 in PEM or DER format, or `NRPE_CA_CERT`. See the
 [network guide](network.md#optional-company-ca-certificate).
 The media are mounted read-only during image builds and container runs. See
-[the SLES guide](sles15sp4.md) for download and repository installation steps.
+[the SLES guide](sles15sp3.md) for download and repository installation steps.
 
 Use `test` for packages you have already built locally. It checks the bytes in
 `output/`; it does not establish that they were built from the current checkout.
@@ -127,7 +127,7 @@ The previous commands remain supported through a compatibility wrapper:
 | `debian12` | Debian 12 Bookworm | amd64 | `output/debian12/` |
 | `debian13` | Debian 13 Trixie | amd64 | `output/debian13/` |
 | `debian14` | Debian 14 Forky | amd64 | `output/debian14/` |
-| `sles15sp4` | SLES 15 SP4 | x86_64 | `output/sles15sp4/` |
+| `sles15sp3` | SLES 15 SP3 | x86_64 | `output/sles15sp3/` |
 
 `all` includes every target, including the SLES target. To validate
 only Debian, list `debian11 debian12 debian13 debian14` explicitly.
@@ -139,9 +139,9 @@ Debian 11 has been built and installation/TLS argument tests have passed here
 with `4.0.3-1+withargs1`. This is historical archive availability, not a promise
 of ongoing security updates for this old release.
 
-SLES uses an actual SLES 15 SP4 BCI base, not a Debian or Leap replacement.
+SLES uses an actual SLES 15 SP3 BCI base, not a Debian or Leap replacement.
 Its RPM recipe, pinned sources, prerequisites, and validation limits
-are documented in [SLES 15 SP4](sles15sp4.md).
+are documented in [SLES 15 SP3](sles15sp3.md).
 
 Each Debian target uses a corresponding Debian container with a shared Dockerfile.
 The build enables source repositories, installs build dependencies, and fetches
@@ -198,7 +198,7 @@ argument responses with `dont_blame_nrpe=1`.
 
 These tests need the target distribution's repository access and run NRPE directly. They do not
 validate systemd startup, external network access, production certificates, or a
-complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 15 SP4 has also passed a full controller verify run with RPM build,
+complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 15 SP3 has also passed a full controller verify run with RPM build,
 installation, and TLS argument tests; see its target notes. Do not interpret passing
 unit tests as successful package builds for every target.
 
