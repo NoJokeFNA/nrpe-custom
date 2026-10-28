@@ -385,62 +385,118 @@ def browse_certificate(start=None):
     return _browse(location, select_file=True)
 
 
-def workflow(root, action):
-    targets = choose('Select targets', [(name, name) for name in TARGETS], multiple=True)
-    if targets is None:
-        return None
-    pull = False
-    certificate = os.environ.get("NRPE_CA_CERT")
+TARGET_LABELS = {
+    'debian11': 'Debian 11 / Bullseye', 'debian12': 'Debian 12 / Bookworm',
+    'debian13': 'Debian 13 / Trixie', 'debian14': 'Debian 14 / Forky (testing)',
+    'sles12sp3': 'SLES 12 SP3',
+}
+
+
+def new_session():
+    certificate = os.environ.get('NRPE_CA_CERT')
+    return {'targets': [], 'pull': False, 'certificate': certificate,
+            'certificate_source': 'environment' if certificate else 'none'}
+
+
+def certificate_settings(session):
+    """Change public build-CA settings only after successful validation."""
+    source = choose('Company CA certificate / this session', [
+        ('none', 'Do not use a company CA for this session'),
+        ('default', 'Use NRPE_CA_CERT from the environment'),
+        ('browse', 'Browse a public .cer/.crt/.pem certificate'),
+        ('path', 'Enter or paste a certificate path')],
+        description='This CA trusts build downloads; it does not configure NRPE server/client TLS or Docker registry trust.')
+    if source is None:
+        return
+    if source == 'none':
+        session.update(certificate=None, certificate_source='disabled')
+        return
+    value = (os.environ.get('NRPE_CA_CERT') if source == 'default' else
+             enter_path('Company CA certificate', kind='file') if source == 'path' else
+             browse_certificate(session['certificate']))
+    if value is None and source != 'default':
+        return
+    from .certificates import prepared_certificate
+    try:
+        with prepared_certificate(value):
+            session.update(certificate=str(value) if value else None,
+                           certificate_source='environment' if source == 'default' and value
+                           else 'manual' if value else 'none')
+    except (OSError, RuntimeError) as exc:
+        choose(f'Invalid CA certificate: {exc}', [(None, 'Back to options')])
+
+
+def workflow(root, action, session=None):
+    session = new_session() if session is None else session
+    states = [{}, {}]
+    step = 0
     while True:
-        options = [
-            ('run', 'Continue to review'),
-            ('pull', f'Check for updated base images: {"yes" if pull else "no"}'),
-            ('certificate', f'Company CA certificate: {certificate or "none"}'),
-        ]
-        answer = choose('Workflow options', options)
-        if answer is None:
-            return None
-        if answer == 'pull':
-            pull = not pull
-        elif answer == 'certificate':
-            source = choose('Company CA certificate', [
-                ('default', 'Default (NRPE_CA_CERT if configured; otherwise none)'),
-                ('browse', 'Browse a public .cer/.crt/.pem certificate'),
-                ('path', 'Enter or paste a certificate path')])
-            if source == 'default':
-                certificate = os.environ.get('NRPE_CA_CERT')
-                continue
-            if source is None:
-                continue
-            selected = (enter_path('Company CA certificate', kind='file')
-                        if source == 'path' else browse_certificate(certificate))
-            if selected is not None:
+        if step == 0:
+            options = [(name, TARGET_LABELS[name] + (' / package present' if package_files(root, name) else ''),
+                        'linux/amd64; package presence is not a successful checksum or integration check.')
+                       for name in TARGETS]
+            targets = choose(f'1/3 / {action} / Select targets', options, multiple=True,
+                             selected=session['targets'], state=states[0])
+            if targets is None:
+                return None
+            session['targets'] = targets
+            step = 1
+        elif step == 1:
+            source = session['certificate_source']
+            certificate = session['certificate']
+            options = [('run', 'Continue to review')]
+            if action in ('build', 'verify'):
+                options.append(('pull', f'Check for updated base images: {"yes" if session["pull"] else "no"}'))
+            options.append(('certificate', f'Company CA [{source}]: {compact(certificate) if certificate else "none"}'))
+            if certificate:
+                options.append(('certificate-info', 'Show complete certificate path'))
+            answer = choose(f'2/3 / {action} / Workflow options', options, state=states[1],
+                            description='Esc returns to target selection without losing choices. Settings last only for this menu session.')
+            if answer is None:
+                step = 0
+            elif answer == 'pull':
+                session['pull'] = not session['pull']
+            elif answer == 'certificate':
+                certificate_settings(session)
+            elif answer == 'certificate-info':
+                view_text('Build CA certificate / ' + source, certificate)
+            elif answer == 'run':
+                # Environment defaults must also be validated before confirmation.
                 from .certificates import prepared_certificate
                 try:
-                    with prepared_certificate(selected):
-                        certificate = str(selected)
+                    with prepared_certificate(certificate):
+                        pass
                 except (OSError, RuntimeError) as exc:
                     choose(f'Invalid CA certificate: {exc}', [(None, 'Back to options')])
+                    continue
+                step = 2
         else:
-            break
-    existing = [name for name in targets if package_files(root, name)]
-    replacing = action in ('build', 'verify') and bool(existing)
-    review = (f'Review workflow\nAction: {action}\nTargets: {", ".join(targets)}'
-              f'\nUpdate base images: {pull}'
-              + (f'\nCompany CA certificate: {certificate}' if certificate else '')
-              + (f'\nRebuild existing packages: {", ".join(existing)}' if replacing else ''))
-    if choose(review, [(False, 'Cancel'), (True, 'Run selected workflow')]) is not True:
-        return None
-    arguments = [action, *targets]
-    if pull:
-        arguments.append('--pull')
-    if certificate:
-        arguments.extend(["--ca-cert", certificate])
-    if replacing:
-        # The review above is the explicit rebuild confirmation. Do not prompt
-        # again through input(), which would break arrow-only navigation.
-        arguments.append('--rebuild')
-    return arguments
+            targets = session['targets']
+            existing = [name for name in targets if package_files(root, name)]
+            replacing = action in ('build', 'verify') and bool(existing)
+            pull = session['pull'] and action != 'test'
+            review = (f'3/3 / Review workflow\nAction: {action} / Targets: {", ".join(targets)}'
+                      f'\nUpdate base images: {pull}'
+                      f'\nCompany CA [{session["certificate_source"]}]: {compact(session["certificate"] or "none")}'
+                      + (f'\nRebuild existing packages: {", ".join(existing)}' if replacing else ''))
+            answer = choose(review, [(False, 'Cancel'), ('back', 'Back to options'),
+                                    (True, 'Run selected workflow')],
+                            description='Containers build/test packages; this never installs them on your workstation. Cancel is selected by default.')
+            if answer == 'back':
+                step = 1
+                continue
+            if answer is not True:
+                return None
+            arguments = [action, *targets]
+            if pull:
+                arguments.append('--pull')
+            if session['certificate']:
+                arguments.extend(['--ca-cert', session['certificate']])
+            elif session['certificate_source'] == 'disabled':
+                arguments.append('--no-ca-cert')
+            if replacing:
+                arguments.append('--rebuild')
+            return arguments
 
 
 def run_menu(root, dispatch):
@@ -453,6 +509,7 @@ def run_menu(root, dispatch):
                ('logs', 'View run logs', 'Select a recorded run; / filters its date, targets and result.'),
                ('quit', 'Quit')]
     home_state = {}
+    session = new_session()
     docker_status = 'not checked'
     try:
         while True:
@@ -465,7 +522,7 @@ def run_menu(root, dispatch):
             if action is None or action == 'quit':
                 return 0
             if action in ('verify', 'build', 'test'):
-                arguments = workflow(root, action)
+                arguments = workflow(root, action, session)
                 if arguments is None:
                     continue
             elif action == 'logs':

@@ -114,8 +114,11 @@ def parser():
                              help="one or more targets: " + ", ".join(TARGETS) + "; or all by itself")
         command.add_argument("--pull", action="store_true",
                              help="check for updated base images before building images")
-        command.add_argument("--ca-cert", metavar="FILE",
+        trust = command.add_mutually_exclusive_group()
+        trust.add_argument("--ca-cert", metavar="FILE",
                              help="optional company CA in PEM or DER format (.cer/.crt/.pem); or set NRPE_CA_CERT")
+        trust.add_argument("--no-ca-cert", action="store_true",
+                           help="do not use a company CA, even if NRPE_CA_CERT is set")
         if action != "test":
             command.add_argument("--rebuild", action="store_true",
                                  help="explicitly allow rebuilding existing package outputs")
@@ -197,7 +200,7 @@ def main(argv=None, root=ROOT):
                     return 0
                 rebuild = True
         options = {"rebuild": rebuild, "pull": args.pull}
-        with prepared_certificate(args.ca_cert or os.environ.get("NRPE_CA_CERT")) as certificate:
+        with prepared_certificate(None if args.no_ca_cert else args.ca_cert or os.environ.get("NRPE_CA_CERT")) as certificate:
             if certificate is not None:
                 options["ca_cert"] = certificate
             return execute(args.action, targets, root, **options)
