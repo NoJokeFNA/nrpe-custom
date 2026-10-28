@@ -295,6 +295,23 @@ img,svg{
 .hero h1 span{
   color:var(--accent)
 }
+.typewriter-word{
+  white-space:nowrap
+}
+.animation-toggle{
+  display:block;
+  margin:-12px 0 15px;
+  padding:0;
+  border:0;
+  background:none;
+  color:var(--muted);
+  font-size:11px;
+  text-decoration:underline;
+  text-underline-offset:3px
+}
+.animation-toggle[hidden]{
+  display:none
+}
 .hero-copy>p{
   max-width:480px;
   font-size:16px;

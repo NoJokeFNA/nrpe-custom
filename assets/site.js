@@ -1,4 +1,63 @@
 const base = document.body.dataset.base || '';
+// Keep the heading's accessible name and layout stable throughout each cycle.
+const typewriter = document.querySelector('[data-typewriter]');
+const animationToggle = document.querySelector('[data-typewriter-toggle]');
+if (typewriter && animationToggle && typeof typewriter.animate === 'function') {
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const characters = [];
+  const words = typewriter.textContent.split(/(\s+)/);
+  typewriter.replaceChildren();
+  for (const word of words) {
+    if (/^\s+$/.test(word)) {
+      typewriter.append(document.createTextNode(word));
+      continue;
+    }
+    const group = document.createElement('span');
+    group.className = 'typewriter-word';
+    for (const letter of word) {
+      const character = document.createElement('span');
+      character.textContent = letter;
+      group.append(character);
+      characters.push(character);
+    }
+    typewriter.append(group);
+  }
+  let timer;
+  let animations = [];
+  let paused = false;
+  let inView = true;
+  const stop = () => {
+    clearTimeout(timer);
+    for (const animation of animations) animation.cancel();
+    animations = [];
+  };
+  const cycle = () => {
+    stop();
+    animations = characters.map((character, index) => character.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: 1, delay: index * 85, fill: 'both' }
+    ));
+    timer = setTimeout(cycle, 10000);
+  };
+  const update = () => {
+    stop();
+    animationToggle.hidden = motion.matches;
+    animationToggle.textContent = paused ? 'Resume animation' : 'Pause animation';
+    if (!motion.matches && !paused && !document.hidden && inView) {
+      timer = setTimeout(cycle, 600);
+    }
+  };
+  animationToggle.addEventListener('click', () => { paused = !paused; update(); });
+  motion.addEventListener('change', update);
+  document.addEventListener('visibilitychange', update);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      update();
+    }).observe(typewriter);
+  }
+  update();
+}
 const search = document.querySelector('#site-search');
 const results = document.querySelector('#search-results');
 let indexPromise;
