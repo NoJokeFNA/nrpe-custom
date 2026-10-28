@@ -183,6 +183,8 @@ def choose(title, options, *, multiple=False, selected=(), state=None, descripti
         return [('class:muted', safe(text))]
 
     control = FormattedTextControl(render, focusable=True, show_cursor=False)
+    body = Window(control, wrap_lines=False, allow_scroll_beyond_bottom=False,
+                  get_vertical_scroll=lambda window: state.get('scroll', 0))
     keys = 'Arrows: move  Enter: select  /: filter  ?: help  Esc: back'
     if multiple:
         keys = 'Arrows: move  Space: toggle  A: visible  Enter: next  Esc: back'
@@ -193,7 +195,7 @@ def choose(title, options, *, multiple=False, selected=(), state=None, descripti
         Window(FormattedTextControl(lambda: [('class:muted',
             f' Filter: {safe(query)}' + ('_' if filtering else '') +
             (f'   Selected: {len(marked)}' if multiple else ''))]), height=1),
-        Window(control, wrap_lines=False, allow_scroll_beyond_bottom=False),
+        body,
         Window(FormattedTextControl(detail), wrap_lines=True, height=Dimension(min=1, max=3)),
         Window(FormattedTextControl(lambda: [('class:error', message)]), height=1),
         Window(FormattedTextControl(keys), wrap_lines=True, height=Dimension(min=1, max=2)),
@@ -206,6 +208,7 @@ def choose(title, options, *, multiple=False, selected=(), state=None, descripti
         color_depth=ColorDepth.DEPTH_1_BIT if monochrome else None,
         mouse_support=False,
     )
+    app.after_render += lambda application: state.update(scroll=body.vertical_scroll)
     return app.run()
 
 
@@ -290,6 +293,7 @@ def view_text(title, text):
     from prompt_toolkit.layout.controls import FormattedTextControl
     from prompt_toolkit.widgets import TextArea, SearchToolbar
     from prompt_toolkit.output import ColorDepth
+    from prompt_toolkit.search import start_search, stop_search
 
     search = SearchToolbar()
     area = TextArea(text='\n'.join(safe(line) for line in text.splitlines()), read_only=True,
@@ -299,7 +303,14 @@ def view_text(title, text):
     @bindings.add('escape', eager=True)
     @bindings.add('c-c')
     def close(event):
-        event.app.exit()
+        if event.app.layout.has_focus(search):
+            stop_search()
+        else:
+            event.app.exit()
+
+    @bindings.add('c-f')
+    def find(event):
+        start_search(area.control)
 
     Application(layout=Layout(HSplit([
         Window(FormattedTextControl(safe(title)), height=1), area, search,
