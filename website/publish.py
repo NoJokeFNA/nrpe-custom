@@ -22,12 +22,12 @@ def git(root, *arguments, **kwargs):
     return subprocess.check_output(['git', *arguments], cwd=root, text=True, **kwargs).strip()
 
 
-def publish(root, output, push=False, remote='origin'):
+def publish(root, output, push=False, remote='origin', allow_topic=False):
     commit, dirty = identity(root)
     if dirty or not commit:
         raise RuntimeError('Publication requires a clean committed source checkout')
-    if git(root, 'branch', '--show-current') not in ('develop', 'master'):
-        raise RuntimeError('Integrate and review website sources in develop before publication')
+    if git(root, 'branch', '--show-current') not in ('develop', 'master') and not allow_topic:
+        raise RuntimeError('Explicitly review website topic sources and use --allow-topic for separate publication')
     manifest = json.loads((output / 'site-manifest.json').read_text(encoding='utf-8'))
     if (manifest.get('generator') != 'nrpe-custom-pages' or manifest.get('source_commit') != commit
             or manifest.get('dirty') is not False or manifest.get('base_path') != BASE
@@ -86,8 +86,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, default=ROOT / '.nrpe/site/nrpe-custom')
     parser.add_argument('--push', action='store_true')
+    parser.add_argument('--allow-topic', action='store_true',
+                        help='Publish reviewed topic sources without merging them into develop/master')
     args = parser.parse_args()
-    publish(ROOT, args.directory, args.push)
+    publish(ROOT, args.directory, args.push, allow_topic=args.allow_topic)
 
 
 if __name__ == '__main__':

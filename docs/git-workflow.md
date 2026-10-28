@@ -46,8 +46,8 @@ commits or automatically merge update PRs.
 ## Topic branch cleanup
 
 `gh-pages` is the website deployment branch, not a topic branch. Website sources
-follow the normal topic-to-develop review flow; an explicitly requested
-publication appends a human-authored generated-site commit to gh-pages. It does
+remain on their separate website topic branch unless the maintainer requests
+integration. An explicitly requested publication appends a human-authored generated-site commit to gh-pages. It does
 not promote develop to master. See [website publication](website.md).
 
 Leave GitHub's unrestricted **Automatically delete head branches** setting off.

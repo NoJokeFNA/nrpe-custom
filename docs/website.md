@@ -37,17 +37,23 @@ publishes automatically, preserving human-only Git authorship.
 
 ## Reviewed publication to gh-pages
 
-Work on a topic branch, review and integrate into develop. Publication requires
-a separate explicit maintainer request. From the exact clean develop or master
-commit that should be shown on the website:
+Hosting uses **gh-pages**, not develop. The initial website sources remain on
+`feat/github-pages-documentation`; its develop PR was closed without merging,
+as requested by the maintainer. Publishing does not require integrating website
+changes into develop or master. Keep that source branch while it is unmerged.
+
+Publication requires an explicit maintainer request and an exact clean reviewed
+source commit. From the separate website source branch:
 
 ```sh
 .nrpe/site-venv/bin/python website/build.py
-.nrpe/site-venv/bin/python website/publish.py
-.nrpe/site-venv/bin/python website/publish.py --push
+.nrpe/site-venv/bin/python website/publish.py --allow-topic
+.nrpe/site-venv/bin/python website/publish.py --allow-topic --push
 ```
 
-The default is a read-only preview. `--push` checks source identity, base path,
+`--allow-topic` explicitly permits publishing reviewed topic sources without
+integration; it does not weaken clean-checkout or asset checks. The default
+is a read-only preview. `--push` checks source identity, base path,
 all asset hashes and the human author/committer. A separate temporary Git index
 creates a commit containing only the generated website, without replacing the
 source checkout/index. Deployment history is appended on **gh-pages** with an
