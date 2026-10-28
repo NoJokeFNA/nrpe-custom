@@ -96,19 +96,19 @@ for current upstream maintenance status. An archived target that still builds
 does not necessarily receive dependency security fixes. Never silently substitute
 another suite, SLES service pack, or Leap packages to preserve a passing result.</p>
 <h2 id="automated-dependency-monitoring">Automated dependency monitoring</h2>
-<p><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/.github/dependabot.yml">Dependabot</a> checks Python requirements and pinned
+<p><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/.github/dependabot.yml">Dependabot</a> checks Python requirements and pinned
 GitHub Actions weekly and proposes update PRs into <code>develop</code>, without automatic
 merging. Bot proposals need human-reviewed/authored integration under the
 <a href="/nrpe-custom/git-workflow/">Git policy</a>.
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
 checkout configuration does not override those settings.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/.github/workflows/dependency-audit.yml">dependency audit</a> runs weekly,
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/.github/workflows/dependency-audit.yml">dependency audit</a> runs weekly,
 on relevant requirement changes, and manually. Pinned <code>pip-audit</code> checks menu
 requirements and resolved dependencies against published advisories. Findings
 and collection failures fail the job. It does not scan NRPE C code, DEB/RPM
 contents, system libraries, container images or SLES repositories. A clean result
 is not a security certification.</p>
-<p>The separate <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/.github/workflows/website.yml">website check</a> audits
+<p>The separate <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/.github/workflows/website.yml">website check</a> audits
 <code>requirements-website.txt</code> and validates generated documentation and publication
 guards. The renderer is isolated from the NRPE CLI/menu environment.</p>
 <p>To reproduce the audit using Python 3.10+ in an isolated development environment:</p>
@@ -159,7 +159,7 @@ keys, company certificates, credentials, full environments or configuration
 backups. Follow <a href="/nrpe-custom/security/">security reporting guidance</a> for vulnerabilities.</p>
 <p>Use <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a> for deployments. Recovery on a
 real server is distinct from rebuilding a package in a container.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/maintenance.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/docs/maintenance.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -182,7 +182,7 @@ real server is distinct from rebuilding a package in a container.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 14bd85f</span>
+<span>Source 8a2b3d3</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

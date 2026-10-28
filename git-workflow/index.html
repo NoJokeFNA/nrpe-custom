@@ -75,8 +75,8 @@ branch with the human author's commit before integration. Do not merge bot-autho
 commits or automatically merge update PRs.</p>
 <h2 id="topic-branch-cleanup">Topic branch cleanup</h2>
 <p><code>gh-pages</code> is the website deployment branch, not a topic branch. Website sources
-remain on their separate website topic branch unless the maintainer requests
-integration. An explicitly requested publication appends a human-authored generated-site commit to gh-pages. It does
+follow the normal topic-to-develop review flow; an explicitly requested
+publication appends a human-authored generated-site commit to gh-pages. It does
 not promote develop to master. See <a href="/nrpe-custom/website/">website publication</a>.</p>
 <p>Leave GitHub's unrestricted <strong>Automatically delete head branches</strong> setting off.
 It cannot express the required distinction between topic branches and the
@@ -91,7 +91,7 @@ state, and remove the corresponding local topic only when its work is integrated
 Never use <code>gh pr merge --delete-branch</code> for a develop-to-master promotion.
 Legacy branches outside the named prefixes are not automatically removed.</p>
 <h2 id="server-side-protection-one-time-administrator-action">Server-side protection: one-time administrator action</h2>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
 long-lived branches against deletion and force-pushes, requires PRs and resolved
 review threads, and requires the branch/author policy and all fast CI checks.
 It does not impose an extra reviewer count on a single-maintainer repository.</p>
@@ -114,7 +114,7 @@ branch <code>master</code> and global head-branch deletion disabled. Repository 
 are separate from workflow guards; verify both rather than assuming that a
 committed template establishes protection.</p>
 <p>See <a href="/nrpe-custom/releases/">release automation</a> for what a master push does.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/git-workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/docs/git-workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -135,7 +135,7 @@ committed template establishes protection.</p>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 14bd85f</span>
+<span>Source 8a2b3d3</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
