@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Build and NRPE diagnostics · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a aria-current="page" href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Build and NRPE diagnostics</h1>
+      <article class="prose"><p>Failed workflow commands retain their original exit status and raw output in
+the local run log. Recognized failures add contextual hints. Successful commands
+do not emit failure hints, including when a retry recovered from an earlier
+error. Hints classify observed messages; they do not establish a root cause.</p>
+<h2 id="inspect-an-existing-log">Inspect an existing log</h2>
+<pre><code class="language-sh">python3 nrpe.py diagnose ./build.log
+python3 nrpe.py diagnose ./build.log --ca-configured
+python3 nrpe.py diagnose ./redacted-nrpe.log --context nrpe
+</code></pre>
+<p><code>diagnose</code> reads a local text file without Docker or a connection to the server.
+It executes no log content, prints category hints rather than raw lines, and
+does not mark any workflow as passed. Exit 0 means the file was read successfully,
+not that the recorded build/check succeeded. No recognized failure is not a pass.
+Use <code>--ca-configured</code> only when the recorded build was actually given a CA.</p>
+<p>The default context is build/download failures. Use <code>--context nrpe</code> for daemon
+or <code>check_nrpe</code> logs: build-time CA configuration and deployed client/server TLS
+are separate. On servers without Python, review/redact the log and copy it to
+the workstation running this tool. Never share credentials, private keys or full
+environment dumps. Keep raw local logs outside Git.</p>
+<h2 id="interpret-the-categories">Interpret the categories</h2>
+<table>
+<thead>
+<tr>
+<th>Observed error</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issuer unknown / certificate verification failed</td>
+<td>Build: issuing CA and chain, certificate dates/name and clock. If company HTTPS inspection is used, pass its reviewed CA with <code>--ca-cert</code> or <code>NRPE_CA_CERT</code>. A supplied CA does not guarantee it is the right issuer.</td>
+</tr>
+<tr>
+<td>Expired certificate / hostname mismatch</td>
+<td>Correct the certificate, endpoint or clock; adding an unrelated CA cannot fix these.</td>
+</tr>
+<tr>
+<td>Image/frontend pull trust failure</td>
+<td>Configure trust in Docker Desktop/Engine and BuildKit. The build's <code>--ca-cert</code> does not configure engine trust.</td>
+</tr>
+<tr>
+<td>Proxy authentication / HTTP 407</td>
+<td>Proxy reachability and credentials for the affected component. A CA cannot fix proxy authentication.</td>
+</tr>
+<tr>
+<td>DNS resolution failure</td>
+<td>Name resolution on the host and inside the affected Docker component, including VPN/proxy configuration.</td>
+</tr>
+<tr>
+<td>Missing or expired repository metadata</td>
+<td>Actual suite/service pack, repository URL, access rights and clock. Do not disable signatures/validity or substitute another distribution.</td>
+</tr>
+<tr>
+<td>Checksum, signature or pinned-input mismatch</td>
+<td>Stop and investigate the reviewed source/key/hash. Do not replace hashes or bypass signatures to obtain a pass.</td>
+</tr>
+<tr>
+<td>No space left</td>
+<td>Host and Docker storage separately. Preview <a href="/nrpe-custom/local-cleanup/">local cleanup</a>; it does not prune BuildKit caches or delete current packages.</td>
+</tr>
+<tr>
+<td>Connection refused</td>
+<td>Intended address/port, listener, daemon startup logs and any firewall REJECT. The connection failed before TLS negotiation.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="nrpe-on-a-deployed-sles-12-sp3-host">NRPE on a deployed SLES 12 SP3 host</h2>
+<p>For <code>Could not complete SSL handshake. 1</code>, compare both NRPE and OpenSSL versions,
+TLS versions, shared authenticated ciphers and CA/server/client certificate
+settings. The message alone does not prove that a CA is missing. NRPE 2.15's
+legacy anonymous DH and NRPE 4.x certificate authentication are different modes.</p>
+<p><code>Receive header underflow</code> can also result from mismatched TLS modes/packet
+versions or access rejection. Check <code>-2</code> for NRPE 2.x, <code>allowed_hosts</code>, TCP wrappers
+and simultaneous server logs before attributing it to certificates.</p>
+<p>The <a href="/nrpe-custom/sles12sp3-plaintext-diagnostic/">anonymized SLES 12 SP3 diagnostic</a> records
+the separate plaintext test, unsupported <code>-f</code> option, configuration permissions,
+wrong-host bind error and cleanup. Plaintext is temporary test evidence, not a
+production fix. Use the <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">authenticated TLS configuration</a>
+for the custom NRPE 4.1.1 build. Do not apply modern <code>ssl_*</code> directives or
+<code>disable_syslog=0</code> to an NRPE 2.15 configuration.</p>
+<p>Inspect the real service definition and process command before changing startup
+options. A manually started daemon is not managed by systemd; a failed second
+service start can simply mean its port/PID is already occupied. Do not launch
+another instance or remove live locks to hide that condition.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#inspect-an-existing-log">Inspect an existing log</a></li>
+<li><a href="#interpret-the-categories">Interpret the categories</a></li>
+<li><a href="#nrpe-on-a-deployed-sles-12-sp3-host">NRPE on a deployed SLES 12 SP3 host</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

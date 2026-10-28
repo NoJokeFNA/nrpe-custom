@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Documentation website and GitHub Pages · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Documentation website and GitHub Pages</h1>
+      <article class="prose"><p>The website is static HTML/CSS/JavaScript with no analytics, remote fonts,
+submission database or hosted backend. Existing Markdown remains the source of
+documentation. The builder rewrites internal links, creates a local search index
+and checks every generated internal link/anchor. Original third-party notices
+are copied without changing their text.</p>
+<p>Presentation and field notes live under <code>website/</code>. English matches the project
+documentation. The initial SLES note uses only reported observations, not an
+invented testimonial or production TLS claim. New reports follow the
+<a href="/nrpe-custom/field-notes/contributing-a-note/">field-note guide</a>.</p>
+<h2 id="local-preview">Local preview</h2>
+<p>Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
+website dependency:</p>
+<pre><code class="language-sh">python3 -m venv .nrpe/site-venv
+.nrpe/site-venv/bin/python -m pip install -r requirements-website.txt
+.nrpe/site-venv/bin/python website/build.py
+python3 -m http.server 8000 --directory .nrpe/site
+</code></pre>
+<p>Open <code>http://localhost:8000/nrpe-custom/</code>. On Windows use
+<code>.nrpe\site-venv\Scripts\python.exe</code> for environment-local Python commands.
+The production base path is <code>/nrpe-custom</code>; builds for another path cannot be
+published by the guarded publisher. Rebuilds replace only a directory carrying
+this builder's manifest; arbitrary directories, unknown added files and the
+workflow-state root are refused. In-checkout output belongs under
+<code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/.github/workflows/website.yml">website workflow</a> tests rendering, links
+and publication guards and uploads a preview artifact. It never commits or
+publishes automatically, preserving human-only Git authorship.</p>
+<h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
+<p>Hosting uses <strong>gh-pages</strong>, not develop. The initial website sources remain on
+<code>feat/github-pages-documentation</code>; its develop PR was closed without merging,
+as requested by the maintainer. Publishing does not require integrating website
+changes into develop or master. Keep that source branch while it is unmerged.</p>
+<p>Publication requires an explicit maintainer request and an exact clean reviewed
+source commit. From the separate website source branch:</p>
+<pre><code class="language-sh">.nrpe/site-venv/bin/python website/build.py
+.nrpe/site-venv/bin/python website/publish.py --allow-topic
+.nrpe/site-venv/bin/python website/publish.py --allow-topic --push
+</code></pre>
+<p><code>--allow-topic</code> explicitly permits publishing reviewed topic sources without
+integration; it does not weaken clean-checkout or asset checks. The default
+is a read-only preview. <code>--push</code> checks source identity, base path,
+all asset hashes and the human author/committer. A separate temporary Git index
+creates a commit containing only the generated website, without replacing the
+source checkout/index. Deployment history is appended on <strong>gh-pages</strong> with an
+ordinary fast-forward push, never force-pushed. Concurrent changes are rejected.
+Master/develop are not deployment targets and must never be deleted. Do not
+develop features directly on gh-pages or edit generated HTML by hand.</p>
+<p>The site does not update itself after a master push. Rebuild and explicitly
+publish a reviewed commit when docs change; automatic package releases remain
+a separate workflow.</p>
+<h2 id="github-pages-setup-by-the-repository-owner">GitHub Pages setup by the repository owner</h2>
+<p>The requested hosting source is <strong>gh-pages</strong>, repository root. In GitHub:</p>
+<ol>
+<li>Open <strong>Settings → Pages</strong>.</li>
+<li>Select <strong>Deploy from a branch</strong>.</li>
+<li>Select <strong>gh-pages</strong>, <strong>/ (root)</strong>, then save.</li>
+<li>Wait for deployment and verify the homepage, FAQ and a deep link.</li>
+</ol>
+<p>The expected URL is <code>https://nojokefna.github.io/nrpe-custom/</code>. The repository
+visibility is managed by the owner and is not changed by the publisher. Pages
+availability and site visibility depend on GitHub's plan and settings.
+Review content for public disclosure; never include private logs, actual
+infrastructure addresses or keys.</p>
+<p>If the connected integration cannot access the Pages settings API, the owner
+must complete setup in Settings. A pushed branch alone does not prove the
+website is live. Deployment and HTTP/browser checks must complete before
+claiming successful hosting. See
+<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/website.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#local-preview">Local preview</a></li>
+<li><a href="#reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</a></li>
+<li><a href="#github-pages-setup-by-the-repository-owner">GitHub Pages setup by the repository owner</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

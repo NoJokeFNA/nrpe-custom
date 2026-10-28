@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>SLES pinned-source license review · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a aria-current="page" href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>SLES pinned-source license review</h1>
+      <article class="prose"><p>Reviewed on 2026-10-27. The same exact upstream and companion source inputs
+are reused for the SLES 12 SP3 migration on 2026-10-28. Historical binary observations
+below were recorded on SLES 15 SP4 and do not establish SLES 12 SP3 runtime validation.
+The published SLES 12 SP3 build/runtime evidence is in the <a href="/nrpe-custom/release-history/">release history</a>.
+The two previously recorded SLES license-evidence gaps
+are closed for the pinned inputs below. The review also resolves the apparent
+ACL license-version discrepancy. Release completeness, provenance and packaging
+checks still apply; this does not approve redistribution of SLES images,
+installation media, or dependency bundles.</p>
+<h2 id="nrpe-and-openssl-explicit-upstream-permission-found">NRPE and OpenSSL: explicit upstream permission found</h2>
+<p>The original <code>nrpe-4.1.1.tar.xz</code> in the pinned OBS source has SHA-256:</p>
+<pre><code class="language-text">7689aea570596573919371f7d6a1753eca90213368ede51f477e25782eb1ef9c
+</code></pre>
+<p>Its <code>src/utils.c</code>, in <code>display_license()</code> at lines 572–596, contains a
+program-level GPL notice expressly allowing compilation, linking and use with
+OpenSSL. The following text grants GPL version 2 or any later version. This is
+permission in the actual NRPE source, independent of Debian's copyright file.
+The corresponding <a href="https://github.com/NagiosEnterprises/nrpe/blob/nrpe-4.1.1/src/utils.c#L572-L596">upstream release source</a>
+provides a public reference.</p>
+<p>The checked <code>src/utils.c</code> has SHA-256:</p>
+<pre><code class="language-text">75f4ab494d009b09d8358ced0394d80f9476f8ed6f7323c200a007d8cd1a2bd3
+</code></pre>
+<p>The first review searched for "exception" and "permission to link" but missed
+the word "exemption" in this function. The earlier unresolved finding was an
+incomplete search, not evidence that an exception was absent. The notice is
+now retained in <a href="/nrpe-custom/notices/NRPE-license-notice.txt">NRPE-license-notice.txt</a>,
+alongside the original full GPL and <code>LEGAL</code> texts.</p>
+<p>The existing custom RPM was checksum-checked and its binary extracted in an
+offline disposable SLES container. The binary's <code>-l</code> output contains the same
+OpenSSL/GPL notice. This NRPE license-display path exits with status 3 even when
+it prints the notice; the text was checked directly, rather than treating that
+exit status as a successful application test. No server was started and no
+package was installed on the host. No fresh package build was required or run
+for that historical license inspection.</p>
+<h2 id="acl-code-gplv2-or-later-not-a-contradictory-gplv2-only-grant">ACL code: GPLv2-or-later, not a contradictory GPLv2-only grant</h2>
+<p>The full license notices in both <code>include/acl.h</code> and <code>src/acl.c</code> expressly
+permit version 2 or a later version. Their short "License: GPLv2" headings do
+not replace those full grants. The notices retain Kaspersky Lab ZAO's 2011
+copyright and are consistent with Debian's <code>GPL-2+</code> entry.</p>
+<p>Checked file hashes:</p>
+<table>
+<thead>
+<tr>
+<th>File in the pinned archive</th>
+<th>SHA-256</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>include/acl.h</code></td>
+<td><code>323ca78733e229c77ec4e8a37fdc837b47558af11776660753b98023e83e138a</code></td>
+</tr>
+<tr>
+<td><code>src/acl.c</code></td>
+<td><code>73f223aeec851559738d06aa2a4e26319c33300d53082d67f0d8a1fc3ae5ef00</code></td>
+</tr>
+</tbody>
+</table>
+<p>Preserve these original headers in the source RPM; no relicensing or replacement
+copyright notice is necessary.</p>
+<h2 id="companion-user-package-mit-declaration-and-complete-notice">Companion user package: MIT declaration and complete notice</h2>
+<p>The exact source declaration is in the
+<a href="https://api.opensuse.org/public/source/server:monitoring/system-user-nagios/system-user-nagios.spec?rev=b979817ae6424675519c86e80add617a&amp;expand=1">pinned original OBS spec</a>,
+not merely in rebuilt RPM metadata. Its source revision is
+<code>b979817ae6424675519c86e80add617a</code>. The spec is bound by the
+<a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/packaging/sles12sp3-user-source.json">input manifest</a> to SHA-256:</p>
+<pre><code class="language-text">36e678f60dd314addc9098421d432bac932c23f19a7ce8b048cf06b6b9cbc1b7
+</code></pre>
+<p>The source spec was extracted from the companion source RPM and also fetched
+directly from OBS at the pinned revision; both matched the manifest's size and
+hash. It explicitly declares <code>License: MIT</code>; its SUSE LLC 2024 header states
+that the spec and contributed modifications use the pristine package's license,
+subject to the header's stated fallback. SUSE's
+<a href="https://packagehub.suse.com/packages/system-user-nagios/">Package Hub entry</a>
+independently identifies the component as MIT; that entry concerns a different
+distribution build and is corroboration, not the identity evidence for ours.</p>
+<p>The original source package has no standalone full MIT text. This is a missing
+notice asset, not an unidentified license or a need for this project to grant
+rights on SUSE's behalf. The
+<a href="https://spdx.org/licenses/MIT.html">standard MIT terms</a> are now supplied in
+<a href="/nrpe-custom/notices/system-user-nagios-MIT.txt">system-user-nagios-MIT.txt</a>,
+with the original copyright and the original source header kept separately.
+That file is explicitly identified as a downstream companion notice. Standard
+short identifiers identify license texts; see
+<a href="https://spdx.dev/learn/handling-license-info/">SPDX's explanation</a>.</p>
+<h2 id="release-obligations-that-remain">Release obligations that remain</h2>
+<p>The two evidence questions are resolved. A SLES candidate must still include:</p>
+<ul>
+<li>All three complete corresponding source RPMs (NRPE, system user and build
+  macros), manifests and required build scripts.</li>
+<li>The <a href="/nrpe-custom/license-notices/">notice directory</a>, including the
+  original GPL text, OpenSSL notice, trademark notice, companion MIT terms and
+  the build macros' BSD-3-Clause notice.</li>
+<li>Original per-file copyright and license notices inside the source packages.</li>
+<li>Candidate checksums covering every distributed asset and tests bound to the
+  exact server and companion binaries.</li>
+</ul>
+<p>The previously missing OBS <code>.changes</code> history is now retained in the original
+input sets exported by new builds. The release gate verifies the complete OBS
+set and the corresponding SRPMs separately. These additions do not change the
+checked license declarations. See <a href="/nrpe-custom/releases/">release automation</a> and the
+<a href="/nrpe-custom/release-plan/">release plan</a> for candidate checks and integration state.</p>
+<h2 id="native-sles-12-build-macros">Native SLES-12 build macros</h2>
+<p>The port additionally pins <code>nagios-rpm-macros</code> 0.14 at OBS revision
+<code>a911087cc73b87e04465861110d43754</code>. Its original <code>nagios-rpm-macros-COPYING</code>
+grants BSD-3-Clause terms and retains Lars Vogdt's 2011 copyright. The verbatim
+<a href="/nrpe-custom/notices/nagios-rpm-macros-BSD.txt">notice</a>, native source
+RPM and all original source files accompany the port. No macros binary or SLE-12
+dependency bundle is published. The release gate compares the notice directly
+with its hash-checked source input.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/sles-license-review.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#nrpe-and-openssl-explicit-upstream-permission-found">NRPE and OpenSSL: explicit upstream permission found</a></li>
+<li><a href="#acl-code-gplv2-or-later-not-a-contradictory-gplv2-only-grant">ACL code: GPLv2-or-later, not a contradictory GPLv2-only grant</a></li>
+<li><a href="#companion-user-package-mit-declaration-and-complete-notice">Companion user package: MIT declaration and complete notice</a></li>
+<li><a href="#release-obligations-that-remain">Release obligations that remain</a></li>
+<li><a href="#native-sles-12-build-macros">Native SLES-12 build macros</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

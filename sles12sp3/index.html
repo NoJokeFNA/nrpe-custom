@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>SLES 12 SP3 RPM target · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a aria-current="page" href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>SLES 12 SP3 RPM target</h1>
+      <article class="prose"><p>The affected deployment is <strong>SLES 12 SP3</strong>, confirmed by <code>/etc/os-release</code> on
+2026-10-28. Its original package is NRPE <code>2.15-4.24</code>, linked to
+<code>libssl.so.1.0.0</code> and <code>libcrypto.so.1.0.0</code>. Previous SLES 15 SP3/SP4 test results
+do not validate this platform. The active target is now <code>sles12sp3</code>; old releases
+are not overwritten or relabeled.</p>
+<pre><code class="language-sh">python3 nrpe.py verify sles12sp3
+python3 nrpe.py test sles12sp3
+</code></pre>
+<p>Use <code>--rebuild</code> to deliberately replace existing local outputs. Old SLE-15 RPMs
+must not be installed or copied into this target's output directory.</p>
+<h2 id="build-architecture-and-matching-inputs">Build architecture and matching inputs</h2>
+<p>The native build and runtime stages use SUSE's genuine image, pinned to:</p>
+<pre><code class="language-text">registry.suse.com/suse/sles12sp3@sha256:0995dbf051274a3a5baf19c7f94ce7ebe69d7aa91f7b3b22248bd06d7122e53a
+</code></pre>
+<p>Its identity is <code>ID=sles</code>, <code>VERSION_ID=12.3</code>, x86_64, with RPM 4.11.2 and
+OpenSSL 1.0.2j. <code>SLES_BASE_IMAGE</code> can select an approved equivalent, but the
+native guard rejects other distributions/releases and requires the OpenSSL 1.0
+ABI. The runtime image contains no compiler or preinstalled NRPE server.</p>
+<p>The historical image has no configured repositories and the old SP3 backports
+index is empty. Instead, the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/packaging/sles12sp3-bootstrap.json">bootstrap manifest</a>
+pins original SLE-12 GA/SP3 Server and SDK RPMs available through SUSE's public
+OBS API. Each entry records its original URL, size, SHA-256, name, version,
+architecture, vendor and SUSE signing key. No SLE-15 or Leap package is used.</p>
+<p>A separate Python download stage fetches and hash-checks those RPMs and the
+pinned OBS sources. A company CA is added only to that process's TLS context;
+it is not copied into target packages. The actual SLES stage independently
+checks the pinned RPM hashes, required SUSE signatures and package identities
+before installing anything. Downloads are not treated as signature verification.
+Native installation uses the complete local dependency set, retaining normal
+RPM dependency checks; no registration credentials or license terms are supplied
+or accepted by this workflow. No system OpenSSL replacement is required.</p>
+<p>Python is not needed in the old target image. NRPE and its support packages are
+compiled/packaged by SLES 12's own tools. The former <code>--sles-media</code> option and
+SLE-15 module/ISO layout were removed; an ISO is not required by this workflow.</p>
+<h2 id="sources-and-package-identities">Sources and package identities</h2>
+<ul>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/packaging/sles12sp3-source.json">NRPE</a>: reviewed immutable OBS revision
+  <code>835292739a5736a9d8f0460f670b6f15</code>, version <code>4.1.1</code>, local Release <code>0.withargs1</code>.
+  Command arguments remain compiled in, runtime-disabled by default; Bash command
+  substitution stays disabled. This is a native rebuild, not a reproduction of
+  the old installed NRPE 2.15 package.</li>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/packaging/sles12sp3-macros-source.json">Nagios build macros</a>: immutable OBS
+  revision <code>a911087cc73b87e04465861110d43754</code>, version <code>0.14-0</code>, built natively.
+  The upstream spec explicitly supports SLES 12. This build dependency is not
+  faked or supplied by a SLE-15 binary.</li>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/packaging/sles12sp3-user-source.json">Nagios user package</a>: pinned original
+  <code>system-user-nagios 1.0.0-0</code>, built natively after the macros. Existing users
+  and groups are handled by the original package scripts.</li>
+</ul>
+<p><code>output/sles12sp3/</code> contains the server, matching <code>monitoring-plugins-nrpe</code> client,
+real user-package RPM, all three source RPMs, four input manifests, original OBS
+files including history, and <code>SHA256SUMS</code> for all three binary RPMs. The macros'
+build-only binary is not a runtime dependency or release asset. Its corresponding
+source and BSD notice are included for rebuilding the workflow.</p>
+<p>The source/license gate checks every original input and SRPM member, the
+client/server source/version relationship, the bootstrap manifest and component
+notices. See <a href="/nrpe-custom/sles-license-review/">license evidence</a> and the
+<a href="/nrpe-custom/license-notices/">notice directory</a>.</p>
+<h2 id="tls-and-the-original-handshake-failure">TLS and the original handshake failure</h2>
+<p>For the user-performed pre-upgrade diagnostic with NRPE 2.15 and <code>check_nrpe</code>
+4.1.0, see <a href="/nrpe-custom/sles12sp3-plaintext-diagnostic/">isolating an NRPE TLS handshake failure</a>.
+It documents a separate temporary plaintext instance, the successful result and
+cleanup using anonymized hosts and documentation addresses, without modifying
+the production service or reloading systemd.</p>
+<p>NRPE 2.15 uses legacy anonymous DH. Merely enabling services or adding modern
+configuration directives does not add certificate support to that old binary.
+This build supplies NRPE 4.1.1 and a matching client against the existing OpenSSL
+1.0 ABI. The integration test explicitly requires <strong>TLS 1.2</strong>, excludes anonymous
+authentication, requires a client certificate and checks rejected/enabled command arguments.
+It does not weaken cipher settings or disable certificate verification to make
+the test pass. TLS 1.3 is not supported by OpenSSL 1.0.2 and is not claimed.</p>
+<p>For the deployed server, back up the old package/configuration, review included
+files and configure compatible CA/server/client certificates on both ends.
+Build-time <code>--ca-cert</code> does not provision production NRPE TLS. The
+<a href="/nrpe-custom/faq/">FAQ</a> distinguishes service startup from TLS compatibility.
+Use the <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">SLES-specific DHE-RSA configuration</a>:
+NRPE 4.1.1 needs DH initialization enabled together with an explicit cipher list
+that excludes anonymous authentication. The modern-client test passed with
+OpenSSL 3.5.7, verified server hostname/chain and a separate required client
+certificate; a connection without that client certificate was rejected.</p>
+<h2 id="recorded-validation-and-limits">Recorded validation and limits</h2>
+<p>The target is published; see the <a href="/nrpe-custom/release-history/#sles-12-sp3-release-2026-10-28">release history</a>
+for exact master-commit, CI and independently checked release-asset evidence.
+Earlier local migration runs are retained in that history. A fresh clean-checkout
+run is required for every release candidate; historical results do not replace it.</p>
+<p>Container tests run NRPE directly. They do not validate real-server systemd,
+reboot, site-specific commands, production certificates, update or rollback.
+Use <a href="/nrpe-custom/installation/#sles-12-sp3">installation</a>, <a href="/nrpe-custom/updates-and-rollback/">rollback</a>
+and <a href="/nrpe-custom/practical-validation/">practical validation</a> before deployment.</p>
+<p>The <a href="https://www.suse.com/lifecycle/">SUSE lifecycle</a> lists SLES 12 SP3 general
+support end as 2019-06-30 and LTSS end as 2022-06-30. This is a requested legacy
+compatibility build, not extended vendor maintenance or certification. Historical
+package/image availability can change and does not guarantee security support.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/sles12sp3.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#build-architecture-and-matching-inputs">Build architecture and matching inputs</a></li>
+<li><a href="#sources-and-package-identities">Sources and package identities</a></li>
+<li><a href="#tls-and-the-original-handshake-failure">TLS and the original handshake failure</a></li>
+<li><a href="#recorded-validation-and-limits">Recorded validation and limits</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

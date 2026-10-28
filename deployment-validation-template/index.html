@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Disposable VM deployment validation record · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Disposable VM deployment validation record</h1>
+      <article class="prose"><p>Template only: no VM scenario has been executed by filling in this document.
+Copy it for each target into an ignored local evidence directory, for example
+<code>.nrpe/validation/debian12.md</code>. Keep raw logs, certificates, keys, access details
+and configuration backups outside Git. Publish only reviewed, sanitized results.</p>
+<p>Follow the <a href="/nrpe-custom/practical-validation/#debian-and-sles-test-vms">practical validation procedure</a>,
+<a href="/nrpe-custom/installation/">installation guide</a> and <a href="/nrpe-custom/updates-and-rollback/">rollback procedure</a>.
+Do not use a production host. An actual VM snapshot and console/recovery access
+are prerequisites; a container is not a replacement for these tests.</p>
+<h2 id="identity-and-preparation">Identity and preparation</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Recorded value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tester / date / timezone</td>
+<td>Not recorded</td>
+</tr>
+<tr>
+<td>Target: debian11 / debian12 / debian13 / debian14 / sles12sp3</td>
+<td>Not selected</td>
+</tr>
+<tr>
+<td>Disposable VM OS, release, architecture and image date</td>
+<td>Not recorded</td>
+</tr>
+<tr>
+<td>VM snapshot and tested console/recovery access</td>
+<td>Not prepared</td>
+</tr>
+<tr>
+<td>Workflow commit / published release tag</td>
+<td>Not selected</td>
+</tr>
+<tr>
+<td>Baseline binary package filename, exact installed version and SHA-256</td>
+<td>Not recorded</td>
+</tr>
+<tr>
+<td>Candidate binary package filename, exact version and SHA-256</td>
+<td>Not recorded</td>
+</tr>
+<tr>
+<td>Trusted checksum/signature verification</td>
+<td>Not performed</td>
+</tr>
+<tr>
+<td>Config/includes/permissions backup and original plugin paths</td>
+<td>Not prepared</td>
+</tr>
+<tr>
+<td>Separate monitoring client version and approved access rules</td>
+<td>Not prepared</td>
+</tr>
+<tr>
+<td>Test CA/server/client identities (no private material)</td>
+<td>Not prepared</td>
+</tr>
+<tr>
+<td>Pre-reboot / post-reboot boot IDs</td>
+<td>Not recorded</td>
+</tr>
+</tbody>
+</table>
+<p>Baseline and candidate must be two distinct real package versions. Verify and
+save the original binaries/checksums before starting; never rename an artifact
+to simulate an update. If either package, repository access or recovery is
+missing, mark the relevant scenarios <strong>blocked</strong> and stop before installation.</p>
+<h2 id="read-only-baseline-inventory">Read-only baseline inventory</h2>
+<p>On the VM, record its actual identity and service definition. Use the correct
+branch below; these commands do not install packages or restart services:</p>
+<pre><code class="language-sh">cat /etc/os-release
+uname -m
+cat /proc/sys/kernel/random/boot_id
+getent passwd nagios
+</code></pre>
+<p>Debian:</p>
+<pre><code class="language-sh">dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' nagios-nrpe-server
+systemctl cat nagios-nrpe-server.service
+systemctl is-enabled nagios-nrpe-server.service
+systemctl is-active nagios-nrpe-server.service
+</code></pre>
+<p>SLES 12 SP3:</p>
+<pre><code class="language-sh">rpm -q --queryformat '%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n' nrpe
+systemctl cat nrpe.service
+systemctl is-enabled nrpe.service
+systemctl is-active nrpe.service
+</code></pre>
+<p>On a fresh VM the package or service may not exist; record that outcome instead
+of treating missing baseline components as an installation pass. Save a baseline
+remote-check result with its exact command, TLS policy and exit status before
+any update. An already failing baseline TLS connection cannot prove successful
+remote-check recovery after rollback.</p>
+<h2 id="execute-and-record-sequentially">Execute and record sequentially</h2>
+<p>Use <strong>passed</strong>, <strong>failed</strong>, <strong>blocked</strong> or <strong>not run</strong> for each scenario. Fill in
+actual commands, exit codes, expected/observed results and reviewed evidence;
+do not prefill a success based on container CI.</p>
+<table>
+<thead>
+<tr>
+<th>Order</th>
+<th>Scenario</th>
+<th>Status</th>
+<th>Expected / observed / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Fresh install on a separate clean snapshot</td>
+<td>Not run</td>
+<td>Correct version, architecture, dependencies and real user; runtime arguments disabled</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Service start and restart</td>
+<td>Not run</td>
+<td>Actual systemd unit active, expected listener, no configuration errors</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Fixed real monitoring plugin</td>
+<td>Not run</td>
+<td>Runs as service user; local and remote output/exit status agree</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Access, TLS and argument policy</td>
+<td>Not run</td>
+<td>Approved client works; invalid credentials/unapproved clients rejected; arguments rejected by default and accepted only after deliberate activation</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Real VM reboot</td>
+<td>Not run</td>
+<td>Boot ID changes, service enabled/active, listener and authenticated remote check recover</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Upgrade from verified baseline to distinct candidate</td>
+<td>Not run</td>
+<td>Expected package version; reviewed config prompts, includes/permissions retained; actual remote check passes</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Package/configuration rollback</td>
+<td>Not run</td>
+<td>Original package and config restored; service and previously working baseline check recover; shared user package retained</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Snapshot recovery, if necessary</td>
+<td>Not run</td>
+<td>Record separately; snapshot restoration does not prove package rollback</td>
+</tr>
+</tbody>
+</table>
+<p>Return to the required baseline snapshot between incompatible scenarios rather
+than carrying changes from the fresh-install test into an alleged baseline
+upgrade. A reboot or migration is performed by the operator only after reviewing
+the disposable VM identity, snapshot and recovery prerequisites.</p>
+<h2 id="completion-and-follow-up">Completion and follow-up</h2>
+<ul>
+<li>Overall result: <strong>not run</strong>.</li>
+<li>Failed/blocked scenarios and concrete reasons: not recorded.</li>
+<li>Restored final state and temporary network/certificate cleanup: not recorded.</li>
+<li>Reviewer and sanitized evidence references: not recorded.</li>
+</ul>
+<p>Update the <a href="/nrpe-custom/release-plan/#remaining-work-in-priority-order">release plan</a> only
+with actual results for the exact tested OS and artifacts. Leave other targets
+open. Windows Docker Desktop validation uses its own procedure and is not
+established by completing this VM worksheet.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/deployment-validation-template.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#identity-and-preparation">Identity and preparation</a></li>
+<li><a href="#read-only-baseline-inventory">Read-only baseline inventory</a></li>
+<li><a href="#execute-and-record-sequentially">Execute and record sequentially</a></li>
+<li><a href="#completion-and-follow-up">Completion and follow-up</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

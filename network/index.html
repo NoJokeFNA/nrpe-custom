@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Network and firewall requirements · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a aria-current="page" href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Network and firewall requirements</h1>
+      <article class="prose"><p>Separate build-time downloads from production NRPE traffic. Builds require
+outbound access, not an inbound NRPE port on the workstation. The default
+integration test keeps both client and server inside one container over loopback.</p>
+<h2 id="connection-map">Connection map</h2>
+<pre><code class="language-mermaid">flowchart LR
+    H[Workstation / Docker daemon] --&gt;|HTTPS 443| REG[Image registries, authentication, and blob storage]
+    C[Build and test containers] --&gt;|HTTP 80 or HTTPS 443| PKG[Distribution package repositories]
+    C --&gt;|HTTPS 443| OBS[OBS source and RPM API]
+    TC[Test client inside container] --&gt;|TLS TCP 5666 over loopback| TS[Test NRPE inside same container]
+    N[Production Nagios server] --&gt;|TLS TCP 5666 by default| P[Production NRPE target]
+</code></pre>
+<h2 id="outbound-destination-inventory">Outbound destination inventory</h2>
+<p>Prefer hostname-aware rules or an approved proxy/mirror. The following is a
+starting inventory derived from the recipes, not an exhaustive static allowlist.
+Registry/repository responses may redirect to other download hosts; resolve those
+through your approved network policy. Do not disable TLS or signature checks to
+work around a firewall rejection.</p>
+<table>
+<thead>
+<tr>
+<th>Hosts</th>
+<th>Ports</th>
+<th>Used by</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>github.com</code></td>
+<td>TCP 443</td>
+<td>Git client</td>
+<td>Clone/update this repository; GitHub releases if used later</td>
+</tr>
+<tr>
+<td><code>registry-1.docker.io</code>, <code>auth.docker.io</code></td>
+<td>TCP 443</td>
+<td>Docker/BuildKit</td>
+<td>Official Debian/Python input-stage images and Dockerfile frontend image/authentication</td>
+</tr>
+<tr>
+<td><code>production.cloudflare.docker.com</code>, <code>production.cloudfront.docker.com</code></td>
+<td>TCP 443</td>
+<td>Docker/BuildKit</td>
+<td>Possible Docker Hub blob/CDN destinations; actual endpoints may differ</td>
+</tr>
+<tr>
+<td><code>registry.suse.com</code></td>
+<td>TCP 443</td>
+<td>Docker/BuildKit</td>
+<td>Genuine SLES 12 SP3 image; follow authorized registry authentication/blob endpoints</td>
+</tr>
+<tr>
+<td><code>deb.debian.org</code>, <code>security.debian.org</code></td>
+<td>TCP 80 and/or 443, matching image APT sources</td>
+<td>Debian containers</td>
+<td>Package indexes, NRPE source, build and runtime dependencies</td>
+</tr>
+<tr>
+<td><code>archive.debian.org</code></td>
+<td>TCP 80 in the current Bullseye security rewrite</td>
+<td>Debian 11 containers</td>
+<td>Archived security packages; APT authenticity checks remain enabled</td>
+</tr>
+<tr>
+<td><code>api.opensuse.org</code></td>
+<td>TCP 443</td>
+<td>SLES input-download stage</td>
+<td>Pinned OBS sources, pinned original SLE-12 Server/SDK RPMs; authoritative signing keys during reviewed updates</td>
+</tr>
+<tr>
+<td><code>pypi.org</code>, <code>files.pythonhosted.org</code></td>
+<td>TCP 443</td>
+<td>Host pip, only when installing the optional menu</td>
+<td>prompt_toolkit and wcwidth</td>
+</tr>
+</tbody>
+</table>
+<p>The default SLES-12 native build and runtime steps install local pinned inputs;
+they need no repository registration or network access after input preparation.
+Custom registries or APT mirrors change the workstation's outbound destinations.
+The controller does not supply subscription credentials or accept terms.</p>
+<p>Configured DNS resolution is also required. Use your network's DNS resolver and
+policy (commonly UDP/TCP 53); no particular public DNS service is required.
+TLS environments may additionally require access to certificate-validation
+services specified by their certificates and local policy.</p>
+<h3 id="why-there-is-no-fixed-public-ip-list">Why there is no fixed public IP list</h3>
+<p>These domains use CDNs, geographic mirrors, authentication services, and changing
+A/AAAA records. An IP returned today can become incorrect or belong to a shared
+service. GitHub's published IP ranges do not cover all registries and package
+mirrors. A one-time DNS lookup is therefore not a durable or least-privilege rule.</p>
+<p>If the firewall accepts only destination IPs, use an approved internal HTTP(S)
+proxy or registry/package mirror with managed addresses. Allow clients to reach
+that internal service, and maintain its external destinations centrally. Internal
+IP addresses and credentials belong in site configuration, not this repository.</p>
+<h2 id="integration-tests">Integration tests</h2>
+<ul>
+<li>The client connects to <code>127.0.0.1:5666</code> inside the test container using TLS.</li>
+<li>No Compose service publishes this port to the Docker host.</li>
+<li>No incoming TCP 5666 rule is needed on the build workstation.</li>
+<li>The temporary configuration permits only loopback. It does not alter production
+  <code>allowed_hosts</code>, certificates, or firewall rules.</li>
+<li>Test image creation and package installation still need the outbound package
+  access described above, unless an approved cache/mirror supplies it.</li>
+</ul>
+<h2 id="production-nrpe">Production NRPE</h2>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Destination</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Explicit Nagios/poller IPs</td>
+<td>NRPE target server</td>
+<td>Allow TCP 5666 inbound on the target, or your configured <code>server_port</code></td>
+</tr>
+<tr>
+<td>NRPE target</td>
+<td>Established monitoring connection</td>
+<td>Permit return traffic through the stateful firewall</td>
+</tr>
+</tbody>
+</table>
+<p>Allow only the actual monitoring servers, including their effective source
+address after NAT where applicable. Use those addresses in NRPE's <code>allowed_hosts</code>
+and configure TLS authentication. NRPE does not normally initiate a new
+connection back to Nagios. Additional connections required by individual check
+plugins are deployment-specific and outside the protocol's port requirement.</p>
+<p>The target server may separately need outbound package-repository access during
+installation and updates. See <a href="/nrpe-custom/security/">deployment security</a>.</p>
+<h2 id="proxies-and-diagnosis">Proxies and diagnosis</h2>
+<p>Docker image pulls, BuildKit downloads, host pip, and programs inside running
+containers are separate clients. Configuring a host proxy alone does not prove
+that every layer can reach its dependencies. Use supported Docker daemon/Desktop
+proxy configuration and Docker client proxy/build configuration as appropriate.
+For TLS inspection, install your organization's trusted CA in each affected
+client/base image; preserve certificate verification.</p>
+<p><code>python3 nrpe.py doctor</code> checks local Docker readiness and Compose configuration.
+It does not probe every remote repository. Inspect the failing phase's log with
+<code>python3 nrpe.py logs --last</code> and your proxy/firewall logs to identify an actual
+blocked hostname or redirect. Do not share unredacted authenticated URLs,
+repository credentials, or complete proxy configuration files.</p>
+<p>When a Docker command fails and its output contains a recognized TLS/certificate
+error, the CLI prints a troubleshooting hint and saves it in the run log. For
+certificate verification errors it indicates whether a company CA was supplied,
+and points to <code>--ca-cert</code> or the menu's certificate selection when none was given.
+A hint identifies a possible cause; it does not prove a company CA is missing.
+Image pulls and Dockerfile frontend downloads require Docker/BuildKit trust
+configuration separately. Successful commands and unrelated failures do not
+produce a TLS hint; the original output and exit code are preserved.</p>
+<h2 id="optional-company-ca-certificate">Optional company CA certificate</h2>
+<p>If your organization inspects HTTPS traffic, the containers must trust the
+organization's issuing CA. For errors such as <code>Curl error 60</code> / <code>self signed
+certificate in certificate chain</code>, select the public root or intermediate CA
+provided by your administrator:</p>
+<pre><code class="language-powershell">python3 nrpe.py verify sles12sp3 --ca-cert &quot;C:\Certificates\Company-Root.cer&quot;
+python3 nrpe.py test debian12 --ca-cert &quot;C:\Certificates\Company-Root.cer&quot;
+</code></pre>
+<p>The option is supported by <code>build</code>, <code>test</code>, <code>verify</code>, and <code>build.py</code>, for every
+target. The menu includes a certificate file browser under Workflow options.
+Alternatively set <code>NRPE_CA_CERT</code> to the local file path; the explicit <code>--ca-cert</code>
+option takes precedence. With neither configured, no extra CA is added.</p>
+<p>Supply <strong>one public X.509 certificate</strong>, in PEM or DER format. <code>.cer</code>, <code>.crt</code>, and
+<code>.pem</code> filenames are supported; the contents determine the format. Bundles and
+private keys are rejected. This is a CA for repository HTTPS, not a production
+NRPE client certificate or key. Keep your file outside the checkout, or under the
+ignored <code>local-certificates/</code> directory. Do not commit company trust material.</p>
+<p>The controller validates and normalizes the certificate in memory and passes its
+PEM contents through the child process environment as a BuildKit secret. No
+temporary certificate file or Windows TEMP path enters the Compose-to-Bake
+handoff. The internal <code>NRPE_CA_PEM</code> variable is set only for the Docker child
+process, using the validated certificate (or an empty value without a CA).
+The normalized SHA-256 is passed separately to invalidate the image cache when
+the certificate changes and is recorded in <code>report.json</code>; its contents are not
+logged. Debian builder and test images install the selected certificate in their
+system trust stores <strong>before</strong> contacting repositories. SLES-12 input downloads
+add it only to their in-memory Python TLS context; the native stages are offline. Debian's minimal-image
+bootstrap preserves existing roots until the regular CA package regenerates the
+full trust database. TLS, APT/zypper signatures, and source checksums stay enabled.</p>
+<p>For Debian, the installed CA and generated trust database remain in local image layers,
+including Docker caches. Do not publish company-specific builder/test images
+without your organization's approval. The CA is not embedded into the exported
+NRPE package. Run subsequent commands without the option/environment variable
+to build images using only their default trust; existing cached images are not
+modified in place.</p>
+<p>The option configures container trust. It cannot fix registry pulls that fail
+<strong>before the Dockerfile runs</strong>, because Docker Desktop/Engine and BuildKit use
+separate trust stores. Configure those through your organization's Docker
+instructions if required. Host pip/Git trust is also separate. Use <code>nrpe.py</code> to
+prepare the secret and its cache identity; direct Compose commands do not
+normalize DER input or calculate that identity for you.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/network.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#connection-map">Connection map</a></li>
+<li><a href="#outbound-destination-inventory">Outbound destination inventory</a><ul>
+<li><a href="#why-there-is-no-fixed-public-ip-list">Why there is no fixed public IP list</a></li>
+</ul>
+</li>
+<li><a href="#integration-tests">Integration tests</a></li>
+<li><a href="#production-nrpe">Production NRPE</a></li>
+<li><a href="#proxies-and-diagnosis">Proxies and diagnosis</a></li>
+<li><a href="#optional-company-ca-certificate">Optional company CA certificate</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

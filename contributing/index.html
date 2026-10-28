@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Contributing · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a aria-current="page" href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Contributing</h1>
+      <article class="prose"><p>Read <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/AGENTS.md">AGENTS.md</a> and the more specific instructions under <code>scripts/</code>
+and <code>tests/</code>. Use the existing checkout and preserve unrelated local changes.
+Write code, comments, documentation, and commits in English. Development is
+independent of editors and operating systems; examples use <code>python3</code>.</p>
+<h2 id="development-checks">Development checks</h2>
+<p>Direct CLI commands need Python 3.9+ and no third-party Python packages. Install
+<code>requirements-menu.txt</code> to work on terminal navigation and run its keyboard tests.
+Builds and installation tests require Docker Engine, Linux containers, BuildKit,
+and Compose 2.17+.</p>
+<p>From the repository root:</p>
+<pre><code class="language-sh">python3 -m pip install -r requirements-menu.txt
+python3 -m unittest discover -s tests -v
+python3 nrpe.py doctor
+</code></pre>
+<p>For shell syntax checks in Bash, check each script explicitly:</p>
+<pre><code class="language-sh">for script in scripts/*.sh examples/*.sh; do bash -n &quot;$script&quot; || exit; done
+</code></pre>
+<p>Without menu dependencies, terminal-input tests are reported as skipped. Workflow
+unit tests must remain independent of Docker and network access. Shell syntax
+and unit tests alone do not establish that packages build or arguments work.</p>
+<p>For a changed build or installation path, run the appropriate targets:</p>
+<pre><code class="language-sh">python3 nrpe.py verify debian12
+python3 nrpe.py verify sles12sp3
+</code></pre>
+<p>Use <code>--rebuild</code> only when replacing existing artifacts intentionally. Validate all
+affected targets when changing shared packaging behavior. Report exactly which
+checks ran, passed, failed, or were skipped, with any platform limitations.
+Native Windows terminal and process behavior need Windows verification; tests on
+Linux do not establish that Windows has been exercised.</p>
+<h2 id="design-boundaries">Design boundaries</h2>
+<p>GitHub Actions runs the unit suite on Linux/Windows with Python 3.9 and 3.14,
+plus Linux shell syntax and both Compose configuration checks. The separate
+weekly dependency audit checks the optional menu requirements. Neither workflow
+performs package/protocol integration tests. See the <a href="/nrpe-custom/maintenance/">maintenance policy</a>
+and inspect actual workflow results for the commit under review.</p>
+<p>Container recipes live under <code>docker/</code>; their build context remains the repository
+root and Compose files remain at that root. Update Compose, <code>doctor</code>, and
+documentation together when moving a recipe.</p>
+<ul>
+<li>Keep UI navigation in <code>nrpe_cli/menu.py</code>; use the existing controller for work.</li>
+<li>Preserve runtime-disabled argument defaults and disabled Bash substitution.</li>
+<li>Keep TLS, repository signatures, source checksums, and RPM verification enabled.</li>
+<li>Match the real target distribution; do not substitute Leap packages for SLES.</li>
+<li>Preserve separate builder/runtime images and meaningful protocol tests.</li>
+<li>Never install the build outputs on the development host during tests.</li>
+<li>Keep artifacts, ISO files, credentials, caches, and local reports out of Git.</li>
+</ul>
+<p>Before removing or combining scripts, consult the
+<a href="/nrpe-custom/architecture/#script-responsibility-review">script responsibility review</a>.
+Fewer files is not a goal if it couples independent package formats or removes
+useful verification boundaries.</p>
+<h2 id="changes-and-pull-requests">Changes and pull requests</h2>
+<p>Start from <code>develop</code> on <code>feat/...</code>, <code>fix/...</code>, <code>refactor/...</code>, or <code>remove/...</code>.
+Open a PR into <code>develop</code>; promote <code>develop</code> to <code>master</code> by PR. Never delete either
+long-lived branch or work directly on it. Use only the human commit author, with
+no co-author or generated-with/by attribution. See the <a href="/nrpe-custom/git-workflow/">Git workflow</a>
+for route/author checks, guarded topic deletion and required administrator setup.</p>
+<p>Keep changes focused and commit independently reviewable changes separately.
+Use <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits</a>, for
+example <code>feat(menu): add target navigation</code> or <code>docs: clarify firewall rules</code>.
+Describe the problem, resulting behavior, and actual validation in pull requests.
+Include relevant logs with private paths, addresses, and credentials removed.</p>
+<p>Use GitHub issues for reproducible non-sensitive bugs and feature proposals.
+For security-sensitive reports, follow <a href="/nrpe-custom/security/">the security guidance</a>.
+Independently authored project code and documentation use the <a href="/nrpe-custom/license/">MIT license</a>.
+Retain all third-party notices; see the <a href="/nrpe-custom/third-party/">license inventory</a>.
+Public binary release preparation follows the <a href="/nrpe-custom/release-plan/">release plan</a>.
+It does not authorize publication or grant new rights to third-party code.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/CONTRIBUTING.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#development-checks">Development checks</a></li>
+<li><a href="#design-boundaries">Design boundaries</a></li>
+<li><a href="#changes-and-pull-requests">Changes and pull requests</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

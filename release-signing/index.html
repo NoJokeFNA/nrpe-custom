@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Release signature setup and verification · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a aria-current="page" href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Release signature setup and verification</h1>
+      <article class="prose"><p>SSH Ed25519 signatures authenticate the release's <code>SHA256SUMS</code> manifest using an
+independently trusted maintainer key. That manifest covers all five target
+archives, workflow sources, notices, metadata and notes. This signs the release
+bundle; it does not add DEB/RPM package signatures or certify software safety.</p>
+<h2 id="rollout-status">Rollout status</h2>
+<p>Signing support is included in the published SLES 12 SP3 release. No production signing
+key is enrolled in <code>packaging/release-allowed-signers</code>. Signing remains off until
+the maintainer completes enrollment, configures the secret/variable and explicitly
+requests promotion to master. The releases recorded in the <a href="/nrpe-custom/release-history/">release history</a> are unsigned;
+enrollment does not retroactively authenticate them or replace their files.</p>
+<p>GitHub's <a href="https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations">artifact attestation requirements</a>
+require Enterprise Cloud for private repositories. This repository is private;
+the connected integration's attestation API read returned HTTP 403, so account
+entitlement/access is not established. The SSH approach needs neither that
+service nor disclosure to a public transparency log. Repository visibility stays
+unchanged. No signing key or secret is generated or configured by this change.</p>
+<h2 id="enroll-a-maintainer-controlled-key">Enroll a maintainer-controlled key</h2>
+<p>Use OpenSSH 8.2+ with <code>ssh-keygen -Y</code> signature support. On a trusted workstation,
+outside the checkout, create a dedicated key if none exists:</p>
+<pre><code class="language-sh">ssh-keygen -t ed25519 -N '' -C nrpe-custom-release -f ./nrpe-release-signing
+ssh-keygen -lf ./nrpe-release-signing.pub
+</code></pre>
+<p>The CI key must be unencrypted for noninteractive use. Protect its private file
+and backup; do not reuse an administrator/login key or commit the private key.
+Only the <code>.pub</code> file and its SHA-256 fingerprint are public enrollment material.</p>
+<ol>
+<li>On an allowed topic branch, add the actual public key to
+   <code>packaging/release-allowed-signers</code> using this format:</li>
+</ol>
+<p><code>text
+   nrpe-custom-release namespaces="nrpe-custom-release" ssh-ed25519 BASE64_PUBLIC_KEY</code></p>
+<ol>
+<li>Review the key and fingerprint independently and integrate through a PR into
+   develop. Consumers need that trusted public key independently of release files.</li>
+<li>With owner-authorized GitHub credentials, configure the repository secret and
+   variable from the trusted workstation, using the actual private-key path:</li>
+</ol>
+<p><code>sh
+   gh secret set NRPE_RELEASE_SIGNING_KEY --repo NoJokeFNA/nrpe-custom &lt; ./nrpe-release-signing
+   gh variable set NRPE_RELEASE_SIGNING --repo NoJokeFNA/nrpe-custom --body ssh-ed25519</code></p>
+<ol>
+<li>Run the local signing/verification check below with a candidate directory.
+   Promote develop to master only on the maintainer's explicit request. Verify
+   that the resulting release contains <code>SHA256SUMS.sig</code> and passes consumer
+   verification before marking enrollment complete in the release plan.</li>
+</ol>
+<p>The publishing job writes the secret to a temporary mode-0600 key file, signs,
+verifies against the reviewed signer list, then removes the temporary key. The
+local CLI restricts the temporary directory to the current Windows SID before
+writing a key on Windows; POSIX uses a mode-0700 directory.
+The key is unavailable to PR/build/test jobs. A missing/mismatched key, empty trusted
+signer list or unsupported signing mode stops publication when signing is
+enabled; there is no fallback to an unsigned release. An unset variable or
+explicit <code>off</code> retains checksum-only publication and logs that signing is off.
+Changing this setting is an administrative decision, not an automatic recovery
+step after a signing failure.</p>
+<p>For key rotation, enroll and independently communicate the new public key before
+switching the CI secret. Preserve independently trusted old public keys for
+historical releases. If a key is compromised, revoke consumer trust and assess
+affected releases; simply changing the workflow key does not revoke old trust.</p>
+<h2 id="consumer-verification">Consumer verification</h2>
+<p>Obtain the signer file from a trusted checkout or independent maintainer channel
+and confirm its fingerprint independently. A public key shipped alongside an
+untrusted download does not authenticate that download. Download all release
+assets into one otherwise empty directory, including <code>SHA256SUMS.sig</code>.</p>
+<p>From a trusted checkout containing the verification helper:</p>
+<pre><code class="language-sh">python3 scripts/release_signature.py verify --directory /path/to/downloaded-release \
+  --allowed-signers /path/to/trusted-release-allowed-signers
+</code></pre>
+<p>The helper first authenticates the checksum manifest, then requires the exact
+asset set and verifies every payload hash. It rejects missing signatures,
+unknown signers, extra/missing files, links, invalid checksum paths and changes.
+It does not extract or install packages. Treat any nonzero exit as failure;
+unsigned historical releases cannot pass this authentication check.</p>
+<p>The equivalent signature-only OpenSSH command on a POSIX host is:</p>
+<pre><code class="language-sh">ssh-keygen -Y verify -f /path/to/trusted-release-allowed-signers \
+  -I nrpe-custom-release -n nrpe-custom-release \
+  -s /path/to/downloaded-release/SHA256SUMS.sig \
+  &lt; /path/to/downloaded-release/SHA256SUMS
+</code></pre>
+<p>That command authenticates the manifest only. The Python helper additionally
+checks completeness and hashes. On Windows, use a recent OpenSSH installation
+and the Python helper; PowerShell redirection is not a substitute for the POSIX
+stdin example above.</p>
+<h2 id="local-signing-check">Local signing check</h2>
+<p>For a complete candidate produced by <a href="/nrpe-custom/releases/#local-candidate-preparation">release preparation</a>,
+the signing CLI accepts the name of an environment variable containing the
+private key. It never accepts the key itself as a command-line argument:</p>
+<pre><code class="language-sh">NRPE_LOCAL_SIGNING_KEY=&quot;$(cat /secure/path/nrpe-release-signing)&quot; \
+  python3 scripts/release_signature.py sign --directory .nrpe/release \
+  --allowed-signers packaging/release-allowed-signers --key-env NRPE_LOCAL_SIGNING_KEY
+</code></pre>
+<p>Use a shell with tracing disabled. Test using disposable keys for development;
+never upload private keys or logs containing them. Signing refuses an existing
+signature rather than replacing it. Signing and verification commands do not
+upload or publish anything.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/release-signing.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#rollout-status">Rollout status</a></li>
+<li><a href="#enroll-a-maintainer-controlled-key">Enroll a maintainer-controlled key</a></li>
+<li><a href="#consumer-verification">Consumer verification</a></li>
+<li><a href="#local-signing-check">Local signing check</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

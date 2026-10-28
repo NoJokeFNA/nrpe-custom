@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Practical validation beyond container CI · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a aria-current="page" href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Practical validation beyond container CI</h1>
+      <article class="prose"><p>These checks cover host and service behavior that the automated package/TLS
+matrix does not exercise. Use disposable hosts and test certificates. Follow
+the <a href="/nrpe-custom/installation/">installation guide</a>, <a href="https://github.com/NagiosEnterprises/nrpe">upstream NRPE documentation</a>
+and <a href="/nrpe-custom/updates-and-rollback/">update/rollback procedure</a> for deployment details.</p>
+<h2 id="current-evidence-and-result-recording">Current evidence and result recording</h2>
+<p>The published SLES 12 SP3 release passed all five container build/install/TLS
+and source/archive gates plus Linux/Windows Python unit tests. Exact release and
+commit evidence, including the earlier SLE-15 scope, is retained in the
+<a href="/nrpe-custom/release-history/">release history</a>. Windows Docker Desktop and real VM
+scenarios below remain <strong>not run</strong>.</p>
+<p>On 2026-10-28 the current cloud environment had no <code>/dev/kvm</code>, QEMU/libvirt or
+supplied test-VM access. The maintainer confirmed that no test VMs are available.
+These scenarios are prepared for later execution, not replaced by container or
+hosted Windows unit tests. Do not run package migration/reboot tests on a
+production server to fill this gap.</p>
+<p>For each scenario record passed, failed, blocked or not run, with:</p>
+<ul>
+<li>Date, tester, exact Git commit/release tag, package version and SHA-256.</li>
+<li>Host OS/release/architecture, Python, Docker Engine, Compose and Buildx versions
+  where applicable; VM image/release and service unit for deployment tests.</li>
+<li>Scenario, command, expected/actual outcome, exit status and run ID.</li>
+<li>A redacted failure excerpt and follow-up issue when a check fails.</li>
+</ul>
+<p>Keep full run reports, private paths, configuration backups, company certificates
+and keys outside Git. Share only reviewed, sanitized evidence. A pass applies
+to the tested host/artifacts, not automatically to every supported platform.</p>
+<h2 id="windows-docker-desktop">Windows Docker Desktop</h2>
+<p>Use an actual Windows host with Docker Desktop's Linux engine. Record the shell
+and terminal; include Compose 5.6.1 and Buildx 0.38.1 when reproducing the original
+report, then test current supported versions separately. Use a clean checkout in
+a path containing spaces and non-ASCII characters, for example
+<code>C:\NRPE validation\Prüfung\nrpe-custom</code>. Put a public test CA certificate in a
+different such directory; never pass a private key to <code>--ca-cert</code>.</p>
+<p>From that checkout in PowerShell:</p>
+<pre><code class="language-powershell">python3 --version
+docker version
+docker compose version
+docker buildx version
+python3 nrpe.py doctor
+python3 nrpe.py verify debian12 --ca-cert &quot;C:\NRPE validation\Prüfung CA\company-ca.pem&quot; --pull
+$LASTEXITCODE
+python3 nrpe.py status
+python3 nrpe.py logs --last
+</code></pre>
+<p>Use your actual certificate path. The expected result is a complete successful
+build/install/TLS run, with no temporary-path failure at "load local bake
+definitions". For intentional repeat builds of existing output, add <code>--rebuild</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Expected result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PEM CA in a path with spaces/non-ASCII characters</td>
+<td>Certificate is accepted and the complete verify run passes</td>
+</tr>
+<tr>
+<td>Equivalent DER CA exported to a <code>.cer</code> file</td>
+<td>Same successful outcome; no path-format dependency</td>
+</tr>
+<tr>
+<td>Windows account using a short temporary-directory alias</td>
+<td>Repeat the CA run from that actual account; no dependence on long/short temp path spelling</td>
+</tr>
+<tr>
+<td>Missing file, malformed certificate or empty file</td>
+<td>Nonzero exit with an actionable certificate error before a successful build is reported</td>
+</tr>
+<tr>
+<td>TLS-intercepted repository with its CA omitted or an unrelated CA supplied</td>
+<td>An actual certificate trust failure produces a CA hint and failed run; do not break public TLS merely to manufacture a result</td>
+</tr>
+<tr>
+<td>Docker Desktop stopped</td>
+<td><code>doctor</code> reports Docker readiness failure; no successful workflow is claimed</td>
+</tr>
+<tr>
+<td>Ctrl+C during a build and during an integration test</td>
+<td>Exit 130, interrupted run recorded, locks released by normal cleanup; inspect any remaining project containers before retrying</td>
+</tr>
+<tr>
+<td>Optional menu: arrows, Space, Enter, Esc and cancellation</td>
+<td>Correct navigation, explicit rebuild consent and return to menu without unintended execution</td>
+</tr>
+</tbody>
+</table>
+<p>Test TLS omission only on an approved test network that requires its test CA.
+A failure pulling an image through Docker Desktop/BuildKit can require trust in
+that component; build-time <code>--ca-cert</code> does not configure the Docker engine or
+registry trust. See <a href="/nrpe-custom/network/">network and trust boundaries</a>.</p>
+<p>For interruption checks, preserve any previous valid package and its hash first.
+Check <code>status</code>, the interrupted report and <code>docker ps -a</code>; follow
+<a href="/nrpe-custom/workflow/#results-logs-and-concurrent-runs">lock recovery guidance</a> if cleanup
+was prevented. Do not delete locks belonging to a running process or use global
+container cleanup. Install <code>requirements-menu.txt</code> to exercise the optional menu.</p>
+<h2 id="debian-and-sles-test-vms">Debian and SLES test VMs</h2>
+<p>Use one copy of the <a href="/nrpe-custom/deployment-validation-template/">deployment validation worksheet</a>
+per target. The operator confirmed no test VMs are available as of 2026-10-28;
+execution is <strong>blocked by unavailable infrastructure</strong>. The procedure and result
+template are prepared, while all VM/systemd/reboot/update/rollback results remain
+not run.</p>
+<p>Use disposable amd64 VMs for Debian 11, 12, 13, 14 and genuine SLES 12 SP3.
+Keep matching signed repositories available and take a recoverable baseline
+snapshot. Use a separate monitoring client for remote TLS checks. Do not
+substitute Leap or another SLES service pack. Forky results apply to the tested
+image date; use a fresh equivalent image when its base changes.</p>
+<p>For each target, download the matching release archive through a trusted
+channel, check the release checksum, then check the binary <code>SHA256SUMS</code> inside
+the target directory. Retain corresponding sources/notices. Install using the
+exact local package commands in the <a href="/nrpe-custom/installation/">installation guide</a>.
+Do not install build outputs on the development host.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Expected result and evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fresh install</td>
+<td>Correct custom version/architecture, dependencies resolved, real Nagios user, default <code>dont_blame_nrpe=0</code></td>
+</tr>
+<tr>
+<td>Service start/restart</td>
+<td>Correct distribution service starts; <code>systemctl status</code> and <code>journalctl</code> show no startup/configuration errors</td>
+</tr>
+<tr>
+<td>Reboot after enabling service</td>
+<td>Service becomes active after a real VM reboot; the remote check succeeds again</td>
+</tr>
+<tr>
+<td>Actual monitoring plugin</td>
+<td>An installed plugin runs as the NRPE service user, returns the expected output/status locally and through the remote TLS check</td>
+</tr>
+<tr>
+<td>Argument policy</td>
+<td>Arguments rejected by default; after deliberate activation, reviewed command/arguments work and forbidden shell syntax remains rejected</td>
+</tr>
+<tr>
+<td>Access and TLS</td>
+<td>Intended monitoring client accepted with the configured TLS policy; unapproved client and invalid client credentials rejected where required by that policy</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>Previous verified package upgraded to a distinct verified version; site configuration/includes/permissions retained and configuration prompts reviewed</td>
+</tr>
+<tr>
+<td>Rollback</td>
+<td>Exact previous package plus configuration restored; service and the original remote check recover; shared user package retained</td>
+</tr>
+</tbody>
+</table>
+<p>Use the service/configuration paths from the installation guide: Debian
+<code>nagios-nrpe-server</code> and <code>/etc/nagios/nrpe.cfg</code>; SLES <code>nrpe</code> and <code>/etc/nrpe.cfg</code>.
+Review plugin paths and TLS/access settings using upstream manuals. Use test
+credentials and approved network rules rather than opening NRPE to all clients.</p>
+<p>An update/rollback pass requires two distinct real package versions and their
+original checksums. Reinstalling the same file is not an upgrade/downgrade test.
+If only one suitable package is available, mark that scenario blocked and retain
+the baseline; never rename a binary to invent another package version. A VM
+snapshot is emergency recovery, not evidence that package/configuration rollback
+worked. Record these outcomes separately.</p>
+<h2 id="follow-up">Follow-up</h2>
+<p>Add sanitized actual results and their exact environments to the
+<a href="/nrpe-custom/release-plan/#remaining-work-in-priority-order">release plan</a>. Leave scenarios
+open until performed; log any failure before claiming practical platform support.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/practical-validation.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#current-evidence-and-result-recording">Current evidence and result recording</a></li>
+<li><a href="#windows-docker-desktop">Windows Docker Desktop</a></li>
+<li><a href="#debian-and-sles-test-vms">Debian and SLES test VMs</a></li>
+<li><a href="#follow-up">Follow-up</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

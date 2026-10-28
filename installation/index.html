@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Installing a custom NRPE package · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a aria-current="page" href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Installing a custom NRPE package</h1>
+      <article class="prose"><p>Run these commands on the destination Linux server. Python, Docker, and this
+checkout are needed on the build workstation, not on the destination server.
+Use a package built for the destination's distribution release and architecture.
+The current SLES target is <strong>SLES 12 SP3 x86_64</strong>, not every SLES 15 service pack.</p>
+<p>For the complete NRPE server/client and Nagios setup, use the
+<a href="https://github.com/NagiosEnterprises/nrpe">official NRPE documentation</a> and
+<a href="https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/">Nagios Core documentation</a>.
+This guide covers deployment of the custom packages and essential configuration
+checks; it does not replace those manuals or distribution-specific plugin and
+TLS instructions.</p>
+<h2 id="prepare-the-files">Prepare the files</h2>
+<p>Build and test the selected target on the workstation with, for example,
+<code>python3 nrpe.py verify debian12</code> or <code>python3 nrpe.py verify sles12sp3</code>.
+Copy the following files into a dedicated directory on the destination server:</p>
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Build output directory</th>
+<th>Files to copy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debian 11</td>
+<td><code>output/debian11/</code></td>
+<td><code>nagios-nrpe-server_*_amd64.deb</code>, <code>SHA256SUMS</code></td>
+</tr>
+<tr>
+<td>Debian 12</td>
+<td><code>output/debian12/</code></td>
+<td><code>nagios-nrpe-server_*_amd64.deb</code>, <code>SHA256SUMS</code></td>
+</tr>
+<tr>
+<td>Debian 13</td>
+<td><code>output/debian13/</code></td>
+<td><code>nagios-nrpe-server_*_amd64.deb</code>, <code>SHA256SUMS</code></td>
+</tr>
+<tr>
+<td>Debian 14</td>
+<td><code>output/debian14/</code></td>
+<td><code>nagios-nrpe-server_*_amd64.deb</code>, <code>SHA256SUMS</code></td>
+</tr>
+<tr>
+<td>SLES 12 SP3</td>
+<td><code>output/sles12sp3/</code></td>
+<td><code>nrpe-*.x86_64.rpm</code>, <code>system-user-nagios-*.noarch.rpm</code>, <code>monitoring-plugins-nrpe-*.x86_64.rpm</code>, <code>SHA256SUMS</code></td>
+</tr>
+</tbody>
+</table>
+<p>Keep exactly one server package version in that directory so the wildcards below
+select the intended package. Source RPMs, manifests, and Debian build information
+are useful provenance but are not installed on the destination.</p>
+<p>Change into the directory containing the copied files and verify them:</p>
+<pre><code class="language-sh">sha256sum --check SHA256SUMS
+</code></pre>
+<p>Continue only if every entry reports <code>OK</code>. Copy the checksum file through a
+trusted channel alongside the packages; checksums detect changes but do not
+authenticate the publisher by themselves. Keep all three SLES binary RPMs available
+for this check even if the destination already has the user package installed.
+For releases that include <code>SHA256SUMS.sig</code>, first perform the
+<a href="/nrpe-custom/release-signing/#consumer-verification">release authentication check</a> using
+an independently trusted maintainer key before extracting/installing packages.
+Unsigned releases are identified in the <a href="/nrpe-custom/release-history/">release history</a>.</p>
+<p>If NRPE is already installed, back up its configuration before updating. Review
+package-manager prompts about configuration files and dependencies. Preserve
+the site's command definitions, allowed monitoring hosts, and TLS configuration.
+Package installation may start or restart a service.</p>
+<p>For an existing deployment, follow <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a>
+before replacing packages. The <a href="/nrpe-custom/configuration-examples/">configuration examples</a>
+and <a href="/nrpe-custom/maintenance/">maintenance policy</a> describe optional checks and verification
+boundaries.</p>
+<h2 id="debian-11-12-13-or-14">Debian 11, 12, 13, or 14</h2>
+<p>Check the destination release and architecture:</p>
+<pre><code class="language-sh">cat /etc/os-release
+dpkg --print-architecture
+</code></pre>
+<p>The architecture must be <code>amd64</code>. Use the package from the matching Debian output
+directory; a Debian 12 package is not a package for every Debian release.</p>
+<p>From the directory with the verified <code>.deb</code> file:</p>
+<pre><code class="language-sh">sudo apt update
+sudo apt install ./nagios-nrpe-server_*_amd64.deb
+dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' nagios-nrpe-server
+</code></pre>
+<p>APT resolves runtime dependencies through the destination's configured Debian
+repositories. The explicit <code>./</code> selects the local custom package. Confirm that
+the installed version contains <code>+withargs1</code> (or the custom revision of the build
+you selected); the upstream version itself is discovered at build time.</p>
+<p>Edit <code>/etc/nagios/nrpe.cfg</code> using your preferred editor. Review the
+<a href="#configure-and-start-nrpe">configuration steps below</a> before restarting.</p>
+<pre><code class="language-sh">sudo systemctl enable nagios-nrpe-server
+sudo systemctl restart nagios-nrpe-server
+sudo systemctl status nagios-nrpe-server --no-pager
+</code></pre>
+<p>If startup fails, inspect the service log:</p>
+<pre><code class="language-sh">sudo journalctl -u nagios-nrpe-server -n 100 --no-pager
+</code></pre>
+<h2 id="sles-12-sp3">SLES 12 SP3</h2>
+<p>Check the destination release and architecture:</p>
+<pre><code class="language-sh">cat /etc/os-release
+uname -m
+</code></pre>
+<p>Expect SLES <code>12.3</code> and <code>x86_64</code>. The current pinned build produces:</p>
+<pre><code class="language-text">nrpe-4.1.1-0.withargs1.x86_64.rpm
+system-user-nagios-1.0.0-0.noarch.rpm
+</code></pre>
+<p>The destination must actually be SLES <strong>12.3</strong> x86_64. Do not install a SLE-15
+package or replace the system OpenSSL. Retain the old NRPE 2.15 package and back
+up the main configuration, includes, plugins and TLS files before upgrading.
+The newer package retains <code>/etc/nrpe.cfg</code> as a configuration file; review package
+prompts and any <code>.rpmnew</code>/<code>.rpmsave</code> files rather than assuming that defaults
+replace an existing deployment's policy.</p>
+<p>Use your authorized matching SLES-12 repositories for missing runtime dependencies.
+Review the package requirements and user package first:</p>
+<pre><code class="language-sh">rpm -qp --requires ./nrpe-4.1.1-0.withargs1.x86_64.rpm
+rpm -q system-user-nagios
+</code></pre>
+<p>The minimal test image additionally needs original <code>libwrap0</code> and
+<code>util-linux-systemd</code>; a full server may already provide them. Resolve missing
+prerequisites using the destination's matching repositories, for example:</p>
+<pre><code class="language-sh">sudo zypper refresh
+sudo zypper install libwrap0 util-linux-systemd shadow netcfg grep sed coreutils
+</code></pre>
+<p>Then install the verified local artifacts with normal RPM dependency and payload
+checks. If no suitable user package exists, install the companion and server
+in one transaction:</p>
+<pre><code class="language-sh">sudo rpm --upgrade --verbose --hash \
+  ./system-user-nagios-1.0.0-0.noarch.rpm \
+  ./nrpe-4.1.1-0.withargs1.x86_64.rpm
+</code></pre>
+<p>If a suitable user package is already installed, keep it and install the server:</p>
+<pre><code class="language-sh">sudo rpm --upgrade --verbose --hash ./nrpe-4.1.1-0.withargs1.x86_64.rpm
+</code></pre>
+<p>These are locally built unsigned RPMs. Verify their hashes through a trusted
+channel (or the optional release signature when enabled) before installation.
+Never use <code>--nodeps</code>, <code>--nosignature</code> or global repository signature bypasses.
+This project's test does not bypass missing dependencies. SLES 12's zypper does
+not provide the newer <code>--allow-unsigned-rpm</code> option used in some SLE-15 examples.</p>
+<p>The matching client RPM is available for a <strong>SLES 12 SP3 monitoring host</strong>:</p>
+<pre><code class="language-sh">sudo rpm --upgrade --verbose --hash ./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm
+</code></pre>
+<p>It needs the same real Nagios user and matching runtime libraries. Do not install
+that client RPM on another distribution; use its native client package instead.
+All three binary files are needed to check the unchanged <code>SHA256SUMS</code>, even when
+only the server/user package will be installed on the monitored host.</p>
+<p>Confirm the installed server and user:</p>
+<pre><code class="language-sh">rpm -q nrpe
+getent passwd nagios
+</code></pre>
+<p>Expect <code>nrpe-4.1.1-0.withargs1.x86_64</code> for the current build.
+<code>zypper install nrpe</code> without the local filename can select the repository
+package instead of this custom build.</p>
+<p>Edit <code>/etc/nrpe.cfg</code> using your preferred editor. Review the configuration below
+before restarting:</p>
+<pre><code class="language-sh">sudo systemctl enable nrpe
+sudo systemctl restart nrpe
+sudo systemctl status nrpe --no-pager
+</code></pre>
+<p>If startup fails:</p>
+<pre><code class="language-sh">sudo journalctl -u nrpe -n 100 --no-pager
+</code></pre>
+<h2 id="configure-and-start-nrpe">Configure and start NRPE</h2>
+<table>
+<thead>
+<tr>
+<th>Distribution</th>
+<th>Configuration</th>
+<th>Service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debian</td>
+<td><code>/etc/nagios/nrpe.cfg</code></td>
+<td><code>nagios-nrpe-server</code></td>
+</tr>
+<tr>
+<td>SLES 12 SP3 / OBS recipe</td>
+<td><code>/etc/nrpe.cfg</code></td>
+<td><code>nrpe</code></td>
+</tr>
+</tbody>
+</table>
+<p>Argument support is compiled in, but <code>dont_blame_nrpe=0</code> remains the packaged
+default. Keep it at <code>0</code> if the monitoring server should not supply arguments.
+To deliberately enable them, edit the existing settings in the appropriate
+configuration file, for example:</p>
+<pre><code class="language-ini">allowed_hosts=127.0.0.1,::1,192.0.2.10
+dont_blame_nrpe=1
+</code></pre>
+<p>Replace <code>192.0.2.10</code> with the actual monitoring server address. Define permitted
+commands and validate any <code>$ARG1$</code>, <code>$ARG2$</code>, etc. they accept. Configure production
+TLS authentication and allow incoming TCP 5666 (or your chosen <code>server_port</code>)
+only from the intended monitoring servers. Keep Bash command substitution
+disabled. See <a href="/nrpe-custom/security/">deployment security</a> and <a href="/nrpe-custom/network/">network requirements</a>.</p>
+<p>Restart the distribution's service after changing its configuration, using the
+commands above. A successful service start does not prove argument handling or
+remote connectivity; exercise the configured check from the real monitoring
+server with the intended TLS settings and arguments. The project's container
+tests do not validate the destination's systemd, firewall, or production TLS.</p>
+<p>The build-time <code>--ca-cert</code> option configures repository HTTPS trust inside build
+and test containers. Its CA is not embedded in the exported package and does not
+provision the destination's NRPE certificates, keys, or operating-system trust.</p>
+<p>Review future package-manager upgrades: a repository package can supersede a
+local custom version. After upgrades, confirm the installed custom revision
+again and rebuild from reviewed sources when security updates are needed.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/installation.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#prepare-the-files">Prepare the files</a></li>
+<li><a href="#debian-11-12-13-or-14">Debian 11, 12, 13, or 14</a></li>
+<li><a href="#sles-12-sp3">SLES 12 SP3</a></li>
+<li><a href="#configure-and-start-nrpe">Configure and start NRPE</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

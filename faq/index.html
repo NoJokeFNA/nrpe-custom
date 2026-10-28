@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Frequently asked questions · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a href="/nrpe-custom/overview/">Documentation</a><a aria-current="page" href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a aria-current="page" href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">FAQ</div>
+      <h1>Frequently asked questions</h1>
+      <article class="prose"><p>For log analysis, see <a href="/nrpe-custom/troubleshooting/">troubleshooting</a>. Use
+<code>python3 nrpe.py diagnose ./redacted-nrpe.log --context nrpe</code> for an existing
+daemon/client log, or omit the context for build/download failures.</p>
+<div class="faq-tools"><label for="faq-filter">Find an answer</label><input id="faq-filter" type="search" placeholder="Try TLS, SLES or services…"><p id="faq-count" aria-live="polite"></p></div><details class="faq-item" id="which-sles-version-does-this-project-target"><summary><h2>Which SLES version does this project target?</h2></summary><div class="faq-answer">
+<p><strong>SLES 12 SP3</strong>, confirmed by <code>/etc/os-release</code>. The active target is
+<code>sles12sp3</code>; see the <a href="/nrpe-custom/sles12sp3/">native build guide</a>.</p>
+</div></details><details class="faq-item" id="what-happened-to-sles-15-sp3-and-sp4"><summary><h2>What happened to SLES 15 SP3 and SP4?</h2></summary><div class="faq-answer">
+<p>Those targets came from an incorrect assumption about the affected server's OS.
+It was subsequently identified as SLES 12 SP3 with NRPE 2.15 and OpenSSL 1.0.2.
+The active SLES-15 Dockerfiles, manifests, media setup and target guides have
+been removed. There is no supported SLES-15 build target in the current workflow.</p>
+<p>The remaining explanation is consolidated here. Historical release results and
+dated license/maintenance observations retain their original platform labels in
+the <a href="/nrpe-custom/release-history/">release history</a> and linked reviews. They do not prove
+SLES 12 compatibility, and old SLE-15 RPMs must not be installed on SLES 12.
+The <a href="/nrpe-custom/local-cleanup/#retired-sles-output">cleanup command</a> still recognizes old
+local output names solely to remove them explicitly; CLI tests reject those
+names as build targets. These references do not restore SLES-15 support.</p>
+</div></details><details class="faq-item" id="why-does-the-old-sles-12-nrpe-daemon-fail-its-ssl-handshake"><summary><h2>Why does the old SLES 12 NRPE daemon fail its SSL handshake?</h2></summary><div class="faq-answer">
+<p>The reported server runs NRPE <code>2.15-4.24</code>, linked to OpenSSL's 1.0 ABI. That old
+NRPE advertises anonymous DH, not modern certificate authentication. A newer
+NRPE/client built for SLES 12 can use certificate-authenticated TLS 1.2 with the
+original OpenSSL 1.0.2 library. TLS 1.3 requires a newer TLS library and is not
+provided by this build. <code>disable_syslog=0</code> is unknown to the old daemon;
+commenting it out removes the warning but does not fix TLS compatibility.</p>
+<p>The message <code>Could not complete SSL handshake. 1</code> alone does not identify a
+specific cipher, certificate or trust failure. Compare the actual server/client
+versions, command, TLS settings and simultaneous logs. Do not disable encryption
+or certificate verification to hide the error. Build-time <code>--ca-cert</code> affects
+source downloads, not the deployed NRPE certificate configuration.</p>
+<p>To isolate this on SLES 12 SP3 before upgrading, the
+<a href="/nrpe-custom/sles12sp3-plaintext-diagnostic/">temporary plaintext diagnostic</a> documents the
+user's successful NRPE 2.15 / <code>check_nrpe</code> 4.1.0 test on a separate port. It
+includes anonymized examples, the encountered errors and cleanup; it does not
+recommend disabling TLS in production.</p>
+<p>For NRPE 4.1.1 on SLES 12, also review the
+<a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">authenticated DHE-RSA example</a>.
+With this old OpenSSL integration, <code>ssl_use_adh=0</code> skips DH initialization and
+can produce <code>no shared cipher</code> with modern clients. Use the complete documented
+policy, which explicitly excludes anonymous ciphers, rather than enabling ADH
+alone. It was tested against OpenSSL 3.5.7 with certificate verification intact.</p>
+</div></details><details class="faq-item" id="which-services-must-run-on-a-combined-nagios-and-nrpe-server"><summary><h2>Which services must run on a combined Nagios and NRPE server?</h2></summary><div class="faq-answer">
+<p>When Nagios Core and the NRPE daemon are installed on the same SLES server, and
+the installed units are named <code>nagios.service</code> and <code>nrpe.service</code>, enable and
+start each service:</p>
+<pre><code class="language-sh">sudo systemctl enable --now nagios.service
+sudo systemctl enable --now nrpe.service
+systemctl is-active nagios.service nrpe.service
+</code></pre>
+<p><code>enable --now</code> configures startup at boot and starts the service immediately.
+Both should report <code>active</code> for this combined setup. If a unit is missing or
+fails, inspect the installed unit names and logs before replacing packages:</p>
+<pre><code class="language-sh">systemctl list-unit-files nagios.service nrpe.service
+sudo systemctl status nagios.service nrpe.service --no-pager
+sudo journalctl -u nagios.service -u nrpe.service -n 100 --no-pager
+</code></pre>
+<p>Package-provided service names vary. For the custom Debian server package in
+this project, the NRPE unit is <code>nagios-nrpe-server.service</code>:</p>
+<pre><code class="language-sh">sudo systemctl enable --now nagios-nrpe-server.service
+</code></pre>
+<p>Follow the <a href="https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/">official Nagios Core documentation</a>
+and <a href="https://github.com/NagiosEnterprises/nrpe">NRPE documentation</a> for complete
+installation and deployment configuration. Enabling a service does not install
+missing plugins, provision TLS credentials or configure monitoring checks.</p>
+</div></details><details class="faq-item" id="does-a-separate-nrpe-agent-also-need-nagios-core-locally"><summary><h2>Does a separate NRPE agent also need Nagios Core locally?</h2></summary><div class="faq-answer">
+<p>No. Nagios Core schedules checks on the monitoring server. Its <code>check_nrpe</code>
+client contacts the NRPE daemon on the monitored host, which executes the
+configured local plugins. A host used only as an NRPE agent needs its NRPE
+daemon and required plugins, but does not need a local Nagios scheduler.
+Starting Nagios alone does not start a separately packaged NRPE daemon.</p>
+<p>The two-service command above applies to the combined server, not every NRPE
+agent. See the <a href="/nrpe-custom/network/#connection-map">connection map</a> for the separate roles.</p>
+</div></details><details class="faq-item" id="when-do-i-actually-need-a-custom-build"><summary><h2>When do I actually need a custom build?</h2></summary><div class="faq-answer">
+<p>First distinguish service/configuration problems from missing compiled features:</p>
+<ol>
+<li>Check that the intended NRPE service is running and inspect its logs.</li>
+<li>Confirm the monitoring server can reach NRPE with the intended allowed hosts,
+   firewall rules and TLS configuration.</li>
+<li>Confirm that the configured plugin exists and runs as the NRPE service user.</li>
+<li>If arguments are required, check both the package's compiled support and the
+   runtime policy. <code>dont_blame_nrpe=0</code> intentionally rejects arguments even when
+   support was compiled in. Enable arguments only after reviewing the command
+   definitions and validating permitted inputs.</li>
+</ol>
+<p>If the distribution package already provides the required feature, use its
+supported packaging and configure the deployment. A stopped service or an
+argument-disabled runtime setting alone is not a reason to compile another
+binary. This project's Debian build is for deployments that deliberately need
+compiled command-argument support; it preserves disabled runtime arguments by
+default and disabled Bash command substitution.</p>
+<p>After changing configuration, restart the applicable NRPE service and repeat
+the actual remote check. <code>enable --now</code> does not restart an already active
+service to reload modified configuration. See <a href="/nrpe-custom/installation/">installation</a>
+and <a href="/nrpe-custom/security/">deployment security</a> for this project's custom package scope.</p></div></details></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/faq.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#which-sles-version-does-this-project-target">Which SLES version does this project target?</a></li>
+<li><a href="#what-happened-to-sles-15-sp3-and-sp4">What happened to SLES 15 SP3 and SP4?</a></li>
+<li><a href="#why-does-the-old-sles-12-nrpe-daemon-fail-its-ssl-handshake">Why does the old SLES 12 NRPE daemon fail its SSL handshake?</a></li>
+<li><a href="#which-services-must-run-on-a-combined-nagios-and-nrpe-server">Which services must run on a combined Nagios and NRPE server?</a></li>
+<li><a href="#does-a-separate-nrpe-agent-also-need-nagios-core-locally">Does a separate NRPE agent also need Nagios Core locally?</a></li>
+<li><a href="#when-do-i-actually-need-a-custom-build">When do I actually need a custom build?</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

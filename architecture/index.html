@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Architecture and maintenance map · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a aria-current="page" href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Architecture and maintenance map</h1>
+      <article class="prose"><p>The host Python controller coordinates Docker Compose. Containers perform the
+actual package work; target packages are never installed on the development host.
+The optional terminal UI translates choices into the same CLI arguments used by
+automation. It does not bypass target locks or artifact validation.</p>
+<h2 id="components">Components</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M[menu.py: keyboard navigation] --&gt; CLI[cli.py: commands and validation]
+    ENTRY[nrpe.py: public entry point] --&gt; CLI
+    LEGACY[build.py: compatibility translation] --&gt; CLI
+    CLI --&gt; CTRL[controller.py: workflow and cleanup]
+    CLI --&gt; STATE[state.py: status and logs]
+    CLI --&gt; CLEAN[cleanup.py: retention and guarded deletion]
+    CLI --&gt; DIAG[diagnostics.py: read-only log analysis]
+    CTRL --&gt; DOCKER[docker.py: readiness]
+    CTRL --&gt; STATE
+    CTRL --&gt; COMPOSE[Compose services]
+    COMPOSE --&gt; BUILD[Distribution build scripts]
+    COMPOSE --&gt; INSTALL[Distribution installation scripts]
+    INSTALL --&gt; PROTOCOL[Shared TLS protocol test]
+    BUILD --&gt; OUTPUT[output/target]
+    OUTPUT --&gt; INSTALL
+    STATE --&gt; REPORTS[.nrpe/runs and .nrpe/locks]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>File/module</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nrpe.py</code></td>
+<td>Public entry point; dispatches to <code>nrpe_cli.cli.main</code></td>
+</tr>
+<tr>
+<td><code>build.py</code></td>
+<td>Compatibility wrapper for older commands; no separate build engine</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/cli.py</code></td>
+<td>Parse commands, diagnose Compose, show status/logs, validate certificates and rebuild consent</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/menu.py</code></td>
+<td>Optional terminal rendering, selection, directory browsing, and command review</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/controller.py</code></td>
+<td>Sequence targets/phases, stream logs, persist outcomes, and clean up only the owned container</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/docker.py</code></td>
+<td>Check Docker Engine, Linux container mode, and Compose; give platform-specific failure hints</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/state.py</code></td>
+<td>Artifact identity/checksums, run IDs/reports, and per-target locks</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/cleanup.py</code></td>
+<td>Preview/retention planning and guarded deletion of expired local evidence or explicitly selected project images</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/diagnostics.py</code></td>
+<td>Classify build/download and NRPE runtime errors without executing or retaining log contents</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/targets.py</code></td>
+<td>Shared target list and package filename conventions</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/certificates.py</code></td>
+<td>Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/release.py</code></td>
+<td>Validate exact workflow/build/source evidence and assemble complete release archives</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/signing.py</code></td>
+<td>Validate complete release assets and sign/authenticate checksums with an enrolled maintainer key</td>
+</tr>
+<tr>
+<td><code>compose.yaml</code> / <code>compose.test.yaml</code></td>
+<td>Parameterized builder services and opt-in runtime test services</td>
+</tr>
+<tr>
+<td><code>docker/debian/build.Dockerfile</code> / <code>docker/debian/test.Dockerfile</code></td>
+<td>Debian build prerequisites and separate runtime environment</td>
+</tr>
+<tr>
+<td><code>docker/sles12sp3/build.Dockerfile</code> / <code>docker/sles12sp3/test.Dockerfile</code></td>
+<td>Genuine SP3 environments, verified prerequisites, and pinned original SLE-12 inputs</td>
+</tr>
+<tr>
+<td><code>packaging/*.json</code> and <code>*.asc</code></td>
+<td>Pinned SLES source/dependency manifests and verified signing-key identities</td>
+</tr>
+<tr>
+<td><code>output/&lt;target&gt;/</code></td>
+<td>Generated packages, checksums, and available provenance; not tracked</td>
+</tr>
+<tr>
+<td><code>.nrpe/</code></td>
+<td>Local reports, logs, and locks; not tracked</td>
+</tr>
+<tr>
+<td><code>website/</code></td>
+<td>Static presentation, shared-Markdown renderer, reviewed field notes and human-authored gh-pages publishing helper</td>
+</tr>
+</tbody>
+</table>
+<h2 id="a-verify-run">A verify run</h2>
+<pre><code class="language-mermaid">sequenceDiagram
+    actor User
+    participant UI as Menu / CLI
+    participant C as Controller
+    participant B as Builder container
+    participant T as Runtime test container
+    participant R as Local report
+    User-&gt;&gt;UI: Select verify and targets
+    UI-&gt;&gt;User: Confirm replacement of existing outputs, if any
+    UI-&gt;&gt;C: Execute with validated options
+    C-&gt;&gt;R: Create run and acquire target lock
+    C-&gt;&gt;B: Build using matching distribution sources
+    B-&gt;&gt;B: Check package identity and configure macros
+    B--&gt;&gt;C: Export validated package and checksums
+    C-&gt;&gt;C: Read artifact identity and verify checksum
+    C-&gt;&gt;T: Install exported package in matching runtime image
+    T-&gt;&gt;T: Reject arguments with runtime setting 0
+    T-&gt;&gt;T: Accept exact argument pairs with runtime setting 1
+    T--&gt;&gt;C: Installation and protocol result
+    C-&gt;&gt;C: Recheck artifact identity after test
+    C-&gt;&gt;R: Persist result, clean up owned container, release lock
+    C--&gt;&gt;UI: Exit code and summary
+</code></pre>
+<p><code>build</code> stops before installation testing. <code>test</code> starts from existing artifacts
+and checks those bytes, without establishing that they match the current source
+checkout. Targets run sequentially within a command and the first failure stops
+the remaining targets. Different target runs can proceed independently.</p>
+<p>A pass is attached to the artifact's identity and SHA-256, including the SLES
+user and matching client RPMs. Replacing any invalidates the matching result. Run reports
+are local records, not cryptographically signed attestations. See the
+<a href="/nrpe-custom/workflow/#results-logs-and-concurrent-runs">workflow reference</a> for cleanup,
+stale locks, and report limitations.</p>
+<h2 id="script-responsibility-review">Script responsibility review</h2>
+<p>All existing shell/Python scripts have active callers. The review retained the
+package-format boundaries and the already-shared TLS protocol test. Shell is
+used for native package tools; Python is used for structured metadata and narrow
+source transformations. Download/source preparation uses a modern Python stage;
+target compilation and installation use native SLES 12 tools without Python.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Caller</th>
+<th>Why it remains separate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>build.sh</code></td>
+<td>Debian builder entry point</td>
+<td>APT source discovery, Debian changelog, <code>dpkg-buildpackage</code>, and export</td>
+</tr>
+<tr>
+<td><code>verify.sh</code></td>
+<td><code>build.sh</code></td>
+<td>Check Debian package contents/identity and generated configure macros before export</td>
+</tr>
+<tr>
+<td><code>enable_command_args.py</code></td>
+<td><code>build.sh</code></td>
+<td>Narrow, independently tested Debian rules transformation</td>
+</tr>
+<tr>
+<td><code>export_debian_sources.py</code></td>
+<td><code>build.sh</code></td>
+<td>Validate the matching DSC and every referenced source archive before exporting corresponding sources</td>
+</tr>
+<tr>
+<td><code>prepare_release.py</code></td>
+<td>Release workflow / local candidate review</td>
+<td>Host-only release staging, source/license validation and five-target completeness gate</td>
+</tr>
+<tr>
+<td><code>release_signature.py</code></td>
+<td>Release workflow / maintainer CLI</td>
+<td>Restrict temporary signing-key access and dispatch optional signing/verification</td>
+</tr>
+<tr>
+<td><code>check_git_policy.py</code> / <code>delete_merged_topic.py</code></td>
+<td>PR workflows</td>
+<td>Check integration/authorship policy and lease-delete only eligible merged topic heads</td>
+</tr>
+<tr>
+<td><code>setup-debian-repositories.sh</code></td>
+<td>Both Debian Dockerfiles</td>
+<td>Shared source/binary setup and Bullseye archive adjustment</td>
+</tr>
+<tr>
+<td><code>integration-test.sh</code></td>
+<td>Debian test entry point</td>
+<td>Debian artifact validation and installation, then shared protocol test</td>
+</tr>
+<tr>
+<td><code>build-sles.sh</code></td>
+<td>SLES builder entry point</td>
+<td>Native RPM build, packaged defaults, and server/helper export</td>
+</tr>
+<tr>
+<td><code>build-sles-user.sh</code></td>
+<td>SLES builder image setup</td>
+<td>Real independently packaged system user/group dependency; needed before NRPE build</td>
+</tr>
+<tr>
+<td><code>sles_source.py</code></td>
+<td>Modern SLES input preparation</td>
+<td>Pinned source fetch/verification and appropriate recipe transformation</td>
+</tr>
+<tr>
+<td><code>prepare_sles_inputs.py</code></td>
+<td>Both SLES Dockerfiles' input stages</td>
+<td>Prepare pinned downloads and metadata with optional in-memory company CA trust</td>
+</tr>
+<tr>
+<td><code>verify-sles-packages.sh</code> / <code>verify-sles-environment.sh</code></td>
+<td>Native SLES image stages</td>
+<td>Validate real OS/ABI and all pinned RPM signatures and identities before installation</td>
+</tr>
+<tr>
+<td><code>fetch_sles_packages.py</code></td>
+<td>Modern input stage via <code>prepare_sles_inputs.py</code></td>
+<td>Download pinned inputs and validate size/hash; signature and identity checks have one native implementation in <code>verify-sles-packages.sh</code></td>
+</tr>
+<tr>
+<td><code>integration-test-sles.sh</code></td>
+<td>SLES test entry point</td>
+<td>RPM artifact/companion checks, dependency installation, then shared protocol test</td>
+</tr>
+<tr>
+<td><code>install-ca-certificate.sh</code></td>
+<td>Debian build and runtime Dockerfiles</td>
+<td>Optional company CA setup, checksum validation, and distribution-specific system trust stores</td>
+</tr>
+<tr>
+<td><code>test-nrpe-protocol.sh</code></td>
+<td>Both integration entry points</td>
+<td>Single TLS client/server test of disabled and enabled argument handling</td>
+</tr>
+</tbody>
+</table>
+<p>SLES 12 downloads are prepared separately, then verified and installed with the
+native RPM implementation before any target code is built. <code>prepare_sles_inputs.py</code>
+produces only pinned inputs, not target binaries. <code>verify-sles-packages.sh</code>
+requires exact hash/signature/vendor/version coverage; <code>verify-sles-environment.sh</code>
+checks the actual 12.3 identity and clean runtime base. The support-package build
+creates genuine macros/user RPMs; no dependency provides are faked.</p>
+<p>Terminal interaction lives in <code>menu.py</code>; workflow execution remains in the
+controller. Server/companion checksums use one streaming helper in <code>state.py</code>,
+with the manifest read once per artifact inspection. Native SLES signature and
+identity verification lives in <code>verify-sles-packages.sh</code>; the unused Python
+duplicate was removed. The legacy <code>build.py</code> remains a thin compatibility wrapper
+for existing callers, without its own workflow engine.</p>
+<h2 id="images-and-updates">Images and updates</h2>
+<p>Builder images contain compilers and build requirements; runtime images contain
+only test/runtime prerequisites. A successful fresh-container install therefore
+cannot rely on a compiler or NRPE server preinstalled by the builder. Keeping two
+roles is intentional even when both derive from the same distribution base.</p>
+<p>Docker caches layers. <code>--pull</code> checks base images, while package-source updates
+are a different concern: Debian discovers sources through APT at build time;
+SLES uses explicitly reviewed pinned manifests. The controller does not yet
+compare a complete remote source/recipe identity to decide whether existing
+outputs need rebuilding. See <a href="/nrpe-custom/workflow/#repeatability-and-updates">repeatability</a>.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/architecture.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#components">Components</a></li>
+<li><a href="#a-verify-run">A verify run</a></li>
+<li><a href="#script-responsibility-review">Script responsibility review</a></li>
+<li><a href="#images-and-updates">Images and updates</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

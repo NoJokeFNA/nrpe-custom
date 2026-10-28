@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Deployment security and reporting · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a aria-current="page" href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Deployment security and reporting</h1>
+      <article class="prose"><h2 id="warranty-liability-and-operator-responsibility">Warranty, liability, and operator responsibility</h2>
+<p>The project and its generated packages are provided "AS IS", without warranty
+of fitness, security, availability, or uninterrupted operation. To the extent
+permitted by applicable law, the authors and contributors accept no liability
+for losses or damage arising from use, including data loss, downtime, service
+interruption, or an unavailable or unresponsive system. Liability that cannot
+lawfully be excluded remains unaffected. See the <a href="/nrpe-custom/license/">MIT license</a> and
+the applicable upstream and distribution licenses recorded in the
+<a href="/nrpe-custom/third-party/">third-party inventory</a>.</p>
+<p>Source code and build recipes are available for inspection and self-compilation.
+No malicious functionality is intended or knowingly included. Source availability
+and successful tests do not guarantee freedom from defects, vulnerabilities, or
+compromised dependencies. Operators remain responsible for reviewing inputs,
+testing in their environment, backing up systems, restricting access, and
+planning rollback before production deployment.</p>
+<h2 id="deployment-defaults-and-limits">Deployment defaults and limits</h2>
+<p>Compiling command argument support does not make arbitrary arguments safe.
+Packages keep <code>dont_blame_nrpe=0</code>. Enable it only for a reviewed deployment with
+restricted commands, validated arguments, trusted clients, and appropriate TLS.
+Do not expose NRPE to the public Internet or enable Bash command substitution.</p>
+<p>Use the distribution-specific configuration and service paths documented in the
+<a href="/nrpe-custom/overview/#using-a-built-package">README</a>. Restrict both <code>allowed_hosts</code> and
+network access to the intended monitoring servers. The allowlist does not replace
+TLS client authentication or argument validation. Avoid passing untrusted strings
+into shell commands, even if the request arrived from an allowed host.</p>
+<p>Integration tests use disposable configurations and a short-lived local
+certificate. They do not provision production credentials, test real firewall
+rules, validate systemd startup, or establish that every command definition is
+safe. Follow the <a href="/nrpe-custom/network/">network guide</a> for connection direction and ports.
+Custom RPMs are currently unsigned local artifacts; SHA-256 checksums detect
+changes but do not by themselves authenticate a publisher.</p>
+<p>For a suspected vulnerability, check whether the repository's Security tab offers
+private vulnerability reporting. If available, use it. If unavailable, ask the
+maintainer to establish a private reporting channel without disclosing exploit
+steps or sensitive data in a public issue. No private reporting service or
+response-time guarantee is currently claimed by this project.</p>
+<p>For upstream NRPE or distribution vulnerabilities, also follow the relevant
+upstream/distribution reporting process. Do not publish credentials, internal
+addresses, production configurations, or unredacted local run logs.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/security.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#warranty-liability-and-operator-responsibility">Warranty, liability, and operator responsibility</a></li>
+<li><a href="#deployment-defaults-and-limits">Deployment defaults and limits</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

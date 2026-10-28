@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Maintenance review: 2026-10-27 · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Maintenance review: 2026-10-27</h1>
+      <article class="prose"><p>Historical snapshot: a later follow-up first assumed SLES 15 SP3, but the
+actual OS was subsequently confirmed as <strong>SLES 12 SP3</strong>. The SP4 findings below
+concern the old scope. See the <a href="/nrpe-custom/sles12sp3/">current target</a> for 12.3 evidence.</p>
+<p>Scope: published release <code>build-4-517fbfb97d7e</code> and the subsequent develop work.
+This is a point-in-time source, advisory and lifecycle review. It does not audit
+all NRPE C code, installed system libraries, container images or deployments.</p>
+<h2 id="findings-and-decisions">Findings and decisions</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Observed evidence</th>
+<th>Decision / follow-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NRPE upstream</td>
+<td><a href="https://github.com/NagiosEnterprises/nrpe/releases/tag/nrpe-4.2.0">Release 4.2.0</a>, published 2026-10-21; <a href="https://github.com/NagiosEnterprises/nrpe/blob/nrpe-4.2.0/CHANGELOG.md">changelog</a> includes TLS configuration, memory leak and buffer fixes</td>
+<td>Assess the source delta against the packaged versions; do not replace distribution packaging with a new upstream archive automatically</td>
+</tr>
+<tr>
+<td>Debian source versions</td>
+<td><a href="https://security-tracker.debian.org/tracker/source-package/nagios-nrpe">Debian security tracker</a> lists bookworm <code>4.1.0-1</code>, trixie/forky <code>4.1.3-1</code>, sid <code>4.2.0-1</code></td>
+<td>Current release matches the listed supported-suite sources; monitor migration and repeat source/license review before publishing a new version</td>
+</tr>
+<tr>
+<td>Debian NRPE advisories</td>
+<td>Tracker lists historical issues as resolved and no open issues on its source-package page at review time</td>
+<td>Limited tracker result; not proof that argument-enabled custom configurations or all dependencies are secure</td>
+</tr>
+<tr>
+<td>Upstream GitHub advisories</td>
+<td><a href="https://api.github.com/repos/NagiosEnterprises/nrpe/security-advisories">Published advisory endpoint</a> returned an empty list</td>
+<td>No published GitHub advisories found through that endpoint; continue checking upstream/distribution sources</td>
+</tr>
+<tr>
+<td>SLES recipe</td>
+<td>Current <a href="https://api.opensuse.org/public/source/server:monitoring/nrpe?rev=f3b182e7e8ebcab4ceca47c98110f08d">OBS directory</a> still includes <code>nrpe-4.1.1.tar.xz</code>; downloaded spec/history hashes match the pinned manifest</td>
+<td>Keep the reviewed pin. A newer OBS directory revision alone is not a reason to change input identities</td>
+</tr>
+<tr>
+<td>Python menu dependencies</td>
+<td>Local <code>pip-audit==2.10.1 --strict -r requirements-menu.txt</code> exited 0, reporting no known vulnerabilities for the resolved dependency set</td>
+<td>Retain pins; this audit does not cover system packages or NRPE</td>
+</tr>
+<tr>
+<td>Update proposals</td>
+<td>No open PRs at the beginning of this review</td>
+<td>Review later Dependabot proposals and integrate approved changes with human authors on permitted topic branches</td>
+</tr>
+</tbody>
+</table>
+<p>The OBS <code>nrpe.spec</code> SHA-256 was
+<code>7f5ff80caa9a4406afb4eb734029de42bcb4f809c625088a067c9e86fb5a2223</code>;
+<code>nrpe.changes</code> was
+<code>58c5248f320acd6d16ffb33ff4bebcb405093589737413a800c0a6f18dd9c793</code>.
+Only these two current OBS files and the directory listing were compared in this
+maintenance check; the original release gate separately validates all pinned
+exported inputs. No source pin, packaging revision or binary was changed here.</p>
+<h2 id="target-lifecycle-review">Target lifecycle review</h2>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Status on the review date</th>
+<th>Maintenance action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debian 11</td>
+<td>The <a href="https://www.debian.org/releases/">published LTS end date</a> was 2026-08-31</td>
+<td>Treat as a legacy compatibility target. Archive availability is not continuing Debian LTS; separately arranged ELTS is outside this project</td>
+</tr>
+<tr>
+<td>Debian 12</td>
+<td><a href="https://www.debian.org/releases/bookworm/">Bookworm LTS</a> for amd64 runs through 2028-06-30</td>
+<td>Continue checking package-specific LTS coverage and advisories</td>
+</tr>
+<tr>
+<td>Debian 13</td>
+<td><a href="https://www.debian.org/releases/">Trixie</a> is stable</td>
+<td>Prefer a currently maintained release for new deployments; validate actual target packages</td>
+</tr>
+<tr>
+<td>Debian 14</td>
+<td><a href="https://www.debian.org/releases/">Forky</a> is testing, with no stable release date</td>
+<td>Treat as a moving validation target, not a production-stability guarantee</td>
+</tr>
+<tr>
+<td>SLES 15 SP4</td>
+<td><a href="https://www.suse.com/lifecycle/">SUSE lifecycle</a> lists general support end 2023-12-31 and LTSS end 2026-12-31</td>
+<td>Confirm separate entitlement and component coverage for deployed systems; review retention/deprecation before LTSS ends</td>
+</tr>
+</tbody>
+</table>
+<p>The dates concern distribution lifecycles, not a support promise for custom
+packages. In particular, SLES base-system LTSS does not establish support for
+every OBS/Package Hub package. No target is removed or silently substituted by
+this review. Any deprecation must follow the <a href="/nrpe-custom/maintenance/#deprecation-and-reporting">maintenance policy</a>.</p>
+<h2 id="next-review-and-outstanding-actions">Next review and outstanding actions</h2>
+<ul>
+<li>[ ] Review NRPE 4.2.0's source delta, including the buffer/memory and TLS changes,
+  and determine whether distribution patches or follow-up advisories affect the
+  actual custom packages. Do not classify a changelog entry alone as a new CVE.</li>
+<li>[ ] Review Debian 11 retention and SLES SP4's approaching LTSS boundary with the
+  maintainer. Document a migration/deprecation decision before removing support.</li>
+<li>[ ] Complete production release-key enrollment and authenticate a newly signed
+  release using the <a href="/nrpe-custom/release-signing/">signing procedure</a>.</li>
+<li>[ ] Complete the externally blocked Windows Docker Desktop and real-VM tests
+  in the <a href="/nrpe-custom/practical-validation/">practical validation procedure</a>.</li>
+<li>[ ] Perform the next routine review by 2026-11-27, earlier for new advisories or
+  affected source/recipe changes. This document does not install a reminder or
+  represent continuous security monitoring.</li>
+</ul>
+<p>Integration stops at develop. This review and signing implementation do not
+authorize a master PR, master merge, release publication or repository visibility
+change.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/maintenance-reviews/2026-10-27.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#findings-and-decisions">Findings and decisions</a></li>
+<li><a href="#target-lifecycle-review">Target lifecycle review</a></li>
+<li><a href="#next-review-and-outstanding-actions">Next review and outstanding actions</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

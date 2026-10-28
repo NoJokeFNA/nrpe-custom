@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Interactive terminal menu · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a aria-current="page" href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Interactive terminal menu</h1>
+      <article class="prose"><p>The menu is an optional frontend to the same controller used by direct commands.
+It does not implement separate build, locking, or cleanup behavior.</p>
+<p>Local retention cleanup is available through <code>python3 nrpe.py clean</code>; see the
+<a href="/nrpe-custom/local-cleanup/">cleanup reference</a>. Its preview is read-only, and deletion
+requires a separate CLI invocation with <code>--apply</code>.</p>
+<h2 id="install-and-start">Install and start</h2>
+<p>From the repository root, install the pinned host-only dependencies:</p>
+<pre><code class="language-sh">python3 -m pip install -r requirements-menu.txt
+python3 nrpe.py
+</code></pre>
+<p>If your Python installation is managed by the operating system, use a virtual
+environment instead of overriding its package protections:</p>
+<pre><code class="language-sh">python3 -m venv .venv
+</code></pre>
+<p>Activate with <code>. .venv/bin/activate</code> on Linux/macOS, or
+<code>.venv\Scripts\Activate.ps1</code> in PowerShell. Then run the installation command
+above. The active interpreter must be available as <code>python3</code>. If a Windows
+virtual environment does not provide that alias, use its explicit interpreter
+<code>.venv\Scripts\python.exe</code> for both pip and <code>nrpe.py</code>, or configure a local
+<code>python3</code> alias for it. No particular editor is required.</p>
+<p>The menu uses prompt_toolkit for terminal input and rendering. This dependency
+is not installed in build containers. Direct commands such as
+<code>python3 nrpe.py verify debian12</code> continue to use only the Python standard library.</p>
+<h2 id="controls">Controls</h2>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Up / Down</td>
+<td>Move selection; long lists scroll</td>
+</tr>
+<tr>
+<td>Home / End</td>
+<td>Jump to the first / last item</td>
+</tr>
+<tr>
+<td>Enter</td>
+<td>Select an action or accept selected targets</td>
+</tr>
+<tr>
+<td>Space</td>
+<td>Toggle a target in the multi-selection screen</td>
+</tr>
+<tr>
+<td>A</td>
+<td>Select all targets in the multi-selection screen</td>
+</tr>
+<tr>
+<td>Escape / Q</td>
+<td>Go back; on the home screen, exit</td>
+</tr>
+<tr>
+<td>Ctrl+C</td>
+<td>Exit the menu; during a workflow, interrupt its command and clean up its container</td>
+</tr>
+<tr>
+<td>Ctrl+D</td>
+<td>End the menu at a selection prompt</td>
+</tr>
+</tbody>
+</table>
+<p>After a workflow or inspection command finishes, its ordinary output remains
+visible in the terminal. Scroll through it, then press Enter to return. Logs are
+also available from the run-selection screen or <code>logs --run &lt;id&gt;</code>.</p>
+<h2 id="workflow">Workflow</h2>
+<ol>
+<li>Choose build and test, build only, or test existing packages.</li>
+<li>Select one or more targets with Space, then Enter. No target is preselected.</li>
+<li>Choose whether to check for updated base images. Optionally browse for a
+   public PEM/DER company CA certificate, or enter/paste its path directly.</li>
+<li>Review the action, targets, base-image refresh, certificate path and output
+   replacement. Cancel is selected by default. SLE-15 media selection was retired.</li>
+<li>Select Run. Existing outputs are rebuilt only after this explicit confirmation.</li>
+<li>Read the result and return to the menu.</li>
+</ol>
+<p>The certificate default follows <code>NRPE_CA_CERT</code>, if configured.
+See <a href="/nrpe-custom/network/#optional-company-ca-certificate">company CA trust</a> for scope and image-cache details.</p>
+<p>Diagnostics, status, and logs are available directly from the home screen.
+A failed command returns to the menu after its result is acknowledged. Closing
+the menu does not turn a failed workflow into a passed run: inspect its exit
+message, report, or status. For automation, use direct commands and their exit
+codes rather than the menu session's exit code.</p>
+<h2 id="enter-or-paste-a-path">Enter or paste a path</h2>
+<p>The certificate browser includes <strong>Enter or paste a path...</strong>. A file selects
+that certificate; a directory opens that location. A direct certificate-path
+option is also available from the source menu.</p>
+<p>Paste paths as plain text, for example <code>C:\Certificates\Company Root.cer</code>, or
+with matching quotes as copied by Explorer's <strong>Copy as path</strong>. Backslashes and
+spaces are preserved; paths are never evaluated as shell commands. <code>~</code> and
+native environment-variable syntax are expanded (for example <code>%USERPROFILE%</code>
+on Windows). Relative paths entered in a browser are relative to its current
+directory; direct source-menu entry is relative to the process working directory.
+Tab offers path completion. Enter accepts; Escape or an empty value cancels.
+Cancelling returns to the existing browser location. Missing paths and incorrect
+file/directory types show an error with options to retry or cancel. Certificate
+contents still undergo regular validation.</p>
+<h2 id="terminal-behavior">Terminal behavior</h2>
+<p>Use an interactive terminal on Windows, Linux, or macOS. <code>NO_COLOR</code> requests
+monochrome rendering; selection remains visible through an arrow and reverse
+video, rather than color alone. <code>TERM=dumb</code> also disables color, but a terminal
+with cursor-control support is still needed for the menu. Use direct commands
+for restricted terminals, screen-reader workflows where full-screen interfaces
+are unsuitable, redirected output, and CI.</p>
+<p>With no terminal attached, launching without arguments prints CLI help without
+importing the optional dependencies or prompting. If a terminal is attached but
+the dependencies are missing, the CLI prints the installation command.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/menu.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#install-and-start">Install and start</a></li>
+<li><a href="#controls">Controls</a></li>
+<li><a href="#workflow">Workflow</a></li>
+<li><a href="#enter-or-paste-a-path">Enter or paste a path</a></li>
+<li><a href="#terminal-behavior">Terminal behavior</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

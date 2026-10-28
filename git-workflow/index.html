@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Branches, commits and integration · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Branches, commits and integration</h1>
+      <article class="prose"><p><code>master</code> is the default and release branch. <code>develop</code> is the integration branch.
+<strong>Never delete either branch.</strong> New work starts from current <code>develop</code> on one
+of <code>feat/...</code>, <code>fix/...</code>, <code>refactor/...</code>, or <code>remove/...</code>.</p>
+<pre><code class="language-sh">git fetch origin
+git switch develop
+git pull --ff-only origin develop
+git switch -c feat/example
+# Make and test the change, then stage explicit paths and commit.
+git push -u origin feat/example
+gh pr create --base develop
+</code></pre>
+<p>Use a PR/MR into <code>develop</code>. Promote the tested integration branch using a PR
+from <code>develop</code> into <code>master</code>; never route a topic directly into <code>master</code>.
+Prefer a normal merge for develop-to-master promotion so ancestry remains clear.
+Keep working on topic branches, not directly on either long-lived branch.</p>
+<p>Integration ends at <code>develop</code> by default. Create or merge a develop-to-master
+promotion PR only when the maintainer explicitly requests promotion to master.
+A request to implement a change or integrate it into develop does not authorize
+a master PR or release. Once an explicitly requested promotion reaches master,
+the automatic release workflow runs as configured.</p>
+<p>By default, work remains on a local topic branch. Pushing, opening a PR or
+merging into develop requires an explicit maintainer request. Master promotion
+requires its own explicit request. Complete the current change and checks before
+starting the next integration.</p>
+<h2 id="attribution">Attribution</h2>
+<p>Commits carry the existing human author identity. Do not add co-author trailers,
+AI attribution, or generated-with/by lines. Never rewrite old history to change
+attribution. The policy check rejects invalid routes, recognizable bot identities,
+missing author identities and attribution trailers. Git metadata alone cannot
+prove that an author is human; maintainers must review it.</p>
+<p>Dependabot PRs are proposals targeting <code>develop</code>, not exceptions to this policy.
+Review their changes and bring approved updates onto a correctly named topic
+branch with the human author's commit before integration. Do not merge bot-authored
+commits or automatically merge update PRs.</p>
+<h2 id="topic-branch-cleanup">Topic branch cleanup</h2>
+<p><code>gh-pages</code> is the website deployment branch, not a topic branch. Website sources
+remain on their separate website topic branch unless the maintainer requests
+integration. An explicitly requested publication appends a human-authored generated-site commit to gh-pages. It does
+not promote develop to master. See <a href="/nrpe-custom/website/">website publication</a>.</p>
+<p>Leave GitHub's unrestricted <strong>Automatically delete head branches</strong> setting off.
+It cannot express the required distinction between topic branches and the
+long-lived <code>develop</code> head of a promotion PR.</p>
+<p>The cleanup workflow handles successful merges into <code>develop</code> only. It requires
+an eligible topic prefix, the same repository, no other open PR needing the head,
+and an unchanged head SHA. Deletion uses a Git lease so a concurrent push is not
+deleted accidentally. Unmerged/closed PRs, forks, changed heads and unknown branch
+prefixes are retained. <code>master</code> and <code>develop</code> are always excluded.</p>
+<p>After a successful merge, update local <code>develop</code>, inspect local changes and PR
+state, and remove the corresponding local topic only when its work is integrated.
+Never use <code>gh pr merge --delete-branch</code> for a develop-to-master promotion.
+Legacy branches outside the named prefixes are not automatically removed.</p>
+<h2 id="server-side-protection-one-time-administrator-action">Server-side protection: one-time administrator action</h2>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
+long-lived branches against deletion and force-pushes, requires PRs and resolved
+review threads, and requires the branch/author policy and all fast CI checks.
+It does not impose an extra reviewer count on a single-maintainer repository.</p>
+<p>Protection was applied by the repository owner and verified on 2026-10-27:
+<a href="https://github.com/NoJokeFNA/nrpe-custom/rules/25987752">active ruleset 25987752</a>
+targets <code>refs/heads/master</code> and <code>refs/heads/develop</code>, with no bypass actors.
+Both branches have deletion/force-push protection, PR and resolved-thread
+requirements, and all six fast status checks from the template. The default
+branch remains <code>master</code>; unrestricted automatic head-branch deletion is off.</p>
+<p>Inspect effective rules when checking or changing repository settings:</p>
+<pre><code class="language-sh">gh api repos/NoJokeFNA/nrpe-custom/rules/branches/master
+gh api repos/NoJokeFNA/nrpe-custom/rules/branches/develop
+</code></pre>
+<p>For a new repository, an administrator can apply the template through GitHub's
+Rules/Rulesets settings or API, subject to plan and permissions. The connected
+integration returned HTTP 403 for administrative writes; owner configuration
+was required. Inspect existing rules before applying a template to avoid
+duplicates. Keep both target branches selected, the ruleset active, default
+branch <code>master</code> and global head-branch deletion disabled. Repository settings
+are separate from workflow guards; verify both rather than assuming that a
+committed template establishes protection.</p>
+<p>See <a href="/nrpe-custom/releases/">release automation</a> for what a master push does.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/git-workflow.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#attribution">Attribution</a></li>
+<li><a href="#topic-branch-cleanup">Topic branch cleanup</a></li>
+<li><a href="#server-side-protection-one-time-administrator-action">Server-side protection: one-time administrator action</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

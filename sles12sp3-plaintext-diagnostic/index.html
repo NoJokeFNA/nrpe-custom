@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>SLES 12 SP3: isolating an NRPE TLS handshake failure · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>SLES 12 SP3: isolating an NRPE TLS handshake failure</h1>
+      <article class="prose"><p>This procedure documents a user-performed diagnostic on <strong>SLES 12 SP3</strong> with
+NRPE <strong>2.15-4.24</strong>, OpenSSL <strong>1.0.2j-fips</strong> and a monitoring host running
+<code>check_nrpe</code> <strong>4.1.0</strong>. The original daemon reported
+<code>Error: Could not complete SSL handshake. 1</code>. A separate plaintext test returned
+<code>NRPE_PLAIN_OK</code>. Hostnames and addresses below are anonymized examples.</p>
+<p>The test runs a second NRPE instance on TCP <strong>15666</strong>, with its own configuration
+and PID file. The existing service on TCP <strong>5666</strong>, its configuration and Nagios
+check definitions remain unchanged. No package installation, systemd override,
+<code>daemon-reload</code> or production service restart is needed.</p>
+<p>Plaintext is a temporary diagnostic, not a deployment recommendation: the test
+has no TLS encryption or certificate authentication. Use a trusted network and
+restrict access to the monitoring host. Stop the test instance afterwards.</p>
+<h2 id="example-hosts-and-prerequisites">Example hosts and prerequisites</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Example hostname</th>
+<th>Example address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monitoring host with <code>check_nrpe</code></td>
+<td><code>monitor01</code></td>
+<td><code>192.0.2.10</code></td>
+</tr>
+<tr>
+<td>SLES 12 SP3 host with NRPE 2.15</td>
+<td><code>sles-agent01</code></td>
+<td><code>192.0.2.20</code></td>
+</tr>
+</tbody>
+</table>
+<p>The addresses belong to a documentation range. <strong>Replace them with your actual
+addresses before running the commands.</strong> <code>server_address</code> must be assigned to
+the SLES host; <code>allowed_hosts</code> must contain the source address the monitoring
+host actually uses. Check the hostname before working on either machine.</p>
+<p>On the SLES host, inspect the platform and local addresses:</p>
+<pre><code class="language-sh">hostname
+cat /etc/os-release
+/usr/sbin/nrpe -V
+ip -4 addr show
+sudo ss -ltnp | grep ':15666'
+</code></pre>
+<p>Expect SLES <code>VERSION_ID="12.3"</code> and NRPE 2.15. An NRPE version/usage command
+may exit nonzero after printing its output. Port 15666 must be unused; no output
+from the final command is expected before starting the test. If a previous test
+directory or instance exists, inspect and clean it up before reusing these paths.
+Allow TCP 15666 only from the monitoring host if a firewall change is necessary;
+record and later remove only that temporary rule.</p>
+<h2 id="1-create-the-isolated-configuration-on-the-sles-host">1. Create the isolated configuration on the SLES host</h2>
+<p>NRPE 2.15 does <strong>not</strong> support the foreground option <code>-f</code>. Use its daemon option
+<code>-d</code> with <code>-n</code> to disable TLS for this instance only. A modern <code>ssl_...</code> setting
+in the configuration is not a substitute for that startup option.</p>
+<pre><code class="language-sh">sudo install -d -o root -g nagios -m 0750 /run/nrpe-plain-test
+sudo install -d -o nagios -g nagios -m 0750 /run/nrpe-plain-test/runtime
+
+sudo tee /run/nrpe-plain-test/nrpe.cfg &gt;/dev/null &lt;&lt;'EOF'
+server_address=192.0.2.20
+server_port=15666
+pid_file=/run/nrpe-plain-test/runtime/nrpe.pid
+nrpe_user=nagios
+nrpe_group=nagios
+allowed_hosts=192.0.2.10
+dont_blame_nrpe=0
+command_timeout=10
+connection_timeout=10
+command[check_plain_test]=/usr/bin/printf 'NRPE_PLAIN_OK\n'
+EOF
+
+sudo chown root:nagios /run/nrpe-plain-test/nrpe.cfg
+sudo chmod 0640 /run/nrpe-plain-test/nrpe.cfg
+sudo -u nagios test -r /run/nrpe-plain-test/nrpe.cfg \
+  &amp;&amp; echo 'Test configuration is readable'
+</code></pre>
+<p>The root-owned configuration is readable by <code>nagios</code>; its runtime subdirectory
+allows that account to write the separate PID file. Command arguments remain
+disabled. The test defines only a fixed <code>printf</code> command, not production checks.</p>
+<h2 id="2-start-and-inspect-the-test-instance-on-the-sles-host">2. Start and inspect the test instance on the SLES host</h2>
+<pre><code class="language-sh">sudo -u nagios /usr/sbin/nrpe \
+  -c /run/nrpe-plain-test/nrpe.cfg -d -n
+
+sudo ss -ltnp | grep ':15666'
+</code></pre>
+<p>With <code>-d</code>, the prompt returns because the daemon runs in the background. Confirm
+that <code>ss</code> shows NRPE listening on the chosen local address and port 15666 before
+testing remotely. A returned prompt alone does not establish successful startup.</p>
+<p>For startup errors:</p>
+<pre><code class="language-sh">sudo journalctl -t nrpe --since '5 minutes ago' --no-pager
+</code></pre>
+<p>If you change this configuration later, stop <strong>only the test instance</strong> using
+the PID procedure below, then repeat this start command. No systemd reload is
+required for the separate daemon.</p>
+<h2 id="3-run-the-check-from-the-monitoring-host">3. Run the check from the monitoring host</h2>
+<pre><code class="language-sh">/usr/lib/nagios/plugins/check_nrpe \
+  -H 192.0.2.20 -p 15666 -2 -n -c check_plain_test
+</code></pre>
+<p>Adjust the plugin path if needed. <code>-2</code> selects the packet format understood by
+NRPE 2.15; <code>-n</code> selects plaintext, matching the test daemon. Do not modify global
+Nagios command definitions or remove TLS from other hosts' checks.</p>
+<p>Expected output:</p>
+<pre><code class="language-text">NRPE_PLAIN_OK
+</code></pre>
+<p>This is the result reported by the user for the original SLES 12 SP3 host. It
+confirms reachability on the test port, access acceptance and execution of this
+fixed command without TLS. It narrows the original problem toward TLS negotiation,
+but does not identify a specific cipher/certificate cause, test the production
+port or commands, or prove an upgrade has fixed the real deployment.</p>
+<h2 id="troubleshooting-encountered-during-this-procedure">Troubleshooting encountered during this procedure</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Meaning and next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid option -- 'f'</code></td>
+<td>NRPE 2.15 lacks <code>-f</code>; start this test with <code>-d -n</code>.</td>
+</tr>
+<tr>
+<td><code>Unable to open config file ... for reading</code></td>
+<td>Check the file's <code>root:nagios</code> ownership, <code>0640</code> mode and directory traversal permissions. <code>chmod 0640</code> alone leaves a root-group file unreadable to <code>nagios</code>.</td>
+</tr>
+<tr>
+<td><code>Cannot assign requested address</code></td>
+<td>The configured address is not local to this host. Check <code>hostname</code> and <code>ip -4 addr show</code>; make sure you are on the intended SLES server.</td>
+</tr>
+<tr>
+<td><code>Connection refused</code></td>
+<td>Check for a listener with <code>ss</code> and inspect startup logs; also consider an actively rejecting firewall. This happens before NRPE/TLS negotiation.</td>
+</tr>
+<tr>
+<td><code>Receive header underflow</code></td>
+<td>Not a specific TLS diagnosis. Confirm both ends use <code>-n</code>, the client uses <code>-2</code>, and the address/port are correct; inspect server logs, <code>allowed_hosts</code> and any TCP-wrapper rules.</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Check routing, firewall policy and the actual listening address. Do not disable the firewall globally.</td>
+</tr>
+<tr>
+<td><code>rmdir: Directory not empty</code></td>
+<td>The <code>runtime</code> subdirectory or PID file remains. Stop the test and remove those specific paths in the order below.</td>
+</tr>
+</tbody>
+</table>
+<p>The old daemon also reported <code>disable_syslog=0</code> as an unknown configuration
+option in the original production configuration. That is separate from the
+TLS failure; this minimal test configuration intentionally omits that directive.</p>
+<h2 id="4-stop-the-test-and-remove-its-files-on-the-sles-host">4. Stop the test and remove its files on the SLES host</h2>
+<p>Inspect the PID and command first. It must refer to the separate instance using
+<code>/run/nrpe-plain-test/nrpe.cfg</code>, not the production NRPE daemon:</p>
+<pre><code class="language-sh">sudo ps -p &quot;$(sudo cat /run/nrpe-plain-test/runtime/nrpe.pid)&quot; \
+  -o pid,user,args
+</code></pre>
+<p>After confirming that identity, stop that process:</p>
+<pre><code class="language-sh">sudo kill &quot;$(sudo cat /run/nrpe-plain-test/runtime/nrpe.pid)&quot;
+sudo ss -ltnp | grep ':15666'
+</code></pre>
+<p>Wait until port 15666 has no listener. If the PID file is missing or stale, use
+<code>ss</code> and process inspection to identify the test process; do not use <code>killall
+nrpe</code>, stop the production service, or send a signal to an unverified PID.</p>
+<p>Then remove the specific test files and directories:</p>
+<pre><code class="language-sh">sudo rm -f /run/nrpe-plain-test/runtime/nrpe.pid
+sudo rm /run/nrpe-plain-test/nrpe.cfg
+sudo rmdir /run/nrpe-plain-test/runtime
+sudo rmdir /run/nrpe-plain-test
+</code></pre>
+<p>Remove any firewall exception added specifically for this diagnostic. Existing
+production files and the listener on port 5666 are unaffected. The test paths
+under <code>/run</code> are temporary and do not survive reboot.</p>
+<p>For the certificate-authenticated upgrade path, see the
+<a href="/nrpe-custom/sles12sp3/#tls-and-the-original-handshake-failure">SLES 12 SP3 build guide</a>
+and <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">SLES TLS configuration example</a>.
+The project's NRPE 4.1.1 container tests are separate evidence from this
+user-performed plaintext diagnostic.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/sles12sp3-plaintext-diagnostic.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#example-hosts-and-prerequisites">Example hosts and prerequisites</a></li>
+<li><a href="#1-create-the-isolated-configuration-on-the-sles-host">1. Create the isolated configuration on the SLES host</a></li>
+<li><a href="#2-start-and-inspect-the-test-instance-on-the-sles-host">2. Start and inspect the test instance on the SLES host</a></li>
+<li><a href="#3-run-the-check-from-the-monitoring-host">3. Run the check from the monitoring host</a></li>
+<li><a href="#troubleshooting-encountered-during-this-procedure">Troubleshooting encountered during this procedure</a></li>
+<li><a href="#4-stop-the-test-and-remove-its-files-on-the-sles-host">4. Stop the test and remove its files on the SLES host</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

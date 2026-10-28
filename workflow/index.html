@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Workflow reference · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a aria-current="page" href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Workflow reference</h1>
+      <article class="prose"><p>Build Debian <code>nagios-nrpe-server</code> packages and a SLES 12 SP3
+<code>nrpe</code> RPM using the distribution packaging recipes, with command arguments
+compiled in and runtime argument handling disabled by default.</p>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Python 3.9 or newer; direct commands have no third-party Python dependencies.</li>
+<li>Optional arrow-key menu: from the repository root, use <code>python3 -m pip install -r requirements-menu.txt</code>.</li>
+<li>Docker Engine with BuildKit, Linux containers, and Docker Compose 2.17 or newer.</li>
+<li>Access from containers to the matching Debian or SLES/OBS repositories.</li>
+<li>Disk space for builder images, source trees, test images, and packages.</li>
+</ul>
+<p>Any editor can be used. On Windows, Docker Desktop with Linux containers is a
+suitable Docker runtime. ARM hosts need support for <code>linux/amd64</code> emulation.
+Bash is needed inside containers and for optional local shell syntax checks.</p>
+<h2 id="quick-start">Quick start</h2>
+<p><strong>Use <code>nrpe.py</code> as the main entry point.</strong> It coordinates this project's Compose
+files, checks Docker readiness, and records results. Direct Compose commands
+bypass the controller's checks, logs, and target locks.</p>
+<p>From the repository root on Windows, Linux, or macOS:</p>
+<pre><code class="language-sh">python3 nrpe.py doctor
+python3 nrpe.py verify debian12
+</code></pre>
+<p>Ensure that <code>python3 --version</code> reports Python 3.9 or newer. On Windows, make
+sure your Python installation provides <code>python3</code> in PATH.</p>
+<p>Run without arguments for an interactive action and target menu:</p>
+<pre><code class="language-powershell">python3 nrpe.py
+</code></pre>
+<p>The arrow-key menu returns after each command. Use arrows and Enter to navigate,
+Space to toggle targets, and A to select all targets. Escape returns to the
+previous screen; Ctrl+C exits the menu or interrupts a running command. Install
+the optional dependencies first; see <a href="/nrpe-custom/menu/">the menu guide</a>. Without an
+interactive terminal, no arguments prints help and does not prompt. All CLI
+messages are in English. Use <code>--help</code> or <code>&lt;command&gt; --help</code> for command-specific usage.</p>
+<h2 id="commands">Commands</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>doctor</code></td>
+<td>Check required project files, Docker connectivity, Linux container mode, Compose v2, and both Compose configurations</td>
+</tr>
+<tr>
+<td><code>build &lt;targets&gt;</code></td>
+<td>Build packages, run in-container package checks, and verify exported checksums</td>
+</tr>
+<tr>
+<td><code>test &lt;targets&gt;</code></td>
+<td>Install and test existing packages without rebuilding them</td>
+</tr>
+<tr>
+<td><code>verify &lt;targets&gt;</code></td>
+<td>Build and integration-test each target before proceeding to the next</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>Show current packages, SHA-256 hashes, matching test results, and target locks without needing Docker</td>
+</tr>
+<tr>
+<td><code>logs --last</code></td>
+<td>Display output from the latest recorded workflow run</td>
+</tr>
+<tr>
+<td><code>logs --run &lt;id&gt;</code></td>
+<td>Display output from a particular recorded workflow run</td>
+</tr>
+</tbody>
+</table>
+<p>Select one target, multiple targets, or <code>all</code> by itself:</p>
+<pre><code class="language-powershell">python3 nrpe.py verify debian12 debian13
+python3 nrpe.py verify all
+python3 nrpe.py test debian14
+python3 nrpe.py status
+python3 nrpe.py logs --last
+</code></pre>
+<p>SLES 12 SP3 uses a genuine digest-pinned 12.3 image and a hash-pinned set of
+original SLE-12 Server/SDK RPMs. A modern input stage downloads sources; native
+SLES tools verify package signatures and compile/install the result. No SLE-15
+binary or ISO layout is used, and the obsolete <code>--sles-media</code> option is removed.
+See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a>.</p>
+<h2 id="targets-and-package-builds">Targets and package builds</h2>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Distribution</th>
+<th>Architecture</th>
+<th>Output directory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>debian11</code></td>
+<td>Debian 11 Bullseye</td>
+<td>amd64</td>
+<td><code>output/debian11/</code></td>
+</tr>
+<tr>
+<td><code>debian12</code></td>
+<td>Debian 12 Bookworm</td>
+<td>amd64</td>
+<td><code>output/debian12/</code></td>
+</tr>
+<tr>
+<td><code>debian13</code></td>
+<td>Debian 13 Trixie</td>
+<td>amd64</td>
+<td><code>output/debian13/</code></td>
+</tr>
+<tr>
+<td><code>debian14</code></td>
+<td>Debian 14 Forky</td>
+<td>amd64</td>
+<td><code>output/debian14/</code></td>
+</tr>
+<tr>
+<td><code>sles12sp3</code></td>
+<td>SLES 12 SP3</td>
+<td>x86_64</td>
+<td><code>output/sles12sp3/</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>all</code> includes every target, including the SLES target. To validate
+only Debian, list <code>debian11 debian12 debian13 debian14</code> explicitly.</p>
+<p>Debian 11's security package files have moved to <code>archive.debian.org</code>; the setup
+helper updates that security repository URL in both builder and test images.
+Suite names, signing keys, signature checks, and validity checks remain enabled.
+Debian 11 has been built and installation/TLS argument tests have passed here
+with <code>4.0.3-1+withargs1</code>. This is historical archive availability, not a promise
+of ongoing security updates for this old release.</p>
+<p>SLES uses an actual SLES 12 SP3 base, not a Debian or Leap replacement.
+Its RPM recipe, pinned sources, prerequisites, and validation limits
+are documented in <a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a>.</p>
+<p>Each Debian target uses a corresponding Debian container with a shared Dockerfile.
+The build enables source repositories, installs build dependencies, and fetches
+verified official <code>nagios-nrpe</code> sources from the selected suite. Source versions
+are discovered dynamically; Forky is a moving testing suite.</p>
+<p>The Debian build changes only the intended configure option in <code>debian/rules</code> and the
+custom version entry in <code>debian/changelog</code>. It rejects unsupported packaging
+layouts. <code>dpkg-buildpackage</code> produces binary packages; the exported server keeps
+the name <code>nagios-nrpe-server</code> and uses <code>${original_version}+withargs1</code>.
+Do not implement versioning by renaming finished packages. Increment the custom
+revision when changing the recipe for the same official source version.</p>
+<p>The build verifies package identity, version, architecture, executable contents,
+and configure macros before exporting the server <code>.deb</code>, <code>SHA256SUMS</code>, and
+available <code>.buildinfo</code>. It also builds the corresponding source package before
+the binary build. <code>output/debianXX/sources/</code> contains the custom <code>.dsc</code>, every
+upstream/packaging archive referenced by its SHA-256 fields, and a separate
+<code>SHA256SUMS</code>. Export rejects missing files, mismatched versions and hashes, and
+unsafe filenames. Preserve this directory alongside binaries for release
+preparation; the binary-only checksum file used for installation is unchanged.
+The client plugin is not exported. Existing valid output is retained until a
+replacement build passes its package and source checks.</p>
+<h2 id="installation-and-argument-integration-tests">Installation and argument integration tests</h2>
+<p><code>verify</code> builds and tests a package; <code>test</code> exercises an existing artifact.
+Separate opt-in services in <code>compose.test.yaml</code> use <code>docker/debian/test.Dockerfile</code> to:</p>
+<ol>
+<li>Require exactly one server package and verify its checksum, identity,
+   architecture, and custom version suffix.</li>
+<li>Install that local <code>.deb</code> and its dependencies in a fresh matching distribution
+   container, then check the installed version.</li>
+<li>Confirm that the installed package keeps <code>dont_blame_nrpe=0</code> by default.</li>
+<li>Start NRPE with a disposable configuration and confirm that ordinary requests
+   succeed while argument requests are rejected.</li>
+<li>Set <code>dont_blame_nrpe=1</code> only in the temporary configuration, restart NRPE, and
+   verify exact responses for the argument pairs <code>alpha beta</code> and <code>gamma delta</code>.</li>
+</ol>
+<p>Debian's <code>nagios-nrpe-plugin</code> and the natively built SLES <code>monitoring-plugins-nrpe</code> supply
+<code>check_nrpe</code>, the client used by Nagios. A full Nagios scheduler or web interface is unnecessary for this protocol
+test. Client and server run inside the same container over loopback using TLS
+and a short-lived test certificate. No NRPE port is published. Package outputs
+are mounted read-only, and the installed default configuration is unchanged.</p>
+<p>Each target has a builder image and a separate minimal test image. Keeping tests
+separate ensures that compiler and build dependencies cannot hide missing runtime
+dependencies during package installation. Common Debian layers are shared by
+Docker, and cached images are reused. Tests do not need a full Nagios server image.</p>
+<p>An installation success alone does <strong>not</strong> mean the argument tests passed. The
+log explicitly reports argument rejection with <code>dont_blame_nrpe=0</code> and exact
+argument responses with <code>dont_blame_nrpe=1</code>.</p>
+<p>These tests need the target distribution's repository access and run NRPE directly. They do not
+validate systemd startup, external network access, production certificates, or a
+complete Nagios deployment. Exact all-five-target release results are recorded
+in the <a href="/nrpe-custom/release-history/">release history</a>; those passes apply to the recorded
+commits and artifacts. Unit tests alone do not establish package/runtime success.</p>
+<h2 id="results-logs-and-concurrent-runs">Results, logs, and concurrent runs</h2>
+<p>Use <a href="/nrpe-custom/local-cleanup/">local cleanup</a> to preview expired run logs/reports and
+explicitly selected retired output or Docker images. <code>python3 nrpe.py clean</code>
+does not delete anything; deletion requires <code>--apply</code> and respects workflow locks.</p>
+<p>Each build/test/verify invocation receives a unique run ID and writes:</p>
+<pre><code class="language-text">.nrpe/runs/&lt;run-id&gt;/
+├── report.json
+└── run.log          # Created when a target reaches its workflow phases
+</code></pre>
+<p>The JSON report includes UTC timestamps, action, per-target build/package/test
+outcomes, exit code, an optional normalized company CA SHA-256, and the tested artifact's filename, version from its filename,
+and SHA-256 hash. A summary distinguishes passed, failed, interrupted, running,
+and unrun phases. The first failure stops remaining targets; failed builds never
+test old output files. <code>logs</code> also shows errors that occur before container output
+exists. Local state and logs are ignored by Git and may contain paths or build
+output; review them before sharing.</p>
+<p><code>status</code> matches test reports to the current package identity and hash. Replacing
+a package with different bytes invalidates its previous passed test status. A
+matching hash describes tested package bytes, not source provenance.</p>
+<p>The controller locks the target during each operation, preventing simultaneous
+controller builds or tests of that target. Different targets may run concurrently.
+Direct Compose commands do not participate in these locks; avoid mixing them
+with controller runs that use the same outputs.</p>
+<p><code>Ctrl+C</code> stops the run's Compose process and removes only its uniquely named
+container. It does not run <code>compose down</code> or stop unrelated containers. If cleanup
+fails, the target lock is retained. After a terminal crash or forced process kill,
+<code>status</code> may show a lock and a report may remain <code>running</code>. Inspect
+<code>.nrpe/locks/&lt;target&gt;/owner.json</code>, the report, and <code>docker ps -a</code> before manually
+removing a stale lock directory. Never remove a lock while its run or container
+is still active. Existing Compose networks and builder caches are retained.</p>
+<h2 id="target-server-configuration">Target server configuration</h2>
+<p>The custom packages compile argument support while leaving runtime arguments
+disabled. On a real target server, deliberately configure <code>/etc/nagios/nrpe.cfg</code>
+on Debian, or <code>/etc/nrpe.cfg</code> for this SLES/OBS recipe:</p>
+<pre><code class="language-ini">allowed_hosts=&lt;nagios-server-ip&gt;,127.0.0.1,::1
+dont_blame_nrpe=1
+</code></pre>
+<p>Replace the placeholder with the permitted Nagios server's address, review
+firewall rules, TLS, command definitions, and argument validation, then restart
+<code>nagios-nrpe-server</code> on Debian or <code>nrpe</code> on SLES. Bash command substitution must remain disabled. Build and
+test containers never apply these settings to the development host.</p>
+<h2 id="development-and-validation">Development and validation</h2>
+<pre><code class="language-sh">python3 -m unittest discover -s tests -v
+for script in scripts/*.sh; do bash -n &quot;$script&quot; || exit; done
+python3 nrpe.py doctor
+</code></pre>
+<p>For affected targets, run <code>python3 nrpe.py verify &lt;target&gt;</code>. Unit tests cover CLI
+routing, Docker diagnostics, run reports, artifact identity, locking, cleanup,
+and the Debian/RPM recipe transformations without requiring Docker or network access.
+They do not replace real package and integration tests. Windows-specific error
+messages and process handling also need validation on Windows.</p>
+<p>Implementation is in <code>nrpe_cli/</code>; <code>nrpe.py</code> is the public entry point. Docker
+runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/AGENTS.md">AGENTS.md</a> and the
+additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/tests/AGENTS.md">test</a> instructions apply.
+Write code, comments, documentation, and commits in English; follow
+<a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits 1.0.0</a>.</p>
+<h2 id="repeatability-and-updates">Repeatability and updates</h2>
+<p>Current Debian sources and mutable image tags give a repeatable method, not
+bit-for-bit reproducible packages. Audit-ready releases require recording or
+pinning image digests, repository snapshots, source versions, and dependencies.
+Retain checksums and build information with released packages. Monitor Debian
+security updates and rebuild custom packages when official sources change; do
+not assume APT automatically replaces every custom version as intended.</p>
+<p>Official sources: <a href="https://sources.debian.org/src/nagios-nrpe/">Debian NRPE sources</a>
+and <a href="https://packages.debian.org/src:nagios-nrpe">source package information</a>.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/workflow.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#quick-start">Quick start</a></li>
+<li><a href="#commands">Commands</a></li>
+<li><a href="#targets-and-package-builds">Targets and package builds</a></li>
+<li><a href="#installation-and-argument-integration-tests">Installation and argument integration tests</a></li>
+<li><a href="#results-logs-and-concurrent-runs">Results, logs, and concurrent runs</a></li>
+<li><a href="#target-server-configuration">Target server configuration</a></li>
+<li><a href="#development-and-validation">Development and validation</a></li>
+<li><a href="#repeatability-and-updates">Repeatability and updates</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

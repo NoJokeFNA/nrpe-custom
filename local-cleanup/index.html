@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Cleaning local workflow data · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
+</span>
+<span>NRPE<span class="brand-light"> Custom</span>
+</span>
+</a>
+<nav aria-label="Main navigation"><a aria-current="page" href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a href="/nrpe-custom/field-notes/">Field notes</a></nav>
+<div class="header-tools">
+<label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>/</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
+</div>
+</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
+    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a aria-current="page" href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="eyebrow">Documentation</div>
+      <h1>Cleaning local workflow data</h1>
+      <article class="prose"><p><code>clean</code> previews eligible data by default. It does not install packages, change
+the target server, remove current packages or contact Docker unless an image is
+explicitly selected.</p>
+<pre><code class="language-sh">python3 nrpe.py clean
+python3 nrpe.py clean --older-than 60 --keep-runs 10
+</code></pre>
+<p>The defaults are 30 days and at least five retained runs. Only completed,
+recognized run directories containing <code>report.json</code> and optionally <code>run.log</code>
+are candidates. Both completion time and file modification times must be old
+enough. Running, malformed and unrecognized evidence is left for inspection.</p>
+<p>The newest report for each current target and the newest test report matching
+its current package bytes are retained even with <code>--keep-runs 0</code>. The newest
+complete successful <code>verify</code> report matching those bytes is also retained,
+even if a newer runtime-only test exists. Current target output directories,
+release candidates, downloaded releases, locks, certificates
+and arbitrary working directories are never cleanup candidates. Back up evidence
+you need beyond that retention policy before deleting it.</p>
+<h2 id="apply-an-inspected-selection">Apply an inspected selection</h2>
+<pre><code class="language-sh">python3 nrpe.py clean --older-than 60 --keep-runs 10 --apply
+</code></pre>
+<p><code>--apply</code> is explicit deletion consent, including in non-interactive use. The
+tool recalculates the plan under a maintenance guard; changed candidates abort
+the operation. Active or unresolved target locks block deletion. New controller
+workflows cannot acquire target locks during cleanup. Symlinks, Windows reparse
+points and special files in traversed cleanup paths are rejected.
+Mounted candidate directories and nested mount points are rejected too.</p>
+<p>Cleanup is sequential, not a filesystem transaction: an I/O or Docker error can
+leave a partially completed cleanup. Already removed paths are reported. Inspect
+the error and preview again; do not assume everything was deleted.</p>
+<p>Direct Compose commands do not take controller locks. Do not run them against
+the same workspace while applying cleanup. After a crash, a retained
+<code>.nrpe/locks/maintenance</code> directory must be inspected along with processes and
+containers before manually removing that marker. Never remove a live lock.</p>
+<h2 id="retired-sles-output">Retired SLES output</h2>
+<p>Include expired output for the explicitly retired <code>sles15sp3</code> and <code>sles15sp4</code>
+targets only when requested:</p>
+<pre><code class="language-sh">python3 nrpe.py clean --retired-outputs
+python3 nrpe.py clean --retired-outputs --apply
+</code></pre>
+<p>The same age threshold applies. A retired directory with an unknown top-level
+file is retained for manual review. The active <code>sles12sp3</code> and Debian outputs
+remain protected. This does not remove published SLE-15 releases or their
+historical verification evidence from GitHub or Git.</p>
+<h2 id="individually-selected-docker-images">Individually selected Docker images</h2>
+<pre><code class="language-sh">python3 nrpe.py clean --image nrpe-custom-builder:sles15sp3
+python3 nrpe.py clean --image nrpe-custom-builder:sles15sp3 --apply
+</code></pre>
+<p>Repeat <code>--image</code> to select more than one explicit <code>nrpe-custom</code> builder/test
+image tag. Docker is required for the preview too. Base images, bare IDs and
+wildcards are rejected. Images used by running <strong>or stopped</strong> containers are
+refused; identity and usage are checked again before applying. Removal uses
+<code>docker image rm</code> without force. A concurrent Docker change can still cause
+Docker to refuse deletion; the tool does not override that protection.</p>
+<p>This command does not prune Docker globally or remove containers, networks,
+volumes or BuildKit caches. Removing an image tag may reclaim little space when
+layers are shared. Manage Docker Desktop/Engine storage separately if necessary.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/14bd85f564477b0dc5be1ef6d965ee0bc2aa4d4e/docs/local-cleanup.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc"><span>On this page</span><div class="toc">
+<ul>
+<li><a href="#apply-an-inspected-selection">Apply an inspected selection</a></li>
+<li><a href="#retired-sles-output">Retired SLES output</a></li>
+<li><a href="#individually-selected-docker-images">Individually selected Docker images</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+<p>Independent tooling. Distribution packages. Reviewed changes.</p>
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 14bd85f</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>
