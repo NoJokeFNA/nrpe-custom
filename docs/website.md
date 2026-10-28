@@ -75,13 +75,13 @@ The requested hosting source is **gh-pages**, repository root. In GitHub:
 4. Wait for deployment and verify the homepage, FAQ and a deep link.
 
 The expected URL is `https://nojokefna.github.io/nrpe-custom/`. The repository
-stays private; Pages availability/site visibility depend on GitHub's plan and
-settings. Publishing docs does not make the repository or releases public.
+visibility is managed by the owner and is not changed by the publisher. Pages
+availability and site visibility depend on GitHub's plan and settings.
 Review content for public disclosure; never include private logs, actual
 infrastructure addresses or keys.
 
-The connected integration returned HTTP 403 for the Pages settings API and
-cannot establish or change those settings. A pushed branch alone does not
-prove the website is live. Owner setup and HTTP/browser checks must complete
-before claiming successful hosting. See
+If the connected integration cannot access the Pages settings API, the owner
+must complete setup in Settings. A pushed branch alone does not prove the
+website is live. Deployment and HTTP/browser checks must complete before
+claiming successful hosting. See
 [GitHub Pages setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
