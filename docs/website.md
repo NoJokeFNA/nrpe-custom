@@ -13,6 +13,13 @@ invented testimonial or production TLS claim. New reports follow the
 
 ## Homepage content and CLI capture
 
+The hero's "Built from real problems." line reveals one letter every 85 ms and
+repeats every 10 seconds, leaving the complete sentence visible between cycles.
+Letter spacing stays reserved so the heading does not move while typing. A pause
+button stops the effect; reduced-motion preferences and missing JavaScript keep
+the full heading static. Animation also stops while the tab or heading is hidden.
+Screen readers receive the complete sentence once, without repeated announcements.
+
 The homepage links to GitHub's latest release rather than hardcoding a release
 version. Its supported-target table is derived from the README table, keeping
 target names and package formats in one source. The project story summarizes
