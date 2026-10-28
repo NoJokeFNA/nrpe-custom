@@ -7,6 +7,7 @@ import sys
 
 from .certificates import prepared_certificate
 from .controller import execute
+from .cleanup import clean
 from .docker import check_docker
 from .state import ROOT, artifact, reports
 from .targets import TARGETS, package_files
@@ -116,6 +117,13 @@ def parser():
                                  help="explicitly allow rebuilding existing package outputs")
     commands.add_parser("doctor", help="Diagnose Docker and project configuration")
     commands.add_parser("status", help="Show local packages and recorded test results (no Docker required)")
+    cleanup = commands.add_parser('clean', help='Preview expired local runs; delete only with --apply')
+    cleanup.add_argument('--older-than', type=int, default=30, metavar='DAYS')
+    cleanup.add_argument('--keep-runs', type=int, default=5, metavar='COUNT')
+    cleanup.add_argument('--retired-outputs', action='store_true', help='Include expired SLES-15 output directories')
+    cleanup.add_argument('--image', action='append', default=[], metavar='REFERENCE',
+                         help='Explicit project image tag to remove; may be repeated')
+    cleanup.add_argument('--apply', action='store_true', help='Perform the displayed cleanup instead of previewing')
     logs = commands.add_parser("logs", help="Display output from a recorded run (no Docker required)")
     selection = logs.add_mutually_exclusive_group()
     selection.add_argument("--last", action="store_true", help="Show the latest run (default)")
@@ -149,6 +157,8 @@ def main(argv=None, root=ROOT):
             return show_status(root)
         if args.action == "logs":
             return show_logs(root, args.run)
+        if args.action == 'clean':
+            return clean(root, args.older_than, args.keep_runs, args.retired_outputs, args.image, args.apply)
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
@@ -172,7 +182,7 @@ def main(argv=None, root=ROOT):
             if certificate is not None:
                 options["ca_cert"] = certificate
             return execute(args.action, targets, root, **options)
-    except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
+    except (OSError, RuntimeError, subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:

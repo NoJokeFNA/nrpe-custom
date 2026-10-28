@@ -34,6 +34,7 @@ flowchart LR
 | `nrpe_cli/controller.py` | Sequence targets/phases, stream logs, persist outcomes, and clean up only the owned container |
 | `nrpe_cli/docker.py` | Check Docker Engine, Linux container mode, and Compose; give platform-specific failure hints |
 | `nrpe_cli/state.py` | Artifact identity/checksums, run IDs/reports, and per-target locks |
+| `nrpe_cli/cleanup.py` | Preview/retention planning and guarded deletion of expired local evidence or explicitly selected project images |
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
 | `nrpe_cli/certificates.py` | Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret |
 | `nrpe_cli/release.py` | Validate exact workflow/build/source evidence and assemble complete release archives |

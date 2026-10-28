@@ -248,6 +248,7 @@ These checks do not replace package builds and runtime integration tests.
 - [Security](docs/security.md): argument risks and safe issue reporting.
 - [Release and maintenance plan](docs/release-plan.md): open work and future release requirements.
 - [Release history](docs/release-history.md): published versions and exact validation evidence.
+- [Local cleanup](docs/local-cleanup.md): preview expired runs and explicitly selected retired outputs/images.
 
 These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review

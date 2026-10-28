@@ -51,7 +51,8 @@ def reports(root):
                 result.append(report)
         except (OSError, ValueError, AttributeError):
             continue
-    return sorted(result, key=lambda item: item.get("started", item["id"]), reverse=True)
+    return sorted(result, key=lambda item: item.get("started")
+                  if isinstance(item.get("started"), str) else item["id"], reverse=True)
 
 
 def _sha256(path):
@@ -94,17 +95,34 @@ def artifact(root, target):
 
 
 @contextmanager
-def target_lock(root, target, run_id):
-    path = root / ".nrpe" / "locks" / target
+def maintenance_guard(root):
+    """Serialize cleanup with target-lock creation, not with whole builds."""
+    path = root / '.nrpe' / 'locks' / 'maintenance'
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         path.mkdir()
     except FileExistsError as exc:
-        raise RuntimeError(
-            f"{target} is locked by another or interrupted run ({path}). "
-            "Check status and running containers. Remove this lock directory only "
-            "after confirming that its owner is no longer running."
-        ) from exc
+        raise RuntimeError('Workspace maintenance or another workflow start is in progress. '
+                           'Retry later; inspect a retained maintenance lock before recovery.') from exc
+    try:
+        yield
+    finally:
+        path.rmdir()
+
+
+@contextmanager
+def target_lock(root, target, run_id):
+    path = root / ".nrpe" / "locks" / target
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with maintenance_guard(root):
+        try:
+            path.mkdir()
+        except FileExistsError as exc:
+            raise RuntimeError(
+                f"{target} is locked by another or interrupted run ({path}). "
+                "Check status and running containers. Remove this lock directory only "
+                "after confirming that its owner is no longer running."
+            ) from exc
     try:
         (path / "owner.json").write_text(
             json.dumps({"run": run_id, "started": timestamp()}), encoding="utf-8"

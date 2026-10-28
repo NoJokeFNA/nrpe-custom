@@ -158,6 +158,10 @@ unit tests as successful package builds for every target.
 
 ## Results, logs, and concurrent runs
 
+Use [local cleanup](local-cleanup.md) to preview expired run logs/reports and
+explicitly selected retired output or Docker images. `python3 nrpe.py clean`
+does not delete anything; deletion requires `--apply` and respects workflow locks.
+
 Each build/test/verify invocation receives a unique run ID and writes:
 
 ```text
