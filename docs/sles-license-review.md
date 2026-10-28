@@ -1,8 +1,10 @@
 # SLES pinned-source license review
 
 Reviewed on 2026-10-27. The same exact upstream and companion source inputs
-are reused for the SLES 12 SP3 migration on 2026-10-28. Binary observations below were
-recorded on SP4 and do not establish SP3 runtime validation. The two previously recorded SLES license-evidence gaps
+are reused for the SLES 12 SP3 migration on 2026-10-28. Historical binary observations
+below were recorded on SLES 15 SP4 and do not establish SLES 12 SP3 runtime validation.
+The published SLES 12 SP3 build/runtime evidence is in the [release history](release-history.md).
+The two previously recorded SLES license-evidence gaps
 are closed for the pinned inputs below. The review also resolves the apparent
 ACL license-version discrepancy. Release completeness, provenance and packaging
 checks still apply; this does not approve redistribution of SLES images,
@@ -40,7 +42,8 @@ offline disposable SLES container. The binary's `-l` output contains the same
 OpenSSL/GPL notice. This NRPE license-display path exits with status 3 even when
 it prints the notice; the text was checked directly, rather than treating that
 exit status as a successful application test. No server was started and no
-package was installed on the host. No fresh package build was required or run.
+package was installed on the host. No fresh package build was required or run
+for that historical license inspection.
 
 ## ACL code: GPLv2-or-later, not a contradictory GPLv2-only grant
 
@@ -94,9 +97,11 @@ short identifiers identify license texts; see
 
 The two evidence questions are resolved. A SLES candidate must still include:
 
-- Both complete corresponding source RPMs, manifests and required build scripts.
+- All three complete corresponding source RPMs (NRPE, system user and build
+  macros), manifests and required build scripts.
 - The [notice directory](../packaging/licenses/sles12sp3/README.md), including the
-  original GPL text, OpenSSL notice, trademark notice and companion MIT terms.
+  original GPL text, OpenSSL notice, trademark notice, companion MIT terms and
+  the build macros' BSD-3-Clause notice.
 - Original per-file copyright and license notices inside the source packages.
 - Candidate checksums covering every distributed asset and tests bound to the
   exact server and companion binaries.

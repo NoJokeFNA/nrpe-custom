@@ -102,15 +102,8 @@ certificate; a connection without that client certificate was rejected.
 
 The target is published; see the [release history](release-history.md#sles-12-sp3-release-2026-10-28)
 for exact master-commit, CI and independently checked release-asset evidence.
-The local runs below preceded publication and remain historical.
-
-Local run `20261028T083230-86e80546` passed native NRPE build, package checks,
-fresh SLES-12 installation and TLS-1.2 requests with mandatory client certificates
-and both argument policies. Subsequent exact commit/run and candidate evidence
-is kept locally under `.nrpe/`; a fresh clean-checkout run is required for each
-release candidate. Earlier unsuccessful local runs
-stopped for missing genuine dependencies/cleanup handling and were not counted
-as passes. No signing, dependency or TLS checks were bypassed.
+Earlier local migration runs are retained in that history. A fresh clean-checkout
+run is required for every release candidate; historical results do not replace it.
 
 Container tests run NRPE directly. They do not validate real-server systemd,
 reboot, site-specific commands, production certificates, update or rollback.

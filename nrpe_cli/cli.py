@@ -26,7 +26,7 @@ def doctor(root):
                 "scripts/prepare_sles_inputs.py", "scripts/sles_source.py", "scripts/fetch_sles_packages.py",
                 "scripts/verify-sles-packages.sh", "scripts/verify-sles-environment.sh",
                 "scripts/setup-debian-repositories.sh", "scripts/install-ca-certificate.sh",
-                "packaging/empty-ca.pem", "packaging/sles12sp3-source.json",
+                "packaging/sles12sp3-source.json",
                 "packaging/sles12sp3-user-source.json", "packaging/sles12sp3-macros-source.json",
                 "packaging/sles12sp3-bootstrap.json", "packaging/sles12sp3-suse.asc")
     missing = [name for name in required if not (root / name).is_file()]
