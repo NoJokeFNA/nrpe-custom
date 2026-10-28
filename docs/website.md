@@ -13,11 +13,14 @@ invented testimonial or production TLS claim. New reports follow the
 
 ## Homepage content and CLI capture
 
-The hero's "Built from real problems." line reveals one letter every 85 ms and
-repeats every 10 seconds, leaving the complete sentence visible between cycles.
-Letter spacing stays reserved so the heading does not move while typing. A pause
-button stops the effect; reduced-motion preferences and missing JavaScript keep
-the full heading static. Animation also stops while the tab or heading is hidden.
+The hero's "Built from real problems." line gently fades out, then reveals letters
+70 ms apart with a 180 ms fade and small vertical transition per letter. Cycles
+start 60 seconds apart, leaving the complete sentence visible between cycles.
+Letter spacing stays reserved so the heading does not move while typing.
+Reduced-motion preferences and missing JavaScript keep the full heading static.
+Animation stops while the tab or heading is hidden. Returning to the heading
+preserves the scheduled interval; an elapsed interval starts a fresh 60-second
+wait instead of immediately replaying. There is no visible animation control.
 Screen readers receive the complete sentence once, without repeated announcements.
 
 The homepage links to GitHub's latest release rather than hardcoding a release
