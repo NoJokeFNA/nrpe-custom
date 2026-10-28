@@ -26,22 +26,18 @@ work around a firewall rejection.
 | Hosts | Ports | Used by | Purpose |
 | --- | --- | --- | --- |
 | `github.com` | TCP 443 | Git client | Clone/update this repository; GitHub releases if used later |
-| `registry-1.docker.io`, `auth.docker.io` | TCP 443 | Docker/BuildKit | Official Debian base images and Dockerfile frontend image/authentication |
+| `registry-1.docker.io`, `auth.docker.io` | TCP 443 | Docker/BuildKit | Official Debian/Python input-stage images and Dockerfile frontend image/authentication |
 | `production.cloudflare.docker.com`, `production.cloudfront.docker.com` | TCP 443 | Docker/BuildKit | Possible Docker Hub blob/CDN destinations; actual endpoints may differ |
-| `registry.suse.com` | TCP 443 | Docker/BuildKit | SLES SP4 BCI base image; follow authorized registry authentication/blob endpoints |
+| `registry.suse.com` | TCP 443 | Docker/BuildKit | Genuine SLES 12 SP3 image; follow authorized registry authentication/blob endpoints |
 | `deb.debian.org`, `security.debian.org` | TCP 80 and/or 443, matching image APT sources | Debian containers | Package indexes, NRPE source, build and runtime dependencies |
 | `archive.debian.org` | TCP 80 in the current Bullseye security rewrite | Debian 11 containers | Archived security packages; APT authenticity checks remain enabled |
-| `download.opensuse.org` | TCP 443 plus approved mirror redirects | SLES containers | SP4 backports repository and package downloads |
-| `updates.suse.com` | TCP 443 | SLES containers | Repository configured in the current SP4 BCI base; custom bases can differ |
-| `api.opensuse.org` | TCP 443 | SLES builder and runtime-image setup | Pinned OBS sources, original SUSE bootstrap RPMs; authoritative signing keys during reviewed updates |
+| `api.opensuse.org` | TCP 443 | SLES input-download stage | Pinned OBS sources, pinned original SLE-12 Server/SDK RPMs; authoritative signing keys during reviewed updates |
 | `pypi.org`, `files.pythonhosted.org` | TCP 443 | Host pip, only when installing the optional menu | prompt_toolkit and wcwidth |
-| `www.suse.com` and authorized SUSE download hosts | TCP 443 | Administrator, optional | Download official SP4 installation media; not needed by the standard online build |
 
-SLES base-image repositories can add destinations such as `updates.suse.com`;
-inspect `/etc/zypp/repos.d/` in the selected base for its actual URLs. A custom
-`SLES_BASE_IMAGE`, RMT server, private registry, Docker registry mirror, or APT
-configuration changes this list. Subscription-backed repositories may require
-your own access entitlement; the controller does not supply one.
+The default SLES-12 native build and runtime steps install local pinned inputs;
+they need no repository registration or network access after input preparation.
+Custom registries or APT mirrors change the workstation's outbound destinations.
+The controller does not supply subscription credentials or accept terms.
 
 Configured DNS resolution is also required. Use your network's DNS resolver and
 policy (commonly UDP/TCP 53); no particular public DNS service is required.
@@ -118,7 +114,7 @@ certificate in certificate chain`, select the public root or intermediate CA
 provided by your administrator:
 
 ```powershell
-python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"
+python3 nrpe.py verify sles12sp3 --ca-cert "C:\Certificates\Company-Root.cer"
 python3 nrpe.py test debian12 --ca-cert "C:\Certificates\Company-Root.cer"
 ```
 
@@ -140,12 +136,13 @@ handoff. The internal `NRPE_CA_PEM` variable is set only for the Docker child
 process, using the validated certificate (or an empty value without a CA).
 The normalized SHA-256 is passed separately to invalidate the image cache when
 the certificate changes and is recorded in `report.json`; its contents are not
-logged. Both builder and test images install the selected certificate in their
-system trust stores **before** contacting repositories. Debian's minimal-image
+logged. Debian builder and test images install the selected certificate in their
+system trust stores **before** contacting repositories. SLES-12 input downloads
+add it only to their in-memory Python TLS context; the native stages are offline. Debian's minimal-image
 bootstrap preserves existing roots until the regular CA package regenerates the
 full trust database. TLS, APT/zypper signatures, and source checksums stay enabled.
 
-The installed CA and generated trust database remain in local image layers,
+For Debian, the installed CA and generated trust database remain in local image layers,
 including Docker caches. Do not publish company-specific builder/test images
 without your organization's approval. The CA is not embedded into the exported
 NRPE package. Run subsequent commands without the option/environment variable

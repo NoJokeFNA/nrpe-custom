@@ -3,8 +3,7 @@
   "package": "nrpe",
   "revision": "835292739a5736a9d8f0460f670b6f15",
   "version": "4.1.1",
-  "reported_release": "150400.95.2",
-  "custom_release": "150400.95.2.withargs1",
+  "custom_release": "0.withargs1",
   "files": {
     "README.SUSE": {
       "sha256": "b97687f8598b61d6fb18159d2cf439c5935e3f0a913a966646af4ef487ec5290",
@@ -67,13 +66,8 @@
       "size": 1436
     }
   },
-  "backports_key": {
-    "url": "https://api.opensuse.org/public/source/openSUSE:Backports/_pubkey",
-    "fingerprint": "637B32FF3D83F07A7AE1C40A9C214D4065176565",
-    "sha256": "427a1fb530e28520f8ef7ef372529e8dc4b0f49cc70100ac0cf7996c81c9cb25"
-  },
   "suse_key": {
-    "url": "https://api.opensuse.org/public/source/SUSE:SLE-15:Update/_pubkey",
+    "url": "https://api.opensuse.org/public/source/SUSE:SLE-12-SP3:Update/_pubkey",
     "fingerprint": "FEAB502539D846DB2C0961CA70AF9E8139DB7C82",
     "sha256": "21ebd74ac3f50f892f0c7038d534a645d0468ce741f3cc8633d66ae01abef9a7"
   }

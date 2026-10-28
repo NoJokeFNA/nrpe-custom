@@ -42,6 +42,21 @@ class CliTests(unittest.TestCase):
         self.assertEqual(error.exception.code, 2)
         execute.assert_not_called()
 
+    @patch('nrpe_cli.cli.execute', return_value=0)
+    def test_all_selects_corrected_sp3_target_in_order(self, execute):
+        self.assertEqual(cli.main(['verify', 'all'], self.root), 0)
+        self.assertEqual(execute.call_args.args[:2],
+                         ('verify', ['debian11', 'debian12', 'debian13', 'debian14', 'sles12sp3']))
+
+    @patch('nrpe_cli.cli.execute')
+    def test_previous_service_pack_is_not_silently_reinterpreted(self, execute):
+        for target in ('sles15sp3', 'sles15sp4', 'sles12sp5'):
+            with self.subTest(target=target), contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as error:
+                    cli.main(['verify', target], self.root)
+                self.assertEqual(error.exception.code, 2)
+                execute.assert_not_called()
+
     @patch('sys.stdin.isatty', return_value=False)
     @patch('builtins.input', side_effect=AssertionError('Must not prompt'))
     @patch('nrpe_cli.cli.execute')

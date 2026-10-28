@@ -10,8 +10,9 @@ Enabling it on a server is an explicit administrator decision. Bash command
 substitution stays disabled.
 
 This is an independent project. Its packages are unofficial custom builds, not
-releases supported or certified by Debian, SUSE, or Nagios. Public binary release
-preparation is tracked in the [release plan](docs/release-plan.md). Independently
+releases supported or certified by Debian, SUSE, or Nagios. Successful master
+pushes publish [verified package releases](docs/releases.md); remaining work and
+release evidence are tracked in the [release plan](docs/release-plan.md). Independently
 authored project code and documentation are [MIT licensed](LICENSE); generated
 packages retain their [upstream and distribution licenses](THIRD_PARTY.md).
 
@@ -66,14 +67,19 @@ python3 nrpe.py
 
 Use **↑/↓ and Enter** to navigate, **Space** to toggle targets, **A** to select all,
 and **Esc** to go back. Select build/test actions, diagnose Docker, inspect status,
-or choose a previous run's logs. Select SLES media and optional company CA
-certificates through their browsers, or enter/paste a path directly.
+or choose a previous run's logs. Select an optional company CA certificate
+through its browser, or enter/paste its path directly.
 The menu reviews your choices before running and returns after each command.
 Colors highlight selection and errors; `NO_COLOR` enables monochrome output.
 See [menu installation and controls](docs/menu.md), including virtual environments.
 
 Direct commands do not require the menu dependencies. Without an interactive
 terminal, launching without arguments prints help and never prompts.
+
+The affected deployment is **SLES 12 SP3**, with old NRPE 2.15/OpenSSL 1.0.2.
+The previous SLES-15 target was based on an incorrect platform assumption and
+has been replaced. See the [SLES guide](docs/sles12sp3.md) and [FAQ](docs/faq.md)
+for the native rebuild and TLS/service diagnosis.
 
 ## Supported targets
 
@@ -85,17 +91,16 @@ All package outputs target `linux/amd64` (`x86_64` for RPM).
 | `debian12` | Debian 12 Bookworm | `nagios-nrpe-server` `.deb` | Discover through APT |
 | `debian13` | Debian 13 Trixie | `nagios-nrpe-server` `.deb` | Discover through APT |
 | `debian14` | Debian 14 Forky | `nagios-nrpe-server` `.deb` | Discover through APT; moving testing suite |
-| `sles15sp4` | SLES 15 SP4 | `nrpe` `.rpm` + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
+| `sles12sp3` | SLES 12 SP3 | `nrpe` `.rpm` + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
 
 Target availability depends on distribution repositories and image availability.
 A listed target is not a promise of ongoing upstream security maintenance. In
 particular, historical archives do not extend a distribution's support period.
-The SLES recipe uses SLE/Package Hub dependencies and no Leap replacement image
-or repository. An installation ISO is optional; see [the SLES guide](docs/sles15sp4.md).
-
-Debian 11 and SLES 15 SP4 passed build, fresh-container installation, and TLS
-argument tests during initial validation. Use your own run reports to establish
-which exact package bytes have passed; target support is not a passing test badge.
+The SLES target uses a pinned genuine 12.3 image and verified original SLE-12
+inputs; no ISO, SLE-15 packages or replacement distribution is used. Its native
+build and certificate-authenticated TLS 1.2 integration passed locally on
+2026-10-28. Container results do not establish production deployment readiness.
+Use your run reports to identify the exact tested package bytes.
 
 ## Commands
 
@@ -119,7 +124,7 @@ when building; SLES sources stay pinned until reviewed and updated.
 
 ```sh
 python3 nrpe.py verify debian12 debian13 --pull
-python3 nrpe.py verify sles15sp4 --rebuild
+python3 nrpe.py verify sles12sp3 --rebuild
 python3 nrpe.py test debian11
 ```
 
@@ -127,7 +132,7 @@ For company HTTPS inspection, optionally select a local public CA certificate
 (PEM or DER); TLS verification remains enabled:
 
 ```powershell
-python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"
+python3 nrpe.py verify sles12sp3 --ca-cert "C:\Certificates\Company-Root.cer"
 ```
 
 No certificate is required by default or included in the exported NRPE package. See
@@ -183,11 +188,11 @@ alternative installation method; do not install over the custom package with
 `make install`.
 
 Follow the [installation guide](docs/installation.md) for step-by-step Debian
-11–14 and SLES 15 SP4 instructions: which files to copy, checksum verification,
+11–14 and SLES 12 SP3 instructions: which files to copy, checksum verification,
 APT/zypper installation, the SLES companion user package, service startup, and
 installed-version checks. Run installation commands on the destination server.
 The guide also explains the unsigned custom RPMs and matching repository
-requirements. See [SLES background](docs/sles15sp4.md) for source provenance and
+requirements. See [SLES background](docs/sles12sp3.md) for source provenance and
 historical repository availability.
 
 Before changing an existing server, read [updates and rollback](docs/updates-and-rollback.md).
@@ -236,7 +241,9 @@ These checks do not replace package builds and runtime integration tests.
 - [Release automation](docs/releases.md): per-master-push packages, sources, licenses and verification.
 - [Architecture](docs/architecture.md): control flow and every script's purpose.
 - [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
-- [SLES 15 SP4](docs/sles15sp4.md): provenance, dependencies, media, and installation.
+- [FAQ](docs/faq.md): Nagios/NRPE service startup and when a custom build is needed.
+- [SLES 12 SP3](docs/sles12sp3.md): provenance, dependencies, build inputs, TLS 1.2 and installation.
+- [SLES 12 SP3 handshake diagnostic](docs/sles12sp3-plaintext-diagnostic.md): anonymized temporary NRPE 2.15 plaintext test and cleanup, without changing the production service.
 - [Contributing](CONTRIBUTING.md): development and meaningful validation.
 - [Security](docs/security.md): argument risks and safe issue reporting.
 - [Deferred release plan](docs/release-plan.md): license review and release preparation.

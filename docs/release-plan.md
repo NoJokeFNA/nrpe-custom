@@ -1,178 +1,129 @@
 # Release preparation plan
 
-Status: automated release preparation, updated 2026-10-27. MIT is adopted for
-independently authored project work. The maintainer has requested automatic
-package releases for successful pushes to master. The implementation follows
-topic PRs into develop, then a develop-to-master promotion PR. Publication is
-gated on complete five-target verification; repository visibility is unchanged.
-See [Git workflow](git-workflow.md) and [release automation](releases.md).
+Status: local SLES 12 SP3 migration, updated 2026-10-28. The actual deployment
+was confirmed as SLES **12.3**, NRPE 2.15-4.24 and the OpenSSL 1.0 ABI. The
+previous SLE-15 targets were based on an incorrect platform assumption; their
+published test evidence remains historical and is not relabeled.
 
-## Scope and current state
+Current local work stays on a topic branch. Pushes, PR creation and merges into
+develop or master require an explicit maintainer request. Changes are handled
+sequentially. See [Git workflow](git-workflow.md).
 
-The intended assets are unofficial custom Debian server packages and the SLES
-15 SP4 NRPE/user packages, with corresponding sources, notices, build scripts,
-checksums, and artifact-bound test results. Container images, dependency package
-bundles, and SLES media are outside this scope.
+## Current scope and implementation
 
-| Item | State | Evidence or next action |
-| --- | --- | --- |
-| CLI, menu, workflow logs and artifact-bound test results | Implemented | [Workflow reference](workflow.md); fresh candidate validation is still required |
-| Company CA handoff on Windows | Implemented; user confirmed the fix | Environment-backed BuildKit secret, PEM/DER validation and SHA-256 cache identity |
-| TLS failure guidance | Implemented | Missing/supplied CA and other TLS failures; separate Docker/BuildKit trust documented |
-| Custom package installation instructions | Documented | [Installation guide](installation.md), linked from README and SLES notes; full deployments use upstream manuals |
-| Operational and maintenance guidance | Documented | [Update/rollback](updates-and-rollback.md), [configuration examples](configuration-examples.md), and [support policy](maintenance.md) |
-| Fast CI and dependency monitoring | Configured; check actual run results | Linux/Windows matrix, shell/Compose checks, dependency audit; full release builds use a separate gated workflow |
-| Project license | Adopted | [MIT license](../LICENSE); third-party components retain their own licenses |
-| Warranty and liability notice | Documented | README and [security guidance](security.md), subject to applicable law; no security or availability guarantee |
-| Third-party license inventory | Recorded SLES evidence gaps resolved; candidate review remains | [Inspected evidence](../THIRD_PARTY.md) and [SLES review](sles-license-review.md); actual release assets still need checking |
-| Debian corresponding-source export | Implemented and validated on all four targets | `scripts/export_debian_sources.py`; full verify runs and independent source reconstruction passed |
-| SLES corresponding sources and notices | Original OBS export and validation implemented | Includes history files, both SRPMs and the [notice directory](../packaging/licenses/sles15sp4/README.md) |
-| Release completeness and test gate | Implemented; validate actual runs | `prepare_release.py`, clean source identities, source/binary hashes and complete five-target assembly |
-| GitHub releases | Automatic on successful master pushes after integration | Draft upload then publication; no feature/develop/PR publication, no container/media redistribution |
-| Long-lived branch protection | Ruleset prepared; administrator action required | API creation returned HTTP 403; [setup instructions](git-workflow.md#server-side-protection-one-time-administrator-action) |
+| Area | State / evidence |
+| --- | --- |
+| Debian 11–14 amd64 | Existing source discovery, package build/source export and TLS integration retained |
+| SLES 12 SP3 x86_64 | Genuine digest-pinned 12.3 base, original SLE-12 Server/SDK dependencies, native compiler and RPM 4.11.2 |
+| Input preparation | Separate modern Python download stage; hashes checked before transfer, native SUSE signature/identity checks before installing any RPM |
+| NRPE | Version 4.1.1, local Release 0.withargs1; runtime arguments remain disabled by default and Bash substitution disabled |
+| SLES support | Native nagios-rpm-macros and system-user-nagios builds; matching NRPE client, all three SRPMs and original source sets exported |
+| TLS compatibility | Native 12.3 test passed TLS 1.2 with mandatory client certificates using the original OpenSSL 1.0.2j ABI; TLS 1.3 is not claimed |
+| Source/license gate | Requires original hashes, clean commit and fresh verify evidence; client/server source relationship, macro source/license and all assets checked |
+| Notices | MIT for independently authored project work; upstream GPL/OpenSSL, companion MIT and macros BSD notices retained |
+| Deployment documentation | [Installation](installation.md), [rollback](updates-and-rollback.md), [FAQ](faq.md) and [SLES guide](sles12sp3.md) |
+| Signatures | [Ed25519 signing support](release-signing.md) implemented; production enrollment and a verified signed release remain open |
+| Branch protection | Master/develop rules applied and verified in the previous integration; no remote setting changes in this task |
 
-## 1. Finish source and notice review
+## Remaining work, in priority order
 
-- [x] Adopt MIT for independent project work and add the root license text.
-- [x] Inventory actual Debian 12 copyright text, the pinned SLES archive and spec
-  headers, companion source spec, and exact pinned optional UI wheels.
-- [x] Record reviewed Debian source/archive and license hashes in
-  `packaging/debian-license-review.json`. Publication rejects unreviewed versions
-  or changed license evidence; builds still discover the suite's current source.
-- [x] Resolve the SLES NRPE/OpenSSL linking basis from the pinned source's
-  `src/utils.c:display_license()` and confirm it in the existing custom binary's
-  license output. Retain the GPL text and explicit OpenSSL exemption.
-- [x] Verify the companion's MIT declaration in its hash-checked original source
-  spec, retain the SUSE copyright header, and prepare the full standard MIT text
-  as an explicitly identified downstream companion notice.
-- [x] Read the full ACL headers: both grant GPLv2-or-later, resolving the apparent
-  difference caused by the short GPLv2 headings.
-- [x] Preserve corresponding source archives/SRPMs and original per-file notices,
-  with separate component/project notices checked during release preparation.
+- [x] Complete local clean-checkout source/archive checks for the 12.3 port; exact
+  implementation commit/run recorded below. No hosted CI run is triggered without
+  a requested push. Repeat the gate for the eventual release commit.
+- [ ] Complete [Windows Docker Desktop practical checks](practical-validation.md#windows-docker-desktop).
+- [ ] Complete [Debian and SLES test VMs](practical-validation.md#debian-and-sles-test-vms):
+  real systemd/reboot, plugins and upgrade/rollback from the saved NRPE 2.15 package.
+- [ ] Enroll a maintainer-controlled release key, configure the signing secret and
+  authenticate a signed release after an explicitly requested master promotion.
+- [ ] Continue recurring [maintenance review](maintenance.md#human-review-cadence),
+  including the legacy SLES 12 SP3 lifecycle and upstream NRPE updates.
 
-The [inventory](../THIRD_PARTY.md) and [SLES source review](sles-license-review.md)
-record the evidence and correct the earlier incomplete searches. The previously
-recorded SLES license questions are closed for these pinned inputs. Do not remove
-notices, relabel third-party code MIT, or assume future source versions have the
-same terms. The final candidate must still include and checksum all notices.
+The dated [2026-10-27 review](maintenance-reviews/2026-10-27.md) records the old
+SP4 scope. SLES 12 SP3's published general/LTSS end dates are 2019-06-30 and
+2022-06-30; archive access is not an extension of vendor support. See the
+[SUSE lifecycle](https://www.suse.com/lifecycle/).
 
-## 2. Complete and validate corresponding sources
+## Source and publication requirements
 
-Debian now builds a custom source package after the narrow rules/changelog
-changes and before building the binary. `output/debianXX/sources/` must contain:
+Each target needs a complete fresh build/package/install/TLS verify run tied to
+the exact clean workflow commit and unchanged binary/source hashes. Runtime-only
+reports and results from the wrong operating-system target cannot qualify.
 
-- The custom `.dsc`, with the source version used by the server binary.
-- Every original and Debian packaging archive referenced by its SHA-256 fields.
-- A source-directory `SHA256SUMS` covering the `.dsc` and referenced files.
+Debian exports the custom DSC and every referenced upstream/packaging archive.
+SLES exports server/client/user binaries, the NRPE/user/macros source RPMs, all
+original OBS files/history and all four pinned manifests. Include the actual
+component notices, project MIT license, [inventory](../THIRD_PARTY.md), workflow
+sources, sanitized evidence and checksums. Do not ship credentials, company CAs,
+private keys, raw environments/logs, container images or dependency RPM bundles.
 
-The exporter checks identities, sizes and hashes, archive presence, and safe
-filenames before replacing source outputs. Preserve the authentic upstream
-archive; do not substitute a GitHub-generated checkout archive.
+The stage/archive verifier rejects missing/extra/changed files, unsafe archive
+entries, wrong versions or notices, and stale/different source evidence. All five
+current targets are required for a complete release. The master-push workflow
+publishes only after its full gate; an unrequested promotion is never implied
+by implementing or locally validating a change.
 
-For each Debian target, require a successful `nrpe.py verify` run and independently
-extract its exported `.dsc` with `dpkg-source --extract`. Inspect the extracted
-custom changelog, `debian/rules`, and license files. Verify both checksum files.
-Old packages built before source export do not gain corresponding sources by
-passing a later runtime-only test.
+## First published release: recorded evidence
 
-For SLES, inspect both exported `.src.rpm` files. Confirm the NRPE spec records
-`150400.95.2.withargs1`, retains command argument support, removes Bash command
-substitution, and contains all source inputs. Confirm the real companion source
-and notices are present. Retain all three input manifests and required build
-scripts. Keep the pure SLES SP4 dependency policy.
+On 2026-10-27, [PR #1](https://github.com/NoJokeFNA/nrpe-custom/pull/1)
+merged into develop and [PR #2](https://github.com/NoJokeFNA/nrpe-custom/pull/2)
+promoted it to master through the active protection rules. The merged topic
+branch was deleted; master and develop were retained.
 
-## 3. Offline release candidate gate and automation
+[Release build-4-517fbfb97d7e](https://github.com/NoJokeFNA/nrpe-custom/releases/tag/build-4-517fbfb97d7e)
+was published from commit `517fbfb97d7efb7b19570c509fa2287e8251d412` by
+[successful run 40571542343](https://github.com/NoJokeFNA/nrpe-custom/actions/runs/40571542343).
+The run passed the Linux/Windows Python 3.9/3.14 unit matrix, shell/Compose checks,
+dependency audit, all five fresh build/install/TLS tests, source and license
+validation, archive assembly and publication. Local preparation also passed
+132 unit tests with the pinned menu requirements.
 
-Local stage commands do not upload. The master-push workflow uploads only after
-the gate passes. The checker must fail if any target is incomplete or untested:
+| Target | Published custom server version |
+| --- | --- |
+| Debian 11 | `4.0.3-1+withargs1` |
+| Debian 12 | `4.1.0-1+withargs1` |
+| Debian 13 | `4.1.3-1+withargs1` |
+| Debian 14 | `4.1.3-1+withargs1` |
+| SLES 15 SP4 | `4.1.1-150400.95.2.withargs1` |
 
-1. Identify exact binaries, sources, targets, custom versions, and build workflow
-   commit. Require clean tracked sources for the workflow archive.
-2. Include complete corresponding sources and the build scripts, Docker/Compose
-   recipes, and manifests required to rebuild them.
-3. Include actual component/project license texts, notices, this inventory, and
-   a record that applicable review findings have been resolved.
-4. Require build, package validation, fresh-container installation, and TLS
-   protocol results for exact binary hashes, including the SLES companion.
-   Runtime-only tests or historical successful runs are insufficient.
-5. Cover every asset with SHA-256: source RPMs, `.dsc`/archives, notices, workflow
-   archive, and sanitized evidence. Preserve usable binary-only installation
-   checksum manifests.
-6. Reject missing/extra or modified assets, unsafe archive paths, mismatched
-   versions/targets, missing notices, and tests bound to different bytes.
-7. Exclude company CAs, private keys, credentials, local paths, raw environment
-   values, caches, container images, and SLES media. Review logs and build
-   information for local information before including public provenance.
+All 11 published assets were independently downloaded after publication. Their
+complete file set and SHA-256 hashes matched `SHA256SUMS`; all five target
+archives passed the archive verifier and their manifests matched `release.json`
+and the release commit. This is integrity and completeness evidence, not a signed
+attestation or a native Windows/systemd/production deployment test.
 
-New reports record workflow identity before and after verification and the full
-exported release-asset hashes. Preparation requires a clean matching commit,
-a fresh successful verify run and unchanged binaries/sources. Legacy reports
-and runtime-only tests are rejected. Local records are not signed attestations;
-the trusted workflow produces and transfers candidate archives within its run.
-Completeness checks do not replace review when source/license evidence changes.
+The SLES source/license questions are closed for the pinned inputs. Native
+Windows Docker Desktop and real Debian/SLES VM tests remain unrun; see the
+[practical validation procedure](practical-validation.md). The available Linux
+cloud environment has no Windows host, VM hypervisor or supplied test-VM access.
 
-## Validation recorded during this preparation
+## Local SLES-12 migration evidence
 
-The following checks passed on 2026-10-27:
+Initial native run `20261028T083230-86e80546` passed the genuine SLES-12 build,
+fresh-container installation and certificate-authenticated TLS 1.2 argument
+checks. It does not qualify as clean-checkout release provenance: further local
+source/guard/documentation changes followed.
 
-- 114 discovered unit tests, shell syntax checks, both Compose configurations,
-  documentation relative-file links and shell snippets, and `git diff --check`.
-- `python3 nrpe.py verify debian11 debian12 debian13 debian14 --rebuild`:
-  all four targets passed build, package validation, fresh-container installation,
-  arguments-disabled rejection, and two distinct arguments-enabled TLS checks.
-- Independent `.dsc` extraction for each target, source/binary checksums, custom
-  changelog versions, build flags, and retained GPL/copyright files.
-- Inspection of both existing SLES source RPMs against their manifests; findings
-  are recorded in the [inventory](../THIRD_PARTY.md). No fresh SLES build was run
-  as part of the Debian-only exporter change. No native Windows run was performed.
+Implementation commit `7aa2f316c3e9b1ce26933929ddf37ffa1eeeeb88` then passed
+clean-checkout run `20261028T090944-fe957b65`: native build, package checks, fresh
+installation and both argument policies over authenticated TLS 1.2. The source
+and archive gate passed for that exact commit/run, comparing all three SRPMs
+against the pinned originals and checking licenses, manifests, the matching
+client and the full 48-file archive. The candidate is local under
+`.nrpe/sles12-local-candidate/`; nothing was published.
 
-The subsequent SLES license review verified the pinned archive and companion spec
-hashes, the full ACL grants, and the existing binary's explicit OpenSSL/GPL
-license output. It retained verbatim GPL and `LEGAL` files and prepared a full
-MIT companion notice with provenance. NRPE's license-display exit status was 3;
-the required text was checked explicitly. These are license-evidence checks, not
-a fresh SLES package build or runtime protocol test.
+An isolated OpenSSL 3.5.7 client also completed a real NRPE request over
+`DHE-RSA-AES256-GCM-SHA384` with default security settings, server hostname/chain
+verification and a separate client certificate. A missing client certificate
+was rejected. The [SLES TLS configuration](configuration-examples.md#hosts-tls-and-fixed-commands)
+records the NRPE-specific DH initialization requirement without permitting
+anonymous ciphers. All 142 unit tests, shell syntax, Compose/doctor checks and
+documentation links/snippets passed. A SLE-15 base was explicitly rejected.
 
-The first Debian attempt failed because `dpkg-source` was run from the extracted
-tree rather than the directory containing the original archive. The build now
-sets that working directory explicitly; the subsequent full four-target run
-passed. These local checks are preparation evidence, not a published release
-attestation. Candidate source/workflow identity still needs the gate above.
+These results identify the implementation commit, not every later documentation
+or integration commit. Fresh per-commit reports and candidate archives remain
+local under `.nrpe/`; the exact eventual release commit must pass the gate again.
 
-## 4. Validate and prepare a reviewable candidate
-
-The subsequent container-layout cleanup passed all five target verify runs
-(Debian 11–14 and SLES 15 SP4), plus 117 local unit tests with the exact pinned
-menu requirements, shell/Compose checks and the Python dependency audit. SLES
-used the existing genuine SP4 cloud base documented in the SLES guide. The
-optional profile example was checked over real NRPE/TLS on Debian 12 with a fake
-load plugin. These checks do not establish production rollback, systemd, native
-Windows Docker Desktop behavior, or hosted CI success; inspect actual CI runs.
-
-Run the repository's unit, shell syntax, and Compose checks. Run every intended
-target with `python3 nrpe.py verify <target>`; use `--rebuild` when intentionally
-replacing existing output. Preserve previous valid artifacts until replacement
-checks pass. Local reports belong under `.nrpe/`.
-
-Record passed, failed, skipped, and unrun checks separately. Include native
-Windows CLI/process/CA validation where claimed. Container tests do not validate
-target-server systemd, production TLS, firewall configuration, or a complete
-Nagios deployment.
-
-Draft release notes listing exact target/package versions, custom revision,
-source provenance, installation links, unsigned-local-RPM policy, runtime-disabled
-arguments by default, disabled Bash substitution, and support/security limits
-of historical distributions. Keep unofficial-build wording; do not imply Debian,
-SUSE, or Nagios endorsement.
-
-Automatic build tags use a workflow-run number and commit prefix, separately
-from distribution package versions. Master pushes are the publication trigger
-requested by the maintainer. Other publication methods require a separate
-request. Changes first follow the [integration workflow](git-workflow.md).
-
-## References
-
-- [Third-party provenance and license inventory](../THIRD_PARTY.md)
-- [Debian Free Software Guidelines](https://www.debian.org/social_contract.en.html#guidelines)
-- [GNU GPL version 2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-- [SUSE BCI documentation and redistribution overview](https://opensource.suse.com/bci-docs/)
+Syntax/unit tests are separate from package/runtime proof. Container tests do
+not establish production systemd, TLS, firewall, plugins or rollback readiness.
+Do not deploy a SLE-15 binary or replace the server's system OpenSSL to imitate
+this test. See [practical validation](practical-validation.md).

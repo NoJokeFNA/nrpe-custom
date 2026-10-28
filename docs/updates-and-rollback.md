@@ -39,7 +39,7 @@ dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' nagios-nrpe-server |
 printf 'Backup directory: %s\n' "$nrpe_backup_dir"
 ```
 
-For SLES 15 SP4:
+For SLES 12 SP3:
 
 ```sh
 nrpe_backup_dir="/var/backups/nrpe-custom/$(date -u +%Y%m%dT%H%M%SZ)"
@@ -105,21 +105,20 @@ remove snippets introduced by the failed update; inspect and reconcile those
 before restarting. Restore separately backed-up TLS files, wrappers and service
 overrides as needed. Package scripts may restart the service during rollback too.
 
-## SLES 15 SP4 rollback
+## SLES 12 SP3 rollback
 
 From the saved `previous/` directory:
 
 ```sh
 sha256sum --check SHA256SUMS
 sudo systemctl stop nrpe
-sudo zypper install --oldpackage --allow-unsigned-rpm ./nrpe-[0-9]*.x86_64.rpm
+sudo rpm --upgrade --oldpackage --verbose --hash ./nrpe-[0-9]*.x86_64.rpm
 ```
 
-`--oldpackage` deliberately allows the older version; `--allow-unsigned-rpm`
-applies to this project's local custom RPM installation. Keep repository
-signature and dependency checks enabled. Keep an existing compatible
-`system-user-nagios`; do not downgrade or remove a shared user package as part
-of a server-only rollback.
+`--oldpackage` deliberately allows the older saved binary after its original
+checksum is verified. Normal RPM dependency/payload checks stay enabled; resolve
+prerequisites using matching SLES-12 repositories. Keep the real Nagios user;
+restoring an older server does not require removing a shared user package.
 
 With `nrpe_backup_dir` set to the saved pre-update backup path:
 

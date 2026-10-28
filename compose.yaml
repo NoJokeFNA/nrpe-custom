@@ -8,25 +8,19 @@ x-nrpe-build: &nrpe-build
       target: /output
 
 services:
-  sles15sp4:
+  sles12sp3:
     <<: *nrpe-build
     build:
       context: .
-      dockerfile: docker/sles15sp4/build.Dockerfile
+      dockerfile: docker/sles12sp3/build.Dockerfile
       secrets:
         - nrpe_ca_cert
-      additional_contexts:
-        nrpe_sles_media: ${SLES_MEDIA_DIR:-./packaging/empty-media}
       args:
         NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
-        SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/bci/bci-base:15.4}
-    image: nrpe-custom-builder:sles15sp4
+        SLES_BASE_IMAGE: ${SLES_BASE_IMAGE:-registry.suse.com/suse/sles12sp3@sha256:0995dbf051274a3a5baf19c7f94ce7ebe69d7aa91f7b3b22248bd06d7122e53a}
+    image: nrpe-custom-builder:sles12sp3
     volumes:
       - ./output:/output
-      - type: bind
-        source: ${SLES_MEDIA_DIR:-./packaging/empty-media}
-        target: /mnt/nrpe-sles-media
-        read_only: true
   debian11:
     <<: *nrpe-build
     build:

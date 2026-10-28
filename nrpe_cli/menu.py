@@ -208,7 +208,7 @@ def _browse(start=None, *, select_file=False):
                            if Path(f'{drive}:\\').is_dir())
         options.extend((str(index), child.name + ('/' if child.is_dir() else ''))
                        for index, child in enumerate(children))
-        label = 'Company CA certificate' if select_file else 'SLES installation media'
+        label = 'Company CA certificate' if select_file else 'Directory'
         answer = choose(f'{label}: {current}', options)
         if answer is None:
             return None
@@ -249,15 +249,12 @@ def workflow(root, action):
         return None
     pull = False
     certificate = os.environ.get("NRPE_CA_CERT")
-    media = os.environ.get('SLES_MEDIA_DIR') if 'sles15sp4' in targets else None
     while True:
         options = [
             ('run', 'Continue to review'),
             ('pull', f'Check for updated base images: {"yes" if pull else "no"}'),
             ('certificate', f'Company CA certificate: {certificate or "none"}'),
         ]
-        if 'sles15sp4' in targets:
-            options.append(('media', f'SLES media: {media or "none (online repositories)"}'))
         answer = choose('Workflow options', options)
         if answer is None:
             return None
@@ -282,24 +279,6 @@ def workflow(root, action):
                         certificate = str(selected)
                 except (OSError, RuntimeError) as exc:
                     choose(f'Invalid CA certificate: {exc}', [(None, 'Back to options')])
-        elif answer == 'media':
-            source = choose('SLES package source', [
-                ('default', 'Online repositories (plus SLES_MEDIA_DIR if configured)'),
-                ('browse', 'Browse extracted installation media'),
-                ('path', 'Enter or paste an installation media path')])
-            if source == 'default':
-                media = os.environ.get('SLES_MEDIA_DIR')
-                continue
-            if source is None:
-                continue
-            directory = (enter_path('SLES installation media', kind='directory')
-                         if source == 'path' else browse_directory(media))
-            if directory is not None:
-                from .media import validate_media
-                try:
-                    media = str(validate_media(directory))
-                except (OSError, RuntimeError) as exc:
-                    choose(f'Invalid SLES media: {exc}', [(None, 'Back to options')])
         else:
             break
     existing = [name for name in targets if package_files(root, name)]
@@ -307,7 +286,6 @@ def workflow(root, action):
     review = (f'Review workflow\nAction: {action}\nTargets: {", ".join(targets)}'
               f'\nUpdate base images: {pull}'
               + (f'\nCompany CA certificate: {certificate}' if certificate else '')
-              + (f'\nSLES media: {media}' if media else '')
               + (f'\nRebuild existing packages: {", ".join(existing)}' if replacing else ''))
     if choose(review, [(False, 'Cancel'), (True, 'Run selected workflow')]) is not True:
         return None
@@ -316,8 +294,6 @@ def workflow(root, action):
         arguments.append('--pull')
     if certificate:
         arguments.extend(["--ca-cert", certificate])
-    if media:
-        arguments.extend(['--sles-media', media])
     if replacing:
         # The review above is the explicit rebuild confirmation. Do not prompt
         # again through input(), which would break arrow-only navigation.

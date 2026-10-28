@@ -3,6 +3,7 @@ output/*/*.deb
 output/*/*.rpm
 output/*/source-manifest.json
 output/*/user-source-manifest.json
+output/*/macros-source-manifest.json
 output/*/bootstrap-manifest.json
 output/*/*.buildinfo
 output/*/SHA256SUMS
