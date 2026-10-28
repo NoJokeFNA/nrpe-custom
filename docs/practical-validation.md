@@ -37,8 +37,10 @@ Use an actual Windows host with Docker Desktop's Linux engine. Record the shell
 and terminal; include Compose 5.6.1 and Buildx 0.38.1 when reproducing the original
 report, then test current supported versions separately. Use a clean checkout in
 a path containing spaces and non-ASCII characters, for example
-`C:\NRPE validation\Prüfung\nrpe-custom`. Put a public test CA certificate in a
-different such directory; never pass a private key to `--ca-cert`.
+`C:\NRPE validation\Project Ω\nrpe-custom`. Put a public test CA certificate in a
+different such directory; never pass a private key to `--ca-cert`. These are
+illustrative test paths, not required installation locations. The `Ω` deliberately
+exercises Unicode handling; use real folders and certificate paths on your test host.
 
 From that checkout in PowerShell:
 
@@ -48,7 +50,7 @@ docker version
 docker compose version
 docker buildx version
 python3 nrpe.py doctor
-python3 nrpe.py verify debian12 --ca-cert "C:\NRPE validation\Prüfung CA\company-ca.pem" --pull
+python3 nrpe.py verify debian12 --ca-cert "C:\NRPE validation\Company CA Ω\company-ca.pem" --pull
 $LASTEXITCODE
 python3 nrpe.py status
 python3 nrpe.py logs --last
