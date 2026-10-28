@@ -1,5 +1,9 @@
 # Frequently asked questions
 
+For log analysis, see [troubleshooting](troubleshooting.md). Use
+`python3 nrpe.py diagnose ./redacted-nrpe.log --context nrpe` for an existing
+daemon/client log, or omit the context for build/download failures.
+
 ## Which SLES version does this project target?
 
 **SLES 12 SP3**, confirmed by `/etc/os-release`. Earlier references to SLES 15

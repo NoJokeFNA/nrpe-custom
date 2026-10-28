@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from pathlib import Path
 import subprocess
 import sys
 
@@ -9,6 +10,7 @@ from .certificates import prepared_certificate
 from .controller import execute
 from .cleanup import clean
 from .docker import check_docker
+from .diagnostics import FailureDiagnostics
 from .state import ROOT, artifact, reports
 from .targets import TARGETS, package_files
 
@@ -124,6 +126,11 @@ def parser():
     cleanup.add_argument('--image', action='append', default=[], metavar='REFERENCE',
                          help='Explicit project image tag to remove; may be repeated')
     cleanup.add_argument('--apply', action='store_true', help='Perform the displayed cleanup instead of previewing')
+    diagnose = commands.add_parser('diagnose', help='Explain recognized failures in a local log without executing it')
+    diagnose.add_argument('file', type=Path, metavar='FILE')
+    diagnose.add_argument('--context', choices=('build', 'nrpe'), default='build',
+                          help='build/download errors (default) or a deployed NRPE/client log')
+    diagnose.add_argument('--ca-configured', action='store_true', help='A build CA was supplied for the recorded run')
     logs = commands.add_parser("logs", help="Display output from a recorded run (no Docker required)")
     selection = logs.add_mutually_exclusive_group()
     selection.add_argument("--last", action="store_true", help="Show the latest run (default)")
@@ -159,6 +166,14 @@ def main(argv=None, root=ROOT):
             return show_logs(root, args.run)
         if args.action == 'clean':
             return clean(root, args.older_than, args.keep_runs, args.retired_outputs, args.image, args.apply)
+        if args.action == 'diagnose':
+            diagnostics = FailureDiagnostics()
+            with args.file.open(encoding='utf-8', errors='replace') as log:
+                for line in iter(lambda: log.readline(65536), ''):
+                    diagnostics.observe(line)
+            print(diagnostics.hint(args.ca_configured, args.context)
+                  or 'No recognized failure found. This does not establish a successful run.')
+            return 0
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
