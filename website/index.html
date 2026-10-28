@@ -14,8 +14,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
 <a class="brand" href="/nrpe-custom/">
-<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
-</span>
+<img class="brand-mark" src="/nrpe-custom/assets/icon.svg" width="35" height="35" alt="">
 <span>NRPE<span class="brand-light"> Custom</span>
 </span>
 </a>
@@ -48,6 +47,18 @@ are copied without changing their text.</p>
 documentation. The initial SLES note uses only reported observations, not an
 invented testimonial or production TLS claim. New reports follow the
 <a href="/nrpe-custom/field-notes/contributing-a-note/">field-note guide</a>.</p>
+<h2 id="homepage-content-and-cli-capture">Homepage content and CLI capture</h2>
+<p>The homepage links to GitHub's latest release rather than hardcoding a release
+version. Its supported-target table is derived from the README table, keeping
+target names and package formats in one source. The project story summarizes
+the reported troubleshooting; it does not claim a successful production upgrade.</p>
+<p><code>website/assets/cli-help.png</code> shows actual <code>python3 nrpe.py --help</code> output
+captured from application revision <code>8a2b3d33c0fa</code>. It is a static terminal view,
+not a live session or a successful build result. Refresh it when the command
+list changes: capture that command's output, render it as plain escaped text in
+a local terminal-style browser view, and take a screenshot. Keep machine names,
+paths and private infrastructure out of the capture. No screenshot tooling is
+required to build or use the website.</p>
 <h2 id="local-preview">Local preview</h2>
 <p>Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
 website dependency:</p>
@@ -63,7 +74,7 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3868a6c8eda3d7a917cdd43d7e9e31558a5137cb/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
@@ -102,10 +113,11 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3868a6c8eda3d7a917cdd43d7e9e31558a5137cb/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
+<li><a href="#homepage-content-and-cli-capture">Homepage content and CLI capture</a></li>
 <li><a href="#local-preview">Local preview</a></li>
 <li><a href="#reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</a></li>
 <li><a href="#github-pages-setup-by-the-repository-owner">GitHub Pages setup by the repository owner</a></li>
@@ -123,7 +135,7 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 8a2b3d3</span>
+<span>Source 3868a6c</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -1371,3 +1371,64 @@ img,svg{
     transition:none!important
   }
 }
+
+/* The project homepage: real tooling, shared target data and two clear paths. */
+.hero{padding-top:62px;padding-bottom:48px}
+.hero h1{font-size:clamp(2.6rem,3.9vw,3.55rem)}
+.project-story,.tool-showcase,.supported-section,.community-section{max-width:1280px;margin:0 auto;padding:38px 30px 46px}
+.project-story{display:grid;grid-template-columns:1fr 1.3fr;gap:65px;border-top:1px solid var(--line)}
+.project-story h2,.tool-copy h2,.community-section h2{font-size:29px;margin:14px 0 18px}
+.project-story p,.tool-copy p,.community-section p{font-size:14px;color:var(--muted);line-height:1.85}
+.entry-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.entry-grid .guide-card{padding:30px}
+.entry-grid .guide-card:hover{transform:none;box-shadow:none}
+.entry-grid .guide-card p{font-size:14px;max-width:440px;min-height:0}
+.entry-grid h3{font-size:25px;margin-top:16px}
+.entry-grid .button{margin-top:6px;font-size:13px}
+.secondary-link{display:block;margin-top:18px;font-size:12px}
+.entry-requirements{display:block;border-top:1px solid var(--line);margin-top:23px;padding-top:16px;font-size:11px;color:var(--muted)}
+.upstream-note{margin:22px 0 0;color:var(--muted);font-size:12px;max-width:850px}
+.tool-showcase{display:grid;grid-template-columns:.85fr 1.4fr;gap:48px;align-items:center;padding-top:10px}
+.tool-copy{min-width:0}
+.tool-features{padding-left:18px;font-size:13px;color:var(--muted);margin:18px 0 25px}
+.tool-features li{padding:4px 0}
+.cli-capture{min-width:0;margin:0}
+.cli-capture>a{display:block;border-radius:12px}
+.cli-capture img{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 16px 32px #122b3214;border:1px solid #345057}
+.cli-capture figcaption{font-size:11px;color:var(--muted);margin-top:13px;line-height:1.8}
+.cli-capture figcaption a{white-space:nowrap}
+.supported-section{padding-top:25px;padding-bottom:52px}
+.target-table{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:11px}
+.target-table:focus-visible{outline:3px solid #df9f3e;outline-offset:4px}
+.target-table table{border-collapse:collapse;width:100%;text-align:left;white-space:nowrap;font-size:13px}
+.target-table th{background:var(--soft);font-size:11px;letter-spacing:.05em}
+.target-table td,.target-table th{padding:15px 22px;border-bottom:1px solid var(--line)}
+.target-table tr:last-child td{border-bottom:0}
+.target-notes{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:20px 0 5px}
+.target-notes p{font-size:12px;color:var(--muted)}
+.community-section{display:grid;grid-template-columns:1.3fr 1fr;gap:80px;padding-top:0;padding-bottom:52px}
+.community-links{align-self:center;border-top:1px solid var(--line)}
+.community-links a{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;text-decoration:none}
+.community-links a:hover{color:var(--ink)}
+@media(max-width:900px){
+ .project-story,.tool-showcase,.community-section{gap:30px}
+ .project-story,.tool-showcase,.supported-section,.community-section{padding-left:25px;padding-right:25px}
+ .tool-showcase{grid-template-columns:1fr 1.2fr}
+ .project-story h2,.tool-copy h2,.community-section h2{font-size:25px}
+ .entry-grid .guide-card{padding:24px}
+}
+@media(max-width:640px){
+ .hero{padding:38px 22px 32px}
+ .hero h1{font-size:2.6rem}
+ .project-story,.tool-showcase,.community-section{display:block}
+ .project-story,.tool-showcase,.supported-section,.community-section{padding:28px 22px 32px}
+ .project-story{margin:0 22px;padding-left:0;padding-right:0}
+ .entry-grid{grid-template-columns:1fr}
+ .entry-grid .guide-card p{max-width:none}
+ .cli-capture{margin-top:26px}
+ .target-notes{grid-template-columns:1fr;gap:0}
+ .target-table td,.target-table th{padding:13px 16px}
+ .community-links{margin-top:25px}
+ .supported-section .section-heading{align-items:start}
+ .supported-section .tag{flex-shrink:0;font-size:8px}
+}

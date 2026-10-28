@@ -14,8 +14,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
 <a class="brand" href="/nrpe-custom/">
-<span class="brand-mark" aria-hidden="true">n<span>↗︎</span>
-</span>
+<img class="brand-mark" src="/nrpe-custom/assets/icon.svg" width="35" height="35" alt="">
 <span>NRPE<span class="brand-light"> Custom</span>
 </span>
 </a>
@@ -106,7 +105,7 @@ Preserve NRPE's default forbidden-metacharacter checks (including single quotes,
 backticks, backslashes, semicolons and newlines) and keep Bash substitution
 disabled. Do not loosen <code>nasty_metachars</code>, put untrusted text in command definitions,
 or expose this interface to arbitrary callers.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3868a6c8eda3d7a917cdd43d7e9e31558a5137cb/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
 or <code>busy</code> and maps them to fixed plugin options. Its first argument is an absolute
 plugin path fixed by the administrator in the server configuration; the caller
 does not select that path. It does not use <code>eval</code>, run a shell on received strings,
@@ -141,7 +140,7 @@ rejection, not the real plugin's load measurements or production capacity limits
 <p>Restart the relevant service after reviewing the configuration and verify checks
 from the real monitoring host. See <a href="/nrpe-custom/installation/">installation</a>,
 <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a>, and <a href="/nrpe-custom/security/">security</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/8a2b3d33c0fa26ec1d15efde4a6579488a0f8183/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3868a6c8eda3d7a917cdd43d7e9e31558a5137cb/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -161,7 +160,7 @@ from the real monitoring host. See <a href="/nrpe-custom/installation/">installa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 8a2b3d3</span>
+<span>Source 3868a6c</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
