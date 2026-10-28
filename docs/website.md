@@ -36,6 +36,13 @@ a local terminal-style browser view, and take a screenshot. Keep machine names,
 paths and private infrastructure out of the capture. No screenshot tooling is
 required to build or use the website.
 
+`website/assets/terminal-menu.png` shows the current menu rendered by
+prompt_toolkit in an empty temporary workspace. Its actual terminal screen cells
+were captured at 100 columns by 24 rows and rendered as escaped text for the
+screenshot. It shows no successful build or real infrastructure; the homepage
+and menu guide share this image. Refresh it when navigation or presentation
+changes, preserving the same empty-workspace provenance.
+
 ## Local preview
 
 Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
