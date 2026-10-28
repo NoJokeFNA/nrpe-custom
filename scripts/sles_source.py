@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fetch pinned OBS sources and narrowly adjust their RPM build recipe.
 
-This helper is compatible with the Python 3.6 interpreter in SLES 15 SP4.
+This helper is compatible with the Python 3.6 interpreter in SLES 15 SP3.
 """
 
 import argparse

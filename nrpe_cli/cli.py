@@ -17,7 +17,7 @@ def doctor(root):
     print("Checking project files...")
     required = ("compose.yaml", "compose.test.yaml",
                 "docker/debian/build.Dockerfile", "docker/debian/test.Dockerfile",
-                "docker/sles15sp4/build.Dockerfile", "docker/sles15sp4/test.Dockerfile",
+                "docker/sles15sp3/build.Dockerfile", "docker/sles15sp3/test.Dockerfile",
                 "scripts/build.sh", "scripts/export_debian_sources.py", "scripts/verify.sh",
                 "scripts/integration-test.sh", "scripts/build-sles.sh",
                 "scripts/integration-test-sles.sh", "scripts/test-nrpe-protocol.sh",
@@ -26,9 +26,9 @@ def doctor(root):
                 "scripts/build-sles-user.sh", "scripts/fetch_sles_packages.py",
                 "scripts/setup-debian-repositories.sh", "scripts/install-ca-certificate.sh",
                 "packaging/empty-ca.pem",
-                "packaging/sles15sp4-source.json", "packaging/sles15sp4-backports.asc",
-                "packaging/sles15sp4-suse.asc", "packaging/sles15sp4-user-source.json",
-                "packaging/sles15sp4-bootstrap.json")
+                "packaging/sles15sp3-source.json", "packaging/sles15sp3-backports.asc",
+                "packaging/sles15sp3-suse.asc", "packaging/sles15sp3-user-source.json",
+                "packaging/sles15sp3-bootstrap.json")
     missing = [name for name in required if not (root / name).is_file()]
     if missing:
         raise RuntimeError("Missing project files: " + ", ".join(missing))
@@ -115,7 +115,7 @@ def parser():
         command.add_argument("--ca-cert", metavar="FILE",
                              help="optional company CA in PEM or DER format (.cer/.crt/.pem); or set NRPE_CA_CERT")
         command.add_argument("--sles-media", metavar="DIRECTORY",
-                             help="use extracted official SLES 15 SP4 Full Media1 repositories")
+                             help="use extracted official SLES 15 SP3 Full Media1 repositories")
         if action != "test":
             command.add_argument("--rebuild", action="store_true",
                                  help="explicitly allow rebuilding existing package outputs")
@@ -157,10 +157,10 @@ def main(argv=None, root=ROOT):
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
-        if args.sles_media and "sles15sp4" not in targets:
-            command_parser.error("--sles-media requires the sles15sp4 target (or all).")
+        if args.sles_media and "sles15sp3" not in targets:
+            command_parser.error("--sles-media requires the sles15sp3 target (or all).")
         media = None
-        if "sles15sp4" in targets:
+        if "sles15sp3" in targets:
             location = args.sles_media or os.environ.get("SLES_MEDIA_DIR")
             if location:
                 media = validate_media(location)

@@ -3,8 +3,7 @@
   "package": "nrpe",
   "revision": "835292739a5736a9d8f0460f670b6f15",
   "version": "4.1.1",
-  "reported_release": "150400.95.2",
-  "custom_release": "150400.95.2.withargs1",
+  "custom_release": "0.withargs1",
   "files": {
     "README.SUSE": {
       "sha256": "b97687f8598b61d6fb18159d2cf439c5935e3f0a913a966646af4ef487ec5290",

@@ -16,7 +16,7 @@ def main(argv=None):
     parser.add_argument("--rebuild", action="store_true", help="allow replacing existing packages")
     parser.add_argument("--pull", action="store_true", help="check for updated base images")
     parser.add_argument("--ca-cert", metavar="FILE", help="optional company CA certificate")
-    parser.add_argument("--sles-media", metavar="DIRECTORY", help="extracted SLES 15 SP4 Full Media1")
+    parser.add_argument("--sles-media", metavar="DIRECTORY", help="extracted SLES 15 SP3 Full Media1")
     args = parser.parse_args(argv)
     action = "test" if args.test_only else "verify" if args.test else "build"
     print("Compatibility mode: prefer 'nrpe.py " + action + " " + args.target + "'.")

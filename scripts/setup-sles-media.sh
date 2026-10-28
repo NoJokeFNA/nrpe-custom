@@ -14,8 +14,8 @@ mapfile -t metadata <<< "$metadata_listing"
 grep -Eiq '(SUSE.*Linux.*Enterprise|\bSLE[-_ ])' "${metadata[@]}" || {
   echo 'ERROR: Expected official SLES installation media' >&2; exit 1;
 }
-grep -Eiq '\b15[. _-]*(SP[ _-]*)?4\b' "${metadata[@]}" || {
-  echo 'ERROR: Expected SLES 15 SP4 installation media' >&2; exit 1;
+grep -Eiq '\b15[. _-]*(SP[ _-]*)?3\b' "${metadata[@]}" || {
+  echo 'ERROR: Expected SLES 15 SP3 installation media' >&2; exit 1;
 }
 if grep -Eiq '\bopenSUSE\b' "${metadata[@]}"; then
   echo 'ERROR: Leap/openSUSE media are not allowed for the pure SLES target' >&2; exit 1
@@ -44,4 +44,4 @@ while IFS= read -r file; do
   # Online matching SLES updates take precedence; media provide missing modules.
   zypper --non-interactive addrepo --priority 200 "dir:$directory" "nrpe-sles-media-$index"
 done <<< "$listing"
-echo "PASS: Registered $index signed SLES 15 SP4 media repositories"
+echo "PASS: Registered $index signed SLES 15 SP3 media repositories"

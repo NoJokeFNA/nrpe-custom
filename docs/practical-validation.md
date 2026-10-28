@@ -76,7 +76,7 @@ container cleanup. Install `requirements-menu.txt` to exercise the optional menu
 
 ## Debian and SLES test VMs
 
-Use disposable amd64 VMs for Debian 11, 12, 13, 14 and genuine SLES 15 SP4.
+Use disposable amd64 VMs for Debian 11, 12, 13, 14 and genuine SLES 15 SP3.
 Keep matching signed repositories available and take a recoverable baseline
 snapshot. Use a separate monitoring client for remote TLS checks. Do not
 substitute Leap or another SLES service pack. Forky results apply to the tested

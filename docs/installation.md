@@ -3,7 +3,7 @@
 Run these commands on the destination Linux server. Python, Docker, and this
 checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
-The current SLES target is **SLES 15 SP4 x86_64**, not every SLES 15 service pack.
+The current SLES target is **SLES 15 SP3 x86_64**, not every SLES 15 service pack.
 
 For the complete NRPE server/client and Nagios setup, use the
 [official NRPE documentation](https://github.com/NagiosEnterprises/nrpe) and
@@ -15,7 +15,7 @@ TLS instructions.
 ## Prepare the files
 
 Build and test the selected target on the workstation with, for example,
-`python3 nrpe.py verify debian12` or `python3 nrpe.py verify sles15sp4`.
+`python3 nrpe.py verify debian12` or `python3 nrpe.py verify sles15sp3`.
 Copy the following files into a dedicated directory on the destination server:
 
 | Destination | Build output directory | Files to copy |
@@ -24,7 +24,7 @@ Copy the following files into a dedicated directory on the destination server:
 | Debian 12 | `output/debian12/` | `nagios-nrpe-server_*_amd64.deb`, `SHA256SUMS` |
 | Debian 13 | `output/debian13/` | `nagios-nrpe-server_*_amd64.deb`, `SHA256SUMS` |
 | Debian 14 | `output/debian14/` | `nagios-nrpe-server_*_amd64.deb`, `SHA256SUMS` |
-| SLES 15 SP4 | `output/sles15sp4/` | `nrpe-*.x86_64.rpm`, `system-user-nagios-*.noarch.rpm`, `SHA256SUMS` |
+| SLES 15 SP3 | `output/sles15sp3/` | `nrpe-*.x86_64.rpm`, `system-user-nagios-*.noarch.rpm`, `SHA256SUMS` |
 
 Keep exactly one server package version in that directory so the wildcards below
 select the intended package. Source RPMs, manifests, and Debian build information
@@ -95,7 +95,7 @@ If startup fails, inspect the service log:
 sudo journalctl -u nagios-nrpe-server -n 100 --no-pager
 ```
 
-## SLES 15 SP4
+## SLES 15 SP3
 
 Check the destination release and architecture:
 
@@ -104,17 +104,17 @@ cat /etc/os-release
 uname -m
 ```
 
-Expect SLES `15.4` and `x86_64`. The current pinned build produces:
+Expect SLES `15.3` and `x86_64`. The current pinned build produces:
 
 ```text
-nrpe-4.1.1-150400.95.2.withargs1.x86_64.rpm
+nrpe-4.1.1-0.withargs1.x86_64.rpm
 system-user-nagios-1.0.0-0.noarch.rpm
 ```
 
-The destination needs matching, reachable SLES SP4 repositories or an approved
-mirror to resolve runtime dependencies. The historical OBS SP4 NRPE repository
-may no longer exist; see [SLES repository availability](sles15sp4.md#installing-the-repository-package-on-an-existing-server).
-Do not replace the SP4 dependency basis with SP7 or Leap packages.
+The destination needs matching, reachable SLES SP3 repositories or an approved
+mirror to resolve runtime dependencies. The historical OBS SP3 NRPE repository
+may no longer exist; see [SLES repository availability](sles15sp3.md#base-image-and-matching-dependencies).
+Do not replace the SP3 dependency basis with SP7 or Leap packages.
 
 From the directory with the verified RPMs, check whether the real Nagios user
 package is already installed and refresh repository metadata:
@@ -129,7 +129,7 @@ install only the custom NRPE RPM:
 
 ```sh
 sudo zypper install --allow-unsigned-rpm \
-  ./nrpe-4.1.1-150400.95.2.withargs1.x86_64.rpm
+  ./nrpe-4.1.1-0.withargs1.x86_64.rpm
 ```
 
 If the user package is missing, install the companion and server together:
@@ -137,7 +137,7 @@ If the user package is missing, install the companion and server together:
 ```sh
 sudo zypper install --allow-unsigned-rpm \
   ./system-user-nagios-1.0.0-0.noarch.rpm \
-  ./nrpe-4.1.1-150400.95.2.withargs1.x86_64.rpm
+  ./nrpe-4.1.1-0.withargs1.x86_64.rpm
 ```
 
 These custom RPMs are currently unsigned local artifacts, which is why these
@@ -154,7 +154,7 @@ rpm -q nrpe
 getent passwd nagios
 ```
 
-Expect `nrpe-4.1.1-150400.95.2.withargs1.x86_64` for the current build.
+Expect `nrpe-4.1.1-0.withargs1.x86_64` for the current build.
 `zypper install nrpe` without the local filename can select the repository
 package instead of this custom build.
 
@@ -178,7 +178,7 @@ sudo journalctl -u nrpe -n 100 --no-pager
 | Distribution | Configuration | Service |
 | --- | --- | --- |
 | Debian | `/etc/nagios/nrpe.cfg` | `nagios-nrpe-server` |
-| SLES 15 SP4 / OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
+| SLES 15 SP3 / OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
 
 Argument support is compiled in, but `dont_blame_nrpe=0` remains the packaged
 default. Keep it at `0` if the monitoring server should not supply arguments.

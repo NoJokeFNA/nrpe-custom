@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG SLES_BASE_IMAGE=registry.suse.com/bci/bci-base:15.4
+ARG SLES_BASE_IMAGE=registry.suse.com/bci/bci-base:15.3
 FROM ${SLES_BASE_IMAGE}
 
 ARG NRPE_CA_SHA256=none
@@ -8,17 +8,17 @@ ARG NRPE_CA_SHA256=none
 # entire compiler filesystem for every intermediate COPY/RUN instruction.
 COPY scripts/install-ca-certificate.sh scripts/setup-sles-repositories.sh scripts/setup-sles-media.sh \
      scripts/sles_source.py scripts/fetch_sles_packages.py scripts/build-sles-user.sh \
-     packaging/sles15sp4-source.json packaging/sles15sp4-user-source.json \
-     packaging/sles15sp4-bootstrap.json packaging/sles15sp4-backports.asc \
-     packaging/sles15sp4-suse.asc /opt/nrpe-build/
+     packaging/sles15sp3-source.json packaging/sles15sp3-user-source.json \
+     packaging/sles15sp3-bootstrap.json packaging/sles15sp3-backports.asc \
+     packaging/sles15sp3-suse.asc /opt/nrpe-build/
 RUN --mount=type=secret,id=nrpe_ca_cert \
     --mount=from=nrpe_sles_media,target=/mnt/nrpe-sles-media,readonly \
     set -eu; \
     bash /opt/nrpe-build/install-ca-certificate.sh /run/secrets/nrpe_ca_cert "$NRPE_CA_SHA256"; \
-    cp /opt/nrpe-build/sles15sp4-source.json /opt/nrpe-build/source.json; \
-    cp /opt/nrpe-build/sles15sp4-user-source.json /opt/nrpe-build/user-source.json; \
-    cp /opt/nrpe-build/sles15sp4-bootstrap.json /opt/nrpe-build/bootstrap.json; \
-    rpm --import /opt/nrpe-build/sles15sp4-backports.asc /opt/nrpe-build/sles15sp4-suse.asc; \
+    cp /opt/nrpe-build/sles15sp3-source.json /opt/nrpe-build/source.json; \
+    cp /opt/nrpe-build/sles15sp3-user-source.json /opt/nrpe-build/user-source.json; \
+    cp /opt/nrpe-build/sles15sp3-bootstrap.json /opt/nrpe-build/bootstrap.json; \
+    rpm --import /opt/nrpe-build/sles15sp3-backports.asc /opt/nrpe-build/sles15sp3-suse.asc; \
     bash /opt/nrpe-build/setup-sles-repositories.sh; \
     zypper --non-interactive install --no-recommends \
       gcc make rpm-build cpio patch diffutils findutils tar gzip xz python3 \

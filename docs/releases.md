@@ -9,7 +9,7 @@ manual workflow dispatch is also validation-only.
 
 1. Run the Linux/Windows unit matrix, shell/Compose checks and dependency audit.
 2. Build all five targets on separate fresh Ubuntu runners: Debian 11, 12, 13,
-   14 and SLES 15 SP4. Apply this project's packaging changes through the normal
+   14 and SLES 15 SP3. Apply this project's packaging changes through the normal
    builders. Install each package in its matching disposable runtime container
    and test disabled/enabled arguments over TLS. All targets are attempted even
    if one fails; no release is published unless every target succeeds.
@@ -45,7 +45,7 @@ by Debian changelog/SLES spec, including the project's custom revision.
 Release assets are:
 
 - `nrpe-custom-debian11.tar.gz` through `nrpe-custom-debian14.tar.gz`.
-- `nrpe-custom-sles15sp4.tar.gz`.
+- `nrpe-custom-sles15sp3.tar.gz`.
 - `workflow-source.tar.gz`, `LICENSE`, `THIRD_PARTY.md`, `release.json`,
   `RELEASE_NOTES.md`, and `SHA256SUMS`.
 - `SHA256SUMS.sig` when SSH signing is enabled. This detached signature is not

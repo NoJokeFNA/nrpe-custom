@@ -76,6 +76,10 @@ See [menu installation and controls](docs/menu.md), including virtual environmen
 Direct commands do not require the menu dependencies. Without an interactive
 terminal, launching without arguments prints help and never prompts.
 
+The affected SLES platform was corrected to SP3 on 2026-10-28; the previous
+automation targeted SP4. See the [SLES guide](docs/sles15sp3.md) and
+[service FAQ](docs/faq.md) before diagnosing a package build problem.
+
 ## Supported targets
 
 All package outputs target `linux/amd64` (`x86_64` for RPM).
@@ -86,16 +90,17 @@ All package outputs target `linux/amd64` (`x86_64` for RPM).
 | `debian12` | Debian 12 Bookworm | `nagios-nrpe-server` `.deb` | Discover through APT |
 | `debian13` | Debian 13 Trixie | `nagios-nrpe-server` `.deb` | Discover through APT |
 | `debian14` | Debian 14 Forky | `nagios-nrpe-server` `.deb` | Discover through APT; moving testing suite |
-| `sles15sp4` | SLES 15 SP4 | `nrpe` `.rpm` + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
+| `sles15sp3` | SLES 15 SP3 | `nrpe` `.rpm` + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
 
 Target availability depends on distribution repositories and image availability.
 A listed target is not a promise of ongoing upstream security maintenance. In
 particular, historical archives do not extend a distribution's support period.
 The SLES recipe uses SLE/Package Hub dependencies and no Leap replacement image
-or repository. An installation ISO is optional; see [the SLES guide](docs/sles15sp4.md).
+or repository. An installation ISO is optional; see [the SLES guide](docs/sles15sp3.md).
 
-Debian 11 and SLES 15 SP4 passed build, fresh-container installation, and TLS
-argument tests during initial validation. Use your own run reports to establish
+Debian 11 passed initial validation; the corrected SLES 15 SP3 target passed
+build, fresh-container installation and TLS argument tests on 2026-10-28.
+Use your own run reports to establish
 which exact package bytes have passed; target support is not a passing test badge.
 
 ## Commands
@@ -120,7 +125,7 @@ when building; SLES sources stay pinned until reviewed and updated.
 
 ```sh
 python3 nrpe.py verify debian12 debian13 --pull
-python3 nrpe.py verify sles15sp4 --rebuild
+python3 nrpe.py verify sles15sp3 --rebuild
 python3 nrpe.py test debian11
 ```
 
@@ -128,7 +133,7 @@ For company HTTPS inspection, optionally select a local public CA certificate
 (PEM or DER); TLS verification remains enabled:
 
 ```powershell
-python3 nrpe.py verify sles15sp4 --ca-cert "C:\Certificates\Company-Root.cer"
+python3 nrpe.py verify sles15sp3 --ca-cert "C:\Certificates\Company-Root.cer"
 ```
 
 No certificate is required by default or included in the exported NRPE package. See
@@ -184,11 +189,11 @@ alternative installation method; do not install over the custom package with
 `make install`.
 
 Follow the [installation guide](docs/installation.md) for step-by-step Debian
-11–14 and SLES 15 SP4 instructions: which files to copy, checksum verification,
+11–14 and SLES 15 SP3 instructions: which files to copy, checksum verification,
 APT/zypper installation, the SLES companion user package, service startup, and
 installed-version checks. Run installation commands on the destination server.
 The guide also explains the unsigned custom RPMs and matching repository
-requirements. See [SLES background](docs/sles15sp4.md) for source provenance and
+requirements. See [SLES background](docs/sles15sp3.md) for source provenance and
 historical repository availability.
 
 Before changing an existing server, read [updates and rollback](docs/updates-and-rollback.md).
@@ -237,7 +242,8 @@ These checks do not replace package builds and runtime integration tests.
 - [Release automation](docs/releases.md): per-master-push packages, sources, licenses and verification.
 - [Architecture](docs/architecture.md): control flow and every script's purpose.
 - [Network requirements](docs/network.md): domains, ports, directions, and proxy notes.
-- [SLES 15 SP4](docs/sles15sp4.md): provenance, dependencies, media, and installation.
+- [FAQ](docs/faq.md): Nagios/NRPE service startup and when a custom build is needed.
+- [SLES 15 SP3](docs/sles15sp3.md): provenance, dependencies, media, and installation.
 - [Contributing](CONTRIBUTING.md): development and meaningful validation.
 - [Security](docs/security.md): argument risks and safe issue reporting.
 - [Deferred release plan](docs/release-plan.md): license review and release preparation.

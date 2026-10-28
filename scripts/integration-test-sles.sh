@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 . /etc/os-release
-[[ "$ID" == sles && "$VERSION_ID" == 15.4 && "$(uname -m)" == x86_64 ]] || {
-  echo 'ERROR: Expected SLES 15 SP4 on x86_64' >&2; exit 1;
+[[ "$ID" == sles && "$VERSION_ID" == 15.3 && "$(uname -m)" == x86_64 ]] || {
+  echo 'ERROR: Expected SLES 15 SP3 on x86_64' >&2; exit 1;
 }
 shopt -s nullglob
 packages=(/packages/nrpe-[0-9]*.x86_64.rpm)
@@ -57,4 +57,4 @@ while IFS= read -r path; do
 done <<< "$plugin_files"
 [[ -n "$client" ]] || { echo 'ERROR: check_nrpe client not found' >&2; exit 1; }
 exec /opt/nrpe-test/test-nrpe-protocol.sh /etc/nrpe.cfg \
-  "$client" /usr/sbin/nrpe "$version" sles15sp4 nrpe
+  "$client" /usr/sbin/nrpe "$version" sles15sp3 nrpe

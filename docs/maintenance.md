@@ -9,7 +9,7 @@ distribution's lifecycle. See the [warranty notice](../README.md#warranty-and-re
 | Area | Project scope and verification |
 | --- | --- |
 | Debian 11–14, `amd64` | Matching build/runtime containers, source export, package validation and TLS tests; a successful run verifies its exact package bytes |
-| SLES 15 SP4, `x86_64` | Genuine SP4 basis, pinned OBS sources, server and real companion user RPM; other SLES service packs are not covered |
+| SLES 15 SP3, `x86_64` | Genuine SP3 basis, pinned OBS sources, server and real companion user RPM; other SLES service packs are not covered |
 | Linux host CLI | Standard-library CLI and optional menu; hosted unit-test CI |
 | Windows host CLI | Hosted Python unit tests; Docker Desktop Linux-container operation and actual console behavior need separate practical verification |
 | macOS / ARM hosts | Linux/amd64 emulation may work; outside the hosted host matrix and not verified by Linux/Windows results |
@@ -91,7 +91,7 @@ Preserve previous outputs, then explicitly rebuild and verify updates.
 
 Do not automatically replace SLES revisions/hashes. Review authoritative source
 and packaging changes, signatures and license terms, then update the manifests
-and checksums together. Retain pure SP4 dependencies, runtime-disabled arguments
+and checksums together. Retain pure SP3 dependencies, runtime-disabled arguments
 and disabled Bash substitution. Change the custom revision when modifying the
 recipe for the same upstream version. Revisit [license evidence](sles-license-review.md)
 when source versions or grants change.

@@ -128,8 +128,8 @@ def validate_sources(root, target, evidence, notices):
                 (notices / Path(name).name).write_bytes(data)
     else:
         allowed = {'SHA256SUMS', 'source-manifest.json', 'user-source-manifest.json', 'bootstrap-manifest.json'}
-        pairs = [('nrpe', 'source-manifest.json', 'sles15sp4-source.json'),
-                 ('system-user-nagios', 'user-source-manifest.json', 'sles15sp4-user-source.json')]
+        pairs = [('nrpe', 'source-manifest.json', 'sles15sp3-source.json'),
+                 ('system-user-nagios', 'user-source-manifest.json', 'sles15sp3-user-source.json')]
         for package, manifest_name, pinned_name in pairs:
             manifest = json.loads((root / 'packaging' / pinned_name).read_text())
             if json.loads((directory / manifest_name).read_text()) != manifest:
@@ -164,21 +164,21 @@ def validate_sources(root, target, evidence, notices):
                     prefix = 'nrpe-' + manifest['version'] + '/'
                     for source_name, notice_name in [('LICENSE.md', 'NRPE-GPL-2.0.md'), ('LEGAL', 'NRPE-LEGAL.txt')]:
                         data = source_tar.extractfile(prefix + source_name).read()
-                        if data != (root / 'packaging/licenses/sles15sp4' / notice_name).read_bytes():
+                        if data != (root / 'packaging/licenses/sles15sp3' / notice_name).read_bytes():
                             raise RuntimeError('SLES license text changed; update the review and notices')
                     utils = source_tar.extractfile(prefix + 'src/utils.c').read().decode()
                     section = utils.split('void display_license(void)', 1)[1]
                     notice = ''.join(ast.literal_eval(s) for s in re.findall(r'printf\(("(?:[^"\\]|\\.)*")\)', section))
-                    if notice != (root / 'packaging/licenses/sles15sp4/NRPE-license-notice.txt').read_text():
+                    if notice != (root / 'packaging/licenses/sles15sp3/NRPE-license-notice.txt').read_text():
                         raise RuntimeError('SLES OpenSSL/GPL notice changed')
             else:
                 header = (directory / 'obs-sources/system-user-nagios/system-user-nagios.spec').read_text().split('%if', 1)[0]
-                if header != (root / 'packaging/licenses/sles15sp4/system-user-nagios-spec-header.txt').read_text():
+                if header != (root / 'packaging/licenses/sles15sp3/system-user-nagios-spec-header.txt').read_text():
                     raise RuntimeError('Companion source copyright/licensing header changed')
         bootstrap = json.loads((directory / 'bootstrap-manifest.json').read_text())
-        if bootstrap != json.loads((root / 'packaging/sles15sp4-bootstrap.json').read_text()):
+        if bootstrap != json.loads((root / 'packaging/sles15sp3-bootstrap.json').read_text()):
             raise RuntimeError('Bootstrap manifest mismatch')
-        shutil.copytree(root / 'packaging/licenses/sles15sp4', notices / 'sles15sp4')
+        shutil.copytree(root / 'packaging/licenses/sles15sp3', notices / 'sles15sp3')
     if set(evidence['assets']) != allowed:
         raise RuntimeError('Output asset mismatch: missing={}, extra={}'.format(
             sorted(allowed - set(evidence['assets'])), sorted(set(evidence['assets']) - allowed)))
@@ -260,7 +260,7 @@ def verify_archive(path, target, commit):
                 raise RuntimeError('Missing corresponding Debian source')
         required = ['licenses/LICENSE.md', 'licenses/LEGAL', 'licenses/copyright']
     else:
-        required = ['licenses/sles15sp4/' + n for n in (
+        required = ['licenses/sles15sp3/' + n for n in (
             'NRPE-GPL-2.0.md', 'NRPE-LEGAL.txt', 'NRPE-license-notice.txt',
             'system-user-nagios-MIT.txt', 'system-user-nagios-spec-header.txt')]
         for name in ('source-manifest.json', 'user-source-manifest.json', 'bootstrap-manifest.json',

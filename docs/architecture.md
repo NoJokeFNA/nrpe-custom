@@ -40,7 +40,7 @@ flowchart LR
 | `nrpe_cli/release.py` | Validate exact workflow/build/source evidence and assemble complete release archives |
 | `compose.yaml` / `compose.test.yaml` | Parameterized builder services and opt-in runtime test services |
 | `docker/debian/build.Dockerfile` / `docker/debian/test.Dockerfile` | Debian build prerequisites and separate runtime environment |
-| `docker/sles15sp4/build.Dockerfile` / `docker/sles15sp4/test.Dockerfile` | Genuine SP4 environments, verified prerequisites, and read-only optional media |
+| `docker/sles15sp3/build.Dockerfile` / `docker/sles15sp3/test.Dockerfile` | Genuine SP3 environments, verified prerequisites, and read-only optional media |
 | `packaging/*.json` and `*.asc` | Pinned SLES source/dependency manifests and verified signing-key identities |
 | `output/<target>/` | Generated packages, checksums, and available provenance; not tracked |
 | `.nrpe/` | Local reports, logs, and locks; not tracked |
@@ -105,7 +105,7 @@ the host controller requires Python 3.9+.
 | `build-sles-user.sh` | SLES builder image setup | Real independently packaged system user/group dependency; needed before NRPE build |
 | `sles_source.py` | SLES Dockerfile and user-package builder | Pinned source fetch/verification and appropriate recipe transformation |
 | `fetch_sles_packages.py` | Both SLES Dockerfiles | Verify original SUSE bootstrap RPM hashes, signatures, vendor, and identity |
-| `setup-sles-repositories.sh` | Both SLES Dockerfiles | Shared SP4 repository setup and media-helper invocation |
+| `setup-sles-repositories.sh` | Both SLES Dockerfiles | Shared SP3 repository setup and media-helper invocation |
 | `setup-sles-media.sh` | SLES repository setup | Validate and register only approved product/module repositories when media is present |
 | `integration-test-sles.sh` | SLES test entry point | RPM artifact/companion checks, dependency installation, then shared protocol test |
 | `install-ca-certificate.sh` | All four Dockerfiles before network package operations | Optional company CA setup, checksum validation, and distribution-specific system trust stores |

@@ -79,14 +79,14 @@ def artifact(root, target):
     config = TARGET_CONFIG[target]
     result = {"file": path.name, "sha256": digest,
               "version": path.name[len(config["prefix"]):-len(config["suffix"])]}
-    if target == "sles15sp4":
+    if target == "sles15sp3":
         helpers = sorted(directory.glob("system-user-nagios-*.noarch.rpm"))
         if len(helpers) != 1:
-            raise RuntimeError("sles15sp4: expected one companion user-package RPM. Rebuild the target.")
+            raise RuntimeError("sles15sp3: expected one companion user-package RPM. Rebuild the target.")
         helper = helpers[0]
         helper_digest = _sha256(helper)
         if f"{helper_digest}  {helper.name}" not in entries:
-            raise RuntimeError("sles15sp4: companion package checksum is missing or incorrect.")
+            raise RuntimeError("sles15sp3: companion package checksum is missing or incorrect.")
         result["companions"] = [{"file": helper.name, "sha256": helper_digest}]
     return result
 
