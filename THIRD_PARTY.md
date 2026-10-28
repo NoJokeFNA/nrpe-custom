@@ -83,6 +83,13 @@ actual license text and a separate dependency inventory. Website CSS, templates
 and browser JavaScript are independently authored project code; no external
 JavaScript framework, analytics SDK or font bundle is shipped.
 
+The build-only syntax highlighter is `Pygments==2.21.0`. Its installed wheel's
+`pygments-2.21.0.dist-info/licenses/LICENSE` was inspected and contains BSD-2-Clause
+terms; wheel metadata records the same SPDX expression. It is installed
+separately, not vendored into the repository, shipped in NRPE packages or sent
+to browsers. Generated HTML token spans and scoped CSS use this project's own
+color palette. No Pierre/Tree/Shiki library or third-party theme is bundled.
+
 Docker images, OpenSSL, system libraries, Debian/SUSE repository packages,
 monitoring plugins, and SLES installation media retain their own licenses.
 The current release scope is the custom server packages, the SLES user package,
