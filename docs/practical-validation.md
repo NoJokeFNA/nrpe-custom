@@ -7,12 +7,17 @@ and [update/rollback procedure](updates-and-rollback.md) for deployment details.
 
 ## Current evidence and result recording
 
-As of 2026-10-27, the first release passed all five container build/install/TLS
-tests and Linux/Windows Python unit tests. The Windows Docker Desktop and real
-VM scenarios below are **not run**. That first release covered SLES 15 SP4;
-the later SLES-12-SP3 migration has separate container evidence in the target guide. The available Linux cloud environment has
-no Windows/Docker Desktop host, QEMU/libvirt, `/dev/kvm`, or supplied test-VM
-access. Containers and hosted Windows unit tests do not establish these results.
+The published SLES 12 SP3 release passed all five container build/install/TLS
+and source/archive gates plus Linux/Windows Python unit tests. Exact release and
+commit evidence, including the earlier SLE-15 scope, is retained in the
+[release history](release-history.md). Windows Docker Desktop and real VM
+scenarios below remain **not run**.
+
+On 2026-10-28 the current cloud environment had no `/dev/kvm`, QEMU/libvirt or
+supplied test-VM access. The maintainer confirmed that no test VMs are available.
+These scenarios are prepared for later execution, not replaced by container or
+hosted Windows unit tests. Do not run package migration/reboot tests on a
+production server to fill this gap.
 
 For each scenario record passed, failed, blocked or not run, with:
 

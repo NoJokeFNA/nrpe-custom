@@ -246,7 +246,8 @@ These checks do not replace package builds and runtime integration tests.
 - [SLES 12 SP3 handshake diagnostic](docs/sles12sp3-plaintext-diagnostic.md): anonymized temporary NRPE 2.15 plaintext test and cleanup, without changing the production service.
 - [Contributing](CONTRIBUTING.md): development and meaningful validation.
 - [Security](docs/security.md): argument risks and safe issue reporting.
-- [Deferred release plan](docs/release-plan.md): license review and release preparation.
+- [Release and maintenance plan](docs/release-plan.md): open work and future release requirements.
+- [Release history](docs/release-history.md): published versions and exact validation evidence.
 
 These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review

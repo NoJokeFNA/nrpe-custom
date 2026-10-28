@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import subprocess
 import uuid
-from .targets import TARGETS, TARGET_CONFIG, package_files
+from .targets import TARGET_CONFIG, package_files
 
 
 ROOT = Path(__file__).resolve().parents[1]

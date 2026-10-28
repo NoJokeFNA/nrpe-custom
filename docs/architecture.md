@@ -102,10 +102,10 @@ target compilation and installation use native SLES 12 tools without Python.
 | `integration-test.sh` | Debian test entry point | Debian artifact validation and installation, then shared protocol test |
 | `build-sles.sh` | SLES builder entry point | Native RPM build, packaged defaults, and server/helper export |
 | `build-sles-user.sh` | SLES builder image setup | Real independently packaged system user/group dependency; needed before NRPE build |
-| `sles_source.py` | SLES Dockerfile and user-package builder | Pinned source fetch/verification and appropriate recipe transformation |
-| `fetch_sles_packages.py` | Both SLES Dockerfiles | Verify original SUSE bootstrap RPM hashes, signatures, vendor, and identity |
+| `sles_source.py` | Modern SLES input preparation | Pinned source fetch/verification and appropriate recipe transformation |
+| `fetch_sles_packages.py` | Modern input stage; standalone inspection CLI | Download hash-checked inputs; standalone CLI also requires native RPM verification |
 | `integration-test-sles.sh` | SLES test entry point | RPM artifact/companion checks, dependency installation, then shared protocol test |
-| `install-ca-certificate.sh` | All four Dockerfiles before network package operations | Optional company CA setup, checksum validation, and distribution-specific system trust stores |
+| `install-ca-certificate.sh` | Debian build and runtime Dockerfiles | Optional company CA setup, checksum validation, and distribution-specific system trust stores |
 | `test-nrpe-protocol.sh` | Both integration entry points | Single TLS client/server test of disabled and enabled argument handling |
 
 SLES 12 downloads are prepared separately, then verified and installed with the

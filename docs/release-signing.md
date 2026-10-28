@@ -7,11 +7,11 @@ bundle; it does not add DEB/RPM package signatures or certify software safety.
 
 ## Rollout status
 
-Signing support is prepared for integration into develop. No production signing
+Signing support is included in the published SLES 12 SP3 release. No production signing
 key is enrolled in `packaging/release-allowed-signers`. Signing remains off until
 the maintainer completes enrollment, configures the secret/variable and explicitly
-requests promotion to master. The existing `build-4-517fbfb97d7e` release is
-unsigned; this change does not retroactively authenticate it or replace its files.
+requests promotion to master. The releases recorded in the [release history](release-history.md) are unsigned;
+enrollment does not retroactively authenticate them or replace their files.
 
 GitHub's [artifact attestation requirements](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
 require Enterprise Cloud for private repositories. This repository is private;

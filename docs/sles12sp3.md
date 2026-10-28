@@ -100,6 +100,10 @@ certificate; a connection without that client certificate was rejected.
 
 ## Recorded validation and limits
 
+The target is published; see the [release history](release-history.md#sles-12-sp3-release-2026-10-28)
+for exact master-commit, CI and independently checked release-asset evidence.
+The local runs below preceded publication and remain historical.
+
 Local run `20261028T083230-86e80546` passed native NRPE build, package checks,
 fresh SLES-12 installation and TLS-1.2 requests with mandatory client certificates
 and both argument policies. Subsequent exact commit/run and candidate evidence

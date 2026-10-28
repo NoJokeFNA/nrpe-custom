@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from nrpe_cli import cli, controller, state
-from nrpe_cli.targets import TARGET_CONFIG
+from nrpe_cli.targets import TARGETS, TARGET_CONFIG
 
 
 class WorkflowTests(unittest.TestCase):
@@ -45,7 +45,7 @@ class WorkflowTests(unittest.TestCase):
     @patch('nrpe_cli.controller.check_docker', return_value='docker')
     @patch('nrpe_cli.controller.run_phase')
     def test_verify_runs_build_and_test_in_order_and_binds_hash(self, phase, docker):
-        for target in state.TARGETS:
+        for target in TARGETS:
             self.package(target)
         phase.return_value = 0
         self.assertEqual(controller.execute('verify', list(state.TARGETS), self.root, rebuild=True), 0)

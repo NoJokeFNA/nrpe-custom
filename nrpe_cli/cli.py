@@ -8,8 +8,8 @@ import sys
 from .certificates import prepared_certificate
 from .controller import execute
 from .docker import check_docker
-from .state import ROOT, TARGETS, artifact, reports
-from .targets import TARGET_CONFIG, package_files
+from .state import ROOT, artifact, reports
+from .targets import TARGETS, package_files
 
 
 def doctor(root):
@@ -152,9 +152,6 @@ def main(argv=None, root=ROOT):
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
         targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
-        for target in targets:
-            if TARGET_CONFIG[target].get("experimental"):
-                print(f"Experimental target: {target}. Review build and integration results before deployment.")
         rebuild = getattr(args, "rebuild", False)
         if args.action in ("build", "verify") and not rebuild:
             existing = [target for target in targets if package_files(root, target)]
