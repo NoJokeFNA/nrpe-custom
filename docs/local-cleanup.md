@@ -4,6 +4,10 @@
 the target server, remove current packages or contact Docker unless an image is
 explicitly selected.
 
+The terminal menu exposes the same options under **Local cleanup**. It shows
+the read-only preview before a separate deletion confirmation, defaults to
+cancellation and rejects a changed candidate list until it is previewed again.
+
 ```sh
 python3 nrpe.py clean
 python3 nrpe.py clean --older-than 60 --keep-runs 10

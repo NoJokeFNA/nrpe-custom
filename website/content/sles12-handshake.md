@@ -1,4 +1,4 @@
-# When the OS version was the missing detail
+# Service checks before TLS changes
 
 **Field note · 28 October 2026 · SLES 12 SP3 · NRPE 2.15 / check_nrpe 4.1.0**
 
@@ -48,7 +48,21 @@ the exact cipher/certificate cause or prove a lasting TLS fix. Starting a manual
 daemon also did not make it a systemd-managed service: a second managed start
 failed because another NRPE process was already running.
 
-## The next step was a different build, not a weaker default
+## The operator's later clarification: start the missing service
+
+The operator later reported that the missing `nrpe.service` was the cause of
+their non-working checks: starting it alongside `nagios.service` restored the
+combined setup. A custom package was not needed to correct that service state.
+See the [combined service and TLS FAQ](../../docs/faq.md#nrpe-checks-on-sles-services-first-then-ssltls)
+for the service commands and the order of checks.
+
+This updates the outcome of the account. It does not establish that every
+previous handshake log entry came from a stopped daemon, or identify a cipher
+or certificate fix. The earlier manual/plaintext tests and the eventual managed
+service state are distinct observations. Confirm the current listener and
+repeat the actual monitoring check before changing TLS policy.
+
+## What the custom build adds when it is actually needed
 
 The project now targets genuine SLES 12 SP3. Its NRPE 4.1.1 container checks cover
 certificate-authenticated TLS 1.2 against the original OpenSSL ABI; a separate
@@ -63,6 +77,7 @@ restored; no successful production upgrade or rollback is claimed in this note.
 
 ## The lesson to carry forward
 
-Verify the host and OS before choosing a build target. Record the daemon and
-client versions, then test the smallest useful hypothesis. A successful plain
+Check the managed service and listener first, then verify the host and OS before
+choosing a build target. Record the daemon and client versions, then test the
+smallest useful hypothesis. A successful plain
 connection is evidence about connectivity — not evidence that TLS is configured.

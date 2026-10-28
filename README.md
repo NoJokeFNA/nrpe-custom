@@ -70,6 +70,10 @@ and **Esc** to go back. Select build/test actions, diagnose Docker, inspect stat
 or choose a previous run's logs. Select an optional company CA certificate
 through its browser, or enter/paste its path directly.
 The menu reviews your choices before running and returns after each command.
+It retains choices within the session, shows real workflow phases and results,
+and offers log diagnosis and preview-first cleanup. Use `/` to filter lists;
+Windows drives live in a separate **Switch drive...** selector so many attached
+drives do not crowd out files.
 Colors highlight selection and errors; `NO_COLOR` enables monochrome output.
 See [menu installation and controls](docs/menu.md), including virtual environments.
 

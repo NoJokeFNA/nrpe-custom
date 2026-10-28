@@ -96,6 +96,8 @@ def render(root, source, pages, base, commit):
         suffix = ('?' + parsed.query if parsed.query else '') + ('#' + parsed.fragment if parsed.fragment else '')
         if target in pages:
             return page_url(pages[target], base) + suffix
+        if target.parts[:2] == ('website', 'assets'):
+            return base + '/assets/' + quote(target.relative_to('website/assets').as_posix(), safe='/') + suffix
         if target.parent == Path('packaging/licenses/sles12sp3') and target.suffix in ('.md', '.txt'):
             return base + '/notices/' + quote(target.name) + suffix
         # Build recipes and other repository-only references remain source links.

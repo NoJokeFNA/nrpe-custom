@@ -39,6 +39,7 @@ flowchart LR
 | `nrpe_cli/cleanup.py` | Preview/retention planning and guarded deletion of expired local evidence or explicitly selected project images |
 | `nrpe_cli/diagnostics.py` | Classify build/download and NRPE runtime errors without executing or retaining log contents |
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
+| `nrpe_cli/progress.py` | Optional context-local presentation events; controller owns execution and evidence |
 | `nrpe_cli/certificates.py` | Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret |
 | `nrpe_cli/release.py` | Validate exact workflow/build/source evidence and assemble complete release archives |
 | `nrpe_cli/signing.py` | Validate complete release assets and sign/authenticate checksums with an enrolled maintainer key |

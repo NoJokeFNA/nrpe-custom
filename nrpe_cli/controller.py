@@ -9,6 +9,7 @@ from .diagnostics import FailureDiagnostics
 from .state import ROOT, artifact, new_id, save_report, target_lock, timestamp, workflow_identity
 from .release import snapshot_assets
 from .targets import package_files
+from .progress import notify
 
 
 def stop_process(process):
@@ -64,7 +65,8 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, ca_cer
                 diagnostics.observe(line)
                 log.write(line)
                 log.flush()
-                print(line, end="", flush=True)
+                if not notify('log', text=line):
+                    print(line, end="", flush=True)
             code = process.wait()
             process.stdout.close()
             if code:
@@ -112,11 +114,14 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, ca_cert=None)
                   target: {"build": "not run", "package": "not run", "test": "not run"}
                   for target in targets}}
     save_report(directory, report)
+    notify('run', run_id=run_id, targets=targets)
     code = 1
     active = None
     phase = None
     try:
+        notify('phase', target='Docker', phase='readiness', status='running')
         docker = check_docker()
+        notify('phase', target='Docker', phase='readiness', status='passed')
         for target in targets:
             active = report["targets"][target]
             phase = None
@@ -127,25 +132,30 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, ca_cert=None)
                             raise RuntimeError(f"{target}: output already exists. Use --rebuild or test it instead.")
                         phase = "build"
                         active[phase] = "running"
+                        notify('phase', target=target, phase=phase, status='running')
                         save_report(directory, report)
                         print(f"\n[{target}] Building package", flush=True)
                         log.write(f"\n[{target}] Building package\n")
                         code = run_phase(docker, root, run_id, target, phase, log, lock, pull=pull,
                                          ca_cert=ca_cert)
                         active[phase] = "passed" if code == 0 else "failed"
+                        notify('phase', target=target, phase=phase, status=active[phase])
                         if code:
                             break
                     phase = "package"
                     active[phase] = "running"
+                    notify('phase', target=target, phase=phase, status='running')
                     print(f"[{target}] Checking package checksum", flush=True)
                     before = artifact(root, target)
                     active["artifact"] = before
                     active['release_assets'] = snapshot_assets(root, target)
                     active[phase] = "passed"
+                    notify('phase', target=target, phase=phase, status='passed')
                     save_report(directory, report)
                     if action in ("test", "verify"):
                         phase = "test"
                         active[phase] = "running"
+                        notify('phase', target=target, phase=phase, status='running')
                         save_report(directory, report)
                         print(f"[{target}] Installing package and testing NRPE arguments", flush=True)
                         log.write(f"\n[{target}] Installing package and testing NRPE arguments\n")
@@ -158,6 +168,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, ca_cert=None)
                             raise RuntimeError(f"{target}: package changed during the test; result is invalid.")
                         if snapshot_assets(root, target) != active['release_assets']:
                             raise RuntimeError(f"{target}: source assets changed during the test.")
+                        notify('phase', target=target, phase=phase, status='passed')
                     code = 0
             save_report(directory, report)
         report["status"] = "passed" if code == 0 else "failed"
@@ -184,6 +195,7 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, ca_cert=None)
         report['workflow_after'] = workflow_identity(root)
         report["exit_code"] = code
         save_report(directory, report)
+        notify('complete', report=report)
         summary(report)
         print(f"Logs and report: {directory}")
     return code
