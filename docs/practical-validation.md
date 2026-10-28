@@ -82,6 +82,12 @@ container cleanup. Install `requirements-menu.txt` to exercise the optional menu
 
 ## Debian and SLES test VMs
 
+Use one copy of the [deployment validation worksheet](deployment-validation-template.md)
+per target. The operator confirmed no test VMs are available as of 2026-10-28;
+execution is **blocked by unavailable infrastructure**. The procedure and result
+template are prepared, while all VM/systemd/reboot/update/rollback results remain
+not run.
+
 Use disposable amd64 VMs for Debian 11, 12, 13, 14 and genuine SLES 12 SP3.
 Keep matching signed repositories available and take a recoverable baseline
 snapshot. Use a separate monitoring client for remote TLS checks. Do not

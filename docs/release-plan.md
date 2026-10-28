@@ -30,6 +30,8 @@ sequentially. See [Git workflow](git-workflow.md).
 - [ ] Complete [Windows Docker Desktop practical checks](practical-validation.md#windows-docker-desktop).
 - [ ] Complete [Debian and SLES test VMs](practical-validation.md#debian-and-sles-test-vms):
   real systemd/reboot, plugins and upgrade/rollback from the saved NRPE 2.15 package.
+  Infrastructure is unavailable; the [per-target worksheet](deployment-validation-template.md)
+  is prepared, and execution remains blocked/not run.
 - [ ] Enroll a maintainer-controlled release key, configure the signing secret and
   authenticate a signed release after a separately requested master promotion.
 - [ ] Continue recurring [maintenance review](maintenance.md#human-review-cadence),
