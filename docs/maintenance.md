@@ -53,6 +53,10 @@ and collection failures fail the job. It does not scan NRPE C code, DEB/RPM
 contents, system libraries, container images or SLES repositories. A clean result
 is not a security certification.
 
+The separate [website check](../.github/workflows/website.yml) audits
+`requirements-website.txt` and validates generated documentation and publication
+guards. The renderer is isolated from the NRPE CLI/menu environment.
+
 To reproduce the audit using Python 3.10+ in an isolated development environment:
 
 ```sh

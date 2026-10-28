@@ -48,6 +48,7 @@ flowchart LR
 | `packaging/*.json` and `*.asc` | Pinned SLES source/dependency manifests and verified signing-key identities |
 | `output/<target>/` | Generated packages, checksums, and available provenance; not tracked |
 | `.nrpe/` | Local reports, logs, and locks; not tracked |
+| `website/` | Static presentation, shared-Markdown renderer, reviewed field notes and human-authored gh-pages publishing helper |
 
 ## A verify run
 

@@ -250,6 +250,7 @@ These checks do not replace package builds and runtime integration tests.
 - [Release history](docs/release-history.md): published versions and exact validation evidence.
 - [Local cleanup](docs/local-cleanup.md): preview expired runs and explicitly selected retired outputs/images.
 - [Troubleshooting](docs/troubleshooting.md): contextual build hints and read-only diagnosis of NRPE/server logs.
+- [Documentation website](docs/website.md): local preview, field notes and reviewed publication to GitHub Pages.
 
 These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review

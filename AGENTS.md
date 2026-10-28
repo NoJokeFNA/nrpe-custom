@@ -154,3 +154,7 @@ They do not validate systemd or a complete Nagios deployment.
   `!` or a `BREAKING CHANGE:` footer when applicable.
 - Include the actual validation results and any remaining limitations in the
   handoff. Do not push commits unless requested.
+- `gh-pages` is a deployment branch selected by the maintainer. Website source
+  changes follow the normal topic/develop PR flow. Publish only reviewed static
+  output with the human Git identity after an explicit publication request;
+  never use this branch for source development or delete master/develop.
