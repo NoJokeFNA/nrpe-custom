@@ -27,8 +27,9 @@ sequentially. See [Git workflow](git-workflow.md).
 
 ## Remaining work, in priority order
 
-- [ ] Finish local clean-checkout source/archive checks for the 12.3 port and record
-  the exact final commit/run. No hosted CI run is triggered without a requested push.
+- [x] Complete local clean-checkout source/archive checks for the 12.3 port; exact
+  implementation commit/run recorded below. No hosted CI run is triggered without
+  a requested push. Repeat the gate for the eventual release commit.
 - [ ] Complete [Windows Docker Desktop practical checks](practical-validation.md#windows-docker-desktop).
 - [ ] Complete [Debian and SLES test VMs](practical-validation.md#debian-and-sles-test-vms):
   real systemd/reboot, plugins and upgrade/rollback from the saved NRPE 2.15 package.
@@ -100,7 +101,27 @@ cloud environment has no Windows host, VM hypervisor or supplied test-VM access.
 Initial native run `20261028T083230-86e80546` passed the genuine SLES-12 build,
 fresh-container installation and certificate-authenticated TLS 1.2 argument
 checks. It does not qualify as clean-checkout release provenance: further local
-source/guard/documentation changes followed. The final run is recorded separately.
+source/guard/documentation changes followed.
+
+Implementation commit `7aa2f316c3e9b1ce26933929ddf37ffa1eeeeb88` then passed
+clean-checkout run `20261028T090944-fe957b65`: native build, package checks, fresh
+installation and both argument policies over authenticated TLS 1.2. The source
+and archive gate passed for that exact commit/run, comparing all three SRPMs
+against the pinned originals and checking licenses, manifests, the matching
+client and the full 48-file archive. The candidate is local under
+`.nrpe/sles12-local-candidate/`; nothing was published.
+
+An isolated OpenSSL 3.5.7 client also completed a real NRPE request over
+`DHE-RSA-AES256-GCM-SHA384` with default security settings, server hostname/chain
+verification and a separate client certificate. A missing client certificate
+was rejected. The [SLES TLS configuration](configuration-examples.md#hosts-tls-and-fixed-commands)
+records the NRPE-specific DH initialization requirement without permitting
+anonymous ciphers. All 142 unit tests, shell syntax, Compose/doctor checks and
+documentation links/snippets passed. A SLE-15 base was explicitly rejected.
+
+These results identify the implementation commit, not every later documentation
+or integration commit. Fresh per-commit reports and candidate archives remain
+local under `.nrpe/`; the exact eventual release commit must pass the gate again.
 
 Syntax/unit tests are separate from package/runtime proof. Container tests do
 not establish production systemd, TLS, firewall, plugins or rollback readiness.
