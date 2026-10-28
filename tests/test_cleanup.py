@@ -33,7 +33,7 @@ class CleanupFixture:
         run_id = f'202001{number:02}T000000-abcdef01'
         directory = self.root / '.nrpe/runs' / run_id
         directory.mkdir(parents=True)
-        report = {'schema': 1, 'id': run_id, 'started': f'2020-01-{number:02}T00:00:00+00:00',
+        report = {'schema': 1, 'id': run_id, 'action': 'test', 'started': f'2020-01-{number:02}T00:00:00+00:00',
                   'finished': f'2020-01-{number:02}T01:00:00+00:00', 'status': status,
                   'targets': {'debian12': {'test': 'passed', 'artifact': artifact}}}
         (directory / 'report.json').write_text(json.dumps(report))
@@ -195,6 +195,21 @@ class CleanupTests(CleanupFixture, unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(cli.main(['clean', '--older-than', '-1', '--apply'], self.root), 1)
         self.assertTrue(expired.exists())
+
+    def test_corrupt_metadata_is_kept_instead_of_guessed_as_an_old_run(self):
+        cases = ({'action': 'operator-backup'}, {'started': 123}, {'targets': None},
+                 {'targets': {'unknown-system': {}}}, {'started': 'invalid'})
+        directories = []
+        for number, change in enumerate(cases, 1):
+            directory = self.report(number)
+            data = json.loads((directory / 'report.json').read_text())
+            data.update(change)
+            (directory / 'report.json').write_text(json.dumps(data))
+            self.age(directory)
+            directories.append(directory)
+        self.report(8)
+        cleanup.clean(self.root, keep_runs=0, apply=True)
+        self.assertTrue(all(directory.exists() for directory in directories))
 
 
 class ImageCleanupTests(CleanupFixture, unittest.TestCase):

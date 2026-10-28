@@ -15,10 +15,10 @@ are candidates. Both completion time and file modification times must be old
 enough. Running, malformed and unrecognized evidence is left for inspection.
 
 The newest report for each current target and the newest test report matching
-its current package bytes are retained even with `--keep-runs 0`. Current target
-package bytes also retain their newest complete successful `verify` report,
-even if a newer runtime-only test exists. Current target
-output directories, release candidates, downloaded releases, locks, certificates
+its current package bytes are retained even with `--keep-runs 0`. The newest
+complete successful `verify` report matching those bytes is also retained,
+even if a newer runtime-only test exists. Current target output directories,
+release candidates, downloaded releases, locks, certificates
 and arbitrary working directories are never cleanup candidates. Back up evidence
 you need beyond that retention policy before deleting it.
 

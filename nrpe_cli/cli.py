@@ -96,6 +96,8 @@ def show_logs(root, run_id=None):
         print("No container output was recorded.")
     if report.get("error"):
         print(f"ERROR: {report['error']}")
+    if report.get('hint'):
+        print('HINT: ' + report['hint'])
     return 0
 
 

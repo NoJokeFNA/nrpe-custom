@@ -112,3 +112,7 @@ class DiagnosticTests(unittest.TestCase):
             self.assertEqual(report['status'], 'failed')
             self.assertEqual(report['targets']['debian12']['test'], 'not run')
             self.assertIn('integrity verification failed', report['hint'])
+            displayed = io.StringIO()
+            with contextlib.redirect_stdout(displayed):
+                cli.show_logs(root)
+            self.assertIn('HINT: Package/source integrity verification failed', displayed.getvalue())

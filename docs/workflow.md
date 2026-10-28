@@ -152,9 +152,9 @@ argument responses with `dont_blame_nrpe=1`.
 
 These tests need the target distribution's repository access and run NRPE directly. They do not
 validate systemd startup, external network access, production certificates, or a
-complete Nagios deployment. Debian 11 passed package and runtime validation in this cloud environment. SLES 12 SP3 has also passed a full controller verify run with RPM build,
-installation, and TLS argument tests; see its target notes. Do not interpret passing
-unit tests as successful package builds for every target.
+complete Nagios deployment. Exact all-five-target release results are recorded
+in the [release history](release-history.md); those passes apply to the recorded
+commits and artifacts. Unit tests alone do not establish package/runtime success.
 
 ## Results, logs, and concurrent runs
 

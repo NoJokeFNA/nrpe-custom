@@ -53,7 +53,10 @@ def plan(root, older_than=30, keep_runs=5, retired_outputs=False, now=None):
         raise RuntimeError('Retention days and retained run count must be nonnegative')
     checked_roots(root)
     now = now or datetime.now(timezone.utc)
-    cutoff = (now - timedelta(days=older_than)).timestamp()
+    try:
+        cutoff = (now - timedelta(days=older_than)).timestamp()
+    except (OverflowError, ValueError) as exc:
+        raise RuntimeError('Retention days are outside the supported date range') from exc
     # Do not follow report symlinks, including those in malformed run directories.
     runs = root / '.nrpe/runs'
     if runs.exists():
@@ -62,8 +65,20 @@ def plan(root, older_than=30, keep_runs=5, retired_outputs=False, now=None):
             report = directory / 'report.json'
             if report.exists() or report.is_symlink():
                 ordinary(report)
-    history = [r for r in reports(root) if isinstance(r.get('targets'), dict)
-               and all(isinstance(value, dict) for value in r['targets'].values())]
+    history = []
+    for report in reports(root):
+        targets = report.get('targets')
+        if (report.get('action') not in ('build', 'test', 'verify')
+                or not isinstance(targets, dict) or not targets
+                or not set(targets).issubset((*TARGETS, *RETIRED_TARGETS))
+                or not all(isinstance(value, dict) for value in targets.values())):
+            continue
+        try:
+            if datetime.fromisoformat(report['started']).tzinfo is None:
+                continue
+        except (KeyError, TypeError, ValueError):
+            continue
+        history.append(report)
     protected = {r['id'] for r in history[:keep_runs]}
     for target in TARGETS:
         candidates = [r for r in history if target in r.get('targets', {})]
