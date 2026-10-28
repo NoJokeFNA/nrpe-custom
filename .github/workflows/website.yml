@@ -1,0 +1,36 @@
+name: Documentation website
+on:
+  pull_request:
+    branches: [develop, master]
+  push:
+    branches: [develop, master]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  website:
+    name: Static website and links
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Install the isolated website renderer
+        run: python -m pip install -r requirements-website.txt -r requirements-audit.txt
+      - name: Audit the renderer dependency
+        run: python -m pip_audit --strict -r requirements-website.txt
+      - name: Test rendering and guarded publication
+        run: python -m unittest discover -s website/tests -v
+      - name: Build and check every internal page and anchor
+        run: python website/build.py
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: documentation-preview
+          path: .nrpe/site/nrpe-custom/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

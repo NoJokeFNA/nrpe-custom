@@ -1,12 +1,12 @@
 # Third-party provenance and license inventory
 
-This inventory records evidence inspected during release preparation on
-2026-10-27. It is not a completed redistribution approval. The root [MIT
+This inventory records evidence inspected during release and website preparation
+on 2026-10-27/28. It is not a completed redistribution approval. The root [MIT
 license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
 
-The active local target was corrected again to **SLES 12 SP3** after receiving
+The active target was corrected to **SLES 12 SP3** after receiving
 its actual OS/binary/library identity on 2026-10-28. The same reviewed NRPE/user
 sources are rebuilt natively; their previous SLE-15 runtime observations do not
 prove SLE-12 compatibility. The port additionally builds the macros from pinned
@@ -72,6 +72,17 @@ as part of the server packages.
 
 ## Build and runtime dependencies
 
+`requirements-website.txt` pins the separate build-only renderer
+`Markdown==3.8.2` (Python-Markdown). Its installed wheel's
+`markdown-3.8.2.dist-info/licenses/LICENSE.md` was inspected and contains
+BSD-3-Clause terms; wheel metadata records the same SPDX expression. The
+renderer is installed separately, not vendored, bundled into NRPE packages or
+copied into the static site. Generated pages retain the licenses of their
+original documentation and notices. Bundling the renderer would require its
+actual license text and a separate dependency inventory. Website CSS, templates
+and browser JavaScript are independently authored project code; no external
+JavaScript framework, analytics SDK or font bundle is shipped.
+
 Docker images, OpenSSL, system libraries, Debian/SUSE repository packages,
 monitoring plugins, and SLES installation media retain their own licenses.
 The current release scope is the custom server packages, the SLES user package,
@@ -79,7 +90,7 @@ their corresponding sources, and this project's build workflow. It does not
 include container images, dependency RPM/DEB bundles, or installation media.
 Any expansion requires an inventory of the additional shipped bytes.
 
-The bundled SUSE and backports public keys are trust material identified by the
+The bundled SUSE public key is trust material identified by the
 fingerprints and checksums in the SLES manifests. They are not independently
 authored project code; do not label them MIT merely because they are in this
 repository. Retain their issuer identity and provenance.

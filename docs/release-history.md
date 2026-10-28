@@ -4,6 +4,20 @@ Historical results apply only to their recorded commits, artifacts and targets.
 Current deployment guidance is in the [installation guide](installation.md);
 open work is tracked in the [release plan](release-plan.md).
 
+## Maintenance release, 2026-10-28
+
+[PR #8](https://github.com/NoJokeFNA/nrpe-custom/pull/8) integrated guarded cleanup,
+contextual diagnostics and the documentation audit into develop.
+[PR #9](https://github.com/NoJokeFNA/nrpe-custom/pull/9) promoted that reviewed
+state to master at the maintainer's request.
+
+[Release build-15-3c8a2bae6b60](https://github.com/NoJokeFNA/nrpe-custom/releases/tag/build-15-3c8a2bae6b60)
+was published from `3c8a2bae6b608d52271ad8197eb78806e6498c95` by
+[successful run 40741054845](https://github.com/NoJokeFNA/nrpe-custom/actions/runs/40741054845).
+All five native build/install/TLS, source/license and archive checks passed.
+Package version conventions and the target matrix remain those listed below.
+Website work is separate; this release does not establish live GitHub Pages hosting.
+
 ## SLES 12 SP3 release, 2026-10-28
 
 [PR #6](https://github.com/NoJokeFNA/nrpe-custom/pull/6) integrated the native
