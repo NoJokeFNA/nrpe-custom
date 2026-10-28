@@ -5,7 +5,7 @@ import signal
 import subprocess
 
 from .docker import check_docker
-from .diagnostics import TLSFailure
+from .diagnostics import FailureDiagnostics
 from .state import ROOT, artifact, new_id, save_report, target_lock, timestamp, workflow_identity
 from .release import snapshot_assets
 from .targets import package_files
@@ -55,20 +55,20 @@ def run_phase(docker, root, run_id, target, phase, log, lock, pull=False, ca_cer
     process = None
     try:
         for command in commands:
-            tls_failure = TLSFailure()
+            diagnostics = FailureDiagnostics()
             process = subprocess.Popen(
                 command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, encoding="utf-8", errors="replace", **options,
             )
             for line in process.stdout:
-                tls_failure.observe(line)
+                diagnostics.observe(line)
                 log.write(line)
                 log.flush()
                 print(line, end="", flush=True)
             code = process.wait()
             process.stdout.close()
             if code:
-                hint = tls_failure.hint(ca_configured=ca_cert is not None)
+                hint = diagnostics.hint(ca_configured=ca_cert is not None, context=phase)
                 if hint:
                     message = '\nHINT: ' + hint + '\n'
                     log.write(message)
@@ -173,6 +173,12 @@ def execute(action, targets, root=ROOT, rebuild=False, pull=False, ca_cert=None)
         if active is not None and phase:
             active[phase] = "failed"
         print(f"ERROR: {exc}")
+        diagnostics = FailureDiagnostics()
+        diagnostics.observe(str(exc))
+        hint = diagnostics.hint(ca_cert is not None, phase or 'build')
+        if hint:
+            report['hint'] = hint
+            print('HINT: ' + hint)
     finally:
         report["finished"] = timestamp()
         report['workflow_after'] = workflow_identity(root)

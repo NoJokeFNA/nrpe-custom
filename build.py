@@ -4,7 +4,7 @@
 import argparse
 
 from nrpe_cli.cli import main as controller_main
-from nrpe_cli.state import TARGETS
+from nrpe_cli.targets import TARGETS
 
 
 def main(argv=None):

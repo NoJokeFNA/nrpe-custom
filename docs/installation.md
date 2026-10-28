@@ -43,7 +43,7 @@ for this check even if the destination already has the user package installed.
 For releases that include `SHA256SUMS.sig`, first perform the
 [release authentication check](release-signing.md#consumer-verification) using
 an independently trusted maintainer key before extracting/installing packages.
-The first published release has no signature.
+Unsigned releases are identified in the [release history](release-history.md).
 
 If NRPE is already installed, back up its configuration before updating. Review
 package-manager prompts about configuration files and dependencies. Preserve

@@ -14,6 +14,8 @@ flowchart LR
     LEGACY[build.py: compatibility translation] --> CLI
     CLI --> CTRL[controller.py: workflow and cleanup]
     CLI --> STATE[state.py: status and logs]
+    CLI --> CLEAN[cleanup.py: retention and guarded deletion]
+    CLI --> DIAG[diagnostics.py: read-only log analysis]
     CTRL --> DOCKER[docker.py: readiness]
     CTRL --> STATE
     CTRL --> COMPOSE[Compose services]
@@ -34,9 +36,12 @@ flowchart LR
 | `nrpe_cli/controller.py` | Sequence targets/phases, stream logs, persist outcomes, and clean up only the owned container |
 | `nrpe_cli/docker.py` | Check Docker Engine, Linux container mode, and Compose; give platform-specific failure hints |
 | `nrpe_cli/state.py` | Artifact identity/checksums, run IDs/reports, and per-target locks |
+| `nrpe_cli/cleanup.py` | Preview/retention planning and guarded deletion of expired local evidence or explicitly selected project images |
+| `nrpe_cli/diagnostics.py` | Classify build/download and NRPE runtime errors without executing or retaining log contents |
 | `nrpe_cli/targets.py` | Shared target list and package filename conventions |
 | `nrpe_cli/certificates.py` | Validate public PEM/DER CA input and normalize it in memory for an environment-backed BuildKit secret |
 | `nrpe_cli/release.py` | Validate exact workflow/build/source evidence and assemble complete release archives |
+| `nrpe_cli/signing.py` | Validate complete release assets and sign/authenticate checksums with an enrolled maintainer key |
 | `compose.yaml` / `compose.test.yaml` | Parameterized builder services and opt-in runtime test services |
 | `docker/debian/build.Dockerfile` / `docker/debian/test.Dockerfile` | Debian build prerequisites and separate runtime environment |
 | `docker/sles12sp3/build.Dockerfile` / `docker/sles12sp3/test.Dockerfile` | Genuine SP3 environments, verified prerequisites, and pinned original SLE-12 inputs |
@@ -97,15 +102,18 @@ target compilation and installation use native SLES 12 tools without Python.
 | `enable_command_args.py` | `build.sh` | Narrow, independently tested Debian rules transformation |
 | `export_debian_sources.py` | `build.sh` | Validate the matching DSC and every referenced source archive before exporting corresponding sources |
 | `prepare_release.py` | Release workflow / local candidate review | Host-only release staging, source/license validation and five-target completeness gate |
+| `release_signature.py` | Release workflow / maintainer CLI | Restrict temporary signing-key access and dispatch optional signing/verification |
 | `check_git_policy.py` / `delete_merged_topic.py` | PR workflows | Check integration/authorship policy and lease-delete only eligible merged topic heads |
 | `setup-debian-repositories.sh` | Both Debian Dockerfiles | Shared source/binary setup and Bullseye archive adjustment |
 | `integration-test.sh` | Debian test entry point | Debian artifact validation and installation, then shared protocol test |
 | `build-sles.sh` | SLES builder entry point | Native RPM build, packaged defaults, and server/helper export |
 | `build-sles-user.sh` | SLES builder image setup | Real independently packaged system user/group dependency; needed before NRPE build |
-| `sles_source.py` | SLES Dockerfile and user-package builder | Pinned source fetch/verification and appropriate recipe transformation |
-| `fetch_sles_packages.py` | Both SLES Dockerfiles | Verify original SUSE bootstrap RPM hashes, signatures, vendor, and identity |
+| `sles_source.py` | Modern SLES input preparation | Pinned source fetch/verification and appropriate recipe transformation |
+| `prepare_sles_inputs.py` | Both SLES Dockerfiles' input stages | Prepare pinned downloads and metadata with optional in-memory company CA trust |
+| `verify-sles-packages.sh` / `verify-sles-environment.sh` | Native SLES image stages | Validate real OS/ABI and all pinned RPM signatures and identities before installation |
+| `fetch_sles_packages.py` | Modern input stage via `prepare_sles_inputs.py` | Download pinned inputs and validate size/hash; signature and identity checks have one native implementation in `verify-sles-packages.sh` |
 | `integration-test-sles.sh` | SLES test entry point | RPM artifact/companion checks, dependency installation, then shared protocol test |
-| `install-ca-certificate.sh` | All four Dockerfiles before network package operations | Optional company CA setup, checksum validation, and distribution-specific system trust stores |
+| `install-ca-certificate.sh` | Debian build and runtime Dockerfiles | Optional company CA setup, checksum validation, and distribution-specific system trust stores |
 | `test-nrpe-protocol.sh` | Both integration entry points | Single TLS client/server test of disabled and enabled argument handling |
 
 SLES 12 downloads are prepared separately, then verified and installed with the
@@ -115,13 +123,12 @@ requires exact hash/signature/vendor/version coverage; `verify-sles-environment.
 checks the actual 12.3 identity and clean runtime base. The support-package build
 creates genuine macros/user RPMs; no dependency provides are faked.
 
-The actual consolidation in this change is the host menu: the previous inline
-number/text menu has been removed from `cli.py` and replaced by one frontend in
-`menu.py`. Workflow execution remains solely in the controller. Repeated server/companion
-checksum calculation is consolidated in one streaming helper in `state.py`,
-with the checksum manifest read once per artifact inspection. The legacy
-`build.py` remains a thin compatibility wrapper rather than being removed without
-a deprecation process.
+Terminal interaction lives in `menu.py`; workflow execution remains in the
+controller. Server/companion checksums use one streaming helper in `state.py`,
+with the manifest read once per artifact inspection. Native SLES signature and
+identity verification lives in `verify-sles-packages.sh`; the unused Python
+duplicate was removed. The legacy `build.py` remains a thin compatibility wrapper
+for existing callers, without its own workflow engine.
 
 ## Images and updates
 

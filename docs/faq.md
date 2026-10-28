@@ -1,11 +1,30 @@
 # Frequently asked questions
 
+For log analysis, see [troubleshooting](troubleshooting.md). Use
+`python3 nrpe.py diagnose ./redacted-nrpe.log --context nrpe` for an existing
+daemon/client log, or omit the context for build/download failures.
+
 ## Which SLES version does this project target?
 
-**SLES 12 SP3**, confirmed by `/etc/os-release`. Earlier references to SLES 15
-SP3/SP4 were based on an incorrect platform assumption. Neither their RPMs nor
-their successful tests establish compatibility with SLES 12. The active target
-is `sles12sp3`; see the [native build guide](sles12sp3.md).
+**SLES 12 SP3**, confirmed by `/etc/os-release`. The active target is
+`sles12sp3`; see the [native build guide](sles12sp3.md).
+
+## What happened to SLES 15 SP3 and SP4?
+
+Those targets came from an incorrect assumption about the affected server's OS.
+It was subsequently identified as SLES 12 SP3 with NRPE 2.15 and OpenSSL 1.0.2.
+The active SLES-15 Dockerfiles, manifests, media setup and target guides have
+been removed. There is no supported SLES-15 build target in the current workflow.
+
+The remaining explanation is consolidated here. Historical release results and
+dated license/maintenance observations retain their original platform labels in
+the [release history](release-history.md) and linked reviews. They do not prove
+SLES 12 compatibility, and old SLE-15 RPMs must not be installed on SLES 12.
+The [cleanup command](local-cleanup.md#retired-sles-output) still recognizes old
+local output names solely to remove them explicitly; CLI tests reject those
+names as build targets. These references do not restore SLES-15 support.
+
+## Why does the old SLES 12 NRPE daemon fail its SSL handshake?
 
 The reported server runs NRPE `2.15-4.24`, linked to OpenSSL's 1.0 ABI. That old
 NRPE advertises anonymous DH, not modern certificate authentication. A newer
