@@ -566,7 +566,7 @@ class LiveWorkflow:
         lines += list(self.output.lines)
         if self.output.pending:
             lines.append(self.output.pending)
-        lines += ['', 'Ctrl+C: cancel safely / no estimated percentages']
+        lines += ['', 'Ctrl+C: cancel safely / full logs retained']
         return '\n'.join(compact(line, max(12, width - 2)) for line in lines)
 
 
@@ -655,12 +655,153 @@ def result_menu(root, dispatch, run_id, code):
             view_text('Recorded result', text)
 
 
+def prompt_value(title, default=''):
+    from prompt_toolkit import prompt
+    from prompt_toolkit.key_binding import KeyBindings
+    bindings = KeyBindings()
+
+    @bindings.add('escape')
+    def cancel(event):
+        event.app.exit(result=None)
+
+    return prompt(safe(title) + ' (Esc to cancel): ', default=str(default), key_bindings=bindings)
+
+
+def select_run(root, title='Select a run (newest first)'):
+    history = reports(root)
+    if not history:
+        choose('No recorded runs', [(None, 'Back')])
+        return None
+    run_id = choose(title, [(item['id'], f'{item["id"]} / {item["action"]} / '
+                            + ', '.join(item.get('targets', {})) + f' / {item["status"]}')
+                           for item in history], description='/ filters date, target, action and result.')
+    return next((item for item in history if item['id'] == run_id), None)
+
+
+def diagnostics_menu(root, dispatch):
+    while True:
+        answer = choose('Diagnostics / choose the evidence', [
+            ('doctor', 'Check Docker and Compose readiness'),
+            ('run', 'Explain a recorded run log'),
+            ('file', 'Explain a local log file'), (None, 'Back to workspace')],
+            description='Log diagnosis reads plain text without executing it or changing TLS configuration.')
+        if answer is None:
+            return None
+        if answer == 'doctor':
+            code = dispatch(['doctor'])
+            pause(code)
+            return code
+        if answer == 'run':
+            report = select_run(root)
+            if report is None:
+                continue
+            path = root / '.nrpe/runs' / report['id'] / 'run.log'
+            if not path.is_file():
+                choose('No log is available for that run', [(None, 'Back')])
+                continue
+            args = ['diagnose', str(path)]
+            if report.get('ca_certificate_sha256'):
+                args.append('--ca-configured')
+        else:
+            source = choose('Local log file', [('path', 'Enter or paste a path'), ('browse', 'Browse files')])
+            if source is None:
+                continue
+            path = enter_path('Log file', kind='file') if source == 'path' else browse_file()
+            if path is None:
+                continue
+            context = choose('What produced this log?', [('build', 'Build / downloads'),
+                                                       ('nrpe', 'NRPE server / check_nrpe')])
+            if context is None:
+                continue
+            args = ['diagnose', str(path), '--context', context]
+            if context == 'build':
+                configured = choose('Was a company CA supplied for that run?',
+                                    [(False, 'No / not known'), (True, 'Yes')])
+                if configured is None:
+                    continue
+                if configured:
+                    args.append('--ca-configured')
+        pause(dispatch(args))
+
+
+def cleanup_menu(root, dispatch):
+    """Use the existing cleanup planner, preview first, then explicit consent."""
+    from .cleanup import IMAGE, inspect_images, plan
+    days, keep, retired, images = 30, 5, False, []
+    while True:
+        answer = choose('Local cleanup / retention options', [
+            ('preview', 'Preview eligible files and selected images'),
+            ('days', f'Minimum completed-run age: {days} days'),
+            ('keep', f'Keep at least the newest {keep} runs'),
+            ('retired', f'Include retired output directories: {"yes" if retired else "no"}'),
+            ('image', 'Add an explicit project image tag'),
+            ('clear-images', f'Clear selected images ({len(images)})'), (None, 'Back to workspace')],
+            description='Current packages and retained evidence are protected. Preview never deletes; image selection never prunes Docker.')
+        if answer is None:
+            return
+        if answer in ('days', 'keep'):
+            value = prompt_value('Retention days' if answer == 'days' else 'Newest runs to retain',
+                                 days if answer == 'days' else keep)
+            if value is None:
+                continue
+            try:
+                number = int(value)
+                if number < 0:
+                    raise ValueError()
+            except ValueError:
+                choose('Enter a nonnegative whole number', [(None, 'Back')])
+                continue
+            if answer == 'days':
+                days = number
+            else:
+                keep = number
+            continue
+        if answer == 'retired':
+            retired = not retired
+            continue
+        if answer == 'clear-images':
+            images = []
+            continue
+        if answer == 'image':
+            image = prompt_value('Exact nrpe-custom builder/test image reference')
+            if image:
+                if not IMAGE.fullmatch(image):
+                    choose('Use an explicit project image tag, not a base image, ID or wildcard', [(None, 'Back')])
+                elif image not in images:
+                    images.append(image)
+            continue
+        arguments = ['clean', '--older-than', str(days), '--keep-runs', str(keep)]
+        if retired:
+            arguments.append('--retired-outputs')
+        for image in images:
+            arguments.extend(['--image', image])
+        try:
+            before = plan(root, days, keep, retired)
+            image_before = inspect_images(images)[1]
+            code = dispatch(arguments)
+            pause(code)  # Let the full preview remain readable before confirmation.
+            if code or not (before or image_before):
+                continue
+            approved = choose(f'Cleanup preview / {len(before)} directories / {len(image_before)} images',
+                              [(False, 'Cancel deletion'), (True, 'Delete the previewed candidates')],
+                              description='Only the selected retention scope is affected; changes since preview require a new review.')
+            if approved is not True:
+                continue
+            if plan(root, days, keep, retired) != before or inspect_images(images)[1] != image_before:
+                choose('Cleanup candidates changed; preview again', [(None, 'Back to options')])
+                continue
+            pause(dispatch([*arguments, '--apply']))
+        except (OSError, RuntimeError) as exc:
+            choose('Cleanup refused: ' + str(exc), [(None, 'Back to options')])
+
+
 def run_menu(root, dispatch):
     """Keep returning to the menu after each command, including failures."""
     actions = [('verify', 'Build and test packages', 'Build, validate and test arguments over TLS in containers.'),
                ('build', 'Build packages', 'Build and check exported artifacts without integration tests.'),
                ('test', 'Test existing packages', 'Test existing bytes; never rebuild packages.'),
-               ('doctor', 'Diagnose Docker', 'Explicitly check local Docker and Compose readiness.'),
+               ('diagnostics', 'Diagnostics', 'Check Docker or explain a recorded/local build or NRPE log.'),
+               ('clean', 'Local cleanup', 'Preview retention and explicitly confirm eligible deletions.'),
                ('status', 'Show package and test status', 'Validate package checksums and match recorded evidence.'),
                ('logs', 'View run logs', 'Select a recorded run; / filters its date, targets and result.'),
                ('quit', 'Quit')]
@@ -681,17 +822,19 @@ def run_menu(root, dispatch):
                 arguments = workflow(root, action, session)
                 if arguments is None:
                     continue
+            elif action == 'diagnostics':
+                result = diagnostics_menu(root, dispatch)
+                if result is not None:
+                    docker_status = 'passed last explicit check' if result == 0 else 'last explicit check failed'
+                continue
+            elif action == 'clean':
+                cleanup_menu(root, dispatch)
+                continue
             elif action == 'logs':
-                history = reports(root)
-                if not history:
-                    choose('No recorded runs', [(None, 'Back')])
+                report = select_run(root)
+                if report is None:
                     continue
-                run = choose('Select a run (newest first)', [
-                    (item['id'], f'{item["id"]}: {item["action"]} ({item["status"]})')
-                    for item in history])
-                if run is None:
-                    continue
-                arguments = ['logs', '--run', run]
+                arguments = ['logs', '--run', report['id']]
             else:
                 arguments = [action]
             if action in ('verify', 'build', 'test'):
