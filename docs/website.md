@@ -45,6 +45,17 @@ changes, preserving the same empty-workspace provenance.
 
 ## Local preview
 
+Fenced code blocks with a recognized language use build-time Pygments syntax
+highlighting and a language label. The palette is independently authored to fit
+the dark code panels; token colors meet a 4.5:1 contrast ratio against that
+background. Shell, PowerShell, INI, YAML, JSON, Python and diff fences are covered.
+Unknown/unlabelled languages, plain output and Mermaid fences remain unchanged;
+there is no speculative language detection. Inline code keeps its existing style.
+
+Colors are static HTML/CSS: no browser highlighter, CDN or remote grammar is
+loaded. Original code text, indentation, entities and Unicode are preserved for
+the copy button. Build-time dependencies remain separate from the NRPE CLI.
+
 Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
 website dependency:
 

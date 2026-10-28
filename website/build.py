@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 from string import Template
 import tempfile
 from urllib.parse import quote, unquote, urlsplit
@@ -18,6 +19,10 @@ from urllib.parse import quote, unquote, urlsplit
 import markdown
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
+
+# Also support the documented direct invocation: python3 website/build.py.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from website.highlighting import colorize, stylesheet
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'NoJokeFNA/nrpe-custom'
@@ -106,7 +111,7 @@ def render(root, source, pages, base, commit):
     converter = markdown.Markdown(extensions=['tables', 'fenced_code', 'toc', 'md_in_html', SiteLinks()],
                                   extension_configs={'toc': {'toc_depth': '2-3'}}, output_format='html')
     converter.site_link = rewrite
-    content = converter.convert(text)
+    content = colorize(converter.convert(text))
     if pages[source] == 'faq':
         sections = re.split(r'<h2 id="([^"]+)">(.*?)</h2>', content)
         content = sections[0] + '<div class="faq-tools"><label for="faq-filter">Find an answer</label><input id="faq-filter" type="search" placeholder="Try TLS, SLES or services…"><p id="faq-count" aria-live="polite"></p></div>'
@@ -212,6 +217,7 @@ def build(output, root=ROOT, base=BASE):
         stage = Path(temporary) / 'site'
         stage.mkdir()
         shutil.copytree(root / 'website/assets', stage / 'assets')
+        (stage / 'assets/highlight.css').write_text(stylesheet(), encoding='utf-8')
         search, stories = [], []
         def write(slug, data):
             path = stage / slug / 'index.html'

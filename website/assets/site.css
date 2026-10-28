@@ -801,6 +801,19 @@ img,svg{
 .prose pre code{
   font-size:inherit
 }
+.prose pre.syntax-block{
+  padding-top:43px;
+  border:1px solid #345057
+}
+.syntax-block::before{
+  content:attr(data-language);
+  position:absolute;
+  top:10px;
+  left:20px;
+  color:#acc6bc;
+  font:600 10px/1.6 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.07em
+}
 .copy-code{
   position:absolute;
   right:8px;
