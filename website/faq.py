@@ -26,11 +26,14 @@ def render_faq(content):
         answers.append('<section class="faq-group" aria-labelledby="' + anchor + '">'
                        '<h2 id="' + anchor + '">' + title + '</h2>'
                        + questions[0] + ''.join(sections) + '</section>')
-    tools = ('<div class="faq-tools" hidden><label for="faq-filter">Find an answer</label>'
-             '<div class="faq-search-row"><input id="faq-filter" type="search" '
+    tools = ('<div class="faq-tools" hidden><label for="faq-filter">Search the FAQ</label>'
+             '<div class="faq-search-field"><svg viewBox="0 0 24 24" width="18" height="18" '
+             'aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/>'
+             '<path d="m16 16 4.5 4.5"/></svg><input id="faq-filter" type="search" '
              'placeholder="Search services, TLS or builds…" aria-controls="faq-answers" '
-             'aria-describedby="faq-count"><button id="faq-clear" type="button" hidden>'
-             'Clear search</button></div><p id="faq-count" role="status"></p></div>')
+             'aria-describedby="faq-count"></div><div class="faq-search-status">'
+             '<p id="faq-count" role="status"></p><button id="faq-clear" type="button" hidden>'
+             'Clear search</button></div></div>')
     return (groups[0] + tools + '<nav class="faq-index" aria-label="Questions by topic">'
             + ''.join(index) + '</nav><p id="faq-empty" hidden>No answers match your search. '
             'Try a shorter term, such as “TLS”, or clear the search to browse all questions.</p>'

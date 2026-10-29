@@ -946,12 +946,16 @@ img,svg{
   color:var(--muted)
 }
 /* FAQ answers stay readable without JavaScript; filtering is progressive. */
-.faq-tools{margin:28px 0 20px}
+.faq-tools{margin:28px 0 20px;max-width:560px}
 .faq-tools label{display:block;font-size:12px;font-weight:650;margin-bottom:8px;color:var(--ink)}
-.faq-search-row{display:flex;gap:10px;align-items:center}
-.faq-tools input{width:100%;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:5px;background:#fff;font-size:14px;color:var(--ink)}
-#faq-clear{flex-shrink:0;border:1px solid var(--line);border-radius:5px;padding:12px;background:#fff;color:var(--accent);font-size:12px;cursor:pointer}
-#faq-count{font-size:11px;color:var(--muted);margin:8px 0 0}
+.faq-search-field{display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.faq-search-field svg{flex:none;fill:none;stroke:var(--muted);stroke-width:1.6;stroke-linecap:round}
+.faq-search-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px #0b766822}
+.faq-tools input{width:100%;min-width:0;height:100%;padding:0;border:0;border-radius:0;background:transparent;font-size:13px;color:var(--ink);outline:none;box-shadow:none}
+.faq-tools input::placeholder{color:var(--muted);opacity:1}
+.faq-search-status{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:32px}
+#faq-clear{border:0;padding:5px 0;background:transparent;color:var(--accent);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+#faq-count{font-size:11px;color:var(--muted);margin:0}
 .faq-index{margin:24px 0 42px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .faq-index-group{display:grid;grid-template-columns:145px minmax(0,1fr);gap:20px;padding:16px 0}
 .faq-index-group+.faq-index-group{border-top:1px solid var(--line)}
@@ -1375,8 +1379,8 @@ img,svg{
   .faq-index-group{display:block;padding:15px 0}
   .prose .faq-index h3{margin:0 0 7px}
   .prose .faq-question h3{font-size:21px}
-  .faq-search-row{align-items:stretch;flex-direction:column}
-  #faq-clear{align-self:flex-start;padding:9px 12px}
+  .faq-tools{max-width:none}
+  .faq-search-status{flex-wrap:wrap;gap:8px}
   .story-card{
     padding:21px
   }
