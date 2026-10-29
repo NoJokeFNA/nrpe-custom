@@ -24,6 +24,9 @@ sequentially. See [Git workflow](git-workflow.md).
 | Branch protection | Master/develop retained; owner migrated required minimum-Python checks to 3.11 on 2026-10-29 |
 | Workstation dependencies | Python 3.11 minimum; prompt-toolkit 3.0.53, wcwidth 0.9.4 and Markdown 3.11.2 reviewed and tested on Linux/Windows CI |
 | Deployment clarification | Server/client RPM identities, complete SLES TLS policy and [operator checklist](sles12sp3-deployment-checklist.md); reported attempt still ran server 2.15 |
+| Operator diagnostics | Read-only Bash inspection with no plugin execution; see [troubleshooting](troubleshooting.md#read-only-target-server-inspection) |
+| Website regression checks | CSS rules/colors consolidated; responsive/navigation/search/keyboard checks run through the website CI workflow |
+| TLS validation | [Ordered procedure](tls-validation.md) distinguishes connectivity, encryption, server identity and mandatory client credentials |
 | Source strategy | [Pinned upstream clone evaluated](source-strategy.md); preserve native distribution packaging and reviewed patches |
 
 ## Remaining work, in priority order
@@ -31,8 +34,9 @@ sequentially. See [Git workflow](git-workflow.md).
 - [ ] Complete [Windows Docker Desktop practical checks](practical-validation.md#windows-docker-desktop).
 - [ ] Complete [Debian and SLES test VMs](practical-validation.md#debian-and-sles-test-vms):
   real systemd/reboot, plugins and upgrade/rollback from the saved NRPE 2.15 package.
-  Infrastructure is unavailable; the [per-target worksheet](deployment-validation-template.md)
-  is prepared, and execution remains blocked/not run.
+  No isolated host management access is available to this task; the
+  [per-target worksheet](deployment-validation-template.md) is prepared and the
+  lifecycle scenarios remain blocked/not run.
 - [ ] Enroll a maintainer-controlled release key, configure the signing secret and
   authenticate a signed release after a separately requested master promotion.
 - [ ] Continue recurring [maintenance review](maintenance.md#human-review-cadence),
@@ -60,3 +64,6 @@ Moved to the [release history](release-history.md#first-published-release-record
 ## Local SLES-12 migration evidence
 
 Moved to the [release history](release-history.md#local-sles-12-migration-evidence).
+
+The [current validation status](validation-status.md) records completed local
+checks, operator-reported results and exact external prerequisites.

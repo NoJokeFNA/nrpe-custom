@@ -138,3 +138,6 @@ rejection, not the real plugin's load measurements or production capacity limits
 Restart the relevant service after reviewing the configuration and verify checks
 from the real monitoring host. See [installation](installation.md),
 [updates and rollback](updates-and-rollback.md), and [security](security.md).
+
+Use the [ordered TLS validation procedure](tls-validation.md) to distinguish
+TCP reachability, encryption, server identity and client-certificate enforcement.

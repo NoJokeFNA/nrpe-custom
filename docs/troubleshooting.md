@@ -5,6 +5,40 @@ the local run log. Recognized failures add contextual hints. Successful commands
 do not emit failure hints, including when a retry recovered from an earlier
 error. Hints classify observed messages; they do not establish a root cause.
 
+## Read-only target-server inspection
+
+Copy the reviewed `scripts/diagnose-server.sh` onto the monitored Linux host;
+it requires Bash and standard Linux tools, not Python or Docker. For SLES:
+
+```sh
+bash scripts/diagnose-server.sh --config /etc/nrpe.cfg \
+  --unit nrpe.service --monitor-ip 192.0.2.10
+```
+
+For Debian:
+
+```sh
+bash scripts/diagnose-server.sh --config /etc/nagios/nrpe.cfg \
+  --unit nagios-nrpe-server.service --monitor-ip 192.0.2.10
+```
+
+Replace the documentation address with the actual monitoring source. It checks
+OS identity, the daemon version and package owner, service/startup state,
+listeners, configuration/includes, relevant TLS settings and configured plugin
+executables. It never sources the configuration or executes plugins, installs
+packages, restarts services or changes the firewall. Command arguments and key
+contents are not printed. Complex executable expressions are flagged for manual
+review instead of evaluated. Existing files do not prove successful plugin or
+TLS operation.
+
+Run without root first. Where authorized, running with `sudo bash ...` also lets
+it check configuration/plugin access as the systemd service user using `runuser`.
+Missing permissions/tools are reported; they are not a successful validation.
+Exit 1 means failed checks, 2 means invalid usage, and 0 means no failed checks;
+review all warnings even on exit 0. Output can contain private file paths and
+listener addresses: review/redact it before sharing. Remote reachability,
+firewall rules and certificate authentication require separate tests below.
+
 ## Inspect an existing log
 
 ```sh

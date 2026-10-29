@@ -170,3 +170,31 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 [GitHub Pages setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+
+
+## Stylesheet maintenance
+
+Shared colors use the existing `:root` tokens (`--accent`, `--ink`, `--muted`,
+`--line`, `--paper`). Extend the relevant component rule instead of appending a
+second unconditional override for the same selector. Keep responsive rules at
+their cascade boundaries and validate desktop/mobile layout and interaction
+states when consolidating styles. A future component/layout/content structure
+is recorded separately in [architecture](architecture.md#future-website-structure-deferred).
+
+## Browser regression checks
+
+After building the static site, run the same browser checks used by CI:
+
+```sh
+node --test website/browser-tests.mjs
+```
+
+Use the existing pinned npm dependencies and a local Chrome/Chromium executable;
+set `NRPE_WEBSITE_BROWSER` if automatic discovery does not find it. The suite
+serves the built files on a temporary loopback port and rejects external runtime
+requests. It checks responsive overflow, sidebar scrolling/footer alignment,
+article outline/anchors, FAQ filtering, search and keyboard/mobile controls.
+Failure screenshots go to ignored `.nrpe/browser-results/` and are uploaded by
+CI for seven days. No deployment or package build is performed by these tests.
+They complement static links and rendering tests; they do not replace testing
+with actual assistive technology or native Windows terminals.
