@@ -52,7 +52,7 @@ check definitions remain unchanged. No package installation, systemd override,
 has no TLS encryption or certificate authentication. Use a trusted network and
 restrict access to the monitoring host. Stop the test instance afterwards.</p>
 <h2 id="example-hosts-and-prerequisites">Example hosts and prerequisites</h2>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Example hosts and prerequisites table"><table>
 <thead>
 <tr>
 <th>Role</th>
@@ -72,7 +72,7 @@ restrict access to the monitoring host. Stop the test instance afterwards.</p>
 <td><code>192.0.2.20</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The addresses belong to a documentation range. <strong>Replace them with your actual
 addresses before running the commands.</strong> <code>server_address</code> must be assigned to
 the SLES host; <code>allowed_hosts</code> must contain the source address the monitoring
@@ -149,7 +149,7 @@ fixed command without TLS. It narrows the original problem toward TLS negotiatio
 but does not identify a specific cipher/certificate cause, test the production
 port or commands, or prove an upgrade has fixed the real deployment.</p>
 <h2 id="troubleshooting-encountered-during-this-procedure">Troubleshooting encountered during this procedure</h2>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Troubleshooting encountered during this procedure table"><table>
 <thead>
 <tr>
 <th>Symptom</th>
@@ -186,7 +186,7 @@ port or commands, or prove an upgrade has fixed the real deployment.</p>
 <td>The <code>runtime</code> subdirectory or PID file remains. Stop the test and remove those specific paths in the order below.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The old daemon also reported <code>disable_syslog=0</code> as an unknown configuration
 option in the original production configuration. That is separate from the
 TLS failure; this minimal test configuration intentionally omits that directive.</p>
@@ -217,7 +217,7 @@ under <code>/run</code> are temporary and do not survive reboot.</p>
 and <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">SLES TLS configuration example</a>.
 The project's NRPE 4.1.1 container tests are separate evidence from this
 user-performed plaintext diagnostic.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/sles12sp3-plaintext-diagnostic.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docs/sles12sp3-plaintext-diagnostic.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -241,7 +241,7 @@ user-performed plaintext diagnostic.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 2ca2f63</span>
+<span>Source 3c2fd47</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

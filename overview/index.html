@@ -107,7 +107,7 @@ has been replaced. See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a> and 
 for the native rebuild and TLS/service diagnosis.</p>
 <h2 id="supported-targets">Supported targets</h2>
 <p>All package outputs target <code>linux/amd64</code> (<code>x86_64</code> for RPM).</p>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Supported targets table"><table>
 <thead>
 <tr>
 <th>Target</th>
@@ -148,7 +148,7 @@ for the native rebuild and TLS/service diagnosis.</p>
 <td>Reviewed, pinned OBS sources; genuine SLES base</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Target availability depends on distribution repositories and image availability.
 A listed target is not a promise of ongoing upstream security maintenance. In
 particular, historical archives do not extend a distribution's support period.
@@ -158,7 +158,7 @@ build and certificate-authenticated TLS 1.2 integration passed locally on
 2026-10-28. Container results do not establish production deployment readiness.
 Use your run reports to identify the exact tested package bytes.</p>
 <h2 id="commands">Commands</h2>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Commands table"><table>
 <thead>
 <tr>
 <th>Command</th>
@@ -195,7 +195,7 @@ Use your run reports to identify the exact tested package bytes.</p>
 <td>Show a specific run's log</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Commands accept multiple targets or <code>all</code> by itself. <code>all</code> includes SLES.
 Use <code>--help</code> or <code>&lt;command&gt; --help</code> for details.</p>
 <p>Existing packages require confirmation before rebuilding. For automation, use
@@ -216,7 +216,7 @@ when building; SLES sources stay pinned until reviewed and updated.</p>
 <a href="/nrpe-custom/workflow/">workflow reference</a> for flags, outputs, caching, logs,
 checksums, locks, and interruption handling.</p>
 <h2 id="how-it-works">How it works</h2>
-<pre><code class="language-mermaid">flowchart TD
+<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="How it works"><a href="/nrpe-custom/assets/diagram-07965402e3ec0d2bf592.svg"><img src="/nrpe-custom/assets/diagram-07965402e3ec0d2bf592.svg" alt="How it works diagram"></a></div><figcaption>How it works · <a href="/nrpe-custom/assets/diagram-07965402e3ec0d2bf592.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">flowchart TD
     U[Menu or direct CLI] --&gt; C[Controller: Docker checks and target lock]
     C --&gt; A{Action}
     A --&gt;|build or verify| B[Builder: fetch, build, validate, and export]
@@ -228,7 +228,7 @@ checksums, locks, and interruption handling.</p>
     D --&gt; E[TLS requests: exact argument responses with runtime setting 1]
     E --&gt; R[Artifact-bound report and logs]
     T --&gt;|build only| R
-</code></pre>
+</code></pre></details></figure>
 <p>Each target has a builder image and a separate runtime test image. This prevents
 compilers and build dependencies from masking missing runtime dependencies.
 Docker reuses cached layers; images do not need to be recreated on every run.
@@ -265,7 +265,7 @@ TLS settings and an optional restricted argument-profile wrapper. The
 <a href="/nrpe-custom/maintenance/">support and maintenance policy</a> explains tested boundaries,
 dependency monitoring and target deprecation.</p>
 <p>Review the server's configuration before enabling arguments:</p>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Using a built package table"><table>
 <thead>
 <tr>
 <th>Distribution</th>
@@ -285,7 +285,7 @@ dependency monitoring and target deprecation.</p>
 <td><code>nrpe</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">allowed_hosts</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">&lt;nagios-server-ip&gt;,127.0.0.1,::1</span>
 <span class="syntax-fg-79c0ff">dont_blame_nrpe</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">1</span>
 </code></pre>
@@ -309,7 +309,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <li><a href="/nrpe-custom/updates-and-rollback/">Updates and rollback</a>: retain packages/configuration and recover deployments.</li>
 <li><a href="/nrpe-custom/configuration-examples/">Configuration examples</a>: fixed checks, TLS and restricted argument profiles.</li>
 <li><a href="/nrpe-custom/maintenance/">Support and maintenance</a>: verification boundaries, dependencies and source updates.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
 <li><a href="/nrpe-custom/git-workflow/">Git workflow</a>: human authorship, integration, promotion and guarded branch cleanup.</li>
 <li><a href="/nrpe-custom/releases/">Release automation</a>: per-master-push packages, sources, licenses and verification.</li>
 <li><a href="/nrpe-custom/architecture/">Architecture</a>: control flow and every script's purpose.</li>
@@ -328,7 +328,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <p>These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review
 upstream security updates and retain provenance with the artifacts you deploy.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/README.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/README.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -354,7 +354,7 @@ upstream security updates and retain provenance with the artifacts you deploy.</
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 2ca2f63</span>
+<span>Source 3c2fd47</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

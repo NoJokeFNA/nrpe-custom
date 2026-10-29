@@ -58,7 +58,7 @@ OpenSSL 1.0.2j. <code>SLES_BASE_IMAGE</code> can select an approved equivalent, 
 native guard rejects other distributions/releases and requires the OpenSSL 1.0
 ABI. The runtime image contains no compiler or preinstalled NRPE server.</p>
 <p>The historical image has no configured repositories and the old SP3 backports
-index is empty. Instead, the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/packaging/sles12sp3-bootstrap.json">bootstrap manifest</a>
+index is empty. Instead, the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/packaging/sles12sp3-bootstrap.json">bootstrap manifest</a>
 pins original SLE-12 GA/SP3 Server and SDK RPMs available through SUSE's public
 OBS API. Each entry records its original URL, size, SHA-256, name, version,
 architecture, vendor and SUSE signing key. No SLE-15 or Leap package is used.</p>
@@ -75,16 +75,16 @@ compiled/packaged by SLES 12's own tools. The former <code>--sles-media</code> o
 SLE-15 module/ISO layout were removed; an ISO is not required by this workflow.</p>
 <h2 id="sources-and-package-identities">Sources and package identities</h2>
 <ul>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/packaging/sles12sp3-source.json">NRPE</a>: reviewed immutable OBS revision
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/packaging/sles12sp3-source.json">NRPE</a>: reviewed immutable OBS revision
   <code>835292739a5736a9d8f0460f670b6f15</code>, version <code>4.1.1</code>, local Release <code>0.withargs1</code>.
   Command arguments remain compiled in, runtime-disabled by default; Bash command
   substitution stays disabled. This is a native rebuild, not a reproduction of
   the old installed NRPE 2.15 package.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/packaging/sles12sp3-macros-source.json">Nagios build macros</a>: immutable OBS
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/packaging/sles12sp3-macros-source.json">Nagios build macros</a>: immutable OBS
   revision <code>a911087cc73b87e04465861110d43754</code>, version <code>0.14-0</code>, built natively.
   The upstream spec explicitly supports SLES 12. This build dependency is not
   faked or supplied by a SLE-15 binary.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/packaging/sles12sp3-user-source.json">Nagios user package</a>: pinned original
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/packaging/sles12sp3-user-source.json">Nagios user package</a>: pinned original
   <code>system-user-nagios 1.0.0-0</code>, built natively after the macros. Existing users
   and groups are handled by the original package scripts.</li>
 </ul>
@@ -137,7 +137,7 @@ and <a href="/nrpe-custom/practical-validation/">practical validation</a> before
 support end as 2019-06-30 and LTSS end as 2022-06-30. This is a requested legacy
 compatibility build, not extended vendor maintenance or certification. Historical
 package/image availability can change and does not guarantee security support.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/sles12sp3.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docs/sles12sp3.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -159,7 +159,7 @@ package/image availability can change and does not guarantee security support.</
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 2ca2f63</span>
+<span>Source 3c2fd47</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

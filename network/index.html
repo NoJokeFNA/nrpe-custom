@@ -43,20 +43,20 @@
 outbound access, not an inbound NRPE port on the workstation. The default
 integration test keeps both client and server inside one container over loopback.</p>
 <h2 id="connection-map">Connection map</h2>
-<pre><code class="language-mermaid">flowchart LR
+<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="Connection map"><a href="/nrpe-custom/assets/diagram-033bd289a17d009be792.svg"><img src="/nrpe-custom/assets/diagram-033bd289a17d009be792.svg" alt="Connection map diagram"></a></div><figcaption>Connection map · <a href="/nrpe-custom/assets/diagram-033bd289a17d009be792.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">flowchart LR
     H[Workstation / Docker daemon] --&gt;|HTTPS 443| REG[Image registries, authentication, and blob storage]
     C[Build and test containers] --&gt;|HTTP 80 or HTTPS 443| PKG[Distribution package repositories]
     C --&gt;|HTTPS 443| OBS[OBS source and RPM API]
     TC[Test client inside container] --&gt;|TLS TCP 5666 over loopback| TS[Test NRPE inside same container]
     N[Production Nagios server] --&gt;|TLS TCP 5666 by default| P[Production NRPE target]
-</code></pre>
+</code></pre></details></figure>
 <h2 id="outbound-destination-inventory">Outbound destination inventory</h2>
 <p>Prefer hostname-aware rules or an approved proxy/mirror. The following is a
 starting inventory derived from the recipes, not an exhaustive static allowlist.
 Registry/repository responses may redirect to other download hosts; resolve those
 through your approved network policy. Do not disable TLS or signature checks to
 work around a firewall rejection.</p>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Outbound destination inventory table"><table>
 <thead>
 <tr>
 <th>Hosts</th>
@@ -115,7 +115,7 @@ work around a firewall rejection.</p>
 <td>prompt_toolkit and wcwidth</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The default SLES-12 native build and runtime steps install local pinned inputs;
 they need no repository registration or network access after input preparation.
 Custom registries or APT mirrors change the workstation's outbound destinations.
@@ -144,7 +144,7 @@ IP addresses and credentials belong in site configuration, not this repository.<
   access described above, unless an approved cache/mirror supplies it.</li>
 </ul>
 <h2 id="production-nrpe">Production NRPE</h2>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Production NRPE table"><table>
 <thead>
 <tr>
 <th>Source</th>
@@ -164,7 +164,7 @@ IP addresses and credentials belong in site configuration, not this repository.<
 <td>Permit return traffic through the stateful firewall</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Allow only the actual monitoring servers, including their effective source
 address after NAT where applicable. Use those addresses in NRPE's <code>allowed_hosts</code>
 and configure TLS authentication. NRPE does not normally initiate a new
@@ -236,7 +236,7 @@ separate trust stores. Configure those through your organization's Docker
 instructions if required. Host pip/Git trust is also separate. Use <code>nrpe.py</code> to
 prepare the secret and its cache identity; direct Compose commands do not
 normalize DER input or calculate that identity for you.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/network.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docs/network.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -263,7 +263,7 @@ normalize DER input or calculate that identity for you.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 2ca2f63</span>
+<span>Source 3c2fd47</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -73,7 +73,7 @@ the optional dependencies first; see <a href="/nrpe-custom/menu/">the menu guide
 interactive terminal, no arguments prints help and does not prompt. All CLI
 messages are in English. Use <code>--help</code> or <code>&lt;command&gt; --help</code> for command-specific usage.</p>
 <h2 id="commands">Commands</h2>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Commands table"><table>
 <thead>
 <tr>
 <th>Command</th>
@@ -110,7 +110,7 @@ messages are in English. Use <code>--help</code> or <code>&lt;command&gt; --help
 <td>Display output from a particular recorded workflow run</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Select one target, multiple targets, or <code>all</code> by itself:</p>
 <pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-fg-e6edf3">python3 nrpe.py verify debian12 debian13</span>
 <span class="syntax-fg-e6edf3">python3 nrpe.py verify all</span>
@@ -124,7 +124,7 @@ SLES tools verify package signatures and compile/install the result. No SLE-15
 binary or ISO layout is used, and the obsolete <code>--sles-media</code> option is removed.
 See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a>.</p>
 <h2 id="targets-and-package-builds">Targets and package builds</h2>
-<table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Targets and package builds table"><table>
 <thead>
 <tr>
 <th>Target</th>
@@ -165,7 +165,7 @@ See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a>.</p>
 <td><code>output/sles12sp3/</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><code>all</code> includes every target, including the SLES target. To validate
 only Debian, list <code>debian11 debian12 debian13 debian14</code> explicitly.</p>
 <p>Debian 11's security package files have moved to <code>archive.debian.org</code>; the setup
@@ -280,8 +280,8 @@ and the Debian/RPM recipe transformations without requiring Docker or network ac
 They do not replace real package and integration tests. Windows-specific error
 messages and process handling also need validation on Windows.</p>
 <p>Implementation is in <code>nrpe_cli/</code>; <code>nrpe.py</code> is the public entry point. Docker
-runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/AGENTS.md">AGENTS.md</a> and the
-additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/tests/AGENTS.md">test</a> instructions apply.
+runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/AGENTS.md">AGENTS.md</a> and the
+additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/tests/AGENTS.md">test</a> instructions apply.
 Write code, comments, documentation, and commits in English; follow
 <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits 1.0.0</a>.</p>
 <h2 id="repeatability-and-updates">Repeatability and updates</h2>
@@ -293,7 +293,7 @@ security updates and rebuild custom packages when official sources change; do
 not assume APT automatically replaces every custom version as intended.</p>
 <p>Official sources: <a href="https://sources.debian.org/src/nagios-nrpe/">Debian NRPE sources</a>
 and <a href="https://packages.debian.org/src:nagios-nrpe">source package information</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docs/workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -320,7 +320,7 @@ and <a href="https://packages.debian.org/src:nagios-nrpe">source package informa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 2ca2f63</span>
+<span>Source 3c2fd47</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
