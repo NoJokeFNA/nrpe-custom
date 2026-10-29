@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Practical validation beyond container CI</h1>
-      <p class="article-meta">Source c7f26e0</p>
+      <p class="article-meta">Source 6512cc1</p>
       <article class="prose"><p>These checks cover host and service behavior that the automated package/TLS
 matrix does not exercise. Use disposable hosts and test certificates. Follow
 the <a href="/nrpe-custom/installation/">installation guide</a>, <a href="https://github.com/NagiosEnterprises/nrpe">upstream NRPE documentation</a>
@@ -69,6 +69,18 @@ that the custom server failed after installation. No successful custom-server
 migration, authenticated remote check, reboot or rollback was supplied in that
 report. The <a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES-specific checklist</a> separates
 these checks. Hostnames, IPs and raw shell history are intentionally omitted.</p>
+<p>Later on 2026-10-29 the operator confirmed a running NRPE 4.1.1 service on a
+SLES 12 SP3 test host. Packet capture showed inbound TCP SYN packets without
+replies; SuSEfirewall2 allowed SSH but dropped NRPE traffic. After a scoped TCP
+5666 firewall allowance, a remote encrypted version query succeeded. Removing
+client <code>-n</code> also made the remote load check succeed. Swap/NTP checks then failed
+because their configured executables were absent; the operator confirmed that
+installing <code>monitoring-plugins-swap</code> and <code>monitoring-plugins-ntp</code> resolved them.
+See <a href="/nrpe-custom/troubleshooting/#nrpe-unable-to-read-output">missing-plugin troubleshooting</a>.</p>
+<p>These are operator-reported functional results. They do not establish mandatory
+client-certificate/hostname verification, package checksum provenance, a completed
+upgrade/rollback procedure or reboot persistence. The separate lifecycle matrix
+remains open; no private hostnames or addresses are published.</p>
 <p>For each scenario record passed, failed, blocked or not run, with:</p>
 <ul>
 <li>Date, tester, exact Git commit/release tag, package version and SHA-256.</li>
@@ -247,7 +259,7 @@ worked. Record these outcomes separately.</p>
 <p>Add sanitized actual results and their exact environments to the
 <a href="/nrpe-custom/release-plan/#remaining-work-in-priority-order">release plan</a>. Leave scenarios
 open until performed; log any failure before claiming practical platform support.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/practical-validation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/practical-validation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -270,7 +282,7 @@ open until performed; log any failure before claiming practical platform support
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source c7f26e0</span>
+<span>Source 6512cc1</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

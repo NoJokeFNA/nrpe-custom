@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Build and NRPE diagnostics</h1>
-      <p class="article-meta">Source c7f26e0</p>
+      <p class="article-meta">Source 6512cc1</p>
       <article class="prose"><p>Failed workflow commands retain their original exit status and raw output in
 the local run log. Recognized failures add contextual hints. Successful commands
 do not emit failure hints, including when a retry recovered from an earlier
@@ -130,8 +130,63 @@ for the custom NRPE 4.1.1 build. Do not apply modern <code>ssl_*</code> directiv
 <p>Inspect the real service definition and process command before changing startup
 options. A manually started daemon is not managed by systemd; a failed second
 service start can simply mean its port/PID is already occupied. Do not launch
-another instance or remove live locks to hide that condition.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
+another instance or remove live locks to hide that condition.</p>
+<h2 id="nrpe-unable-to-read-output">NRPE: Unable to read output</h2>
+<p>A successful NRPE connection does not prove that the requested local plugin is
+installed. <code>NRPE: Unable to read output</code> means the daemon did not obtain usable
+standard output from the configured command. Missing executables are one cause;
+also inspect permissions, the command definition and errors written to stderr.</p>
+<p>On the monitored host, find the relevant <code>command[...]</code> definitions in the main
+configuration and its included files. Verify their actual executable paths and
+run the same command as the service user. For these example paths on SLES:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">ls</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-l</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">      </span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_ntp_time</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-w</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">50%</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">20%</span>
+<span class="syntax-fg-79c0ff">echo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;Exitcode: </span><span class="syntax-fg-79c0ff">$?</span><span class="syntax-fg-a5d6ff">&quot;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_ntp_time</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.30</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-w</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0.5</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">2</span>
+<span class="syntax-fg-79c0ff">echo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;Exitcode: </span><span class="syntax-fg-79c0ff">$?</span><span class="syntax-fg-a5d6ff">&quot;</span>
+</code></pre>
+<p>Replace the NTP address with a real reachable NTP server. These commands execute
+checks on the monitored host; their plugin exit statuses distinguish monitoring
+results from execution errors. Verify that the selected server provides NTP and
+that the required UDP 123 traffic is allowed if the installed NTP plugin times out.</p>
+<p>For SLES 12 SP3, search the configured matching repositories and install the
+missing plugin packages if available:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">zypper</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">search</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-s</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-ntp</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">zypper</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-ntp</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ql</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-ntp</span>
+</code></pre>
+<p>Use authorized SLES-12 repositories and retain repository signature checks.
+The NRPE custom server and its <code>monitoring-plugins-nrpe</code> client package do not
+supply every monitoring plugin. Confirm the installed paths rather than assuming
+that another distribution uses the same directory. If the <code>command[...]</code> paths
+need changing, edit them and restart <code>nrpe.service</code>; merely installing a missing
+executable at an already configured path does not require an NRPE restart.</p>
+<p>Example definitions matching the calls below:</p>
+<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">command</span><span class="syntax-fg-e6edf3">[</span><span class="syntax-fg-d2a8ff">check_swap</span><span class="syntax-fg-e6edf3">]</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_swap </span><span class="syntax-fg-79c0ff">$ARG1$</span>
+<span class="syntax-fg-79c0ff">command</span><span class="syntax-fg-e6edf3">[</span><span class="syntax-fg-d2a8ff">check_ntp_time</span><span class="syntax-fg-e6edf3">]</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_ntp_time </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">$ARG1$</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">-w</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">$ARG2$</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">$ARG3$</span>
+</code></pre>
+<p>From the monitoring host, using fictional target <code>192.0.2.20</code> and NTP server
+<code>192.0.2.30</code>:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">5666</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">check_swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;-w 50% -c 20%&#x27;</span>
+<span class="syntax-fg-ffa657">check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">5666</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">check_ntp_time</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.30</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0.5</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">2</span>
+</code></pre>
+<p>Use the deployment's required client TLS/certificate options too. Do not add
+<code>-n</code> when the daemon expects TLS. These definitions require deliberately enabled
+runtime arguments for trusted clients; keep Bash substitution and NRPE's default
+metacharacter protections intact. Prefer fixed commands when arguments are not
+needed; see <a href="/nrpe-custom/configuration-examples/">configuration examples</a>.</p>
+<p>The operator confirmed this missing-plugin cause and successful installation of
+<code>monitoring-plugins-swap</code> and <code>monitoring-plugins-ntp</code> on a SLES 12 SP3 test host
+on 2026-10-29. This is operator-reported evidence, not an automated lifecycle or
+certificate-authentication test.</p>
+<p>For the complete operator-reported journey, including the OS correction, old
+plaintext diagnostic, client/server package confusion, firewall and final plugin
+fix, read the <a href="/nrpe-custom/field-notes/sles12-handshake/">SLES field note</a>.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -139,6 +194,7 @@ another instance or remove live locks to hide that condition.</p></article>
 <li><a href="#inspect-an-existing-log">Inspect an existing log</a></li>
 <li><a href="#interpret-the-categories">Interpret the categories</a></li>
 <li><a href="#nrpe-on-a-deployed-sles-12-sp3-host">NRPE on a deployed SLES 12 SP3 host</a></li>
+<li><a href="#nrpe-unable-to-read-output">NRPE: Unable to read output</a></li>
 </ul>
 </div>
 </aside>
@@ -153,7 +209,7 @@ another instance or remove live locks to hide that condition.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source c7f26e0</span>
+<span>Source 6512cc1</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

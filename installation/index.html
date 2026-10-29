@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Installing a custom NRPE package</h1>
-      <p class="article-meta">Source c7f26e0</p>
+      <p class="article-meta">Source 6512cc1</p>
       <article class="prose"><p>Run these commands on the destination Linux server. Python, Docker, and this
 checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
@@ -349,6 +349,20 @@ see <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">
 For a socket timeout, establish TCP reachability and inspect simultaneous server
 logs before attributing the failure to a certificate or cipher. Repeat the check
 after a controlled test-host reboot using the <a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment worksheet</a>.</p>
+<h3 id="install-the-required-monitoring-plugins">Install the required monitoring plugins</h3>
+<p>The custom NRPE server executes configured plugins but does not include every
+check. Install plugins separately on the monitored host using matching SLES-12
+repositories. For the operator-confirmed Swap and NTP checks:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">zypper</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">search</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-s</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-ntp</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">zypper</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-ntp</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ql</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-swap</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-ntp</span>
+</code></pre>
+<p>Confirm that the executable paths match the existing <code>command[...]</code> definitions
+and run each check as <code>nagios</code> before retrying remotely. Missing executables can
+produce <code>NRPE: Unable to read output</code>. See the
+<a href="/nrpe-custom/troubleshooting/#nrpe-unable-to-read-output">diagnosis, command definitions and remote examples</a>.
+Restart NRPE after changing its configuration; installing a plugin at an already
+configured path alone does not require a restart.</p>
 <h3 id="optional-client-on-a-sles-monitoring-host">Optional client on a SLES monitoring host</h3>
 <p>Install this only when that SLES host also needs the <code>check_nrpe</code> plugin:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--upgrade</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--verbose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--hash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
@@ -404,7 +418,7 @@ provision the destination's NRPE certificates, keys, or operating-system trust.<
 <p>Review future package-manager upgrades: a repository package can supersede a
 local custom version. After upgrades, confirm the installed custom revision
 again and rebuild from reviewed sources when security updates are needed.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/installation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/installation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -417,6 +431,7 @@ again and rebuild from reviewed sources when security updates are needed.</p></a
 <li><a href="#install-the-server-and-its-real-dependency">Install the server and its real dependency</a></li>
 <li><a href="#sles-certificate-authenticated-tls">SLES certificate-authenticated TLS</a></li>
 <li><a href="#start-the-intended-managed-daemon">Start the intended managed daemon</a></li>
+<li><a href="#install-the-required-monitoring-plugins">Install the required monitoring plugins</a></li>
 <li><a href="#optional-client-on-a-sles-monitoring-host">Optional client on a SLES monitoring host</a></li>
 </ul>
 </li>
@@ -435,7 +450,7 @@ again and rebuild from reviewed sources when security updates are needed.</p></a
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source c7f26e0</span>
+<span>Source 6512cc1</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
