@@ -64,15 +64,21 @@ merging into develop requires an explicit maintainer request. Master promotion
 requires its own explicit request. Complete the current change and checks before
 starting the next integration.</p>
 <h2 id="attribution">Attribution</h2>
-<p>Commits carry the existing human author identity. Do not add co-author trailers,
+<p>Authored work carries the existing human author identity. Do not add co-author trailers,
 AI attribution, or generated-with/by lines. Never rewrite old history to change
 attribution. The policy check rejects invalid routes, recognizable bot identities,
 missing author identities and attribution trailers. Git metadata alone cannot
 prove that an author is human; maintainers must review it.</p>
-<p>Dependabot PRs are proposals targeting <code>develop</code>, not exceptions to this policy.
-Review their changes and bring approved updates onto a correctly named topic
-branch with the human author's commit before integration. Do not merge bot-authored
-commits or automatically merge update PRs.</p>
+<p>Genuine Dependabot PRs into <code>develop</code> are the sole approved bot exception.
+The policy checks GitHub's PR event for the official <code>dependabot[bot]</code> login,
+numeric identity and Bot account type, a <code>dependabot/...</code> head, and the same
+repository on both sides. The event's refs and SHAs must match the checked PR.
+Only Dependabot's exact official author name/email are exempted; arbitrary bots,
+AI attribution and co-author/generated-with trailers remain prohibited.</p>
+<p>Review update diffs, upstream release notes and compatibility checks before
+merging a Dependabot PR directly into <code>develop</code>. Do not enable automatic merges.
+Accepted Dependabot commits remain valid during a subsequent same-repository
+<code>develop</code>-to-<code>master</code> promotion. A bot branch cannot target master directly.</p>
 <h2 id="topic-branch-cleanup">Topic branch cleanup</h2>
 <p><code>gh-pages</code> is the website deployment branch, not a topic branch. Website sources
 follow the normal topic-to-develop review flow; an explicitly requested
@@ -89,9 +95,11 @@ prefixes are retained. <code>master</code> and <code>develop</code> are always e
 <p>After a successful merge, update local <code>develop</code>, inspect local changes and PR
 state, and remove the corresponding local topic only when its work is integrated.
 Never use <code>gh pr merge --delete-branch</code> for a develop-to-master promotion.
-Legacy branches outside the named prefixes are not automatically removed.</p>
+Successfully merged genuine Dependabot branches use the same guarded cleanup,
+including the unchanged-head lease and open-PR checks. Other branches outside
+the named prefixes are not automatically removed.</p>
 <h2 id="server-side-protection-one-time-administrator-action">Server-side protection: one-time administrator action</h2>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/686e89e14984113de618ed928f212249b5e0c01b/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d27320e3bcb9795b20c378151e7d24064773f5b3/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
 long-lived branches against deletion and force-pushes, requires PRs and resolved
 review threads, and requires the branch/author policy and all fast CI checks.
 It does not impose an extra reviewer count on a single-maintainer repository.</p>
@@ -114,7 +122,7 @@ branch <code>master</code> and global head-branch deletion disabled. Repository 
 are separate from workflow guards; verify both rather than assuming that a
 committed template establishes protection.</p>
 <p>See <a href="/nrpe-custom/releases/">release automation</a> for what a master push does.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/686e89e14984113de618ed928f212249b5e0c01b/docs/git-workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d27320e3bcb9795b20c378151e7d24064773f5b3/docs/git-workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -135,7 +143,7 @@ committed template establishes protection.</p>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 686e89e</span>
+<span>Source d27320e</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
