@@ -1,7 +1,7 @@
 # Third-party provenance and license inventory
 
 This inventory records evidence inspected during release and website preparation
-on 2026-10-27/28. It is not a completed redistribution approval. The root [MIT
+on 2026-10-27 through 2026-10-29. It is not a completed redistribution approval. The root [MIT
 license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
@@ -40,6 +40,11 @@ input sets under `obs-sources/`; release preparation verifies every file against
 the pinned manifests and includes the history alongside the SRPMs. The original
 comparison alone is not evidence of a fresh build.
 
+The [Debian 4.2.0-1 source review](docs/debian-source-review.md) additionally
+covers the version now supplied by Debian 14. Its license grants and OpenSSL
+exception are unchanged; the Debian copyright edit removes obsolete FSF postal
+addresses. This does not approve later versions.
+
 Reviewed Debian upstream archive and license-file hashes are recorded in
 `packaging/debian-license-review.json`. Automatic publication fails for a new
 source version or changed evidence until it is reviewed; source discovery and
@@ -67,7 +72,7 @@ license files of different versions installed in a development environment.
 Apache License 2.0. It and its dependencies are installed separately for auditing,
 not vendored into this repository or shipped inside NRPE packages. Bundling this
 tool would require its own complete dependency/notice inventory. GitHub Actions
-are similarly fetched by CI at pinned upstream commits rather than distributed
+are similarly fetched by CI at maintainer-selected upstream major-version tags rather than distributed
 as part of the server packages.
 
 ## Build and runtime dependencies
@@ -96,6 +101,11 @@ included in NRPE packages or browser JavaScript. Generated code colors use the
 bundled GitHub Dark Default theme. The small NRPE syntax grammar and static
 HTML/CSS adapter are independently authored project code. The upstream NRPE
 sample configuration is referenced, not copied or relicensed as project code.
+Static diagrams use build-only `mermaid@12.2.0` (MIT; the installed LICENSE was
+inspected and is [retained unchanged](website/assets/mermaid-LICENSE.txt)) and
+`puppeteer@25.16.0` (Apache-2.0 in its package metadata), also locked with integrity
+hashes. The renderer uses the workstation's installed Chrome/Chromium and ships
+SVG output, not a browser binary, Mermaid runtime, fonts or Node dependencies.
 The previous Pygments renderer dependency has been removed.
 
 Docker images, OpenSSL, system libraries, Debian/SUSE repository packages,

@@ -23,6 +23,7 @@ from markdown.extensions import Extension
 # Also support the documented direct invocation: python3 website/build.py.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from website.highlighting import colorize, stylesheet
+from website.diagrams import render_diagrams
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'NoJokeFNA/nrpe-custom'
@@ -83,7 +84,7 @@ class SiteLinks(Extension):
         md.treeprocessors.register(Links(md), 'site-links', 1)
 
 
-def render(root, source, pages, base, commit):
+def render(root, source, pages, base, commit, diagram_assets):
     text = (root / source).read_text(encoding='utf-8')
     title_match = re.search(r'^# (.+)$', text, re.M)
     title = title_match[1] if title_match else 'Project MIT license'
@@ -111,7 +112,13 @@ def render(root, source, pages, base, commit):
     converter = markdown.Markdown(extensions=['tables', 'fenced_code', 'toc', 'md_in_html', SiteLinks()],
                                   extension_configs={'toc': {'toc_depth': '2-3'}}, output_format='html')
     converter.site_link = rewrite
-    content = colorize(converter.convert(text))
+    content = render_diagrams(colorize(converter.convert(text)), base, diagram_assets, title)
+    def table_region(match):
+        headings = re.findall(r'<h[23][^>]*>(.*?)</h[23]>', content[:match.start()], re.S)
+        label = plain(headings[-1]) if headings else title
+        return ('<div class="table-scroll" tabindex="0" role="region" aria-label="'
+                + html.escape(label + ' table', quote=True) + '">' + match[0] + '</div>')
+    content = re.sub(r'<table>.*?</table>', table_region, content, flags=re.S)
     if pages[source] == 'faq':
         sections = re.split(r'<h2 id="([^"]+)">(.*?)</h2>', content)
         content = sections[0] + '<div class="faq-tools"><label for="faq-filter">Find an answer</label><input id="faq-filter" type="search" placeholder="Try TLS, SLES or services…"><p id="faq-count" aria-live="polite"></p></div>'
@@ -219,12 +226,13 @@ def build(output, root=ROOT, base=BASE):
         shutil.copytree(root / 'website/assets', stage / 'assets')
         (stage / 'assets/highlight.css').write_text(stylesheet(), encoding='utf-8')
         search, stories = [], []
+        diagram_assets = {}
         def write(slug, data):
             path = stage / slug / 'index.html'
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(data, encoding='utf-8')
         for source, slug in pages.items():
-            title, content, toc = render(root, source, pages, base, commit)
+            title, content, toc = render(root, source, pages, base, commit, diagram_assets)
             write(slug, layout(title, content, pages, slug, base, toc, source, commit, dirty))
             search.append({'title': title, 'url': page_url(slug, base), 'text': plain(content),
                            'section': 'Field notes' if slug.startswith('field-notes/') else 'Documentation'})
@@ -244,6 +252,8 @@ def build(output, root=ROOT, base=BASE):
         write('', layout('Custom NRPE builds. Clear, practical docs.', homepage(base, root), pages, '', base, commit=commit, dirty=dirty, home=True))
         (stage / '404.html').write_text(layout('That page is not here', '<p>The address may have changed. <a href="' + page_url('overview', base) + '">Browse the documentation</a> or use search to find the next step.</p>', pages, '404', base, commit=commit, dirty=dirty), encoding='utf-8')
         (stage / 'assets/search-index.json').write_text(json.dumps(search, ensure_ascii=False), encoding='utf-8')
+        for filename, data in diagram_assets.items():
+            (stage / 'assets' / filename).write_bytes(data)
         notices = stage / 'notices'
         notices.mkdir()
         for path in (root / 'packaging/licenses/sles12sp3').iterdir():

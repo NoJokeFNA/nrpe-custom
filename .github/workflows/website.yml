@@ -13,17 +13,22 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
           cache-dependency-path: website/package-lock.json
+      - name: Locate the diagram build browser
+        run: |
+          diagram_browser=$(command -v google-chrome || command -v chromium)
+          "$diagram_browser" --version
+          printf 'NRPE_WEBSITE_BROWSER=%s\n' "$diagram_browser" >> "$GITHUB_ENV"
       - name: Install pinned build-only syntax grammars
         run: npm ci --prefix website --ignore-scripts --no-fund
       - name: Audit the syntax highlighter
@@ -36,7 +41,7 @@ jobs:
         run: python -m unittest discover -s website/tests -v
       - name: Build and check every internal page and anchor
         run: python website/build.py
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@v6
         with:
           name: documentation-preview
           path: .nrpe/site/nrpe-custom/
