@@ -36,3 +36,16 @@ class BranchCleanupTests(unittest.TestCase):
         self.assertTrue(cleanup(self.event(), 'owner/repo', call))
         self.assertEqual(call.call_args.args[0], ['git', 'push',
             '--force-with-lease=refs/heads/feat/example:' + 'a' * 40, 'origin', ':refs/heads/feat/example'])
+
+    def test_dependabot_cleanup_requires_real_proposal_identity_and_preserves_lease(self):
+        event = self.event()
+        branch = 'dependabot/github_actions/develop/actions-group'
+        event['pull_request']['head']['ref'] = branch
+        event['pull_request']['user'] = {'login': 'dependabot[bot]', 'id': 49699333, 'type': 'Bot'}
+        call = Mock(side_effect=['', '[]', 'a' * 40 + '\trefs/heads/' + branch, ''])
+        self.assertTrue(cleanup(event, 'owner/repo', call))
+        self.assertEqual(call.call_args.args[0][2], '--force-with-lease=refs/heads/' + branch + ':' + 'a' * 40)
+        event['pull_request']['user']['id'] = 123
+        call = Mock()
+        self.assertFalse(cleanup(event, 'owner/repo', call))
+        call.assert_not_called()

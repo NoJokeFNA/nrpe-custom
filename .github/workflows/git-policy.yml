@@ -15,7 +15,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Check route and human attribution
+      - name: Check route and approved attribution
         env:
           BASE_NAME: ${{ github.base_ref }}
           HEAD_NAME: ${{ github.head_ref }}

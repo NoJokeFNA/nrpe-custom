@@ -72,8 +72,9 @@ useful verification boundaries.
 
 Start from `develop` on `feat/...`, `fix/...`, `refactor/...`, or `remove/...`.
 Open a PR into `develop`; promote `develop` to `master` by PR. Never delete either
-long-lived branch or work directly on it. Use only the human commit author, with
-no co-author or generated-with/by attribution. See the [Git workflow](docs/git-workflow.md)
+long-lived branch or work directly on it. Use the human commit author for authored
+work; reviewed genuine Dependabot PRs are the sole bot exception. Do not add
+co-author or generated-with/by attribution. See the [Git workflow](docs/git-workflow.md)
 for route/author checks, guarded topic deletion and required administrator setup.
 
 Keep changes focused and commit independently reviewable changes separately.
