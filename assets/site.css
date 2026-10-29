@@ -2687,3 +2687,25 @@ html,.sidebar-content,.page-toc,.table-scroll{scrollbar-width:thin;scrollbar-col
 .site-footer .footer-links{font-size:11px;gap:6px 14px;margin:0}
 .site-footer .footer-note{font-size:11px;line-height:18px;margin:0}
 @media(max-width:720px){.site-footer{padding:18px 22px}.site-footer .footer-links{margin-top:10px}.site-footer .footer-note{margin-top:10px}}
+
+/* Field notes retain their reading column and share the docs section outline. */
+.blog-article{max-width:1210px;margin:0 auto;padding-left:24px;padding-right:24px}
+.field-note-header{max-width:900px}
+.field-note-layout{display:grid;grid-template-columns:minmax(0,900px) 220px;gap:42px;align-items:start}
+.field-note-main{min-width:0;width:100%}
+.blog-article .field-note-toc{display:block;top:78px;max-height:calc(100vh - 100px);overflow:auto;padding-right:8px}
+.field-note-toc summary{font-size:12px;font-weight:600;color:#6c6c70;cursor:pointer;margin-bottom:14px}
+.field-note-toc li{margin-bottom:12px}
+.field-note-toc ul ul{padding-left:12px}
+.field-note-toc a[aria-current="location"]{color:#307fff;font-weight:500}
+.field-note-toc li:has(>a[aria-current="location"]):before{left:-16px}
+@media(max-width:1100px){
+  .blog-article{max-width:930px;margin:0 auto;padding-left:32px;padding-right:32px}
+  .field-note-layout{display:flex;flex-direction:column;gap:28px}
+  .blog-article .field-note-toc{order:-1;position:static;max-height:none;width:100%;padding:14px 0;border-left:0;border-top:1px solid #d3d3d5;border-bottom:1px solid #d3d3d5}
+  .field-note-toc summary{margin-bottom:0;font-size:13px}
+  .field-note-toc details[open] summary{margin-bottom:14px}
+  .field-note-toc li{margin-bottom:8px}
+  .field-note-toc li:has(>a[aria-current="location"]):before{display:none}
+}
+@media(max-width:720px){.blog-article{padding-left:22px;padding-right:22px}}

@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Documentation website and GitHub Pages</h1>
-      <p class="article-meta">Source 0895e58</p>
+      <p class="article-meta">Source db75a5d</p>
       <article class="prose"><p>The website is static HTML/CSS/JavaScript with no analytics, remote fonts,
 submission database or hosted backend. Existing Markdown remains the source of
 documentation. The builder rewrites internal links, creates a local search index
@@ -61,7 +61,10 @@ invented testimonial or production TLS claim. New reports follow the
 layouts from the approved design exploration. Documentation has a compact tree,
 full-width blue selection, local search and a separate article outline. Field
 notes feature the existing reported account and label guide links separately;
-report bodies and metadata still come from canonical Markdown.</p>
+report bodies and metadata still come from canonical Markdown. Individual field
+notes also have a sticky section outline on the right with direct heading links
+and current-section tracking. On narrow screens it becomes an initially collapsed
+“On this page” list above the article; links remain available without JavaScript.</p>
 <p>Inter Variable is self-hosted with its verbatim SIL Open Font License under
 <code>website/assets/Inter-OFL.txt</code>. JetBrains Mono Regular/Bold is self-hosted for code examples with
 its verbatim SIL OFL notice at <code>website/assets/JetBrainsMono-OFL.txt</code>. Ligatures
@@ -143,7 +146,7 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
@@ -182,7 +185,7 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -207,7 +210,7 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 0895e58</span>
+<span>Source db75a5d</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

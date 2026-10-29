@@ -27,9 +27,13 @@
 </div>
 </header>
 <main id="main" class="blog-article">
+<header class="field-note-header">
 <a class="back-link" href="/nrpe-custom/field-notes/">← All field notes</a>
 <p class="article-label">Field note · 28–29 October 2026 · SLES 12 SP3 · NRPE 2.15 → 4.1.1</p>
 <h1>Service checks before TLS changes</h1>
+</header>
+<div class="field-note-layout">
+<div class="field-note-main">
 <article class="prose">
 <p>This account is based on the operator's reported commands and output during
 troubleshooting. Hostnames and addresses are anonymized. It is an observation
@@ -212,7 +216,29 @@ verification evidence, reboot or rollback results. Those remain covered by the
 network reachability, compatible TLS modes, then installed plugins and their
 argument definitions. Change one layer at a time and repeat the same remote
 check so each result has a clear meaning.</p></article>
-<a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/website/content/sles12-handshake.md">View this page on GitHub ↗︎</a>
+<a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/website/content/sles12-handshake.md">View this page on GitHub ↗︎</a>
+</div>
+<aside class="page-toc field-note-toc" aria-label="Article sections">
+<details class="article-outline" open>
+<summary>On this page</summary>
+<div class="toc">
+<ul>
+<li><a href="#the-symptom">The symptom</a></li>
+<li><a href="#a-smaller-test-on-a-separate-port">A smaller test, on a separate port</a></li>
+<li><a href="#what-the-result-established">What the result established</a></li>
+<li><a href="#the-operators-later-clarification-start-the-missing-service">The operator's later clarification: start the missing service</a></li>
+<li><a href="#what-the-custom-build-adds-when-it-is-actually-needed">What the custom build adds when it is actually needed</a></li>
+<li><a href="#the-first-installation-attempt-updated-the-client-not-the-daemon">The first installation attempt updated the client, not the daemon</a></li>
+<li><a href="#a-timeout-turned-out-to-be-the-sles-firewall">A timeout turned out to be the SLES firewall</a></li>
+<li><a href="#a-leftover-no-ssl-option-caused-the-next-failure">A leftover no-SSL option caused the next failure</a></li>
+<li><a href="#swap-and-ntp-needed-their-own-plugin-packages">Swap and NTP needed their own plugin packages</a></li>
+<li><a href="#outcome-and-limits">Outcome and limits</a></li>
+</ul>
+</div>
+
+</details>
+</aside>
+</div>
 </main>
 <footer class="site-footer">
 <div>
@@ -223,7 +249,7 @@ check so each result has a clear meaning.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 0895e58</span>
+<span>Source db75a5d</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
