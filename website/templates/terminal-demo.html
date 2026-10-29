@@ -1,0 +1,19 @@
+<section class="terminal-demo" id="try-cli" data-terminal-demo aria-label="Interactive NRPE CLI demonstration" hidden>
+  <header class="demo-bar"><strong>NRPE Custom</strong><span class="demo-badge">Interactive simulation</span><button type="button" data-demo-reset>Reset</button></header>
+  <div class="demo-controls"><label for="demo-target">Target</label><select id="demo-target" data-demo-target><option>debian12</option><option>debian11</option><option>debian13</option><option>debian14</option><option>sles12sp3</option></select><span data-demo-phase>Ready</span><button type="button" data-demo-cancel disabled>Cancel run</button></div>
+  <div class="demo-body">
+    <nav class="demo-menu" aria-label="Demo actions">
+      <button type="button" data-demo-command="verify" tabindex="0">Build &amp; verify</button>
+      <button type="button" data-demo-command="status" tabindex="-1">Package status</button>
+      <button type="button" data-demo-command="doctor" tabindex="-1">Docker diagnostics</button>
+      <button type="button" data-demo-command="logs" tabindex="-1">Run logs</button>
+      <button type="button" data-demo-command="clean" tabindex="-1">Preview cleanup</button>
+      <button type="button" data-demo-command="help" tabindex="-1">Help &amp; commands</button>
+    </nav>
+    <pre class="demo-output" data-demo-output role="log" aria-live="polite" aria-relevant="additions" aria-label="Simulated command output" tabindex="0"></pre>
+  </div>
+  <div class="demo-confirm" data-demo-confirm hidden><p data-demo-question></p><button type="button" data-demo-yes>Confirm</button><button type="button" data-demo-no>Cancel</button></div>
+  <form class="demo-input" data-demo-form><label for="demo-command" aria-label="Command">$$</label><input id="demo-command" data-demo-input type="text" autocomplete="off" spellcheck="false" placeholder="Try: python3 nrpe.py verify debian12" aria-label="Enter a simulated NRPE command"><button type="submit">Run</button></form>
+  <p class="demo-hint">Use ↑ ↓ and Enter in the menu, or type a command. Escape / Ctrl+C cancels a run. Example data only; no commands execute on your machine.</p>
+</section>
+<noscript><figure class="demo-fallback"><img src="${base}/assets/terminal-menu.png" width="1325" height="770" alt="NRPE terminal menu in an empty workspace"><figcaption>Enable JavaScript to try the interactive simulation.</figcaption></figure></noscript>

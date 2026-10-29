@@ -20,8 +20,10 @@ notes feature the existing reported account and label guide links separately;
 report bodies and metadata still come from canonical Markdown.
 
 Inter Variable is self-hosted with its verbatim SIL Open Font License under
-`website/assets/Inter-OFL.txt`. No JetBrains logo, illustrations or JetBrains
-font files are bundled. The former animated hero is retired with this layout.
+`website/assets/Inter-OFL.txt`. JetBrains Mono Regular/Bold is self-hosted for code and the browser demo with
+its verbatim SIL OFL notice at `website/assets/JetBrainsMono-OFL.txt`. Ligatures
+are disabled for unambiguous commands. The project mark and favicon are its own
+NRPE logo; no JetBrains logo or illustrations are bundled. The former animated hero is retired with this layout.
 
 The homepage links to GitHub's latest release rather than hardcoding a release
 version. Its supported-target table is derived from the README table, keeping
@@ -42,6 +44,21 @@ were captured at 100 columns by 24 rows and rendered as escaped text for the
 screenshot. It shows no successful build or real infrastructure; the homepage
 and menu guide share this image. Refresh it when navigation or presentation
 changes, preserving the same empty-workspace provenance.
+
+## Interactive browser demo
+
+The homepage replaces its large menu image with an in-memory CLI simulation.
+Users can navigate by arrows/Enter or enter the supported command subset.
+Build/test phases, package state, logs and expired reports are sample data;
+no shell, Docker, host access or backend runs in the browser. The demo resets
+on reload, supports Escape/Ctrl+C cancellation and asks before rebuilding or
+applying cleanup. Cleanup retains the sample packages and current evidence.
+
+Maintain these examples alongside changes to the real CLI/menu. A real-browser
+website test covers cancellation, rebuild consent, preview/apply cleanup,
+literal input, reset and mobile layout. Without JavaScript the original menu
+image remains available. The documentation sidebar uses a full-height column
+with independently sticky navigation so its background meets the footer.
 
 ## FAQ structure
 
