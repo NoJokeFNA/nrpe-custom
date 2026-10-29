@@ -1,0 +1,85 @@
+<section class="blog-masthead">
+<div class="blog-container">
+<div class="blog-project">
+<div>
+<a class="blog-project-title" href="${base}/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<h1>NRPE Custom</h1>
+</a>
+<p class="blog-description">Field reports, build guides and lessons from real NRPE troubleshooting.</p>
+</div>
+<div class="blog-follow">
+<span>Follow development:</span>
+<a href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗</a>
+<a class="download-pill" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Download</a>
+</div>
+</div>
+<nav id="topics" class="blog-tabs" aria-label="Topics">
+<a aria-current="page" href="${base}/field-notes/">All</a>
+<a href="${base}/field-notes/sles12-handshake/">Field notes</a>
+<a href="${base}/workflow/">Build guides</a>
+<a href="${base}/troubleshooting/">Troubleshooting</a>
+<a href="${base}/release-history/">Releases</a>
+</nav>
+</div>
+</section>
+<main id="main" class="blog-main">
+<div class="blog-container">
+<section class="editorial-feature" aria-labelledby="feature-title">
+<a class="feature-cover" href="${base}/field-notes/sles12-handshake/">
+<span class="cover-kicker">NRPE CUSTOM / FIELD NOTE</span>
+<h2>SLES 12 SP3.<br>Services before TLS.</h2>
+<div class="cover-terminal">
+<code>NRPE_PLAIN_OK</code>
+<span>Observed in a temporary diagnostic.<br>Not evidence of a production TLS fix.</span>
+</div>
+<span class="cover-date">${feature_date}</span>
+</a>
+<div class="feature-copy">
+<p class="article-label">${feature_meta}</p>
+<h2 id="feature-title">
+<a href="${base}/field-notes/sles12-handshake/">${feature_title}</a>
+</h2>
+<p>${feature_summary}</p>
+<a class="read-article" href="${base}/field-notes/sles12-handshake/">Read article →</a>
+</div>
+</section>
+<div class="editorial-grid">
+<a class="editorial-card" href="${base}/sles12sp3/">
+<div class="editorial-cover">
+<h3>Build for the SLES version you actually run.</h3>
+<span class="cover-symbol">12 SP3</span>
+</div>
+<div class="editorial-body">
+<p class="article-label">BUILD GUIDE</p>
+<p>Sources, native packages and verification for SLES 12 SP3.</p>
+</div>
+</a>
+<a class="editorial-card" href="${base}/troubleshooting/">
+<div class="editorial-cover blue">
+<h3>Follow the evidence.<br>Then change the configuration.</h3>
+<span class="cover-symbol">TLS</span>
+</div>
+<div class="editorial-body">
+<p class="article-label">TROUBLESHOOTING GUIDE</p>
+<p>Diagnose service, network and certificate failures step by step.</p>
+</div>
+</a>
+<a class="editorial-card" href="${base}/releases/">
+<div class="editorial-cover dark">
+<h3>From source to verified package.</h3>
+<span class="cover-symbol">.deb .rpm</span>
+</div>
+<div class="editorial-body">
+<p class="article-label">PROJECT REFERENCE</p>
+<p>How builds, package checks and release archives fit together.</p>
+</div>
+</a>
+<aside class="contribute-box">
+<h3>Have a field note to share?</h3>
+<p>Help document a useful failure, a fix or an unexpected deployment lesson.</p>
+<a href="${base}/field-notes/contributing-a-note/">Contribute a note →</a>
+<small>Real observations only. Remove private hostnames, addresses and credentials.</small>
+</aside>
+</div>${more_notes}</div>
+</main>

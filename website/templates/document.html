@@ -1,15 +1,21 @@
 <div class="docs-layout">
   <aside class="sidebar" id="doc-nav">
-    <a class="sidebar-title" href="${overview_url}">The documentation</a>
+    <a class="sidebar-title" href="${overview_url}">NRPE Custom Help</a>
     ${sidebar}
   </aside>
   <main id="main" class="document">
     <div class="document-main">
-      <div class="eyebrow">${section}</div>
+      <div class="doc-breadcrumb">
+<a href="${base}/">NRPE Custom</a>
+<span>/</span>
+<a href="${overview_url}">Documentation</a>
+</div>
       <h1>${title}</h1>
+      <p class="article-meta">${meta}</p>
       <article class="prose">${content}</article>
       ${source_link}
     </div>
-    <aside class="page-toc"><span>On this page</span>${toc}</aside>
+    <aside class="page-toc">
+<span>On this page</span>${toc}</aside>
   </main>
 </div>
