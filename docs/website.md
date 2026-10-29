@@ -170,3 +170,13 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 [GitHub Pages setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+
+
+## Stylesheet maintenance
+
+Shared colors use the existing `:root` tokens (`--accent`, `--ink`, `--muted`,
+`--line`, `--paper`). Extend the relevant component rule instead of appending a
+second unconditional override for the same selector. Keep responsive rules at
+their cascade boundaries and validate desktop/mobile layout and interaction
+states when consolidating styles. A future component/layout/content structure
+is recorded separately in [architecture](architecture.md#future-website-structure-deferred).
