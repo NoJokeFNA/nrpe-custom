@@ -43,6 +43,19 @@ screenshot. It shows no successful build or real infrastructure; the homepage
 and menu guide share this image. Refresh it when navigation or presentation
 changes, preserving the same empty-workspace provenance.
 
+## FAQ structure
+
+The [FAQ](faq.md) remains canonical Markdown: level-two headings define topics,
+level-three headings define questions, and level-four headings divide longer
+answers. Keep existing heading IDs stable so shared troubleshooting links work.
+The website derives a compact question index, per-question links and its page
+outline from these headings; answers stay visible without JavaScript.
+
+Local search filters questions and their index entries, highlights matching
+prose, and provides a clear empty/reset state. It leaves command text intact.
+Opening a link to a filtered answer restores its context. The existing page
+outline tracks the current section; mobile uses one content column.
+
 ## Diagrams and wide tables
 
 Mermaid flowcharts and sequence diagrams are rendered into static SVG images
