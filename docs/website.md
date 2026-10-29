@@ -17,7 +17,10 @@ The product homepage, help documentation and editorial field notes use distinct
 layouts from the approved design exploration. Documentation has a compact tree,
 full-width blue selection, local search and a separate article outline. Field
 notes feature the existing reported account and label guide links separately;
-report bodies and metadata still come from canonical Markdown.
+report bodies and metadata still come from canonical Markdown. Individual field
+notes also have a sticky section outline on the right with direct heading links
+and current-section tracking. On narrow screens it becomes an initially collapsed
+“On this page” list above the article; links remain available without JavaScript.
 
 Inter Variable is self-hosted with its verbatim SIL Open Font License under
 `website/assets/Inter-OFL.txt`. JetBrains Mono Regular/Bold is self-hosted for code examples with

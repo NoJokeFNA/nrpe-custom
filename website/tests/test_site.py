@@ -49,6 +49,10 @@ class SiteTests(unittest.TestCase):
         self.assertIn('NRPE_PLAIN_OK', article)
         self.assertIn('not a recommendation to disable production TLS', article)
         self.assertNotIn('class="sidebar"', article)
+        self.assertIn('class="page-toc field-note-toc"', article)
+        self.assertIn('class="article-outline" open', article)
+        self.assertIn('href="#the-symptom"', article)
+        self.assertIn('id="the-symptom"', article)
         self.assertIn('SIL OPEN FONT LICENSE', (self.output / 'assets/Inter-OFL.txt').read_text())
 
     def test_docs_remain_the_content_source_and_search_is_local(self):
