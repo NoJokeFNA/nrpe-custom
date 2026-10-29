@@ -40,11 +40,11 @@ jobs:
       matrix:
         target: [debian11, debian12, debian13, debian14, sles12sp3]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - name: Install source inspection tools
@@ -62,7 +62,7 @@ jobs:
         run: >-
           python3 scripts/prepare_release.py target --target "$TARGET"
           --commit "$COMMIT" --destination .nrpe/target-bundles
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: target-${{ matrix.target }}
           path: .nrpe/target-bundles/nrpe-custom-${{ matrix.target }}.tar.gz
@@ -74,14 +74,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: target-*
           merge-multiple: true
@@ -92,7 +92,7 @@ jobs:
         run: >-
           python3 scripts/prepare_release.py assemble --commit "$COMMIT"
           --incoming .nrpe/incoming --destination .nrpe/release
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: release-bundle
           path: .nrpe/release/*
@@ -107,11 +107,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: release-bundle
           path: release
