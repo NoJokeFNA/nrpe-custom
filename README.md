@@ -70,6 +70,10 @@ and **Esc** to go back. Select build/test actions, diagnose Docker, inspect stat
 or choose a previous run's logs. Select an optional company CA certificate
 through its browser, or enter/paste its path directly.
 The menu reviews your choices before running and returns after each command.
+It retains choices within the session, shows real workflow phases and results,
+and offers log diagnosis and preview-first cleanup. Use `/` to filter lists;
+Windows drives live in a separate **Switch drive...** selector so many attached
+drives do not crowd out files.
 Colors highlight selection and errors; `NO_COLOR` enables monochrome output.
 See [menu installation and controls](docs/menu.md), including virtual environments.
 
@@ -208,7 +212,7 @@ Review the server's configuration before enabling arguments:
 | Debian | `/etc/nagios/nrpe.cfg` | `nagios-nrpe-server` |
 | SLES/OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
 
-```ini
+```nrpe
 allowed_hosts=<nagios-server-ip>,127.0.0.1,::1
 dont_blame_nrpe=1
 ```
@@ -250,6 +254,7 @@ These checks do not replace package builds and runtime integration tests.
 - [Release history](docs/release-history.md): published versions and exact validation evidence.
 - [Local cleanup](docs/local-cleanup.md): preview expired runs and explicitly selected retired outputs/images.
 - [Troubleshooting](docs/troubleshooting.md): contextual build hints and read-only diagnosis of NRPE/server logs.
+- [Documentation website](docs/website.md): local preview, field notes and reviewed publication to GitHub Pages.
 
 These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review

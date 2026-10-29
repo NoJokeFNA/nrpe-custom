@@ -37,8 +37,10 @@ Use an actual Windows host with Docker Desktop's Linux engine. Record the shell
 and terminal; include Compose 5.6.1 and Buildx 0.38.1 when reproducing the original
 report, then test current supported versions separately. Use a clean checkout in
 a path containing spaces and non-ASCII characters, for example
-`C:\NRPE validation\Prüfung\nrpe-custom`. Put a public test CA certificate in a
-different such directory; never pass a private key to `--ca-cert`.
+`C:\NRPE validation\Project Ω\nrpe-custom`. Put a public test CA certificate in a
+different such directory; never pass a private key to `--ca-cert`. These are
+illustrative test paths, not required installation locations. The `Ω` deliberately
+exercises Unicode handling; use real folders and certificate paths on your test host.
 
 From that checkout in PowerShell:
 
@@ -48,7 +50,7 @@ docker version
 docker compose version
 docker buildx version
 python3 nrpe.py doctor
-python3 nrpe.py verify debian12 --ca-cert "C:\NRPE validation\Prüfung CA\company-ca.pem" --pull
+python3 nrpe.py verify debian12 --ca-cert "C:\NRPE validation\Company CA Ω\company-ca.pem" --pull
 $LASTEXITCODE
 python3 nrpe.py status
 python3 nrpe.py logs --last
@@ -67,7 +69,12 @@ definitions". For intentional repeat builds of existing output, add `--rebuild`.
 | TLS-intercepted repository with its CA omitted or an unrelated CA supplied | An actual certificate trust failure produces a CA hint and failed run; do not break public TLS merely to manufacture a result |
 | Docker Desktop stopped | `doctor` reports Docker readiness failure; no successful workflow is claimed |
 | Ctrl+C during a build and during an integration test | Exit 130, interrupted run recorded, locks released by normal cleanup; inspect any remaining project containers before retrying |
-| Optional menu: arrows, Space, Enter, Esc and cancellation | Correct navigation, explicit rebuild consent and return to menu without unintended execution |
+| Menu: arrows, filtering with `/`, Space/A, Enter, Esc and resize down to 60×16 | Correct navigation and visible focus; no action runs while browsing |
+| Menu: Back through targets/options/review, then cancel | Targets, CA choice and options persist only for the session; no rebuild on cancellation |
+| Menu: 0/1/12+ drive roots; mapped/disconnected roots; quoted long/UNC paths | Drives stay in their own selector; failure/cancel retains the directory and focus; complete path remains inspectable |
+| Menu: explicit CA removal while `NRPE_CA_CERT` is set | This session omits the CA; environment and runtime NRPE TLS settings remain unchanged |
+| Menu: live phase display and Ctrl+C during actual build/test | Original exit/report outcome, retained logs and normal container/lock cleanup |
+| Menu: cleanup preview, cancellation, changed candidates, then approved disposable data | Preview never deletes; changed scope requires another preview; protected evidence remains |
 
 Test TLS omission only on an approved test network that requires its test CA.
 A failure pulling an image through Docker Desktop/BuildKit can require trust in

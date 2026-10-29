@@ -18,3 +18,4 @@ local-media/
 .venv-audit/
 local-certificates/
 /work/
+/website/node_modules/

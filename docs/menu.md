@@ -3,9 +3,15 @@
 The menu is an optional frontend to the same controller used by direct commands.
 It does not implement separate build, locking, or cleanup behavior.
 
-Local retention cleanup is available through `python3 nrpe.py clean`; see the
-[cleanup reference](local-cleanup.md). Its preview is read-only, and deletion
-requires a separate CLI invocation with `--apply`.
+The workspace overview shows package presence, the latest recorded outcome and
+Docker readiness from the last explicit check. It never checks Docker merely by
+opening the menu, or treats package presence as a successful verification.
+
+![Terminal menu in an empty workspace](../website/assets/terminal-menu.png)
+
+The screenshot is an actual prompt_toolkit render of an empty temporary workspace,
+not evidence of a package build. Use direct commands for automation; see the
+[CLI help capture](../website/assets/cli-help.png) for the command list.
 
 ## Install and start
 
@@ -42,30 +48,70 @@ is not installed in build containers. Direct commands such as
 | Home / End | Jump to the first / last item |
 | Enter | Select an action or accept selected targets |
 | Space | Toggle a target in the multi-selection screen |
-| A | Select all targets in the multi-selection screen |
-| Escape / Q | Go back; on the home screen, exit |
+| A | Select all currently visible targets, keeping previous selections |
+| / | Start filtering labels and descriptions; type letters, including Q |
+| Backspace | Edit the filter |
+| Tab | Keep the filter and return to selection shortcuts |
+| ? | Toggle contextual keyboard help |
+| Escape / Q | Go back; Esc first closes help or clears an active filter; Q is literal text while filtering |
 | Ctrl+C | Exit the menu; during a workflow, interrupt its command and clean up its container |
 | Ctrl+D | End the menu at a selection prompt |
 
-After a workflow or inspection command finishes, its ordinary output remains
-visible in the terminal. Scroll through it, then press Enter to return. Logs are
-also available from the run-selection screen or `logs --run <id>`.
+Selections and filtering are retained when returning to a directory or the
+workspace. Long lists scroll to the highlighted entry; labels stay on one row
+so a long path cannot consume the file list. Details provide contextual help.
+Complete paths are available in a separate scrollable view.
+
+During a workflow, the live panel shows the current controller phase, phase/run
+elapsed time, per-target states and a bounded tail of recent output. No percentage
+is guessed. Full Docker output is still written to the run log. Dispatch and
+cancellation stay on the main thread; only rendering runs in a background thread.
+The result screen offers target details, full logs and diagnosis of that run.
+
+Inspection commands and full logs remain in terminal scrollback until Enter or
+Esc returns to the menu. Logs are also available with `logs --run <id>`.
 
 ## Workflow
 
 1. Choose build and test, build only, or test existing packages.
-2. Select one or more targets with Space, then Enter. No target is preselected.
-3. Choose whether to check for updated base images. Optionally browse for a
-   public PEM/DER company CA certificate, or enter/paste its path directly.
+2. Select one or more named distributions with Space, then Enter. The first
+   workflow has no selection; later workflows retain the session selection.
+3. Choose whether to refresh base images for a build. Existing-package tests
+   omit that build option. Optionally browse for a public PEM/DER company CA
+   certificate, or enter/paste its path directly. Esc returns to targets.
 4. Review the action, targets, base-image refresh, certificate path and output
-   replacement. Cancel is selected by default. SLE-15 media selection was retired.
+   replacement. Cancel is selected by default; Back to options preserves all
+   choices. SLE-15 media selection was retired.
 5. Select Run. Existing outputs are rebuilt only after this explicit confirmation.
-6. Read the result and return to the menu.
+6. Read the recorded per-target result, inspect full logs or explain a failure,
+   then return to the workspace.
 
-The certificate default follows `NRPE_CA_CERT`, if configured.
+The certificate default follows `NRPE_CA_CERT`, if configured. The options show
+whether the choice came from the environment, was selected manually, or was
+explicitly disabled. Invalid environment defaults are validated before review.
+"Do not use a company CA" overrides the environment for this session, without
+changing it; direct commands can use `--no-ca-cert`. The CLI rejects combining
+that option with `--ca-cert`. Choices are kept only in memory until the menu exits.
+
+This CA trusts build downloads. It does not configure NRPE server/client
+certificates or Docker Engine/registry trust.
 See [company CA trust](network.md#optional-company-ca-certificate) for scope and image-cache details.
 
-Diagnostics, status, and logs are available directly from the home screen.
+## Diagnostics and cleanup
+
+Diagnostics checks Docker explicitly or explains a recorded/local log. For a
+local file, choose build/download or NRPE context and state whether a build CA
+was supplied. Diagnosis reads text; it never runs log content or changes TLS.
+Runs are filterable by date/ID, target, action and outcome.
+
+Local cleanup exposes retention age, number of runs to keep, retired outputs
+and optional explicit project image tags. It uses the same planner and guards
+as [the cleanup CLI](local-cleanup.md). Preview is read-only and remains visible
+before a separate confirmation, with cancellation selected by default. Changed
+candidates require another preview. There is no Docker-wide prune or forced
+removal; current packages and retained evidence remain protected.
+
+Diagnostics, status, and logs are available from the workspace.
 A failed command returns to the menu after its result is acknowledged. Closing
 the menu does not turn a failed workflow into a passed run: inspect its exit
 message, report, or status. For automation, use direct commands and their exit
@@ -88,6 +134,20 @@ Cancelling returns to the existing browser location. Missing paths and incorrect
 file/directory types show an error with options to retry or cancel. Certificate
 contents still undergo regular validation.
 
+## Many drives and long paths
+
+Windows drive letters appear only in **Switch drive...**, not in every directory.
+For twelve attached drives, the file list still contains just the current folder,
+its navigation actions and eligible files. The separate drive selector is
+scrollable and filterable with `/`; enumeration uses the OS drive mask without
+probing every drive for labels, capacity or connectivity. Only the selected root
+is opened. Unavailable roots show an error and retain the previous directory.
+
+Cancelling drive selection retains the browser's folder, selection and scroll
+position. Returning to a parent directory restores its highlighted entry. Use
+**Show complete current path** for long paths or **Enter or paste a path...**
+for direct drive/UNC access. Linux keeps ordinary directory/mount navigation.
+
 ## Terminal behavior
 
 Use an interactive terminal on Windows, Linux, or macOS. `NO_COLOR` requests
@@ -100,3 +160,12 @@ are unsuitable, redirected output, and CI.
 With no terminal attached, launching without arguments prints CLI help without
 importing the optional dependencies or prompting. If a terminal is attached but
 the dependencies are missing, the CLI prints the installation command.
+
+## Validation limits for this revision
+
+Keyboard/filtering/session-state tests, simulated 0/1/12-drive and unavailable-root
+tests, and an actual Linux PTY cancellation exercise passed locally. The PTY
+exercise used simulated build output to check main-thread interruption, retained
+logs and lock release; it was not a real package build. Real Windows Terminal,
+mapped/network drive and Docker Desktop scenarios remain not run here; use the
+[practical validation checklist](practical-validation.md#windows-docker-desktop).

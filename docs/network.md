@@ -122,6 +122,9 @@ The option is supported by `build`, `test`, `verify`, and `build.py`, for every
 target. The menu includes a certificate file browser under Workflow options.
 Alternatively set `NRPE_CA_CERT` to the local file path; the explicit `--ca-cert`
 option takes precedence. With neither configured, no extra CA is added.
+Use `--no-ca-cert` to explicitly omit the company CA even when `NRPE_CA_CERT`
+is set; it cannot be combined with `--ca-cert`. The menu offers the same
+session-only override without changing the process environment.
 
 Supply **one public X.509 certificate**, in PEM or DER format. `.cer`, `.crt`, and
 `.pem` filenames are supported; the contents determine the format. Bundles and

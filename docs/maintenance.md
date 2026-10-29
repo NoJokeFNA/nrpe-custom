@@ -39,10 +39,13 @@ another suite, SLES service pack, or Leap packages to preserve a passing result.
 
 ## Automated dependency monitoring
 
-[Dependabot](../.github/dependabot.yml) checks Python requirements and pinned
-GitHub Actions weekly and proposes update PRs into `develop`, without automatic
+[Dependabot](../.github/dependabot.yml) checks Python requirements, locked website
+npm dependencies and GitHub Actions version tags weekly and proposes update PRs into `develop`, without automatic
 merging. Bot proposals need human-reviewed/authored integration under the
 [Git policy](git-workflow.md).
+Actions use official major-version tags such as `actions/setup-python@v6`, as
+selected by the maintainer. Dependabot proposes major-version changes through PRs;
+compatible updates within the selected upstream major tag are picked up directly.
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
 checkout configuration does not override those settings.
 
@@ -52,6 +55,10 @@ requirements and resolved dependencies against published advisories. Findings
 and collection failures fail the job. It does not scan NRPE C code, DEB/RPM
 contents, system libraries, container images or SLES repositories. A clean result
 is not a security certification.
+
+The separate [website check](../.github/workflows/website.yml) audits
+`requirements-website.txt` and validates generated documentation and publication
+guards. The renderer is isolated from the NRPE CLI/menu environment.
 
 To reproduce the audit using Python 3.10+ in an isolated development environment:
 

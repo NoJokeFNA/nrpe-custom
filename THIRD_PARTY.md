@@ -1,12 +1,12 @@
 # Third-party provenance and license inventory
 
-This inventory records evidence inspected during release preparation on
-2026-10-27. It is not a completed redistribution approval. The root [MIT
+This inventory records evidence inspected during release and website preparation
+on 2026-10-27 through 2026-10-29. It is not a completed redistribution approval. The root [MIT
 license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
 
-The active local target was corrected again to **SLES 12 SP3** after receiving
+The active target was corrected to **SLES 12 SP3** after receiving
 its actual OS/binary/library identity on 2026-10-28. The same reviewed NRPE/user
 sources are rebuilt natively; their previous SLE-15 runtime observations do not
 prove SLE-12 compatibility. The port additionally builds the macros from pinned
@@ -40,6 +40,11 @@ input sets under `obs-sources/`; release preparation verifies every file against
 the pinned manifests and includes the history alongside the SRPMs. The original
 comparison alone is not evidence of a fresh build.
 
+The [Debian 4.2.0-1 source review](docs/debian-source-review.md) additionally
+covers the version now supplied by Debian 14. Its license grants and OpenSSL
+exception are unchanged; the Debian copyright edit removes obsolete FSF postal
+addresses. This does not approve later versions.
+
 Reviewed Debian upstream archive and license-file hashes are recorded in
 `packaging/debian-license-review.json`. Automatic publication fails for a new
 source version or changed evidence until it is reviewed; source discovery and
@@ -67,10 +72,41 @@ license files of different versions installed in a development environment.
 Apache License 2.0. It and its dependencies are installed separately for auditing,
 not vendored into this repository or shipped inside NRPE packages. Bundling this
 tool would require its own complete dependency/notice inventory. GitHub Actions
-are similarly fetched by CI at pinned upstream commits rather than distributed
+are similarly fetched by CI at maintainer-selected upstream major-version tags rather than distributed
 as part of the server packages.
 
 ## Build and runtime dependencies
+
+`requirements-website.txt` pins the separate build-only renderer
+`Markdown==3.8.2` (Python-Markdown). Its installed wheel's
+`markdown-3.8.2.dist-info/licenses/LICENSE.md` was inspected and contains
+BSD-3-Clause terms; wheel metadata records the same SPDX expression. The
+renderer is installed separately, not vendored, bundled into NRPE packages or
+copied into the static site. Generated pages retain the licenses of their
+original documentation and notices. Bundling the renderer would require its
+actual license text and a separate dependency inventory. Website CSS, templates
+and browser JavaScript are independently authored project code; no external
+JavaScript framework, analytics SDK or font bundle is shipped.
+
+The build-only syntax highlighter is `shiki@4.5.0`, pinned with integrity-checked
+transitive dependencies in `website/package-lock.json`. Installed `shiki`,
+`@shikijs/core`, `@shikijs/langs`, `@shikijs/themes` and `@shikijs/engine-oniguruma`
+LICENSE files were inspected and contain MIT terms; the installed
+`@shikijs/vscode-textmate` LICENSE.md also contains MIT terms. The
+[original Shiki license](website/assets/shiki-LICENSE.txt) is retained unchanged.
+Individual language/theme provenance is covered by the upstream
+[grammar/theme notices](https://github.com/shikijs/textmate-grammars-themes/blob/main/NOTICE).
+These dependencies, their grammars and WASM remain build-only, not vendored or
+included in NRPE packages or browser JavaScript. Generated code colors use the
+bundled GitHub Dark Default theme. The small NRPE syntax grammar and static
+HTML/CSS adapter are independently authored project code. The upstream NRPE
+sample configuration is referenced, not copied or relicensed as project code.
+Static diagrams use build-only `mermaid@12.2.0` (MIT; the installed LICENSE was
+inspected and is [retained unchanged](website/assets/mermaid-LICENSE.txt)) and
+`puppeteer@25.16.0` (Apache-2.0 in its package metadata), also locked with integrity
+hashes. The renderer uses the workstation's installed Chrome/Chromium and ships
+SVG output, not a browser binary, Mermaid runtime, fonts or Node dependencies.
+The previous Pygments renderer dependency has been removed.
 
 Docker images, OpenSSL, system libraries, Debian/SUSE repository packages,
 monitoring plugins, and SLES installation media retain their own licenses.
@@ -79,7 +115,7 @@ their corresponding sources, and this project's build workflow. It does not
 include container images, dependency RPM/DEB bundles, or installation media.
 Any expansion requires an inventory of the additional shipped bytes.
 
-The bundled SUSE and backports public keys are trust material identified by the
+The bundled SUSE public key is trust material identified by the
 fingerprints and checksums in the SLES manifests. They are not independently
 authored project code; do not label them MIT merely because they are in this
 repository. Retain their issuer identity and provenance.
