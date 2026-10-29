@@ -201,7 +201,7 @@ The custom packages compile argument support while leaving runtime arguments
 disabled. On a real target server, deliberately configure `/etc/nagios/nrpe.cfg`
 on Debian, or `/etc/nrpe.cfg` for this SLES/OBS recipe:
 
-```ini
+```nrpe
 allowed_hosts=<nagios-server-ip>,127.0.0.1,::1
 dont_blame_nrpe=1
 ```

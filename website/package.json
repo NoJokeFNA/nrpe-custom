@@ -1,0 +1,7 @@
+{
+  "name": "nrpe-custom-website",
+  "private": true,
+  "version": "0.0.0",
+  "engines": { "node": ">=24 <25" },
+  "devDependencies": { "shiki": "4.5.0" }
+}
