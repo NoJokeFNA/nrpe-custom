@@ -85,9 +85,9 @@ Protection was applied by the repository owner and verified on 2026-10-27:
 [active ruleset 25987752](https://github.com/NoJokeFNA/nrpe-custom/rules/25987752)
 targets `refs/heads/master` and `refs/heads/develop`, with no bypass actors.
 Both branches have deletion/force-push protection, PR and resolved-thread
-requirements, and all six fast status checks from the template. The supported
-minimum Python check is being migrated from 3.9 to 3.11 alongside CI; verify
-the effective ruleset rather than assuming the template is already applied. The default
+requirements, and all six fast status checks from the template. On 2026-10-29 the owner updated both minimum-Python checks from 3.9 to 3.11,
+matching the Linux/Windows CI matrix (3.11 and 3.14). PR #29 and the subsequent
+dependency PR passed the required checks and merged under these rules. The default
 branch remains `master`; unrestricted automatic head-branch deletion is off.
 
 Inspect effective rules when checking or changing repository settings:

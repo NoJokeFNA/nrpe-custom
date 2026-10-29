@@ -19,6 +19,14 @@ These scenarios are prepared for later execution, not replaced by container or
 hosted Windows unit tests. Do not run package migration/reboot tests on a
 production server to fill this gap.
 
+On 2026-10-29 the operator supplied an installation attempt from a SLES 12 SP3
+host. The client package was updated to 4.1.1, while `rpm -q nrpe` still showed
+server 2.15. Unknown TLS directives and a remote timeout therefore do not prove
+that the custom server failed after installation. No successful custom-server
+migration, authenticated remote check, reboot or rollback was supplied in that
+report. The [SLES-specific checklist](sles12sp3-deployment-checklist.md) separates
+these checks. Hostnames, IPs and raw shell history are intentionally omitted.
+
 For each scenario record passed, failed, blocked or not run, with:
 
 - Date, tester, exact Git commit/release tag, package version and SHA-256.

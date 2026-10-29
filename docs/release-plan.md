@@ -1,6 +1,6 @@
 # Release preparation plan
 
-Status: SLES 12 SP3 support published, updated 2026-10-28. The actual deployment
+Status: SLES 12 SP3 support published, updated 2026-10-29. The actual deployment
 was confirmed as SLES **12.3**, NRPE 2.15-4.24 and the OpenSSL 1.0 ABI. The
 previous SLE-15 targets were based on an incorrect platform assumption; their
 published test evidence remains historical and is not relabeled.
@@ -23,7 +23,10 @@ sequentially. See [Git workflow](git-workflow.md).
 | Notices | MIT for independently authored project work; upstream GPL/OpenSSL, companion MIT and macros BSD notices retained |
 | Deployment documentation | [Installation](installation.md), [rollback](updates-and-rollback.md), [FAQ](faq.md) and [SLES guide](sles12sp3.md) |
 | Signatures | [Ed25519 signing support](release-signing.md) implemented; production enrollment and a verified signed release remain open |
-| Branch protection | Master/develop rules applied and verified in the previous integration; no remote setting changes in this task |
+| Branch protection | Master/develop retained; owner migrated required minimum-Python checks to 3.11 on 2026-10-29 |
+| Workstation dependencies | Python 3.11 minimum; prompt-toolkit 3.0.53, wcwidth 0.9.4 and Markdown 3.11.2 reviewed and tested on Linux/Windows CI |
+| Deployment clarification | Server/client RPM identities, complete SLES TLS policy and [operator checklist](sles12sp3-deployment-checklist.md); reported attempt still ran server 2.15 |
+| Source strategy | [Pinned upstream clone evaluated](source-strategy.md); preserve native distribution packaging and reviewed patches |
 
 ## Remaining work, in priority order
 
