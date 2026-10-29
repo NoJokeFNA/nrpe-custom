@@ -1,7 +1,7 @@
 # Third-party provenance and license inventory
 
 This inventory records evidence inspected during release and website preparation
-on 2026-10-27/28. It is not a completed redistribution approval. The root [MIT
+on 2026-10-27 through 2026-10-29. It is not a completed redistribution approval. The root [MIT
 license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
@@ -39,6 +39,11 @@ differences explicitly. New SLES builds now export the complete original OBS
 input sets under `obs-sources/`; release preparation verifies every file against
 the pinned manifests and includes the history alongside the SRPMs. The original
 comparison alone is not evidence of a fresh build.
+
+The [Debian 4.2.0-1 source review](docs/debian-source-review.md) additionally
+covers the version now supplied by Debian 14. Its license grants and OpenSSL
+exception are unchanged; the Debian copyright edit removes obsolete FSF postal
+addresses. This does not approve later versions.
 
 Reviewed Debian upstream archive and license-file hashes are recorded in
 `packaging/debian-license-review.json`. Automatic publication fails for a new

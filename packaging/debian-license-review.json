@@ -1,5 +1,5 @@
 {
-  "reviewed": "2026-10-27",
+  "reviewed": "2026-10-29",
   "source": "nagios-nrpe",
   "versions": {
     "4.0.3-1": {
@@ -39,6 +39,19 @@
         "src/utils.c": "75f4ab494d009b09d8358ced0394d80f9476f8ed6f7323c200a007d8cd1a2bd3",
         "src/acl.c": "3a618bc080ad300edfd166c37c5051d75d6be9e8ec16d29c669db6638a1b9693",
         "include/acl.h": "323ca78733e229c77ec4e8a37fdc837b47558af11776660753b98023e83e138a"
+      }
+    },
+    "4.2.0-1": {
+      "upstream_archives": {
+        "nagios-nrpe_4.2.0.orig.tar.gz": "f89455bdb5c4057d3bbebbde8a1d9f775d2598eb04d2d876eea9e718716e1a37"
+      },
+      "license_files": {
+        "debian/copyright": "926a4b7c74fc5f6be55ed78d1624a87b10d75c2ca1328956362f68cccfdb1b8d",
+        "LICENSE.md": "a343b35d58dccd90b63cd892ce0eae326c796147adaead5057c49b39186388c5",
+        "LEGAL": "ae094e1b4d2dc5c7d8e759365925c934913b1549875bfef90d28da542101352a",
+        "src/utils.c": "f77981bc5acf2a9bdf2d2eec9702f8ad42d0ceecb8d10f0c3cca7ef9bdb7683d",
+        "src/acl.c": "4b5f40f7d9f1ff4bb58eafb08cbc86a35cfc2a3d0f1001fe634c51fd6f8d1918",
+        "include/acl.h": "3db4223a133d9ced12d3e1bc25d3a74a11bde8bd478d2742227b328b95752d5b"
       }
     }
   }
