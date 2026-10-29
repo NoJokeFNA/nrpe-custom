@@ -183,9 +183,7 @@ def layout(title, content, pages, slug, base, toc='', source=None, commit=None, 
     header = template('header-' + ('home' if home else 'blog' if editorial else 'document') + '.html',
                       base=base, search=template('search.html'))
     return template('layout.html', title=esc(title), body=body, header=header,
-                    meta=esc(meta), base=base, docs_toggle=toggle,
-                    page_styles=('<link rel="stylesheet" href="' + base + '/assets/terminal-demo.css">') if home else '',
-                    page_scripts=('<script type="module" src="' + base + '/assets/terminal-demo.js"></script>') if home else '')
+                    meta=esc(meta), base=base, docs_toggle=toggle)
 
 
 def notes_index(stories, base):
@@ -209,8 +207,7 @@ def homepage(base, root=ROOT):
     rows = [line for line in target_section.splitlines() if line.startswith('|')]
     compact = ['| ' + ' | '.join(line.split('|')[1:4]) + ' |' for line in rows]
     supported_targets = markdown.markdown('\n'.join(compact), extensions=['tables'])
-    return template('home.html', supported_targets=supported_targets, base=base,
-                    terminal_demo=template('terminal-demo.html', base=base))
+    return template('home.html', supported_targets=supported_targets, base=base)
 
 
 def build(output, root=ROOT, base=BASE):
