@@ -32,7 +32,7 @@ BASE = '/nrpe-custom'
 GROUPS = (
     ('Getting started', ('overview', 'installation', 'workflow', 'faq')),
     ('Build and diagnose', ('sles12sp3', 'network', 'menu', 'local-cleanup', 'troubleshooting')),
-    ('Deployment', ('configuration-examples', 'sles12sp3-deployment-checklist', 'updates-and-rollback', 'security', 'practical-validation')),
+    ('Deployment', ('configuration-examples', 'tls-validation', 'sles12sp3-deployment-checklist', 'updates-and-rollback', 'security', 'practical-validation')),
     ('Project reference', ('architecture', 'source-strategy', 'maintenance', 'releases', 'release-history',
                            'release-signing', 'release-plan', 'sles-license-review',
                            'third-party', 'contributing', 'license')),
@@ -41,7 +41,7 @@ LABELS = {'overview': 'Overview', 'installation': 'Install a package', 'workflow
           'faq': 'Frequently asked questions', 'sles12sp3': 'SLES 12 SP3', 'network': 'Network & company CA',
           'menu': 'Terminal menu', 'local-cleanup': 'Local cleanup', 'troubleshooting': 'Troubleshooting',
           'configuration-examples': 'Configuration examples', 'updates-and-rollback': 'Update & rollback',
-          'security': 'Security', 'practical-validation': 'Validation limits', 'architecture': 'Architecture',
+          'tls-validation': 'Verify TLS & identity', 'security': 'Security', 'practical-validation': 'Validation limits', 'architecture': 'Architecture',
           'sles12sp3-deployment-checklist': 'SLES deployment checklist',
           'source-strategy': 'Source & patch strategy', 'maintenance': 'Maintenance', 'releases': 'Release workflow', 'release-history': 'Release history',
           'release-signing': 'Release signatures', 'release-plan': 'Open work',
