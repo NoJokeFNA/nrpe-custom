@@ -40,13 +40,13 @@
             "context": "Shell and Compose configuration"
           },
           {
-            "context": "Unit tests (ubuntu-24.04, Python 3.9)"
+            "context": "Unit tests (ubuntu-24.04, Python 3.11)"
           },
           {
             "context": "Unit tests (ubuntu-24.04, Python 3.14)"
           },
           {
-            "context": "Unit tests (windows-2022, Python 3.9)"
+            "context": "Unit tests (windows-2022, Python 3.11)"
           },
           {
             "context": "Unit tests (windows-2022, Python 3.14)"

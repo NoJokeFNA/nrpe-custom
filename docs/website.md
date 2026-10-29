@@ -94,7 +94,7 @@ browser highlighter is needed. No Shiki runtime, grammar, WASM, CDN or remote fo
 is loaded by visitors. Code text, indentation, entities and Unicode are checked
 for exact preservation before publication. Plain/unknown languages remain unchanged; Mermaid renders as static diagrams; there is no speculative language detection.
 
-Use **Node.js 24 LTS** and **Python 3.9+** on the website build workstation.
+Use **Node.js 24 LTS** and **Python 3.11+** on the website build workstation.
 Neither Node nor website dependencies are needed for the NRPE CLI or destination
 servers. Install locked npm dependencies without package lifecycle scripts:
 

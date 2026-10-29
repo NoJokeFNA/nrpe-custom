@@ -19,6 +19,14 @@ class CliTests(unittest.TestCase):
         self.redirect.__enter__()
         self.addCleanup(self.redirect.__exit__, None, None, None)
 
+    def test_unsupported_python_stops_before_running_workflows(self):
+        errors = io.StringIO()
+        with patch('nrpe_cli.cli.sys.version_info', (3, 10, 0)), \
+                patch('nrpe_cli.cli.check_docker') as docker, contextlib.redirect_stderr(errors):
+            self.assertEqual(cli.main(['doctor'], self.root), 2)
+        docker.assert_not_called()
+        self.assertIn('Python 3.11 or newer', errors.getvalue())
+
     def test_help_explains_multiple_targets_without_repeating_choices(self):
         with self.assertRaises(SystemExit) as exit_status:
             cli.main(['verify', '--help'], self.root)

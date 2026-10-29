@@ -6,7 +6,7 @@ compiled in and runtime argument handling disabled by default.
 
 ## Requirements
 
-- Python 3.9 or newer; direct commands have no third-party Python dependencies.
+- Python 3.11 or newer; direct commands have no third-party Python dependencies.
 - Optional arrow-key menu: from the repository root, use `python3 -m pip install -r requirements-menu.txt`.
 - Docker Engine with BuildKit, Linux containers, and Docker Compose 2.17 or newer.
 - Access from containers to the matching Debian or SLES/OBS repositories.
@@ -29,7 +29,7 @@ python3 nrpe.py doctor
 python3 nrpe.py verify debian12
 ```
 
-Ensure that `python3 --version` reports Python 3.9 or newer. On Windows, make
+Ensure that `python3 --version` reports Python 3.11 or newer. On Windows, make
 sure your Python installation provides `python3` in PATH.
 
 Run without arguments for an interactive action and target menu:
