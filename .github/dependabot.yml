@@ -8,7 +8,11 @@ updates:
     open-pull-requests-limit: 3
     groups:
       menu-dependencies:
-        patterns: ['*']
+        patterns: ['prompt-toolkit', 'wcwidth']
+      website-renderer:
+        patterns: ['Markdown', 'markdown']
+      audit-tools:
+        patterns: ['pip-audit']
   - package-ecosystem: github-actions
     directory: /
     target-branch: develop

@@ -44,7 +44,12 @@ another suite, SLES service pack, or Leap packages to preserve a passing result.
 npm dependencies and GitHub Actions version tags weekly and proposes update PRs into `develop`, without automatic
 merging. Genuine Dependabot PRs may merge into develop after review under the
 [Git policy](git-workflow.md).
-Actions use official major-version tags such as `actions/setup-python@v6`, as
+Python proposals group the optional menu (`prompt-toolkit`, `wcwidth`), website
+renderer (`Markdown`) and audit tooling (`pip-audit`) separately. Review each
+component's minimum Python version, license and actual CI results before merging;
+a dependency's newest release must fit the documented interpreter baseline.
+
+Actions use official major-version tags such as `actions/setup-python@v7`, as
 selected by the maintainer. Dependabot proposes major-version changes through PRs;
 compatible updates within the selected upstream major tag are picked up directly.
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
@@ -122,3 +127,7 @@ backups. Follow [security reporting guidance](security.md) for vulnerabilities.
 
 Use [updates and rollback](updates-and-rollback.md) for deployments. Recovery on a
 real server is distinct from rebuilding a package in a container.
+
+For the evaluated upstream-clone alternative and future C changes, follow the
+[source and patch strategy](source-strategy.md). A newer upstream tag alone does
+not establish compatibility with a legacy target.

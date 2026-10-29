@@ -32,8 +32,8 @@ BASE = '/nrpe-custom'
 GROUPS = (
     ('Getting started', ('overview', 'installation', 'workflow', 'faq')),
     ('Build and diagnose', ('sles12sp3', 'network', 'menu', 'local-cleanup', 'troubleshooting')),
-    ('Deployment', ('configuration-examples', 'updates-and-rollback', 'security', 'practical-validation')),
-    ('Project reference', ('architecture', 'maintenance', 'releases', 'release-history',
+    ('Deployment', ('configuration-examples', 'sles12sp3-deployment-checklist', 'updates-and-rollback', 'security', 'practical-validation')),
+    ('Project reference', ('architecture', 'source-strategy', 'maintenance', 'releases', 'release-history',
                            'release-signing', 'release-plan', 'sles-license-review',
                            'third-party', 'contributing', 'license')),
 )
@@ -42,7 +42,8 @@ LABELS = {'overview': 'Overview', 'installation': 'Install a package', 'workflow
           'menu': 'Terminal menu', 'local-cleanup': 'Local cleanup', 'troubleshooting': 'Troubleshooting',
           'configuration-examples': 'Configuration examples', 'updates-and-rollback': 'Update & rollback',
           'security': 'Security', 'practical-validation': 'Validation limits', 'architecture': 'Architecture',
-          'maintenance': 'Maintenance', 'releases': 'Release workflow', 'release-history': 'Release history',
+          'sles12sp3-deployment-checklist': 'SLES deployment checklist',
+          'source-strategy': 'Source & patch strategy', 'maintenance': 'Maintenance', 'releases': 'Release workflow', 'release-history': 'Release history',
           'release-signing': 'Release signatures', 'release-plan': 'Open work',
           'sles-license-review': 'SLES license review', 'third-party': 'Third-party notices',
           'contributing': 'Contributing', 'license': 'Project license'}
