@@ -39,10 +39,13 @@ another suite, SLES service pack, or Leap packages to preserve a passing result.
 
 ## Automated dependency monitoring
 
-[Dependabot](../.github/dependabot.yml) checks Python requirements and pinned
-GitHub Actions weekly and proposes update PRs into `develop`, without automatic
+[Dependabot](../.github/dependabot.yml) checks Python requirements, locked website
+npm dependencies and GitHub Actions version tags weekly and proposes update PRs into `develop`, without automatic
 merging. Bot proposals need human-reviewed/authored integration under the
 [Git policy](git-workflow.md).
+Actions use official major-version tags such as `actions/setup-python@v6`, as
+selected by the maintainer. Dependabot proposes major-version changes through PRs;
+compatible updates within the selected upstream major tag are picked up directly.
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
 checkout configuration does not override those settings.
 

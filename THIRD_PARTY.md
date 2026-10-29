@@ -67,7 +67,7 @@ license files of different versions installed in a development environment.
 Apache License 2.0. It and its dependencies are installed separately for auditing,
 not vendored into this repository or shipped inside NRPE packages. Bundling this
 tool would require its own complete dependency/notice inventory. GitHub Actions
-are similarly fetched by CI at pinned upstream commits rather than distributed
+are similarly fetched by CI at maintainer-selected upstream major-version tags rather than distributed
 as part of the server packages.
 
 ## Build and runtime dependencies
