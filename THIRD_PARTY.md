@@ -145,4 +145,7 @@ The website bundles Inter Variable from the official
 [Inter project](https://github.com/rsms/inter), licensed under SIL OFL 1.1.
 The verbatim notice is retained as `website/assets/Inter-OFL.txt` alongside
 `InterVariable.woff2`; the font is served locally and is not an NRPE dependency.
-No JetBrains font files, logos or illustrations are distributed.
+JetBrains Mono Regular/Bold from the [official project](https://github.com/JetBrains/JetBrainsMono)
+is additionally served locally under SIL OFL 1.1, with its full notice retained
+as `website/assets/JetBrainsMono-OFL.txt`. Font files are unmodified. No JetBrains
+logos or illustrations are distributed.

@@ -113,9 +113,9 @@ organization's issuing CA. For errors such as `Curl error 60` / `self signed
 certificate in certificate chain`, select the public root or intermediate CA
 provided by your administrator:
 
-```powershell
-python3 nrpe.py verify sles12sp3 --ca-cert "C:\Certificates\Company-Root.cer"
-python3 nrpe.py test debian12 --ca-cert "C:\Certificates\Company-Root.cer"
+```sh
+python3 nrpe.py verify sles12sp3 --ca-cert "./local-certificates/company-root.cer"
+python3 nrpe.py test debian12 --ca-cert "./local-certificates/company-root.cer"
 ```
 
 The option is supported by `build`, `test`, `verify`, and `build.py`, for every

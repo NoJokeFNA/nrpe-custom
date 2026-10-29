@@ -2664,3 +2664,19 @@ a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
     margin-top:20px
   }
 }
+
+/* The column reaches the footer; its navigation scrolls independently. */
+.docs-layout>.sidebar{align-self:stretch;position:static;max-height:none;padding:0;overflow:visible}
+.sidebar-content{position:sticky;top:70px;max-height:calc(100vh - 70px);overflow:auto;padding:22px 0 40px}
+@media(max-width:720px){.sidebar-content{position:static;max-height:none;padding:16px 0 22px}}
+
+@font-face{font-family:"JetBrains Mono";src:url("JetBrainsMono-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"JetBrains Mono";src:url("JetBrainsMono-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+pre,code,kbd{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none}
+html,.sidebar-content,.page-toc,.table-scroll{scrollbar-width:thin;scrollbar-color:#b7b7bf #f7f7f9}
+.sidebar-content{scrollbar-gutter:stable;overscroll-behavior:contain}
+.sidebar-content::-webkit-scrollbar,.page-toc::-webkit-scrollbar,.table-scroll::-webkit-scrollbar{width:8px;height:8px}
+.sidebar-content::-webkit-scrollbar-track,.page-toc::-webkit-scrollbar-track{background:#f8f8fa}
+.sidebar-content::-webkit-scrollbar-thumb,.page-toc::-webkit-scrollbar-thumb,.table-scroll::-webkit-scrollbar-thumb{background:#b7b7bf;border-radius:5px;border:2px solid #f8f8fa}
+.sidebar-content::-webkit-scrollbar-thumb:hover{background:#93939c}
+.prose pre{scrollbar-width:thin;scrollbar-color:#606772 #151922}

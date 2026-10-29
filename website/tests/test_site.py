@@ -51,6 +51,15 @@ class SiteTests(unittest.TestCase):
         self.assertNotIn('class="sidebar"', article)
         self.assertIn('SIL OPEN FONT LICENSE', (self.output / 'assets/Inter-OFL.txt').read_text())
 
+    def test_interactive_demo_cancellation_consent_and_cleanup_in_browser(self):
+        build(self.output)
+        environment = __import__('os').environ.copy()
+        environment['NRPE_WEBSITE_BROWSER'] = environment.get('NRPE_WEBSITE_BROWSER') or next(
+            (path for name in ('chromium', 'google-chrome', 'chromium-browser')
+             if (path := shutil.which(name))), '')
+        subprocess.run(['node', str(PROJECT / 'website/tests/terminal-browser.mjs'), str(self.output)],
+                       env=environment, check=True, timeout=45, capture_output=True, text=True)
+
     def test_docs_remain_the_content_source_and_search_is_local(self):
         build(self.output)
         search = json.loads((self.output / 'assets/search-index.json').read_text())

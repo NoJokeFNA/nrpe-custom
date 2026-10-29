@@ -135,8 +135,8 @@ python3 nrpe.py test debian11
 For company HTTPS inspection, optionally select a local public CA certificate
 (PEM or DER); TLS verification remains enabled:
 
-```powershell
-python3 nrpe.py verify sles12sp3 --ca-cert "C:\Certificates\Company-Root.cer"
+```sh
+python3 nrpe.py verify sles12sp3 --ca-cert "./local-certificates/company-root.cer"
 ```
 
 No certificate is required by default or included in the exported NRPE package. See

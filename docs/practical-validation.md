@@ -42,21 +42,22 @@ different such directory; never pass a private key to `--ca-cert`. These are
 illustrative test paths, not required installation locations. The `Ω` deliberately
 exercises Unicode handling; use real folders and certificate paths on your test host.
 
-From that checkout in PowerShell:
+From that checkout in a terminal:
 
-```powershell
+```sh
 python3 --version
 docker version
 docker compose version
 docker buildx version
 python3 nrpe.py doctor
-python3 nrpe.py verify debian12 --ca-cert "C:\NRPE validation\Company CA Ω\company-ca.pem" --pull
-$LASTEXITCODE
+python3 nrpe.py verify debian12 --ca-cert "C:/NRPE validation/Company CA Ω/company-ca.pem" --pull
 python3 nrpe.py status
 python3 nrpe.py logs --last
 ```
 
-Use your actual certificate path. The expected result is a complete successful
+Use your actual certificate path. Immediately after `verify`, check `$?` in a
+POSIX-compatible shell or `$LASTEXITCODE` in PowerShell, before running the
+next command. The expected result is a complete successful
 build/install/TLS run, with no temporary-path failure at "load local bake
 definitions". For intentional repeat builds of existing output, add `--rebuild`.
 
