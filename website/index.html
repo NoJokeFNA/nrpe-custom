@@ -75,6 +75,16 @@ were captured at 100 columns by 24 rows and rendered as escaped text for the
 screenshot. It shows no successful build or real infrastructure; the homepage
 and menu guide share this image. Refresh it when navigation or presentation
 changes, preserving the same empty-workspace provenance.</p>
+<h2 id="faq-structure">FAQ structure</h2>
+<p>The <a href="/nrpe-custom/faq/">FAQ</a> remains canonical Markdown: level-two headings define topics,
+level-three headings define questions, and level-four headings divide longer
+answers. Keep existing heading IDs stable so shared troubleshooting links work.
+The website derives a compact question index, per-question links and its page
+outline from these headings; answers stay visible without JavaScript.</p>
+<p>Local search filters questions and their index entries, highlights matching
+prose, and provides a clear empty/reset state. It leaves command text intact.
+Opening a link to a filtered answer restores its context. The existing page
+outline tracks the current section; mobile uses one content column.</p>
 <h2 id="diagrams-and-wide-tables">Diagrams and wide tables</h2>
 <p>Mermaid flowcharts and sequence diagrams are rendered into static SVG images
 at build time with Mermaid 12.2.0 and Puppeteer 25.16.0. Install local Chrome or
@@ -121,7 +131,7 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/70f547943cbdf8190c0061d289a5f4145d841a03/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
@@ -160,11 +170,12 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/70f547943cbdf8190c0061d289a5f4145d841a03/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
 <li><a href="#homepage-content-and-cli-capture">Homepage content and CLI capture</a></li>
+<li><a href="#faq-structure">FAQ structure</a></li>
 <li><a href="#diagrams-and-wide-tables">Diagrams and wide tables</a></li>
 <li><a href="#local-preview">Local preview</a></li>
 <li><a href="#reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</a></li>
@@ -183,7 +194,7 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 3c2fd47</span>
+<span>Source 70f5479</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

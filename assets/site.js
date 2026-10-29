@@ -151,22 +151,93 @@ document.querySelector('.docs-toggle')?.addEventListener('click', event => {
   toggle.setAttribute('aria-expanded', String(open));
   document.querySelector('#doc-nav').classList.toggle('mobile-open', open);
 });
-const faq = [...document.querySelectorAll('.faq-item')];
+const faq = [...document.querySelectorAll('.faq-question')];
 const filter = document.querySelector('#faq-filter');
 if (filter) {
   const count = document.querySelector('#faq-count');
+  const clear = document.querySelector('#faq-clear');
+  const empty = document.querySelector('#faq-empty');
+  const text = new Map(faq.map(item => [item, item.textContent.toLowerCase()]));
+  filter.closest('.faq-tools').hidden = false;
+  const highlight = (item, query) => {
+    for (const mark of item.querySelectorAll('mark')) mark.replaceWith(document.createTextNode(mark.textContent));
+    item.normalize();
+    if (!query) return;
+    const walker = document.createTreeWalker(item, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      if (!walker.currentNode.parentElement.closest('pre, code, button, .question-link')) nodes.push(walker.currentNode);
+    }
+    for (const node of nodes) {
+      const value = node.textContent;
+      const lower = value.toLowerCase();
+      if (!lower.includes(query)) continue;
+      const fragment = document.createDocumentFragment();
+      let start = 0;
+      for (let match = lower.indexOf(query); match !== -1; match = lower.indexOf(query, start)) {
+        fragment.append(document.createTextNode(value.slice(start, match)));
+        const mark = document.createElement('mark');
+        mark.textContent = value.slice(match, match + query.length);
+        fragment.append(mark);
+        start = match + query.length;
+      }
+      fragment.append(document.createTextNode(value.slice(start)));
+      node.replaceWith(fragment);
+    }
+  };
   const update = () => {
     const query = filter.value.trim().toLowerCase();
     let visible = 0;
     for (const item of faq) {
-      item.hidden = !!query && !item.textContent.toLowerCase().includes(query);
+      item.hidden = !!query && !text.get(item).includes(query);
       if (!item.hidden) visible++;
-      if (query && !item.hidden) item.open = true;
+      highlight(item, item.hidden ? '' : query);
+      const id = item.querySelector('h3').id;
+      document.querySelector(`.faq-index [data-question="${CSS.escape(id)}"]`).closest('li').hidden = item.hidden;
     }
-    count.textContent = `${visible} of ${faq.length} questions`;
+    for (const group of document.querySelectorAll('.faq-group')) {
+      group.hidden = [...group.querySelectorAll('.faq-question')].every(item => item.hidden);
+    }
+    for (const group of document.querySelectorAll('.faq-index-group')) {
+      group.hidden = [...group.querySelectorAll('li')].every(item => item.hidden);
+    }
+    clear.hidden = !query;
+    empty.hidden = visible !== 0;
+    const topics = document.querySelectorAll('.faq-group').length;
+    count.textContent = query ? `${visible} of ${faq.length} questions match` : `${faq.length} questions across ${topics} topics`;
+    document.dispatchEvent(new Event('faq-filtered'));
   };
   filter.addEventListener('input', update);
+  clear.addEventListener('click', () => { filter.value = ''; update(); filter.focus(); });
+  window.addEventListener('hashchange', () => {
+    let target;
+    try { target = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch { return; }
+    if (target?.closest('.faq-question[hidden], .faq-group[hidden]')) {
+      filter.value = ''; update(); target.scrollIntoView();
+    }
+  });
   update();
+}
+// Reuse the existing page outline instead of adding another navigation rail.
+if (faq.length) {
+  const links = [...document.querySelectorAll('.page-toc a[href^="#"]')];
+  const targets = links.map(link => document.getElementById(decodeURIComponent(link.hash.slice(1))));
+  let scheduled = false;
+  const track = () => {
+    scheduled = false;
+    const visible = targets.filter(target => target && !target.closest('[hidden]'));
+    const active = visible.filter(target => target.getBoundingClientRect().top <= 160).at(-1) || visible[0];
+    links.forEach((link, index) => {
+      if (targets[index] === active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+      link.parentElement.hidden = !!targets[index]?.closest('[hidden]');
+    });
+  };
+  const schedule = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(track); } };
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  document.addEventListener('faq-filtered', schedule);
+  track();
 }
 function revealAnchor() {
   let id;

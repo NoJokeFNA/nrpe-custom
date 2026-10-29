@@ -44,7 +44,7 @@ actual package work; target packages are never installed on the development host
 The optional terminal UI translates choices into the same CLI arguments used by
 automation. It does not bypass target locks or artifact validation.</p>
 <h2 id="components">Components</h2>
-<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="Components"><a href="/nrpe-custom/assets/diagram-74ee0d07fa7bdad94df3.svg"><img src="/nrpe-custom/assets/diagram-74ee0d07fa7bdad94df3.svg" alt="Components diagram"></a></div><figcaption>Components · <a href="/nrpe-custom/assets/diagram-74ee0d07fa7bdad94df3.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">flowchart LR
+<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="Components"><a href="/nrpe-custom/assets/diagram-1a71e0b9f9d53cc4f25b.svg"><img src="/nrpe-custom/assets/diagram-1a71e0b9f9d53cc4f25b.svg" alt="Components diagram"></a></div><figcaption>Components · <a href="/nrpe-custom/assets/diagram-1a71e0b9f9d53cc4f25b.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">flowchart LR
     M[menu.py: keyboard navigation] --&gt; CLI[cli.py: commands and validation]
     ENTRY[nrpe.py: public entry point] --&gt; CLI
     LEGACY[build.py: compatibility translation] --&gt; CLI
@@ -157,7 +157,7 @@ automation. It does not bypass target locks or artifact validation.</p>
 </tbody>
 </table></div>
 <h2 id="a-verify-run">A verify run</h2>
-<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="A verify run"><a href="/nrpe-custom/assets/diagram-11b86bc374fa37404510.svg"><img src="/nrpe-custom/assets/diagram-11b86bc374fa37404510.svg" alt="A verify run diagram"></a></div><figcaption>A verify run · <a href="/nrpe-custom/assets/diagram-11b86bc374fa37404510.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">sequenceDiagram
+<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="A verify run"><a href="/nrpe-custom/assets/diagram-3ec917f707f3f6526b8c.svg"><img src="/nrpe-custom/assets/diagram-3ec917f707f3f6526b8c.svg" alt="A verify run diagram"></a></div><figcaption>A verify run · <a href="/nrpe-custom/assets/diagram-3ec917f707f3f6526b8c.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">sequenceDiagram
     actor User
     participant UI as Menu / CLI
     participant C as Controller
@@ -318,7 +318,7 @@ are a different concern: Debian discovers sources through APT at build time;
 SLES uses explicitly reviewed pinned manifests. The controller does not yet
 compare a complete remote source/recipe identity to decide whether existing
 outputs need rebuilding. See <a href="/nrpe-custom/workflow/#repeatability-and-updates">repeatability</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/3c2fd47154cc84f63a9dedf46c48149f5a09c908/docs/architecture.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/70f547943cbdf8190c0061d289a5f4145d841a03/docs/architecture.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -340,7 +340,7 @@ outputs need rebuilding. See <a href="/nrpe-custom/workflow/#repeatability-and-u
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 3c2fd47</span>
+<span>Source 70f5479</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
