@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a aria-current="page" href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a aria-current="page" href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Installing a custom NRPE package</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>Run these commands on the destination Linux server. Python, Docker, and this
 checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
@@ -119,6 +119,52 @@ Package installation may start or restart a service.</p>
 before replacing packages. The <a href="/nrpe-custom/configuration-examples/">configuration examples</a>
 and <a href="/nrpe-custom/maintenance/">maintenance policy</a> describe optional checks and verification
 boundaries.</p>
+<h2 id="replace-an-existing-distribution-installation">Replace an existing distribution installation</h2>
+<p>The package being replaced is the <strong>NRPE daemon</strong>, not Nagios Core. Keep the
+Nagios scheduler, plugin packages and site checks. The local custom server has
+the same package name as its distribution counterpart, so use the package
+manager's install/upgrade operation; do not uninstall the old server first.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Replace an existing distribution installation table"><table>
+<thead>
+<tr>
+<th>Existing installation</th>
+<th>Local replacement</th>
+<th>Required post-install identity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debian <code>nagios-nrpe-server</code> from official APT sources</td>
+<td>Matching-release <code>nagios-nrpe-server_*_amd64.deb</code> with <code>apt install ./...</code> below</td>
+<td>Package version contains the intended <code>+withargs</code> revision; <code>/usr/sbin/nrpe</code> belongs to it</td>
+</tr>
+<tr>
+<td>SLES 12 SP3 <code>nrpe</code>, including 2.15 from official repositories</td>
+<td><code>nrpe-4.1.1-0.withargs1.x86_64.rpm</code> with <code>rpm --upgrade</code> below</td>
+<td><code>rpm -q nrpe</code> and <code>/usr/sbin/nrpe -V</code> identify server 4.1.1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Before upgrading, save the exact old package and checksum, configuration,
+included files, TLS keys/certificates and service overrides using
+<a href="/nrpe-custom/updates-and-rollback/#before-an-update">updates and rollback</a>. Record current
+package/executable versions and a baseline remote check. Verify the new archive
+and package identity before installation. Stop if the package manager reports
+missing dependencies or a different target; never force the transaction.</p>
+<p>After installing, inspect configuration-file prompts and <code>.rpmnew</code>/<code>.rpmsave</code>
+files on SLES. Existing configuration can be retained intentionally; merge new
+supported settings into that configuration instead of discarding site commands
+or assuming the new defaults took effect. Reload changed service definitions,
+restart the intended managed daemon and verify its executable, listener, logs
+and actual remote check. Follow the distribution-specific commands below.
+If installation or validation fails, use the saved package and configuration
+with the <a href="/nrpe-custom/updates-and-rollback/#debian-rollback">Debian rollback</a> or
+<a href="/nrpe-custom/updates-and-rollback/#sles-12-sp3-rollback">SLES rollback</a>, and record the
+failure rather than claiming a completed migration.</p>
+<p>On SLES, installing only <strong><code>monitoring-plugins-nrpe</code> updates the client</strong>, leaving
+an old <code>nrpe</code> daemon untouched. This is what the supplied operator transcript
+showed. Use the <a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES checklist</a> to verify each
+step; a newer client version is not evidence of a server upgrade.</p>
 <h2 id="debian-11-12-13-or-14">Debian 11, 12, 13, or 14</h2>
 <p>Check the destination release and architecture:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">cat</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/os-release</span>
@@ -130,6 +176,8 @@ directory; a Debian 12 package is not a package for every Debian release.</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">apt</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">update</span>
 <span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">apt</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nagios-nrpe-server_</span><span class="syntax-fg-79c0ff">*</span><span class="syntax-fg-a5d6ff">_amd64.deb</span>
 <span class="syntax-fg-ffa657">dpkg-query</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-W</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-f=</span><span class="syntax-fg-a5d6ff">&#x27;${Package} ${Version} ${Architecture}\n&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span>
+<span class="syntax-fg-ffa657">dpkg-query</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-S</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/sbin/nrpe</span>
+<span class="syntax-fg-ffa657">/usr/sbin/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-V</span>
 </code></pre>
 <p>APT resolves runtime dependencies through the destination's configured Debian
 repositories. The explicit <code>./</code> selects the local custom package. Confirm that
@@ -145,69 +193,172 @@ you selected); the upstream version itself is discovered at build time.</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">journalctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">100</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
 </code></pre>
 <h2 id="sles-12-sp3">SLES 12 SP3</h2>
-<p>Check the destination release and architecture:</p>
+<p>The custom server package upgrades the old NRPE daemon to <strong>4.1.1</strong> on genuine
+SLES <strong>12.3 x86_64</strong>, retaining its native OpenSSL 1.0 ABI. This provides the
+modern NRPE configuration/TLS implementation; it does not add TLS 1.3 to OpenSSL
+1.0.2. A separate installation of the repository's NRPE 2.15 is unnecessary.</p>
+<h3 id="choose-the-server-package">Choose the server package</h3>
+<p>The archive contains different packages, not alternate filenames for one binary:</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Choose the server package table"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+<th>Installed executable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nrpe-4.1.1-0.withargs1.x86_64.rpm</code></td>
+<td><strong>Server: install on the monitored SLES host</strong></td>
+<td><code>/usr/sbin/nrpe</code></td>
+</tr>
+<tr>
+<td><code>system-user-nagios-1.0.0-0.noarch.rpm</code></td>
+<td>Account-package dependency</td>
+<td>Creates missing Nagios accounts/groups</td>
+</tr>
+<tr>
+<td><code>monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm</code></td>
+<td>Client: optional on a SLES monitoring host</td>
+<td><code>/usr/lib/nagios/plugins/check_nrpe</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Installing <code>monitoring-plugins-nrpe</code> does not upgrade <code>/usr/sbin/nrpe</code>. If
+<code>rpm -q nrpe</code> still reports <code>2.15</code>, the old server is still installed. Do not
+proceed to the NRPE 4 TLS settings until the server version is correct.</p>
+<p>From the directory containing all checksum-verified binaries, inspect identities:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">cat</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/os-release</span>
 <span class="syntax-fg-ffa657">uname</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-qp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--queryformat</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">./nrpe-4.1.1-0.withargs1.x86_64.rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">./system-user-nagios-1.0.0-0.noarch.rpm</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-qpl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-qp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--requires</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
 </code></pre>
-<p>Expect SLES <code>12.3</code> and <code>x86_64</code>. The current pinned build produces:</p>
-<pre><code class="language-text">nrpe-4.1.1-0.withargs1.x86_64.rpm
-system-user-nagios-1.0.0-0.noarch.rpm
+<p>Expect server identity <code>nrpe 4.1.1-0.withargs1 x86_64</code> and payload entries for
+<code>/usr/sbin/nrpe</code>, <code>/etc/nrpe.cfg</code>, <code>nrpe.service</code> and <code>tmpfiles.d/nrpe.conf</code>.
+Use the SLES-12 build, not a SLE-15 RPM or repository. Keep the old package and
+<a href="/nrpe-custom/updates-and-rollback/#before-an-update">root-only configuration/include/key backups</a>
+before changing an existing installation. Review <code>.rpmnew</code>/<code>.rpmsave</code> files;
+a preserved old configuration header is not evidence of the executable version.</p>
+<h3 id="install-the-server-and-its-real-dependency">Install the server and its real dependency</h3>
+<p>Check the package dependency and current account state:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--whatprovides</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">system-user-nagios</span>
+<span class="syntax-fg-ffa657">getent</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">passwd</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span>
+<span class="syntax-fg-ffa657">getent</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">group</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span>
 </code></pre>
-<p>The destination must actually be SLES <strong>12.3</strong> x86_64. Do not install a SLE-15
-package or replace the system OpenSSL. Retain the old NRPE 2.15 package and back
-up the main configuration, includes, plugins and TLS files before upgrading.
-The newer package retains <code>/etc/nrpe.cfg</code> as a configuration file; review package
-prompts and any <code>.rpmnew</code>/<code>.rpmsave</code> files rather than assuming that defaults
-replace an existing deployment's policy.</p>
-<p>Use your authorized matching SLES-12 repositories for missing runtime dependencies.
-Review the package requirements and user package first:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-qp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--requires</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
-<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">system-user-nagios</span>
-</code></pre>
-<p>The minimal test image additionally needs original <code>libwrap0</code> and
-<code>util-linux-systemd</code>; a full server may already provide them. Resolve missing
-prerequisites using the destination's matching repositories, for example:</p>
+<p>An existing <code>nagios</code> account does not satisfy an RPM requirement on the
+<code>system-user-nagios</code> package. The companion is included in the archive but must
+still be installed when no suitable provider exists. Its inspected script uses
+<code>getent</code> before creating accounts/groups; record existing UID/GID values and
+verify them after installation. Keep a suitable existing user package.</p>
+<p>Resolve missing runtime libraries using your authorized matching SLES-12
+repositories. A full server may already provide these packages:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">zypper</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">refresh</span>
 <span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">zypper</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">libwrap0</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">util-linux-systemd</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">shadow</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">netcfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">grep</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">sed</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">coreutils</span>
 </code></pre>
-<p>Then install the verified local artifacts with normal RPM dependency and payload
-checks. If no suitable user package exists, install the companion and server
-in one transaction:</p>
+<p>If the account package is missing, install <strong>the companion and server</strong> together:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--upgrade</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--verbose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--hash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
 <span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">./system-user-nagios-1.0.0-0.noarch.rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
 <span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">./nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
 </code></pre>
-<p>If a suitable user package is already installed, keep it and install the server:</p>
+<p>If a suitable account package already exists, install only the server:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--upgrade</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--verbose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--hash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
 </code></pre>
-<p>These are locally built unsigned RPMs. Verify their hashes through a trusted
-channel (or the optional release signature when enabled) before installation.
-Never use <code>--nodeps</code>, <code>--nosignature</code> or global repository signature bypasses.
-This project's test does not bypass missing dependencies. SLES 12's zypper does
-not provide the newer <code>--allow-unsigned-rpm</code> option used in some SLE-15 examples.</p>
-<p>The matching client RPM is available for a <strong>SLES 12 SP3 monitoring host</strong>:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--upgrade</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--verbose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--hash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
-</code></pre>
-<p>It needs the same real Nagios user and matching runtime libraries. Do not install
-that client RPM on another distribution; use its native client package instead.
-All three binary files are needed to check the unchanged <code>SHA256SUMS</code>, even when
-only the server/user package will be installed on the monitored host.</p>
-<p>Confirm the installed server and user:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
+<p>These locally built RPMs are unsigned. Use the previously verified trusted
+checksums/release authentication; retain normal RPM dependency and payload
+checks. Do not use <code>--nodeps</code>, <code>--nosignature</code> or disable repository verification.
+SLES 12's zypper does not provide <code>--allow-unsigned-rpm</code>.</p>
+<p>Verify the actual server before configuring TLS:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">system-user-nagios</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-qf</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/sbin/nrpe</span>
+<span class="syntax-fg-ffa657">/usr/sbin/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-V</span>
 <span class="syntax-fg-ffa657">getent</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">passwd</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span>
+<span class="syntax-fg-ffa657">getent</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">group</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span>
 </code></pre>
-<p>Expect <code>nrpe-4.1.1-0.withargs1.x86_64</code> for the current build.
-<code>zypper install nrpe</code> without the local filename can select the repository
-package instead of this custom build.</p>
-<p>Edit <code>/etc/nrpe.cfg</code> using your preferred editor. Review the configuration below
-before restarting:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">enable</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
-<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">restart</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
-<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+<p>Expect custom server <code>4.1.1-0.withargs1</code> and NRPE executable version <code>4.1.1</code>.
+<code>zypper install nrpe</code> without an explicit local artifact can select the old
+repository version. Installing only the client leaves the old server unchanged.</p>
+<h3 id="sles-certificate-authenticated-tls">SLES certificate-authenticated TLS</h3>
+<p>Provision a CA, an RSA server certificate/key and a separate monitoring-client
+certificate/key according to the <a href="https://github.com/NagiosEnterprises/nrpe">upstream NRPE documentation</a>.
+Give the service user read access to its server key without making it public.
+The client and server must trust the intended issuing CA and support the chosen
+cipher. Keep the server's actual configuration/includes and plugin definitions.</p>
+<p>Merge this <strong>complete policy fragment</strong> into <code>/etc/nrpe.cfg</code>, replacing the
+example monitoring address and certificate paths. Update existing directives
+rather than appending conflicting duplicates:</p>
+<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">allowed_hosts</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">127.0.0.1,::1,192.0.2.10</span>
+<span class="syntax-fg-79c0ff">dont_blame_nrpe</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">0</span>
+<span class="syntax-fg-79c0ff">allow_bash_command_substitution</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">0</span>
+<span class="syntax-fg-79c0ff">ssl_version</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">TLSv1.2</span>
+<span class="syntax-fg-79c0ff">ssl_use_adh</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">1</span>
+<span class="syntax-fg-79c0ff">ssl_cipher_list</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL</span>
+<span class="syntax-fg-79c0ff">ssl_client_certs</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">2</span>
+<span class="syntax-fg-79c0ff">ssl_cacert_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/monitoring-ca.pem</span>
+<span class="syntax-fg-79c0ff">ssl_cert_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/server.pem</span>
+<span class="syntax-fg-79c0ff">ssl_privatekey_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/server.key</span>
 </code></pre>
-<p>If startup fails:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">journalctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">100</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+<p>On this NRPE 4.1.1/OpenSSL 1.0.2 combination, <code>ssl_use_adh=0</code> also skips
+initialization of certificate-authenticated finite-field DH. The switch above
+initializes it, while the explicit cipher list excludes anonymous/null ciphers.
+Keep all certificate/key/CA and mandatory client-certificate settings: the three
+protocol/DH/cipher lines alone are not a TLS deployment. This policy passed the
+native container protocol tests, including rejection of missing client
+certificates; it is not a completed production-host validation.</p>
+<p>The build option <code>--ca-cert</code> only configures repository HTTPS during builds and
+tests. It does not install these runtime NRPE credentials. Provisioning trust for
+SLES repositories is also a separate task; verify CA sources/fingerprints rather
+than bypassing HTTPS checks. Configure the firewall to permit the actual
+monitoring host to reach TCP 5666.</p>
+<h3 id="start-the-intended-managed-daemon">Start the intended managed daemon</h3>
+<p>The custom server supplies <code>nrpe.service</code> with <code>RuntimeDirectory=nrpe</code> and a
+<code>/usr/lib/tmpfiles.d/nrpe.conf</code> rule for <code>/run/nrpe</code>, owned by <code>nagios:nagios</code>.
+Manual creation of <code>/run/nrpe</code> is temporary because <code>/run</code> is cleared at boot.
+Review old service overrides and configuration migration before restarting:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">daemon-reload</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">enable</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">restart</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">is-active</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cat</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">show</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ExecStart</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">User</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">Group</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">RuntimeDirectory</span>
+<span class="syntax-fg-ffa657">ls</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ld</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ss</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ltnp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;sport = :5666&#x27;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">journalctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">50</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
 </code></pre>
+<p><code>daemon-reload</code> rereads unit definitions; it does not restart other services.
+The packaged unit uses <code>Type=simple</code> and <code>/usr/sbin/nrpe -c /etc/nrpe.cfg -f</code>.
+An old drop-in can override it. Confirm that the intended process owns port 5666,
+not a manually started test daemon, and resolve startup/configuration errors.
+A running NRPE 2.15 reporting unknown <code>ssl_*</code> options has not been upgraded by
+installing the check client. A successful service start alone does not prove TLS.</p>
+<p>From the actual monitoring host, use its native <code>check_nrpe</code> with matching
+credentials and a configured fixed command, for example:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.example.internal</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-S</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">TLSv1.2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-L</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-A</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/monitoring-ca.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-C</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-K</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.key</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">check_load_standard</span>
+</code></pre>
+<p>Replace the hostname, paths and command. Install/configure the actual plugin;
+see <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">fixed command examples and identity-verification limits</a>.
+For a socket timeout, establish TCP reachability and inspect simultaneous server
+logs before attributing the failure to a certificate or cipher. Repeat the check
+after a controlled test-host reboot using the <a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment worksheet</a>.</p>
+<h3 id="optional-client-on-a-sles-monitoring-host">Optional client on a SLES monitoring host</h3>
+<p>Install this only when that SLES host also needs the <code>check_nrpe</code> plugin:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--upgrade</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--verbose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--hash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">monitoring-plugins-nrpe</span>
+<span class="syntax-fg-ffa657">/usr/lib/nagios/plugins/check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-V</span>
+</code></pre>
+<p>It shares the real user-package/native-library requirements. On another
+monitoring distribution, use its native client package. Keep all three binaries
+for verification of the archive's unchanged <code>SHA256SUMS</code>, even when installing
+only the server and user package on the monitored host.</p>
 <h2 id="configure-and-start-nrpe">Configure and start NRPE</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Configure and start NRPE table"><table>
 <thead>
@@ -253,14 +404,22 @@ provision the destination's NRPE certificates, keys, or operating-system trust.<
 <p>Review future package-manager upgrades: a repository package can supersede a
 local custom version. After upgrades, confirm the installed custom revision
 again and rebuild from reviewed sources when security updates are needed.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/installation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/installation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
 <ul>
 <li><a href="#prepare-the-files">Prepare the files</a></li>
+<li><a href="#replace-an-existing-distribution-installation">Replace an existing distribution installation</a></li>
 <li><a href="#debian-11-12-13-or-14">Debian 11, 12, 13, or 14</a></li>
-<li><a href="#sles-12-sp3">SLES 12 SP3</a></li>
+<li><a href="#sles-12-sp3">SLES 12 SP3</a><ul>
+<li><a href="#choose-the-server-package">Choose the server package</a></li>
+<li><a href="#install-the-server-and-its-real-dependency">Install the server and its real dependency</a></li>
+<li><a href="#sles-certificate-authenticated-tls">SLES certificate-authenticated TLS</a></li>
+<li><a href="#start-the-intended-managed-daemon">Start the intended managed daemon</a></li>
+<li><a href="#optional-client-on-a-sles-monitoring-host">Optional client on a SLES monitoring host</a></li>
+</ul>
+</li>
 <li><a href="#configure-and-start-nrpe">Configure and start NRPE</a></li>
 </ul>
 </div>
@@ -276,7 +435,7 @@ again and rebuild from reviewed sources when security updates are needed.</p></a
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a aria-current="page" href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a aria-current="page" href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Updating and rolling back a deployed package</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>These are target-server procedures, not <code>nrpe.py</code> commands. Start with the
 <a href="/nrpe-custom/installation/">installation guide</a> and the <a href="/nrpe-custom/overview/#using-a-built-package">upstream manuals</a>.
 Use a maintenance window and test the process on an equivalent disposable server
@@ -94,7 +94,7 @@ include directory, local plugin/wrapper, service override and external TLS file
 to the backup before changing the installation. On SLES, inspect the configuration
 for the actual include paths; do not assume Debian's layout.</p>
 <h2 id="install-and-check-the-replacement">Install and check the replacement</h2>
-<p>Install the explicit local file from <code>replacement/</code> using APT or zypper as in the
+<p>Install the explicit local file from <code>replacement/</code> using APT on Debian or RPM on SLES as in the
 <a href="/nrpe-custom/installation/">installation guide</a>. Package scripts can start or restart NRPE;
 use your site's maintenance/access controls during the transaction. Review
 configuration prompts rather than automatically forcing new or old files.</p>
@@ -159,7 +159,7 @@ if the host is unresponsive or package operations are no longer possible.</p>
 <p>A version hold/lock can be a temporary operational choice, but it can also block
 security updates. Record the reason, owner and review date rather than silently
 pinning an old custom package forever. See the <a href="/nrpe-custom/maintenance/">maintenance policy</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/updates-and-rollback.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/updates-and-rollback.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -183,7 +183,7 @@ pinning an old custom package forever. See the <a href="/nrpe-custom/maintenance
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

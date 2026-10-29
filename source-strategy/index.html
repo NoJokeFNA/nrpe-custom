@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Source and patch strategy · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<span>NRPE Custom</span>
+</a>
+<a class="collection-link" href="/nrpe-custom/overview/">Documentation <span aria-hidden="true">▾</span>
+</a>
+<div class="header-tools">
+<a class="header-source" href="https://github.com/NoJokeFNA/nrpe-custom">Source code ↗</a>
+<a class="header-download" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Get NRPE packages</a><label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+</div>
+</header>
+<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a aria-current="page" href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="doc-breadcrumb">
+<a href="/nrpe-custom/">NRPE Custom</a>
+<span>/</span>
+<a href="/nrpe-custom/overview/">Documentation</a>
+</div>
+      <h1>Source and patch strategy</h1>
+      <p class="article-meta">Source c7f26e0</p>
+      <article class="prose"><h2 id="decision">Decision</h2>
+<p>Keep the native Debian and SLES packaging as the production build basis.
+Cloning upstream NRPE is useful for investigating and developing a C patch,
+but is not necessary to apply patches and does not simplify distribution
+integration by itself. The current workflow intentionally changes packaging
+options rather than maintaining a separate NRPE implementation.</p>
+<p>The SLES operator report does not demonstrate a new C defect: client 4.1.1 was
+installed while the daemon remained 2.15. Correct the server installation and
+validate authenticated TLS before proposing an upstream replacement.</p>
+<h2 id="evaluated-upstream-checkout">Evaluated upstream checkout</h2>
+<p>On 2026-10-29 the official upstream <code>nrpe-4.2.0</code> tag was cloned and inspected at
+commit <code>cf47f059637fe4ad23dd4a5f2612e2787ce7c09d</code>. The source contains legacy
+OpenSSL compatibility branches. Inspection and a clean checkout do not prove
+that 4.2.0 builds, installs or survives upgrades/reboots on SLES 12 SP3.</p>
+<p>A pinned checkout for patch development can be prepared separately:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">git</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clone</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--branch</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-4.2.0</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--single-branch</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">https://github.com/NagiosEnterprises/nrpe.git</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-upstream</span>
+<span class="syntax-fg-79c0ff">cd</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-upstream</span>
+<span class="syntax-fg-ffa657">git</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">checkout</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--detach</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cf47f059637fe4ad23dd4a5f2612e2787ce7c09d</span>
+<span class="syntax-fg-ffa657">git</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rev-parse</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">HEAD</span>
+<span class="syntax-fg-ffa657">git</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--short</span>
+</code></pre>
+<p>Match the full commit to independently reviewed upstream evidence before use.
+The clone alone does not authenticate a tag or replace source-integrity checks.
+Never build a release from a moving <code>master</code> branch or run <code>make install</code> over a
+package-managed daemon. The example is a development checkout, not a new
+supported build mode or target-server installation instruction.</p>
+<h2 id="introducing-a-necessary-c-change">Introducing a necessary C change</h2>
+<ol>
+<li>Reproduce the defect with the correctly installed server and a sanitized
+   protocol/configuration case; check upstream fixes and distribution backports.</li>
+<li>Develop the smallest patch against the exact reviewed source revision.
+   Preserve authorship, licensing and corresponding source. Check that the
+   patch applies cleanly; fail rather than silently applying a fuzzy substitute.</li>
+<li>Carry the reviewed change through native packaging: Debian's patch series
+   and the SLES spec's patch declarations/application. Keep distribution paths,
+   users, services, dependencies and configuration migration behavior.</li>
+<li>Update reviewed source hashes/manifests and custom package revision as
+   necessary. Export the patch with the complete corresponding source and
+   notices; a Git link alone is not a replacement for those source archives.</li>
+<li>Run genuine matching-OS builds, fresh installation and TLS/argument tests
+   for every affected target. Follow with real systemd, update, rollback and
+   reboot checks on isolated hosts before claiming deployment readiness.</li>
+</ol>
+<p>Debian continues to discover its suite's official source. SLES remains on the
+reviewed 4.1.1 OBS source recipe until an independently reviewed migration is
+justified. A future 4.2.x SLES prototype must retain genuine SP3 libraries,
+source/signature verification and native RPM integration. Current container
+passes do not validate a different upstream revision.</p>
+<p>See <a href="/nrpe-custom/architecture/">architecture</a>, <a href="/nrpe-custom/maintenance/">maintenance</a>,
+<a href="/nrpe-custom/sles12sp3/">SLES native build</a> and <a href="/nrpe-custom/practical-validation/">practical validation</a>.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/source-strategy.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc">
+<span>On this page</span><div class="toc">
+<ul>
+<li><a href="#decision">Decision</a></li>
+<li><a href="#evaluated-upstream-checkout">Evaluated upstream checkout</a></li>
+<li><a href="#introducing-a-necessary-c-change">Introducing a necessary C change</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source c7f26e0</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

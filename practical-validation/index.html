@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a aria-current="page" href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a aria-current="page" href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Practical validation beyond container CI</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>These checks cover host and service behavior that the automated package/TLS
 matrix does not exercise. Use disposable hosts and test certificates. Follow
 the <a href="/nrpe-custom/installation/">installation guide</a>, <a href="https://github.com/NagiosEnterprises/nrpe">upstream NRPE documentation</a>
@@ -62,6 +62,13 @@ supplied test-VM access. The maintainer confirmed that no test VMs are available
 These scenarios are prepared for later execution, not replaced by container or
 hosted Windows unit tests. Do not run package migration/reboot tests on a
 production server to fill this gap.</p>
+<p>On 2026-10-29 the operator supplied an installation attempt from a SLES 12 SP3
+host. The client package was updated to 4.1.1, while <code>rpm -q nrpe</code> still showed
+server 2.15. Unknown TLS directives and a remote timeout therefore do not prove
+that the custom server failed after installation. No successful custom-server
+migration, authenticated remote check, reboot or rollback was supplied in that
+report. The <a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES-specific checklist</a> separates
+these checks. Hostnames, IPs and raw shell history are intentionally omitted.</p>
 <p>For each scenario record passed, failed, blocked or not run, with:</p>
 <ul>
 <li>Date, tester, exact Git commit/release tag, package version and SHA-256.</li>
@@ -240,7 +247,7 @@ worked. Record these outcomes separately.</p>
 <p>Add sanitized actual results and their exact environments to the
 <a href="/nrpe-custom/release-plan/#remaining-work-in-priority-order">release plan</a>. Leave scenarios
 open until performed; log any failure before claiming practical platform support.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/practical-validation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/practical-validation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -263,7 +270,7 @@ open until performed; log any failure before claiming practical platform support
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

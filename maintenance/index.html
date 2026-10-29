@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a aria-current="page" href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a aria-current="page" href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Support and maintenance policy</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>This independent open-source workflow has best-effort maintenance, without an
 SLA, guaranteed response times, enterprise support rights, or an extension of a
 distribution's lifecycle. See the <a href="/nrpe-custom/overview/#warranty-and-responsibility">warranty notice</a>.</p>
@@ -85,9 +85,10 @@ distribution's lifecycle. See the <a href="/nrpe-custom/overview/#warranty-and-r
 </tr>
 </tbody>
 </table></div>
-<p>Python 3.9 remains the application minimum. CI exercises that minimum and Python
+<p>Python 3.11 remains the application minimum. CI exercises that minimum and Python
 3.14 on Linux/Windows, not every intermediate interpreter or terminal. The optional
-audit tool has its own Python 3.10+ minimum and is not an application dependency.
+audit tool is not an application dependency. The project workstation baseline
+also covers the optional menu and website renderer.
 Use an upstream-maintained interpreter for production; compatibility testing does
 not provide security maintenance for an interpreter. Consult the
 <a href="https://devguide.python.org/versions/">Python version lifecycle</a>.</p>
@@ -104,25 +105,29 @@ for current upstream maintenance status. An archived target that still builds
 does not necessarily receive dependency security fixes. Never silently substitute
 another suite, SLES service pack, or Leap packages to preserve a passing result.</p>
 <h2 id="automated-dependency-monitoring">Automated dependency monitoring</h2>
-<p><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/.github/dependabot.yml">Dependabot</a> checks Python requirements, locked website
+<p><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/.github/dependabot.yml">Dependabot</a> checks Python requirements, locked website
 npm dependencies and GitHub Actions version tags weekly and proposes update PRs into <code>develop</code>, without automatic
 merging. Genuine Dependabot PRs may merge into develop after review under the
 <a href="/nrpe-custom/git-workflow/">Git policy</a>.
-Actions use official major-version tags such as <code>actions/setup-python@v6</code>, as
+Python proposals group the optional menu (<code>prompt-toolkit</code>, <code>wcwidth</code>), website
+renderer (<code>Markdown</code>) and audit tooling (<code>pip-audit</code>) separately. Review each
+component's minimum Python version, license and actual CI results before merging;
+a dependency's newest release must fit the documented interpreter baseline.</p>
+<p>Actions use official major-version tags such as <code>actions/setup-python@v7</code>, as
 selected by the maintainer. Dependabot proposes major-version changes through PRs;
 compatible updates within the selected upstream major tag are picked up directly.
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
 checkout configuration does not override those settings.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/.github/workflows/dependency-audit.yml">dependency audit</a> runs weekly,
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/.github/workflows/dependency-audit.yml">dependency audit</a> runs weekly,
 on relevant requirement changes, and manually. Pinned <code>pip-audit</code> checks menu
 requirements and resolved dependencies against published advisories. Findings
 and collection failures fail the job. It does not scan NRPE C code, DEB/RPM
 contents, system libraries, container images or SLES repositories. A clean result
 is not a security certification.</p>
-<p>The separate <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/.github/workflows/website.yml">website check</a> audits
+<p>The separate <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/.github/workflows/website.yml">website check</a> audits
 <code>requirements-website.txt</code> and validates generated documentation and publication
 guards. The renderer is isolated from the NRPE CLI/menu environment.</p>
-<p>To reproduce the audit using Python 3.10+ in an isolated development environment:</p>
+<p>To reproduce the audit using Python 3.11+ in an isolated development environment:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">venv</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">.venv-audit</span>
 <span class="syntax-fg-ffa657">.venv-audit/bin/python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">pip</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-r</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">requirements-audit.txt</span>
 <span class="syntax-fg-ffa657">.venv-audit/bin/python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">pip_audit</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--strict</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-r</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">requirements-menu.txt</span>
@@ -169,8 +174,11 @@ redacted log excerpt. Include artifact/run identity where relevant. Do not attac
 keys, company certificates, credentials, full environments or configuration
 backups. Follow <a href="/nrpe-custom/security/">security reporting guidance</a> for vulnerabilities.</p>
 <p>Use <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a> for deployments. Recovery on a
-real server is distinct from rebuilding a package in a container.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/maintenance.md">View this page on GitHub ↗︎</a>
+real server is distinct from rebuilding a package in a container.</p>
+<p>For the evaluated upstream-clone alternative and future C changes, follow the
+<a href="/nrpe-custom/source-strategy/">source and patch strategy</a>. A newer upstream tag alone does
+not establish compatibility with a legacy target.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/maintenance.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -194,7 +202,7 @@ real server is distinct from rebuilding a package in a container.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Documentation website and GitHub Pages</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>The website is static HTML/CSS/JavaScript with no analytics, remote fonts,
 submission database or hosted backend. Existing Markdown remains the source of
 documentation. The builder rewrites internal links, creates a local search index
@@ -123,7 +123,7 @@ The Python builder turns tokens into scoped CSS classes so no inline style or
 browser highlighter is needed. No Shiki runtime, grammar, WASM, CDN or remote font
 is loaded by visitors. Code text, indentation, entities and Unicode are checked
 for exact preservation before publication. Plain/unknown languages remain unchanged; Mermaid renders as static diagrams; there is no speculative language detection.</p>
-<p>Use <strong>Node.js 24 LTS</strong> and <strong>Python 3.9+</strong> on the website build workstation.
+<p>Use <strong>Node.js 24 LTS</strong> and <strong>Python 3.11+</strong> on the website build workstation.
 Neither Node nor website dependencies are needed for the NRPE CLI or destination
 servers. Install locked npm dependencies without package lifecycle scripts:</p>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">npm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ci</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--prefix</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">website</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--ignore-scripts</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-fund</span>
@@ -143,7 +143,7 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
@@ -182,7 +182,7 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -207,7 +207,7 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

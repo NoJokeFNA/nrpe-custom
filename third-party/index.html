@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a aria-current="page" href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a aria-current="page" href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Third-party provenance and license inventory</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>This inventory records evidence inspected during release and website preparation
 on 2026-10-27 through 2026-10-29. It is not a completed redistribution approval. The root <a href="/nrpe-custom/license/">MIT
 license</a> applies to independently authored project code and
@@ -75,7 +75,7 @@ are verified but are not release assets. Historical releases are unchanged.</p>
 </tr>
 <tr>
 <td>SLES NRPE <code>4.1.1</code></td>
-<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/packaging/sles12sp3-source.json">Pinned source manifest</a>, revision <code>835292739a5736a9d8f0460f670b6f15</code>; actual upstream archive, modified spec and existing custom binary's license output</td>
+<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/packaging/sles12sp3-source.json">Pinned source manifest</a>, revision <code>835292739a5736a9d8f0460f670b6f15</code>; actual upstream archive, modified spec and existing custom binary's license output</td>
 <td><strong>Resolved:</strong> <code>src/utils.c:display_license()</code> explicitly allows compilation, linking and use with OpenSSL and grants GPLv2-or-later. This is evidence from the SLES source itself. The earlier search missed the word "exemption". Preserve the <a href="/nrpe-custom/license-notices/">upstream notice and full GPL text</a>; see the <a href="/nrpe-custom/sles-license-review/">source review</a>.</td>
 </tr>
 <tr>
@@ -105,7 +105,7 @@ are verified but are not release assets. Historical releases are unchanged.</p>
 </tr>
 <tr>
 <td><code>system-user-nagios</code> <code>1.0.0-0</code></td>
-<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/packaging/sles12sp3-user-source.json">Pinned manifest</a>, revision <code>b979817ae6424675519c86e80add617a</code>; actual original spec extracted from the source RPM and hash-verified</td>
+<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/packaging/sles12sp3-user-source.json">Pinned manifest</a>, revision <code>b979817ae6424675519c86e80add617a</code>; actual original spec extracted from the source RPM and hash-verified</td>
 <td><strong>Resolved:</strong> the source spec itself explicitly declares MIT and retains the SUSE LLC 2024 copyright/licensing header. The missing standalone full text is supplied as a <a href="/nrpe-custom/notices/system-user-nagios-MIT.txt">downstream companion notice</a>, not represented as an original upstream file or a new project license grant. Preserve the spec and README and include that notice in release assets.</td>
 </tr>
 </tbody>
@@ -132,7 +132,7 @@ source version or changed evidence until it is reviewed; source discovery and
 local builds remain dynamic. This separates successful compilation from license
 review of previously unexamined source bytes.</p>
 <h2 id="host-only-optional-menu-dependencies">Host-only optional menu dependencies</h2>
-<p><code>requirements-menu.txt</code> pins <code>prompt-toolkit==3.0.52</code> and <code>wcwidth==0.2.13</code>.
+<p><code>requirements-menu.txt</code> pins <code>prompt-toolkit==3.0.53</code> and <code>wcwidth==0.9.4</code>.
 These libraries are downloaded by the user through pip; they are not vendored
 into this checkout or installed in the NRPE server package. The exact pinned
 wheels were downloaded without installation and their actual notices inspected:</p>
@@ -146,17 +146,19 @@ wheels were downloaded without installation and their actual notices inspected:<
 </thead>
 <tbody>
 <tr>
-<td><code>prompt_toolkit-3.0.52-py3-none-any.whl</code></td>
-<td><code>prompt_toolkit-3.0.52.dist-info/licenses/LICENSE</code>: BSD three-clause terms, Jonathan Slenders, 2014</td>
-<td><code>9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955</code></td>
+<td><code>prompt_toolkit-3.0.53-py3-none-any.whl</code></td>
+<td><code>prompt_toolkit-3.0.53.dist-info/licenses/LICENSE</code>: BSD three-clause terms, Jonathan Slenders, 2014</td>
+<td><code>01c0891d7f9237d5e339f7d3e42cdae80b7534abb1c7c0e3352efba6231492f2</code></td>
 </tr>
 <tr>
-<td><code>wcwidth-0.2.13-py2.py3-none-any.whl</code></td>
-<td><code>wcwidth-0.2.13.dist-info/LICENSE</code>: MIT, Jeff Quast, 2014; additional Markus Kuhn 2007 permission/warranty notice</td>
-<td><code>3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859</code></td>
+<td><code>wcwidth-0.9.4-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl</code></td>
+<td><code>wcwidth-0.9.4.dist-info/licenses/LICENSE</code>: MIT, Jeff Quast, 2014; additional Markus Kuhn 2007 permission/warranty notice</td>
+<td><code>b185c8b927b23af2721be1783499d1cfa5c028b098b0858951b4ae224477f1c2</code></td>
 </tr>
 </tbody>
 </table></div>
+<p>The wcwidth hash above identifies the reviewed Linux x86_64 wheel; other
+platform wheels have different hashes. Their runtime selection is handled by pip.</p>
 <p>Before distributing a bundled Python application, include these actual license
 files and inventory any additional shipped dependencies. Do not substitute the
 license files of different versions installed in a development environment.</p>
@@ -169,9 +171,11 @@ are similarly fetched by CI at maintainer-selected upstream major-version tags r
 as part of the server packages.</p>
 <h2 id="build-and-runtime-dependencies">Build and runtime dependencies</h2>
 <p><code>requirements-website.txt</code> pins the separate build-only renderer
-<code>Markdown==3.8.2</code> (Python-Markdown). Its installed wheel's
-<code>markdown-3.8.2.dist-info/licenses/LICENSE.md</code> was inspected and contains
-BSD-3-Clause terms; wheel metadata records the same SPDX expression. The
+<code>Markdown==3.11.2</code> (Python-Markdown). Its installed wheel's
+<code>markdown-3.11.2.dist-info/licenses/LICENSE.md</code> was inspected and contains
+BSD-3-Clause terms; wheel metadata records the same SPDX expression. The reviewed
+<code>markdown-3.11.2-py3-none-any.whl</code> SHA-256 is
+<code>f80390747a2a0ff2ba54da074ce4f862f72a6685f608cd2637b646a6d83993f5</code>. The
 renderer is installed separately, not vendored, bundled into NRPE packages or
 copied into the static site. Generated pages retain the licenses of their
 original documentation and notices. Bundling the renderer would require its
@@ -231,7 +235,7 @@ JetBrains Mono Regular/Bold from the <a href="https://github.com/JetBrains/JetBr
 is additionally served locally under SIL OFL 1.1, with its full notice retained
 as <code>website/assets/JetBrainsMono-OFL.txt</code>. Font files are unmodified. No JetBrains
 logos or illustrations are distributed.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/THIRD_PARTY.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/THIRD_PARTY.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -255,7 +259,7 @@ logos or illustrations are distributed.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

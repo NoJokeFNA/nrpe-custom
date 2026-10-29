@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a aria-current="page" href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a aria-current="page" href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>NRPE configuration examples</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>These fragments illustrate a restricted deployment; they are not complete
 configuration files. Merge reviewed settings into <code>/etc/nagios/nrpe.cfg</code> on
 Debian or <code>/etc/nrpe.cfg</code> on SLES. Follow the <a href="https://github.com/NagiosEnterprises/nrpe">official NRPE manuals</a>
@@ -78,22 +78,13 @@ the complete sample, included files or distribution-specific service setup.</p>
 <span class="syntax-fg-79c0ff">ssl_cert_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/server.pem</span>
 <span class="syntax-fg-79c0ff">ssl_privatekey_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/server.key</span>
 </code></pre>
-<p>For this project's <strong>SLES 12 SP3 NRPE 4.1.1</strong> build with RSA certificates,
-replace the <code>ssl_version</code> and <code>ssl_use_adh</code> settings above with all three lines:</p>
-<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">ssl_version</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">TLSv1.2</span>
-<span class="syntax-fg-79c0ff">ssl_use_adh</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">1</span>
-<span class="syntax-fg-79c0ff">ssl_cipher_list</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL</span>
-</code></pre>
-<p>Keep the CA, server key/certificate and mandatory client-certificate settings.
-On this NRPE/OpenSSL combination, <code>ssl_use_adh=0</code> also skips initialization of
-certificate-authenticated finite-field DH. The explicit cipher list permits
-only authenticated DHE-RSA with AES-256-GCM and excludes anonymous and null
-ciphers even though the initialization switch is enabled. This policy passed
-with 2048-bit DH and an OpenSSL 3.5.7 client using its default security level,
-server hostname/chain verification and a separate client certificate. Missing
-client certificates were rejected. Do not use <code>ssl_use_adh=1</code> without the
-restrictive cipher list, and confirm that the actual monitoring client supports
-the chosen suite. These options do not apply to the old NRPE 2.15 daemon.</p>
+<p>For this project's <strong>SLES 12 SP3 NRPE 4.1.1</strong> build, use the complete
+<a href="/nrpe-custom/installation/#sles-certificate-authenticated-tls">SLES certificate-authenticated TLS policy</a>
+instead of the generic protocol/DH settings above. It includes mandatory client
+certificates and a restricted authenticated DHE-RSA cipher suite. On this old
+OpenSSL integration, disabling the DH initialization switch also prevents that
+suite from working. These options do not apply to NRPE 2.15; verify the actual
+server executable version before changing TLS settings.</p>
 <p>The server certificate needs an appropriate identity and certificate chain. Give
 the NRPE service account the permissions necessary to read its key, without
 making that key readable by other users. Restrict incoming TCP 5666 to the actual
@@ -128,7 +119,7 @@ Preserve NRPE's default forbidden-metacharacter checks (including single quotes,
 backticks, backslashes, semicolons and newlines) and keep Bash substitution
 disabled. Do not loosen <code>nasty_metachars</code>, put untrusted text in command definitions,
 or expose this interface to arbitrary callers.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
 or <code>busy</code> and maps them to fixed plugin options. Its first argument is an absolute
 plugin path fixed by the administrator in the server configuration; the caller
 does not select that path. It does not use <code>eval</code>, run a shell on received strings,
@@ -163,7 +154,7 @@ rejection, not the real plugin's load measurements or production capacity limits
 <p>Restart the relevant service after reviewing the configuration and verify checks
 from the real monitoring host. See <a href="/nrpe-custom/installation/">installation</a>,
 <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a>, and <a href="/nrpe-custom/security/">security</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -185,7 +176,7 @@ from the real monitoring host. See <a href="/nrpe-custom/installation/">installa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a aria-current="page" href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a aria-current="page" href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Frequently asked questions</h1>
-      <p class="article-meta">Source a0ef1b4</p>
+      <p class="article-meta">Source c7f26e0</p>
       <article class="prose"><p>Find answers about services, TLS and supported builds. Start with the running
 service before changing packages; for log analysis, see
 <a href="/nrpe-custom/troubleshooting/">troubleshooting</a>.</p>
@@ -113,6 +113,12 @@ NRPE/client built for SLES 12 can use certificate-authenticated TLS 1.2 with the
 original OpenSSL 1.0.2 library. TLS 1.3 requires a newer TLS library and is not
 provided by this build. <code>disable_syslog=0</code> is unknown to the old daemon;
 commenting it out removes the warning but does not fix TLS compatibility.</p>
+<p><strong>Check the server package, not just the client version.</strong> Installing
+<code>monitoring-plugins-nrpe</code> updates <code>check_nrpe</code>; it does not replace the daemon
+provided by <code>nrpe</code>. The operator's later installation attempt still showed
+server 2.15 after installing client 4.1.1. Follow the
+<a href="/nrpe-custom/installation/#choose-the-server-package">server-package identity and installation checks</a>
+and <a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a>.</p>
 <p>The message <code>Could not complete SSL handshake. 1</code> alone does not identify a
 specific cipher, certificate or trust failure. Compare the actual server/client
 versions, command, TLS settings and simultaneous logs. Do not disable encryption
@@ -124,7 +130,7 @@ user's successful NRPE 2.15 / <code>check_nrpe</code> 4.1.0 test on a separate p
 includes anonymized examples, the encountered errors and cleanup; it does not
 recommend disabling TLS in production.</p>
 <p>For NRPE 4.1.1 on SLES 12, also review the
-<a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">authenticated DHE-RSA example</a>.
+<a href="/nrpe-custom/installation/#sles-certificate-authenticated-tls">complete authenticated DHE-RSA policy</a>.
 With this old OpenSSL integration, <code>ssl_use_adh=0</code> skips DH initialization and
 can produce <code>no shared cipher</code> with modern clients. Use the complete documented
 policy, which explicitly excludes anonymous ciphers, rather than enabling ADH
@@ -168,7 +174,7 @@ default and disabled Bash command substitution.</p>
 the actual remote check. <code>enable --now</code> does not restart an already active
 service to reload modified configuration. See <a href="/nrpe-custom/installation/">installation</a>
 and <a href="/nrpe-custom/security/">deployment security</a> for this project's custom package scope.</p></div></section></section></div></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/a0ef1b4aef96b33fa1069408ad22375ae297fc3a/docs/faq.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c7f26e0c49796457c5f4a7093678348c9e5cce42/docs/faq.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -201,7 +207,7 @@ and <a href="/nrpe-custom/security/">deployment security</a> for this project's 
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source a0ef1b4</span>
+<span>Source c7f26e0</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
