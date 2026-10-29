@@ -16,7 +16,7 @@ LANGUAGES = {
     'nrpe': 'nrpe', 'nrpe.cfg': 'nrpe', 'python': 'python', 'py': 'python',
     'yaml': 'yaml', 'yml': 'yaml', 'json': 'json', 'dockerfile': 'dockerfile', 'diff': 'diff',
 }
-LABELS = {'sh': 'Shell', 'bash': 'Bash', 'powershell': 'PowerShell', 'ini': 'INI',
+LABELS = {'sh': 'Shell', 'bash': 'Shell', 'powershell': 'PowerShell', 'ini': 'INI',
           'nrpe': 'NRPE config', 'python': 'Python', 'yaml': 'YAML', 'json': 'JSON',
           'dockerfile': 'Dockerfile', 'diff': 'Diff'}
 

@@ -34,7 +34,7 @@ sure your Python installation provides `python3` in PATH.
 
 Run without arguments for an interactive action and target menu:
 
-```powershell
+```sh
 python3 nrpe.py
 ```
 
@@ -59,7 +59,7 @@ messages are in English. Use `--help` or `<command> --help` for command-specific
 
 Select one target, multiple targets, or `all` by itself:
 
-```powershell
+```sh
 python3 nrpe.py verify debian12 debian13
 python3 nrpe.py verify all
 python3 nrpe.py test debian14
