@@ -122,3 +122,36 @@ Use a shell with tracing disabled. Test using disposable keys for development;
 never upload private keys or logs containing them. Signing refuses an existing
 signature rather than replacing it. Signing and verification commands do not
 upload or publish anything.
+
+## Check readiness without accessing private keys
+
+Before enabling signing, inspect the reviewed public signer file and available
+local tool:
+
+```sh
+python3 scripts/check_release_signing.py
+```
+
+Optionally check the specific GitHub variable and secret's **metadata** using
+owner-authorized `gh` access:
+
+```sh
+python3 scripts/check_release_signing.py --repository NoJokeFNA/nrpe-custom
+```
+
+The checker prints public SHA-256 fingerprints, never creates/reads a private key,
+never changes GitHub configuration and returns nonzero for missing/invalid public
+enrollment or missing/inaccessible requested metadata. It only queries
+`NRPE_RELEASE_SIGNING` and metadata for `NRPE_RELEASE_SIGNING_KEY`; GitHub does
+not expose the secret's value. Metadata cannot establish that the secret matches
+the enrolled public key. Even exit 0 is not proof of a verified signed release.
+
+On 2026-10-29 the maintainer confirmed that no dedicated release key exists yet
+and requested prepared setup with enrollment explicitly left open. The local
+check found no enrolled public key. The GitHub signing variable could not be
+read through the connected credentials; this cannot distinguish an unset setting
+from insufficient permission. No setting was changed and no production key was
+generated. Complete the workstation key creation/enrollment steps above, retain
+an owner-controlled backup and independently communicate the approved fingerprint
+before activation. Master promotion and the first signed release remain separate
+explicit maintainer actions.

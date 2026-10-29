@@ -53,5 +53,10 @@ No maintainer public release key has been enrolled in the tracked signer file.
 Production signing cannot be enabled meaningfully until the maintainer controls
 the key/backup, independently confirms its public fingerprint, and configures
 the CI secret and signing mode. Follow [release signature setup](release-signing.md).
-A disposable-key test validates signing code, not production enrollment. No
+The maintainer confirmed that no dedicated key exists yet and selected prepared
+setup with enrollment left open. The [readiness checker](release-signing.md#check-readiness-without-accessing-private-keys)
+reports that block without reading private material or changing GitHub settings.
+The actual GitHub signing variable could not be read with the connected access;
+its existence/value is therefore unverified. A disposable-key test validates
+signing code, not production enrollment. No
 master promotion or new package release is authorized by this status record.

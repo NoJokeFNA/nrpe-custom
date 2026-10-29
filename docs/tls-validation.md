@@ -68,8 +68,8 @@ Expected: successful chain/name verification, TLS 1.2 and the intended
 authenticated cipher. Require a successful verification result and inspect the
 complete output, not just a displayed certificate. These protocol/cipher options
 are specific to the documented SLES policy, not a universal configuration for
-all targets. Never add `-verify_quiet` or suppress a verification failure to
-claim success.
+all targets. Do not ignore a nonzero verification result or treat a displayed
+certificate as proof that verification succeeded.
 
 This is a TLS diagnostic, not an NRPE request: no valid NRPE packet is sent after
 the handshake. The daemon can log a later packet/read error when the diagnostic

@@ -24,6 +24,9 @@ sequentially. See [Git workflow](git-workflow.md).
 | Branch protection | Master/develop retained; owner migrated required minimum-Python checks to 3.11 on 2026-10-29 |
 | Workstation dependencies | Python 3.11 minimum; prompt-toolkit 3.0.53, wcwidth 0.9.4 and Markdown 3.11.2 reviewed and tested on Linux/Windows CI |
 | Deployment clarification | Server/client RPM identities, complete SLES TLS policy and [operator checklist](sles12sp3-deployment-checklist.md); reported attempt still ran server 2.15 |
+| Operator diagnostics | Read-only Bash inspection with no plugin execution; see [troubleshooting](troubleshooting.md#read-only-target-server-inspection) |
+| Website regression checks | CSS rules/colors consolidated; responsive/navigation/search/keyboard checks run through the website CI workflow |
+| TLS validation | [Ordered procedure](tls-validation.md) distinguishes connectivity, encryption, server identity and mandatory client credentials |
 | Source strategy | [Pinned upstream clone evaluated](source-strategy.md); preserve native distribution packaging and reviewed patches |
 
 ## Remaining work, in priority order
