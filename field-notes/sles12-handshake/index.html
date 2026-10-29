@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
 <title>Service checks before TLS changes · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
@@ -13,33 +13,24 @@
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="site-header">
-<a class="brand" href="/nrpe-custom/">
-<img class="brand-mark" src="/nrpe-custom/assets/icon.svg" width="35" height="35" alt="">
-<span>NRPE<span class="brand-light"> Custom</span>
-</span>
+<header class="site-header blog-header">
+<a class="brand" href="/nrpe-custom/field-notes/">NRPE Custom <span class="blog-brand-light">Blog</span>
 </a>
-<nav aria-label="Main navigation"><a href="/nrpe-custom/overview/">Documentation</a><a href="/nrpe-custom/faq/">FAQ</a><a aria-current="page" href="/nrpe-custom/field-notes/">Field notes</a></nav>
 <div class="header-tools">
-<label class="search-label" for="site-search">
+<a class="header-source" href="/nrpe-custom/field-notes/#topics">Topics</a><label class="search-label" for="site-search">
 <span class="sr-only">Search documentation</span>
-<input id="site-search" type="search" placeholder="Search the docs" autocomplete="off" aria-controls="search-results" aria-expanded="false">
-<kbd>/</kbd>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
 </label>
 <div id="search-results" hidden>
 </div>
-<a class="github-link" href="https://github.com/NoJokeFNA/nrpe-custom">GitHub ↗︎</a>
 </div>
-</header><button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
-  <aside class="sidebar" id="doc-nav">
-    <a class="sidebar-title" href="/nrpe-custom/overview/">The documentation</a>
-    <details class="nav-group" open><summary>Start here</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deploy carefully</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
-  </aside>
-  <main id="main" class="document">
-    <div class="document-main">
-      <div class="eyebrow">Field notes</div>
-      <h1>Service checks before TLS changes</h1>
-      <article class="prose"><p><strong>Field note · 28 October 2026 · SLES 12 SP3 · NRPE 2.15 / check_nrpe 4.1.0</strong></p>
+</header>
+<main id="main" class="blog-article">
+<a class="back-link" href="/nrpe-custom/field-notes/">← All field notes</a>
+<p class="article-label">Field note · 28 October 2026 · SLES 12 SP3 · NRPE 2.15 / check_nrpe 4.1.0</p>
+<h1>Service checks before TLS changes</h1>
+<article class="prose">
 <p>This account is based on the operator's reported commands and output during
 troubleshooting. Hostnames and addresses are anonymized. It is an observation
 from one deployment, not a recommendation to disable production TLS.</p>
@@ -98,21 +89,8 @@ restored; no successful production upgrade or rollback is claimed in this note.<
 choosing a build target. Record the daemon and client versions, then test the
 smallest useful hypothesis. A successful plain
 connection is evidence about connectivity — not evidence that TLS is configured.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d27320e3bcb9795b20c378151e7d24064773f5b3/website/content/sles12-handshake.md">View this page on GitHub ↗︎</a>
-    </div>
-    <aside class="page-toc"><span>On this page</span><div class="toc">
-<ul>
-<li><a href="#the-symptom">The symptom</a></li>
-<li><a href="#a-smaller-test-on-a-separate-port">A smaller test, on a separate port</a></li>
-<li><a href="#what-the-result-established">What the result established</a></li>
-<li><a href="#the-operators-later-clarification-start-the-missing-service">The operator's later clarification: start the missing service</a></li>
-<li><a href="#what-the-custom-build-adds-when-it-is-actually-needed">What the custom build adds when it is actually needed</a></li>
-<li><a href="#the-lesson-to-carry-forward">The lesson to carry forward</a></li>
-</ul>
-</div>
-</aside>
-  </main>
-</div>
+<a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c854aed19eb1a0bb70ec7fb153d33a5f0ec88532/website/content/sles12-handshake.md">View this page on GitHub ↗︎</a>
+</main>
 <footer class="site-footer">
 <div>
 <a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
@@ -122,9 +100,9 @@ connection is evidence about connectivity — not evidence that TLS is configure
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d27320e</span>
+<span>Source c854aed</span>
 </div>
-<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
 <script type="module" src="/nrpe-custom/assets/site.js">
 </script>
