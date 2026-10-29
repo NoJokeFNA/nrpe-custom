@@ -158,3 +158,6 @@ worked. Record these outcomes separately.
 Add sanitized actual results and their exact environments to the
 [release plan](release-plan.md#remaining-work-in-priority-order). Leave scenarios
 open until performed; log any failure before claiming practical platform support.
+
+See the [dated validation status](validation-status.md) for the current distinction
+between local checks, operator reports and unavailable host access.
