@@ -24,6 +24,11 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: website/package-lock.json
+      - name: Locate the diagram build browser
+        run: |
+          diagram_browser=$(command -v google-chrome || command -v chromium)
+          "$diagram_browser" --version
+          printf 'NRPE_WEBSITE_BROWSER=%s\n' "$diagram_browser" >> "$GITHUB_ENV"
       - name: Install pinned build-only syntax grammars
         run: npm ci --prefix website --ignore-scripts --no-fund
       - name: Audit the syntax highlighter

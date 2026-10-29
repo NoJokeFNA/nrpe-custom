@@ -844,9 +844,16 @@ img,svg{
   width:100%;
   font-size:11px;
   line-height:1.65;
+  margin:0
+}
+.table-scroll{
+  max-width:100%;
   margin:24px 0;
-  display:block;
   overflow:auto
+}
+.table-scroll:focus-visible,.diagram-viewport:focus-visible{
+  outline:3px solid #df9f3e;
+  outline-offset:3px
 }
 .prose thead{
   background:#eaf0e6;
@@ -858,6 +865,49 @@ img,svg{
   border:1px solid var(--line);
   min-width:90px;
   vertical-align:top
+}
+.prose table code{
+  white-space:nowrap;
+  overflow-wrap:normal;
+  word-break:normal
+}
+.prose table a{
+  white-space:nowrap;
+  overflow-wrap:normal;
+  word-break:normal
+}
+.prose table th{
+  white-space:nowrap
+}
+.diagram{
+  margin:26px 0;
+  padding:20px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px
+}
+.diagram-viewport{
+  overflow:auto;
+  max-width:100%
+}
+.diagram-viewport img{
+  display:block;
+  width:100%;
+  min-width:640px;
+  max-width:none;
+  height:auto
+}
+.diagram figcaption{
+  margin-top:14px;
+  font-size:11px;
+  color:var(--muted)
+}
+.diagram-source{
+  margin-top:12px;
+  font-size:11px
+}
+.diagram-source summary{
+  cursor:pointer
 }
 .prose tbody tr:nth-child(even){
   background:#eff3ec

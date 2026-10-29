@@ -43,6 +43,23 @@ screenshot. It shows no successful build or real infrastructure; the homepage
 and menu guide share this image. Refresh it when navigation or presentation
 changes, preserving the same empty-workspace provenance.
 
+## Diagrams and wide tables
+
+Mermaid flowcharts and sequence diagrams are rendered into static SVG images
+at build time with Mermaid 12.2.0 and Puppeteer 25.16.0. Install local Chrome or
+Chromium on the website build workstation; set `NRPE_WEBSITE_BROWSER` to its
+executable if automatic discovery does not find it. CI uses its runner's Chrome.
+The browser loads Mermaid only through a temporary loopback HTTP server and
+blocks other requests. Package lifecycle scripts and automatic browser downloads
+remain disabled. The NRPE CLI and destination servers need none of these tools.
+
+Diagrams use strict mode and plain SVG text; external resources, active SVG
+content and per-diagram configuration overrides are rejected. Each figure has
+an accessible label, a full-size link and collapsed source. Visitors need no
+Mermaid runtime or JavaScript to see diagrams. Tables expose keyboard-focusable
+horizontal scrolling when needed; code and URL tokens stay intact rather than
+wrapping their final characters onto separate lines.
+
 ## Local preview
 
 Fenced code blocks use **Shiki 4.5.0** with the bundled **GitHub Dark Default**
@@ -56,8 +73,7 @@ Colors and font styles come from the theme, including token background colors.
 The Python builder turns tokens into scoped CSS classes so no inline style or
 browser highlighter is needed. No Shiki runtime, grammar, WASM, CDN or remote font
 is loaded by visitors. Code text, indentation, entities and Unicode are checked
-for exact preservation before publication. Plain/unknown languages and Mermaid
-remain unchanged; there is no speculative language detection.
+for exact preservation before publication. Plain/unknown languages remain unchanged; Mermaid renders as static diagrams; there is no speculative language detection.
 
 Use **Node.js 24 LTS** and **Python 3.9+** on the website build workstation.
 Neither Node nor website dependencies are needed for the NRPE CLI or destination

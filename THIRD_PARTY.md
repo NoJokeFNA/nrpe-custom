@@ -96,6 +96,11 @@ included in NRPE packages or browser JavaScript. Generated code colors use the
 bundled GitHub Dark Default theme. The small NRPE syntax grammar and static
 HTML/CSS adapter are independently authored project code. The upstream NRPE
 sample configuration is referenced, not copied or relicensed as project code.
+Static diagrams use build-only `mermaid@12.2.0` (MIT; the installed LICENSE was
+inspected and is [retained unchanged](website/assets/mermaid-LICENSE.txt)) and
+`puppeteer@25.16.0` (Apache-2.0 in its package metadata), also locked with integrity
+hashes. The renderer uses the workstation's installed Chrome/Chromium and ships
+SVG output, not a browser binary, Mermaid runtime, fonts or Node dependencies.
 The previous Pygments renderer dependency has been removed.
 
 Docker images, OpenSSL, system libraries, Debian/SUSE repository packages,
