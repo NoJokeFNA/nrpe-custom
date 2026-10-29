@@ -8,14 +8,12 @@ from one deployment, not a recommendation to disable production TLS.
 
 ## The symptom
 
-The daemon logged `Error: Could not complete SSL handshake. 1`. The initial
-discussion assumed SLES 15. Checking `/etc/os-release`, the installed RPM and
-linked libraries changed the picture: the host actually ran **SLES 12 SP3**, NRPE
-`2.15-4.24` and OpenSSL `1.0.2j-fips` with the OpenSSL 1.0 ABI.
-
-That mattered. A package built for SLES 15 could not be treated as a compatible
-replacement. Modern configuration directives also did not add certificate
-authentication support to the existing NRPE 2.15 executable.
+The daemon logged `Error: Could not complete SSL handshake. 1`. Checking
+`/etc/os-release`, the installed RPM and linked libraries established the actual
+platform: **SLES 12 SP3**, NRPE `2.15-4.24` and OpenSSL `1.0.2j-fips` with the
+OpenSSL 1.0 ABI. This identity determined the native build target. Modern
+configuration directives did not add certificate authentication support to the
+existing NRPE 2.15 executable.
 
 ## A smaller test, on a separate port
 

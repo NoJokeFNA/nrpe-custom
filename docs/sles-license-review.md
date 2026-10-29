@@ -1,9 +1,9 @@
 # SLES pinned-source license review
 
-Reviewed on 2026-10-27. The same exact upstream and companion source inputs
-are reused for the SLES 12 SP3 migration on 2026-10-28. Historical binary observations
-below were recorded on SLES 15 SP4 and do not establish SLES 12 SP3 runtime validation.
-The published SLES 12 SP3 build/runtime evidence is in the [release history](release-history.md).
+Reviewed on 2026-10-27. The exact upstream and companion source inputs are
+used by the native SLES 12 SP3 build. Source license evidence is independent of
+runtime validation; published build/runtime evidence is in the
+[release history](release-history.md#sles-12-sp3-release-2026-10-28).
 The two previously recorded SLES license-evidence gaps
 are closed for the pinned inputs below. The review also resolves the apparent
 ACL license-version discrepancy. Release completeness, provenance and packaging
@@ -36,14 +36,6 @@ the word "exemption" in this function. The earlier unresolved finding was an
 incomplete search, not evidence that an exception was absent. The notice is
 now retained in [NRPE-license-notice.txt](../packaging/licenses/sles12sp3/NRPE-license-notice.txt),
 alongside the original full GPL and `LEGAL` texts.
-
-The existing custom RPM was checksum-checked and its binary extracted in an
-offline disposable SLES container. The binary's `-l` output contains the same
-OpenSSL/GPL notice. This NRPE license-display path exits with status 3 even when
-it prints the notice; the text was checked directly, rather than treating that
-exit status as a successful application test. No server was started and no
-package was installed on the host. No fresh package build was required or run
-for that historical license inspection.
 
 ## ACL code: GPLv2-or-later, not a contradictory GPLv2-only grant
 

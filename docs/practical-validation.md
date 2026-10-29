@@ -9,7 +9,7 @@ and [update/rollback procedure](updates-and-rollback.md) for deployment details.
 
 The published SLES 12 SP3 release passed all five container build/install/TLS
 and source/archive gates plus Linux/Windows Python unit tests. Exact release and
-commit evidence, including the earlier SLE-15 scope, is retained in the
+commit evidence is retained in the
 [release history](release-history.md). Windows Docker Desktop and real VM
 scenarios below remain **not run**.
 

@@ -33,7 +33,7 @@ class SiteTests(unittest.TestCase):
         self.assertIn('/nrpe-custom/faq/', home)
         faq = (self.output / 'faq/index.html').read_text()
         self.assertIn('class="faq-question"', faq)
-        self.assertIn('What happened to SLES 15', faq)
+        self.assertIn('Which SLES version does this project target?', faq)
         self.assertNotIn('AGENTS.md', manifest['files'])
         self.assertFalse(any(name.endswith(('.key', '.pem', '.log')) for name in manifest['files']))
         self.assertEqual((self.output / 'notices/NRPE-GPL-2.0.md').read_bytes(),
