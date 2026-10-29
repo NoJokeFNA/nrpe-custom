@@ -46,11 +46,8 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Maintenance review: 2026-10-27</h1>
-      <p class="article-meta">Source 6512cc1</p>
-      <article class="prose"><p>Historical snapshot: a later follow-up first assumed SLES 15 SP3, but the
-actual OS was subsequently confirmed as <strong>SLES 12 SP3</strong>. The SP4 findings below
-concern the old scope. See the <a href="/nrpe-custom/sles12sp3/">current target</a> for 12.3 evidence.</p>
-<p>Scope: published release <code>build-4-517fbfb97d7e</code> and the subsequent develop work.
+      <p class="article-meta">Source 0895e58</p>
+      <article class="prose"><p>Scope: published release <code>build-4-517fbfb97d7e</code> and the subsequent develop work.
 This is a point-in-time source, advisory and lifecycle review. It does not audit
 all NRPE C code, installed system libraries, container images or deployments.</p>
 <h2 id="findings-and-decisions">Findings and decisions</h2>
@@ -137,11 +134,6 @@ exported inputs. No source pin, packaging revision or binary was changed here.</
 <td><a href="https://www.debian.org/releases/">Forky</a> is testing, with no stable release date</td>
 <td>Treat as a moving validation target, not a production-stability guarantee</td>
 </tr>
-<tr>
-<td>SLES 15 SP4</td>
-<td><a href="https://www.suse.com/lifecycle/">SUSE lifecycle</a> lists general support end 2023-12-31 and LTSS end 2026-12-31</td>
-<td>Confirm separate entitlement and component coverage for deployed systems; review retention/deprecation before LTSS ends</td>
-</tr>
 </tbody>
 </table></div>
 <p>The dates concern distribution lifecycles, not a support promise for custom
@@ -153,8 +145,7 @@ this review. Any deprecation must follow the <a href="/nrpe-custom/maintenance/#
 <li>[ ] Review NRPE 4.2.0's source delta, including the buffer/memory and TLS changes,
   and determine whether distribution patches or follow-up advisories affect the
   actual custom packages. Do not classify a changelog entry alone as a new CVE.</li>
-<li>[ ] Review Debian 11 retention and SLES SP4's approaching LTSS boundary with the
-  maintainer. Document a migration/deprecation decision before removing support.</li>
+<li>[ ] Review Debian 11 retention with the maintainer. Document a migration/deprecation decision before removing support.</li>
 <li>[ ] Complete production release-key enrollment and authenticate a newly signed
   release using the <a href="/nrpe-custom/release-signing/">signing procedure</a>.</li>
 <li>[ ] Complete the externally blocked Windows Docker Desktop and real-VM tests
@@ -166,7 +157,7 @@ this review. Any deprecation must follow the <a href="/nrpe-custom/maintenance/#
 <p>Integration stops at develop. This review and signing implementation do not
 authorize a master PR, master merge, release publication or repository visibility
 change.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/maintenance-reviews/2026-10-27.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/maintenance-reviews/2026-10-27.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -188,7 +179,7 @@ change.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

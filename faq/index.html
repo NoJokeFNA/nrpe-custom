@@ -46,11 +46,11 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Frequently asked questions</h1>
-      <p class="article-meta">Source 6512cc1</p>
+      <p class="article-meta">Source 0895e58</p>
       <article class="prose"><p>Find answers about services, TLS and supported builds. Start with the running
 service before changing packages; for log analysis, see
 <a href="/nrpe-custom/troubleshooting/">troubleshooting</a>.</p>
-<div class="faq-tools" hidden><label for="faq-filter">Search the FAQ</label><div class="faq-search-field"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="faq-filter" type="search" placeholder="Search services, TLS or builds…" aria-controls="faq-answers" aria-describedby="faq-count"></div><div class="faq-search-status"><p id="faq-count" role="status"></p><button id="faq-clear" type="button" hidden>Clear search</button></div></div><nav class="faq-index" aria-label="Questions by topic"><section class="faq-index-group"><h3><a href="#installation-services">Installation &amp; services</a></h3><ul><li><a data-question="does-a-separate-nrpe-agent-also-need-nagios-core-locally" href="#does-a-separate-nrpe-agent-also-need-nagios-core-locally">Does a separate NRPE agent also need Nagios Core locally?</a></li></ul></section><section class="faq-index-group"><h3><a href="#tls-certificates">TLS &amp; certificates</a></h3><ul><li><a data-question="nrpe-checks-on-sles-services-first-then-ssltls" href="#nrpe-checks-on-sles-services-first-then-ssltls">NRPE checks on SLES: services first, then SSL/TLS</a></li></ul></section><section class="faq-index-group"><h3><a href="#versions-builds">Versions &amp; builds</a></h3><ul><li><a data-question="which-sles-version-does-this-project-target" href="#which-sles-version-does-this-project-target">Which SLES version does this project target?</a></li><li><a data-question="what-happened-to-sles-15-sp3-and-sp4" href="#what-happened-to-sles-15-sp3-and-sp4">What happened to SLES 15 SP3 and SP4?</a></li><li><a data-question="when-do-i-actually-need-a-custom-build" href="#when-do-i-actually-need-a-custom-build">When do I actually need a custom build?</a></li></ul></section></nav><p id="faq-empty" hidden>No answers match your search. Try a shorter term, such as “TLS”, or clear the search to browse all questions.</p><div id="faq-answers"><section class="faq-group" aria-labelledby="installation-services"><h2 id="installation-services">Installation &amp; services</h2>
+<div class="faq-tools" hidden><label for="faq-filter">Search the FAQ</label><div class="faq-search-field"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="faq-filter" type="search" placeholder="Search services, TLS or builds…" aria-controls="faq-answers" aria-describedby="faq-count"></div><div class="faq-search-status"><p id="faq-count" role="status"></p><button id="faq-clear" type="button" hidden>Clear search</button></div></div><nav class="faq-index" aria-label="Questions by topic"><section class="faq-index-group"><h3><a href="#installation-services">Installation &amp; services</a></h3><ul><li><a data-question="does-a-separate-nrpe-agent-also-need-nagios-core-locally" href="#does-a-separate-nrpe-agent-also-need-nagios-core-locally">Does a separate NRPE agent also need Nagios Core locally?</a></li></ul></section><section class="faq-index-group"><h3><a href="#tls-certificates">TLS &amp; certificates</a></h3><ul><li><a data-question="nrpe-checks-on-sles-services-first-then-ssltls" href="#nrpe-checks-on-sles-services-first-then-ssltls">NRPE checks on SLES: services first, then SSL/TLS</a></li></ul></section><section class="faq-index-group"><h3><a href="#versions-builds">Versions &amp; builds</a></h3><ul><li><a data-question="which-sles-version-does-this-project-target" href="#which-sles-version-does-this-project-target">Which SLES version does this project target?</a></li><li><a data-question="when-do-i-actually-need-a-custom-build" href="#when-do-i-actually-need-a-custom-build">When do I actually need a custom build?</a></li></ul></section></nav><p id="faq-empty" hidden>No answers match your search. Try a shorter term, such as “TLS”, or clear the search to browse all questions.</p><div id="faq-answers"><section class="faq-group" aria-labelledby="installation-services"><h2 id="installation-services">Installation &amp; services</h2>
 <section class="faq-question" aria-labelledby="does-a-separate-nrpe-agent-also-need-nagios-core-locally"><h3 id="does-a-separate-nrpe-agent-also-need-nagios-core-locally">Does a separate NRPE agent also need Nagios Core locally?<a class="question-link" href="#does-a-separate-nrpe-agent-also-need-nagios-core-locally" aria-label="Link to this question">#</a></h3><div class="faq-answer">
 <p>No. Nagios Core schedules checks on the monitoring server. Its <code>check_nrpe</code>
 client contacts the NRPE daemon on the monitored host, which executes the
@@ -139,18 +139,6 @@ alone. It was tested against OpenSSL 3.5.7 with certificate verification intact.
 <section class="faq-question" aria-labelledby="which-sles-version-does-this-project-target"><h3 id="which-sles-version-does-this-project-target">Which SLES version does this project target?<a class="question-link" href="#which-sles-version-does-this-project-target" aria-label="Link to this question">#</a></h3><div class="faq-answer">
 <p><strong>SLES 12 SP3</strong>, confirmed by <code>/etc/os-release</code>. The active target is
 <code>sles12sp3</code>; see the <a href="/nrpe-custom/sles12sp3/">native build guide</a>.</p>
-</div></section><section class="faq-question" aria-labelledby="what-happened-to-sles-15-sp3-and-sp4"><h3 id="what-happened-to-sles-15-sp3-and-sp4">What happened to SLES 15 SP3 and SP4?<a class="question-link" href="#what-happened-to-sles-15-sp3-and-sp4" aria-label="Link to this question">#</a></h3><div class="faq-answer">
-<p>Those targets came from an incorrect assumption about the affected server's OS.
-It was subsequently identified as SLES 12 SP3 with NRPE 2.15 and OpenSSL 1.0.2.
-The active SLES-15 Dockerfiles, manifests, media setup and target guides have
-been removed. There is no supported SLES-15 build target in the current workflow.</p>
-<p>The remaining explanation is consolidated here. Historical release results and
-dated license/maintenance observations retain their original platform labels in
-the <a href="/nrpe-custom/release-history/">release history</a> and linked reviews. They do not prove
-SLES 12 compatibility, and old SLE-15 RPMs must not be installed on SLES 12.
-The <a href="/nrpe-custom/local-cleanup/#retired-sles-output">cleanup command</a> still recognizes old
-local output names solely to remove them explicitly; CLI tests reject those
-names as build targets. These references do not restore SLES-15 support.</p>
 </div></section><section class="faq-question" aria-labelledby="when-do-i-actually-need-a-custom-build"><h3 id="when-do-i-actually-need-a-custom-build">When do I actually need a custom build?<a class="question-link" href="#when-do-i-actually-need-a-custom-build" aria-label="Link to this question">#</a></h3><div class="faq-answer">
 <p><strong>Use the distribution package when it already provides the required feature.</strong>
 A custom build makes sense when a required compiled feature is missing. Before
@@ -174,7 +162,7 @@ default and disabled Bash command substitution.</p>
 the actual remote check. <code>enable --now</code> does not restart an already active
 service to reload modified configuration. See <a href="/nrpe-custom/installation/">installation</a>
 and <a href="/nrpe-custom/security/">deployment security</a> for this project's custom package scope.</p></div></section></section></div></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/faq.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/faq.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -189,7 +177,6 @@ and <a href="/nrpe-custom/security/">deployment security</a> for this project's 
 </li>
 <li><a href="#versions-builds">Versions &amp; builds</a><ul>
 <li><a href="#which-sles-version-does-this-project-target">Which SLES version does this project target?</a></li>
-<li><a href="#what-happened-to-sles-15-sp3-and-sp4">What happened to SLES 15 SP3 and SP4?</a></li>
 <li><a href="#when-do-i-actually-need-a-custom-build">When do I actually need a custom build?</a></li>
 </ul>
 </li>
@@ -207,7 +194,7 @@ and <a href="/nrpe-custom/security/">deployment security</a> for this project's 
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

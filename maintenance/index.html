@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Support and maintenance policy</h1>
-      <p class="article-meta">Source 6512cc1</p>
+      <p class="article-meta">Source 0895e58</p>
       <article class="prose"><p>This independent open-source workflow has best-effort maintenance, without an
 SLA, guaranteed response times, enterprise support rights, or an extension of a
 distribution's lifecycle. See the <a href="/nrpe-custom/overview/#warranty-and-responsibility">warranty notice</a>.</p>
@@ -105,7 +105,7 @@ for current upstream maintenance status. An archived target that still builds
 does not necessarily receive dependency security fixes. Never silently substitute
 another suite, SLES service pack, or Leap packages to preserve a passing result.</p>
 <h2 id="automated-dependency-monitoring">Automated dependency monitoring</h2>
-<p><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/.github/dependabot.yml">Dependabot</a> checks Python requirements, locked website
+<p><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/.github/dependabot.yml">Dependabot</a> checks Python requirements, locked website
 npm dependencies and GitHub Actions version tags weekly and proposes update PRs into <code>develop</code>, without automatic
 merging. Genuine Dependabot PRs may merge into develop after review under the
 <a href="/nrpe-custom/git-workflow/">Git policy</a>.
@@ -118,13 +118,13 @@ selected by the maintainer. Dependabot proposes major-version changes through PR
 compatible updates within the selected upstream major tag are picked up directly.
 The repository owner may need to enable Actions/Dependabot in GitHub settings;
 checkout configuration does not override those settings.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/.github/workflows/dependency-audit.yml">dependency audit</a> runs weekly,
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/.github/workflows/dependency-audit.yml">dependency audit</a> runs weekly,
 on relevant requirement changes, and manually. Pinned <code>pip-audit</code> checks menu
 requirements and resolved dependencies against published advisories. Findings
 and collection failures fail the job. It does not scan NRPE C code, DEB/RPM
 contents, system libraries, container images or SLES repositories. A clean result
 is not a security certification.</p>
-<p>The separate <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/.github/workflows/website.yml">website check</a> audits
+<p>The separate <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/.github/workflows/website.yml">website check</a> audits
 <code>requirements-website.txt</code> and validates generated documentation and publication
 guards. The renderer is isolated from the NRPE CLI/menu environment.</p>
 <p>To reproduce the audit using Python 3.11+ in an isolated development environment:</p>
@@ -178,7 +178,7 @@ real server is distinct from rebuilding a package in a container.</p>
 <p>For the evaluated upstream-clone alternative and future C changes, follow the
 <a href="/nrpe-custom/source-strategy/">source and patch strategy</a>. A newer upstream tag alone does
 not establish compatibility with a legacy target.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/maintenance.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/maintenance.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -202,7 +202,7 @@ not establish compatibility with a legacy target.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

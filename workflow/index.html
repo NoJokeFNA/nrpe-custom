@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Workflow reference</h1>
-      <p class="article-meta">Source 6512cc1</p>
+      <p class="article-meta">Source 0895e58</p>
       <article class="prose"><p>Build Debian <code>nagios-nrpe-server</code> packages and a SLES 12 SP3
 <code>nrpe</code> RPM using the distribution packaging recipes, with command arguments
 compiled in and runtime argument handling disabled by default.</p>
@@ -128,8 +128,8 @@ messages are in English. Use <code>--help</code> or <code>&lt;command&gt; --help
 </code></pre>
 <p>SLES 12 SP3 uses a genuine digest-pinned 12.3 image and a hash-pinned set of
 original SLE-12 Server/SDK RPMs. A modern input stage downloads sources; native
-SLES tools verify package signatures and compile/install the result. No SLE-15
-binary or ISO layout is used, and the obsolete <code>--sles-media</code> option is removed.
+SLES tools verify package signatures and compile/install the result. No ISO is
+required.
 See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a>.</p>
 <h2 id="targets-and-package-builds">Targets and package builds</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Targets and package builds table"><table>
@@ -238,7 +238,7 @@ in the <a href="/nrpe-custom/release-history/">release history</a>; those passes
 commits and artifacts. Unit tests alone do not establish package/runtime success.</p>
 <h2 id="results-logs-and-concurrent-runs">Results, logs, and concurrent runs</h2>
 <p>Use <a href="/nrpe-custom/local-cleanup/">local cleanup</a> to preview expired run logs/reports and
-explicitly selected retired output or Docker images. <code>python3 nrpe.py clean</code>
+explicitly selected project Docker images. <code>python3 nrpe.py clean</code>
 does not delete anything; deletion requires <code>--apply</code> and respects workflow locks.</p>
 <p>Each build/test/verify invocation receives a unique run ID and writes:</p>
 <pre><code class="language-text">.nrpe/runs/&lt;run-id&gt;/
@@ -288,8 +288,8 @@ and the Debian/RPM recipe transformations without requiring Docker or network ac
 They do not replace real package and integration tests. Windows-specific error
 messages and process handling also need validation on Windows.</p>
 <p>Implementation is in <code>nrpe_cli/</code>; <code>nrpe.py</code> is the public entry point. Docker
-runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/AGENTS.md">AGENTS.md</a> and the
-additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/tests/AGENTS.md">test</a> instructions apply.
+runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/AGENTS.md">AGENTS.md</a> and the
+additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/tests/AGENTS.md">test</a> instructions apply.
 Write code, comments, documentation, and commits in English; follow
 <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits 1.0.0</a>.</p>
 <h2 id="repeatability-and-updates">Repeatability and updates</h2>
@@ -301,7 +301,7 @@ security updates and rebuild custom packages when official sources change; do
 not assume APT automatically replaces every custom version as intended.</p>
 <p>Official sources: <a href="https://sources.debian.org/src/nagios-nrpe/">Debian NRPE sources</a>
 and <a href="https://packages.debian.org/src:nagios-nrpe">source package information</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -329,7 +329,7 @@ and <a href="https://packages.debian.org/src:nagios-nrpe">source package informa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

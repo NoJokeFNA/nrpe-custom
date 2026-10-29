@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Cleaning local workflow data</h1>
-      <p class="article-meta">Source 6512cc1</p>
+      <p class="article-meta">Source 0895e58</p>
       <article class="prose"><p><code>clean</code> previews eligible data by default. It does not install packages, change
 the target server, remove current packages or contact Docker unless an image is
 explicitly selected.</p>
@@ -83,19 +83,9 @@ the error and preview again; do not assume everything was deleted.</p>
 the same workspace while applying cleanup. After a crash, a retained
 <code>.nrpe/locks/maintenance</code> directory must be inspected along with processes and
 containers before manually removing that marker. Never remove a live lock.</p>
-<h2 id="retired-sles-output">Retired SLES output</h2>
-<p>Include expired output for the explicitly retired <code>sles15sp3</code> and <code>sles15sp4</code>
-targets only when requested:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clean</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--retired-outputs</span>
-<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clean</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--retired-outputs</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--apply</span>
-</code></pre>
-<p>The same age threshold applies. A retired directory with an unknown top-level
-file is retained for manual review. The active <code>sles12sp3</code> and Debian outputs
-remain protected. This does not remove published SLE-15 releases or their
-historical verification evidence from GitHub or Git.</p>
 <h2 id="individually-selected-docker-images">Individually selected Docker images</h2>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clean</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--image</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-custom-builder:sles15sp3</span>
-<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clean</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--image</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-custom-builder:sles15sp3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--apply</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clean</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--image</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-custom-builder:sles12sp3</span>
+<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">clean</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--image</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-custom-builder:sles12sp3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--apply</span>
 </code></pre>
 <p>Repeat <code>--image</code> to select more than one explicit <code>nrpe-custom</code> builder/test
 image tag. Docker is required for the preview too. Base images, bare IDs and
@@ -106,13 +96,12 @@ Docker to refuse deletion; the tool does not override that protection.</p>
 <p>This command does not prune Docker globally or remove containers, networks,
 volumes or BuildKit caches. Removing an image tag may reclaim little space when
 layers are shared. Manage Docker Desktop/Engine storage separately if necessary.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/local-cleanup.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/local-cleanup.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
 <ul>
 <li><a href="#apply-an-inspected-selection">Apply an inspected selection</a></li>
-<li><a href="#retired-sles-output">Retired SLES output</a></li>
 <li><a href="#individually-selected-docker-images">Individually selected Docker images</a></li>
 </ul>
 </div>
@@ -128,7 +117,7 @@ layers are shared. Manage Docker Desktop/Engine storage separately if necessary.
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

@@ -46,11 +46,11 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Installing a custom NRPE package</h1>
-      <p class="article-meta">Source 6512cc1</p>
+      <p class="article-meta">Source 0895e58</p>
       <article class="prose"><p>Run these commands on the destination Linux server. Python, Docker, and this
 checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
-The current SLES target is <strong>SLES 12 SP3 x86_64</strong>, not every SLES 15 service pack.</p>
+The current SLES target is <strong>SLES 12 SP3 x86_64</strong>.</p>
 <p>For the complete NRPE server/client and Nagios setup, use the
 <a href="https://github.com/NagiosEnterprises/nrpe">official NRPE documentation</a> and
 <a href="https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/">Nagios Core documentation</a>.
@@ -239,7 +239,7 @@ proceed to the NRPE 4 TLS settings until the server version is correct.</p>
 </code></pre>
 <p>Expect server identity <code>nrpe 4.1.1-0.withargs1 x86_64</code> and payload entries for
 <code>/usr/sbin/nrpe</code>, <code>/etc/nrpe.cfg</code>, <code>nrpe.service</code> and <code>tmpfiles.d/nrpe.conf</code>.
-Use the SLES-12 build, not a SLE-15 RPM or repository. Keep the old package and
+Use the build and repositories matching SLES 12 SP3. Keep the old package and
 <a href="/nrpe-custom/updates-and-rollback/#before-an-update">root-only configuration/include/key backups</a>
 before changing an existing installation. Review <code>.rpmnew</code>/<code>.rpmsave</code> files;
 a preserved old configuration header is not evidence of the executable version.</p>
@@ -418,7 +418,7 @@ provision the destination's NRPE certificates, keys, or operating-system trust.<
 <p>Review future package-manager upgrades: a repository package can supersede a
 local custom version. After upgrades, confirm the installed custom revision
 again and rebuild from reviewed sources when security updates are needed.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/installation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/installation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -450,7 +450,7 @@ again and rebuild from reviewed sources when security updates are needed.</p></a
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

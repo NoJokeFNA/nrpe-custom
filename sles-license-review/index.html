@@ -46,11 +46,11 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>SLES pinned-source license review</h1>
-      <p class="article-meta">Source 6512cc1</p>
-      <article class="prose"><p>Reviewed on 2026-10-27. The same exact upstream and companion source inputs
-are reused for the SLES 12 SP3 migration on 2026-10-28. Historical binary observations
-below were recorded on SLES 15 SP4 and do not establish SLES 12 SP3 runtime validation.
-The published SLES 12 SP3 build/runtime evidence is in the <a href="/nrpe-custom/release-history/">release history</a>.
+      <p class="article-meta">Source 0895e58</p>
+      <article class="prose"><p>Reviewed on 2026-10-27. The exact upstream and companion source inputs are
+used by the native SLES 12 SP3 build. Source license evidence is independent of
+runtime validation; published build/runtime evidence is in the
+<a href="/nrpe-custom/release-history/#sles-12-sp3-release-2026-10-28">release history</a>.
 The two previously recorded SLES license-evidence gaps
 are closed for the pinned inputs below. The review also resolves the apparent
 ACL license-version discrepancy. Release completeness, provenance and packaging
@@ -74,13 +74,6 @@ the word "exemption" in this function. The earlier unresolved finding was an
 incomplete search, not evidence that an exception was absent. The notice is
 now retained in <a href="/nrpe-custom/notices/NRPE-license-notice.txt">NRPE-license-notice.txt</a>,
 alongside the original full GPL and <code>LEGAL</code> texts.</p>
-<p>The existing custom RPM was checksum-checked and its binary extracted in an
-offline disposable SLES container. The binary's <code>-l</code> output contains the same
-OpenSSL/GPL notice. This NRPE license-display path exits with status 3 even when
-it prints the notice; the text was checked directly, rather than treating that
-exit status as a successful application test. No server was started and no
-package was installed on the host. No fresh package build was required or run
-for that historical license inspection.</p>
 <h2 id="acl-code-gplv2-or-later-not-a-contradictory-gplv2-only-grant">ACL code: GPLv2-or-later, not a contradictory GPLv2-only grant</h2>
 <p>The full license notices in both <code>include/acl.h</code> and <code>src/acl.c</code> expressly
 permit version 2 or a later version. Their short "License: GPLv2" headings do
@@ -112,7 +105,7 @@ copyright notice is necessary.</p>
 <a href="https://api.opensuse.org/public/source/server:monitoring/system-user-nagios/system-user-nagios.spec?rev=b979817ae6424675519c86e80add617a&amp;expand=1">pinned original OBS spec</a>,
 not merely in rebuilt RPM metadata. Its source revision is
 <code>b979817ae6424675519c86e80add617a</code>. The spec is bound by the
-<a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/packaging/sles12sp3-user-source.json">input manifest</a> to SHA-256:</p>
+<a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/packaging/sles12sp3-user-source.json">input manifest</a> to SHA-256:</p>
 <pre><code class="language-text">36e678f60dd314addc9098421d432bac932c23f19a7ce8b048cf06b6b9cbc1b7
 </code></pre>
 <p>The source spec was extracted from the companion source RPM and also fetched
@@ -157,7 +150,7 @@ grants BSD-3-Clause terms and retains Lars Vogdt's 2011 copyright. The verbatim
 RPM and all original source files accompany the port. No macros binary or SLE-12
 dependency bundle is published. The release gate compares the notice directly
 with its hash-checked source input.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docs/sles-license-review.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docs/sles-license-review.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -181,7 +174,7 @@ with its hash-checked source input.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

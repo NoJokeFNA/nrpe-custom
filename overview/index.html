@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>nrpe-custom</h1>
-      <p class="article-meta">Source 6512cc1</p>
+      <p class="article-meta">Source 0895e58</p>
       <article class="prose"><p>Build and test custom NRPE packages for Debian and SUSE Linux Enterprise Server
 (SLES). Use a keyboard-driven menu or scriptable CLI to rebuild distribution
 packages with command argument support, then verify the result in an isolated
@@ -110,8 +110,7 @@ See <a href="/nrpe-custom/menu/">menu installation and controls</a>, including v
 <p>Direct commands do not require the menu dependencies. Without an interactive
 terminal, launching without arguments prints help and never prompts.</p>
 <p>The affected deployment is <strong>SLES 12 SP3</strong>, with old NRPE 2.15/OpenSSL 1.0.2.
-The previous SLES-15 target was based on an incorrect platform assumption and
-has been replaced. See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a> and <a href="/nrpe-custom/faq/">FAQ</a>
+See the <a href="/nrpe-custom/sles12sp3/">SLES guide</a> and <a href="/nrpe-custom/faq/">FAQ</a>
 for the native rebuild and TLS/service diagnosis.</p>
 <h2 id="supported-targets">Supported targets</h2>
 <p>All package outputs target <code>linux/amd64</code> (<code>x86_64</code> for RPM).</p>
@@ -161,7 +160,7 @@ for the native rebuild and TLS/service diagnosis.</p>
 A listed target is not a promise of ongoing upstream security maintenance. In
 particular, historical archives do not extend a distribution's support period.
 The SLES target uses a pinned genuine 12.3 image and verified original SLE-12
-inputs; no ISO, SLE-15 packages or replacement distribution is used. Its native
+inputs; no ISO or replacement distribution is used. Its native
 build and certificate-authenticated TLS 1.2 integration passed locally on
 2026-10-28. Container results do not establish production deployment readiness.
 Use your run reports to identify the exact tested package bytes.</p>
@@ -317,7 +316,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <li><a href="/nrpe-custom/updates-and-rollback/">Updates and rollback</a>: retain packages/configuration and recover deployments.</li>
 <li><a href="/nrpe-custom/configuration-examples/">Configuration examples</a>: fixed checks, TLS and restricted argument profiles.</li>
 <li><a href="/nrpe-custom/maintenance/">Support and maintenance</a>: verification boundaries, dependencies and source updates.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
 <li><a href="/nrpe-custom/git-workflow/">Git workflow</a>: human authorship, integration, promotion and guarded branch cleanup.</li>
 <li><a href="/nrpe-custom/releases/">Release automation</a>: per-master-push packages, sources, licenses and verification.</li>
 <li><a href="/nrpe-custom/architecture/">Architecture</a>: control flow and every script's purpose.</li>
@@ -329,14 +328,14 @@ These checks do not replace package builds and runtime integration tests.</p>
 <li><a href="/nrpe-custom/security/">Security</a>: argument risks and safe issue reporting.</li>
 <li><a href="/nrpe-custom/release-plan/">Release and maintenance plan</a>: open work and future release requirements.</li>
 <li><a href="/nrpe-custom/release-history/">Release history</a>: published versions and exact validation evidence.</li>
-<li><a href="/nrpe-custom/local-cleanup/">Local cleanup</a>: preview expired runs and explicitly selected retired outputs/images.</li>
+<li><a href="/nrpe-custom/local-cleanup/">Local cleanup</a>: preview expired runs and explicitly selected project images.</li>
 <li><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a>: contextual build hints and read-only diagnosis of NRPE/server logs.</li>
 <li><a href="/nrpe-custom/website/">Documentation website</a>: local preview, field notes and reviewed publication to GitHub Pages.</li>
 </ul>
 <p>These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review
 upstream security updates and retain provenance with the artifacts you deploy.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/6512cc1c1f43c4f1005fd1d291e01982aed21da1/README.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/0895e584eefff98ff7a85dbfa2cd3274a911a3a9/README.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -363,7 +362,7 @@ upstream security updates and retain provenance with the artifacts you deploy.</
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 6512cc1</span>
+<span>Source 0895e58</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
