@@ -52,12 +52,15 @@ def svg(source):
         raise RuntimeError('Mermaid builds need Node.js 24 and Chrome/Chromium. '
                            'Set NRPE_WEBSITE_BROWSER to a local browser executable if needed.')
     settings = {'securityLevel':'strict', 'theme':'base', 'htmlLabels':False,
+                'themeCSS':'.edgeLabel rect { opacity: 1 !important; fill: #ffffff !important; } '
+                           '.labelBkg { background-color: #ffffff !important; }',
                 'deterministicIds':True, 'deterministicIDSeed':hashlib.sha256(source.encode()).hexdigest(),
                 'flowchart':{'htmlLabels':False},
                 'themeVariables':{'fontFamily':'Arial, sans-serif','fontSize':'15px',
                                  'primaryColor':'#e8f1e9','primaryTextColor':'#162b35',
                                  'primaryBorderColor':'#086d5d','lineColor':'#48675b',
-                                 'secondaryColor':'#f0e8db','tertiaryColor':'#ffffff'}}
+                                 'secondaryColor':'#f0e8db','tertiaryColor':'#ffffff',
+                                 'edgeLabelBackground':'#ffffff'}}
     command = [node, str(ROOT / 'mermaid.mjs')]
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True,
                             input=json.dumps({'source':source,'config':settings,'browser':browser}),
