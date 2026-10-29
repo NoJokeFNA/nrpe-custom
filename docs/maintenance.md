@@ -15,9 +15,10 @@ distribution's lifecycle. See the [warranty notice](../README.md#warranty-and-re
 | macOS / ARM hosts | Linux/amd64 emulation may work; outside the hosted host matrix and not verified by Linux/Windows results |
 | Production deployment | Installation guidance and examples; operators configure plugins, monitoring, systemd, access, TLS and recovery |
 
-Python 3.9 remains the application minimum. CI exercises that minimum and Python
+Python 3.11 remains the application minimum. CI exercises that minimum and Python
 3.14 on Linux/Windows, not every intermediate interpreter or terminal. The optional
-audit tool has its own Python 3.10+ minimum and is not an application dependency.
+audit tool is not an application dependency. The project workstation baseline
+also covers the optional menu and website renderer.
 Use an upstream-maintained interpreter for production; compatibility testing does
 not provide security maintenance for an interpreter. Consult the
 [Python version lifecycle](https://devguide.python.org/versions/).
@@ -60,7 +61,7 @@ The separate [website check](../.github/workflows/website.yml) audits
 `requirements-website.txt` and validates generated documentation and publication
 guards. The renderer is isolated from the NRPE CLI/menu environment.
 
-To reproduce the audit using Python 3.10+ in an isolated development environment:
+To reproduce the audit using Python 3.11+ in an isolated development environment:
 
 ```sh
 python3 -m venv .venv-audit

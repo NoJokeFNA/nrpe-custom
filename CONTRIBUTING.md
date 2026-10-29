@@ -7,7 +7,7 @@ independent of editors and operating systems; examples use `python3`.
 
 ## Development checks
 
-Direct CLI commands need Python 3.9+ and no third-party Python packages. Install
+Direct CLI commands need Python 3.11+ and no third-party Python packages. Install
 `requirements-menu.txt` to work on terminal navigation and run its keyboard tests.
 Builds and installation tests require Docker Engine, Linux containers, BuildKit,
 and Compose 2.17+.
@@ -45,7 +45,7 @@ Linux do not establish that Windows has been exercised.
 
 ## Design boundaries
 
-GitHub Actions runs the unit suite on Linux/Windows with Python 3.9 and 3.14,
+GitHub Actions runs the unit suite on Linux/Windows with Python 3.11 and 3.14,
 plus Linux shell syntax and both Compose configuration checks. The separate
 weekly dependency audit checks the optional menu requirements. Neither workflow
 performs package/protocol integration tests. See the [maintenance policy](docs/maintenance.md)

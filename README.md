@@ -36,7 +36,7 @@ See [deployment security and limitations](docs/security.md).
 
 ## Quick start
 
-Install Git, **Python 3.9+**, and Docker Engine with Linux containers, BuildKit,
+Install Git, **Python 3.11+**, and Docker Engine with Linux containers, BuildKit,
 and **Docker Compose 2.17+**. On Windows, start Docker Desktop and wait for its
 Linux engine to become ready. Make sure `python3 --version` works in your shell.
 ARM hosts need `linux/amd64` emulation. Allow disk space for separate builder and
@@ -135,8 +135,8 @@ python3 nrpe.py test debian11
 For company HTTPS inspection, optionally select a local public CA certificate
 (PEM or DER); TLS verification remains enabled:
 
-```powershell
-python3 nrpe.py verify sles12sp3 --ca-cert "C:\Certificates\Company-Root.cer"
+```sh
+python3 nrpe.py verify sles12sp3 --ca-cert "./local-certificates/company-root.cer"
 ```
 
 No certificate is required by default or included in the exported NRPE package. See

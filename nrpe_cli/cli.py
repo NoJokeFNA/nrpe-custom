@@ -146,6 +146,9 @@ def parser():
 
 
 def main(argv=None, root=ROOT):
+    if sys.version_info < (3, 11):
+        print("ERROR: NRPE Custom requires Python 3.11 or newer on the workstation.", file=sys.stderr)
+        return 2
     argv = sys.argv[1:] if argv is None else argv
     if not argv and sys.stdin.isatty() and sys.stdout.isatty():
         try:

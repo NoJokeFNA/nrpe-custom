@@ -1,74 +1,89 @@
 <main id="main">
-<section class="hero">
-<div class="hero-copy">
-<div class="eyebrow">
-<span class="status-dot">
-</span> INDEPENDENT NRPE PACKAGING · OPEN SOURCE</div>
-<h1>Custom NRPE builds.<br>
-<span class="sr-only">Built from real problems.</span><span data-typewriter aria-hidden="true">Built from real problems.</span>
-</h1>
-<p>Build NRPE packages with command-argument support for Debian and SLES 12 SP3. Download a verified release or run the same build and container checks yourself.</p>
-<div class="hero-actions">
-<a class="button button-primary" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Download packages <span>↗︎</span>
-</a>
-<a class="button button-quiet" href="${workflow_url}">Build it yourself <span>→</span>
-</a>
+<section class="product-hero">
+<div class="product-hero-inner">
+<div class="product-hero-copy">
+<p class="product-kicker">
+<span class="dot">
+</span>Independent packaging. Open source.</p>
+<h1>The right NRPE build.<br>For the system you run.</h1>
+<nav class="platform-selector" aria-label="Platform guides">
+<a href="${base}/workflow/">Debian 11–14</a>
+<a href="${base}/sles12sp3/">SLES 12 SP3</a>
+<a href="${base}/menu/">Terminal workflow</a>
+</nav>
 </div>
-<div class="platforms">
-<span>DEBIAN 11–14</span>
-<span>SLES 12 SP3</span>
-<span>LINUX / AMD64</span>
-</div>
-</div>
-<div class="terminal-wrap">
-<div class="terminal">
-<div class="terminal-bar">
-<span class="terminal-dots">● ● ●</span>
-<span>your build workstation</span>
-<span>bash</span>
-</div>
-<div class="terminal-body">
-<p class="terminal-comment"># Build, install & test in containers</p><pre><code><span class="terminal-prompt">$$</span> python3 nrpe.py verify debian12</code></pre><div class="terminal-stages">
-<span>
-<b>01</b> Build the package</span>
-<span>
-<b>02</b> Check its identity</span>
-<span>
-<b>03</b> Test arguments over TLS</span>
-</div>
-<p class="terminal-foot">An example command, not a live build result.</p>
-</div>
-</div>
-<div class="default-note">
-<span class="note-icon">↳</span>
-<div>
-<strong>Compiled in. Off by default.</strong>
-<p>Runtime arguments stay disabled until you deliberately enable them.</p>
-</div>
-</div>
+<figure class="product-art">
+<span class="art-label">YOUR WORKSTATION. YOUR BUILD.</span>
+<img src="${base}/assets/cli-help.png" width="1280" height="720" alt="Actual NRPE Custom CLI help output">
+<figcaption>Direct commands, with the build and verification steps in your hands.</figcaption>
+</figure>
 </div>
 </section>
-<section class="project-story" aria-labelledby="why-title">
-<div><div class="eyebrow">WHY THIS PROJECT EXISTS</div><h2 id="why-title">One monitoring problem.<br>A workflow worth keeping.</h2></div>
-<div><p>NRPE Custom grew out of practical Nagios troubleshooting: packages needed command-argument support, company certificates complicated builds, and an SSL error turned out to involve a much older SUSE installation than expected.</p><p>Those lessons became a shared build workflow, explicit checks and documentation that records what worked. The NRPE server itself comes from upstream and distribution packaging.</p><a class="text-link" href="${field_note_url}">Read the SLES 12 SP3 story →</a></div>
+<section class="product-intro">
+<div class="product-intro-inner">
+<h2>NRPE Custom</h2>
+<p class="product-subtitle">Build, verify and package NRPE for Debian and SLES.</p>
+<div class="product-actions">
+<a class="button button-primary" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Download NRPE packages</a>
+<span>Open source · Corresponding sources and checksums included</span>
+</div>
+<figure class="product-screen"><img src="${base}/assets/terminal-menu.png" width="1325" height="770" alt="Actual keyboard-driven NRPE Custom menu in an empty workspace"></figure>
+<p class="product-caption">Actual terminal menu in an empty workspace. Runtime arguments stay disabled until explicitly enabled.</p>
+</div>
 </section>
 <section class="start-section" aria-labelledby="start-title">
-<div class="section-heading"><div><div class="eyebrow">TWO WAYS TO GET STARTED</div><h2 id="start-title">Use a package. Or build your own.</h2></div><p>Choose the path that fits your environment.</p></div>
+<div class="section-heading">
+<div>
+<div class="eyebrow">TWO WAYS TO GET STARTED</div>
+<h2 id="start-title">Use a package. Or build your own.</h2>
+</div>
+<p>Choose the path that fits your environment.</p>
+</div>
 <div class="guide-grid entry-grid">
-<article class="guide-card"><span class="card-number">01 / DOWNLOAD</span><h3>Start with a release</h3><p>Choose the archive for your exact distribution and architecture. Each release includes packages, corresponding sources, notices and checksums.</p><a class="button button-primary" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">View package releases ↗︎</a><a class="text-link secondary-link" href="${installation_url}">Verify and install your package →</a><span class="entry-requirements">Destination: matching Linux release · x86_64</span></article>
-<article class="guide-card"><span class="card-number">02 / BUILD</span><h3>Keep the build in your hands</h3><p>Inspect the recipes, choose your target and run the same build, installation and TLS checks in containers on your workstation.</p><a class="button button-quiet" href="${workflow_url}">Follow the build guide →</a><a class="text-link secondary-link" href="${menu_url}">Prefer arrow keys? Use the menu →</a><span class="entry-requirements">Workstation: Git · Python 3.9+ · Docker + Compose</span></article>
+<article class="guide-card">
+<span class="card-number">01 / DOWNLOAD</span>
+<h3>Start with a release</h3>
+<p>Choose the archive for your exact distribution and architecture. Each release includes packages, corresponding sources, notices and checksums.</p>
+<a class="button button-primary" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">View package releases ↗︎</a>
+<a class="text-link secondary-link" href="${base}/installation/">Verify and install your package →</a>
+<span class="entry-requirements">Destination: matching Linux release · x86_64</span>
+</article>
+<article class="guide-card">
+<span class="card-number">02 / BUILD</span>
+<h3>Keep the build in your hands</h3>
+<p>Inspect the recipes, choose your target and run the same build, installation and TLS checks in containers on your workstation.</p>
+<a class="button button-quiet" href="${base}/workflow/">Follow the build guide →</a>
+<a class="text-link secondary-link" href="${base}/menu/">Prefer arrow keys? Use the menu →</a>
+<span class="entry-requirements">Workstation: Git · Python 3.11+ · Docker + Compose</span>
+</article>
 </div>
 <p class="upstream-note">Already running Nagios? Follow the <a href="https://github.com/NagiosEnterprises/nrpe">upstream NRPE</a> and <a href="https://www.nagios.org/documentation/">Nagios documentation</a> for the full monitoring setup. These guides cover this project's custom packages.</p>
 </section>
-<section class="tool-showcase" aria-labelledby="tool-title">
-<div class="tool-copy"><div class="eyebrow">THE TOOL, UP CLOSE</div><h2 id="tool-title">A terminal workflow.<br>Your choice of controls.</h2><p>Use direct commands in scripts, or the optional keyboard-driven menu. Both use the same controller for builds, checks and run reports.</p><ul class="tool-features"><li>Build and verify one or more targets</li><li>Inspect status, logs and Docker readiness</li><li>Supply a company CA when your network needs it</li></ul><a class="text-link" href="${menu_url}">Explore the menu and controls →</a></div>
-<figure class="cli-capture"><a href="${base}/assets/terminal-menu.png" aria-label="Open the CLI screenshot at full size"><img src="${base}/assets/terminal-menu.png" width="1325" height="770" loading="lazy" alt="Actual terminal menu in an empty workspace, with build, test, diagnostics, cleanup, package status and logs."></a><figcaption>Actual terminal menu, rendered in an empty workspace. <a href="${overview_url}">Read the command reference →</a></figcaption></figure>
-</section>
 <section class="supported-section" aria-labelledby="supported-title">
-<div class="section-heading"><div><div class="eyebrow">FIND YOUR TARGET</div><h2 id="supported-title">Packages for the system you actually run.</h2></div><span class="tag">LINUX / AMD64</span></div>
+<div class="section-heading">
+<div>
+<div class="eyebrow">FIND YOUR TARGET</div>
+<h2 id="supported-title">Packages for the system you actually run.</h2>
+</div>
+<span class="tag">LINUX / AMD64</span>
+</div>
 <div class="target-table" role="region" aria-label="Supported distributions and package formats" tabindex="0">${supported_targets}</div>
-<div class="target-notes"><p>Container checks cover package builds, fresh installation and NRPE argument handling over TLS. Real-server reboot, update and rollback tests remain open.</p><p>Debian 14 Forky is a moving testing suite. Historical targets depend on archive availability; listing them does not extend upstream support.</p></div>
-<a class="text-link" href="${validation_url}">See exactly what has and hasn't been tested →</a>
+<div class="target-notes">
+<p>Container checks cover package builds, fresh installation and NRPE argument handling over TLS. Real-server reboot, update and rollback tests remain open.</p>
+<p>Debian 14 Forky is a moving testing suite. Historical targets depend on archive availability; listing them does not extend upstream support.</p>
+</div>
+<a class="text-link" href="${base}/practical-validation/">See exactly what has and hasn't been tested →</a>
+</section>
+<section class="project-story" aria-labelledby="why-title">
+<div>
+<div class="eyebrow">WHY THIS PROJECT EXISTS</div>
+<h2 id="why-title">One monitoring problem.<br>A workflow worth keeping.</h2>
+</div>
+<div>
+<p>NRPE Custom grew out of practical Nagios troubleshooting: packages needed command-argument support, company certificates complicated builds, and an SSL error turned out to involve a much older SUSE installation than expected.</p>
+<p>Those lessons became a shared build workflow, explicit checks and documentation that records what worked. The NRPE server itself comes from upstream and distribution packaging.</p>
+<a class="text-link" href="${base}/field-notes/sles12-handshake/">Read the SLES 12 SP3 story →</a>
+</div>
 </section>
 <section class="field-feature">
 <div class="field-feature-heading">
@@ -79,7 +94,7 @@
 <div>
 <h2>Start with the service.<br>Then follow the evidence.</h2>
 <p>The operator resolved the checks by starting the missing NRPE service. The earlier diagnosis shows why service state, OS versions and TLS evidence belong in one troubleshooting sequence.</p>
-<a class="text-link" href="${field_note_url}">Read the troubleshooting story <span>↗︎</span>
+<a class="text-link" href="${base}/field-notes/sles12-handshake/">Read the troubleshooting story <span>↗︎</span>
 </a>
 </div>
 <div class="field-proof">
@@ -89,6 +104,19 @@
 </div>
 </div>
 </section>
-<section class="community-section" aria-labelledby="community-title"><div><div class="eyebrow">A SMALL, INDEPENDENT PROJECT</div><h2 id="community-title">Built from experience.<br>Improved by sharing it.</h2><p>Maintained by <a href="https://github.com/NoJokeFNA">NoJokeFNA</a>, with source code and build recipes open for inspection. Have a useful failure, a fix or a deployment lesson? Help make the next person's path shorter.</p></div><div class="community-links"><a href="https://github.com/NoJokeFNA/nrpe-custom/issues">Report a problem <span>↗︎</span></a><a href="${note_guide_url}">Share a field note <span>→</span></a><a href="${contributing_url}">Contribute a change <span>→</span></a></div></section>
-
+<section class="community-section" aria-labelledby="community-title">
+<div>
+<div class="eyebrow">A SMALL, INDEPENDENT PROJECT</div>
+<h2 id="community-title">Built from experience.<br>Improved by sharing it.</h2>
+<p>Maintained by <a href="https://github.com/NoJokeFNA">NoJokeFNA</a>, with source code and build recipes open for inspection. Have a useful failure, a fix or a deployment lesson? Help make the next person's path shorter.</p>
+</div>
+<div class="community-links">
+<a href="https://github.com/NoJokeFNA/nrpe-custom/issues">Report a problem <span>↗︎</span>
+</a>
+<a href="${base}/field-notes/contributing-a-note/">Share a field note <span>→</span>
+</a>
+<a href="${base}/contributing/">Contribute a change <span>→</span>
+</a>
+</div>
+</section>
 </main>
