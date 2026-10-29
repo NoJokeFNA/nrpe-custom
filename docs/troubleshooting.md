@@ -61,3 +61,77 @@ Inspect the real service definition and process command before changing startup
 options. A manually started daemon is not managed by systemd; a failed second
 service start can simply mean its port/PID is already occupied. Do not launch
 another instance or remove live locks to hide that condition.
+
+## NRPE: Unable to read output
+
+A successful NRPE connection does not prove that the requested local plugin is
+installed. `NRPE: Unable to read output` means the daemon did not obtain usable
+standard output from the configured command. Missing executables are one cause;
+also inspect permissions, the command definition and errors written to stderr.
+
+On the monitored host, find the relevant `command[...]` definitions in the main
+configuration and its included files. Verify their actual executable paths and
+run the same command as the service user. For these example paths on SLES:
+
+```sh
+ls -l /usr/lib/nagios/plugins/check_swap \
+      /usr/lib/nagios/plugins/check_ntp_time
+sudo -u nagios /usr/lib/nagios/plugins/check_swap -w 50% -c 20%
+echo "Exitcode: $?"
+sudo -u nagios /usr/lib/nagios/plugins/check_ntp_time \
+  -H 192.0.2.30 -w 0.5 -c 2
+echo "Exitcode: $?"
+```
+
+Replace the NTP address with a real reachable NTP server. These commands execute
+checks on the monitored host; their plugin exit statuses distinguish monitoring
+results from execution errors. Verify that the selected server provides NTP and
+that the required UDP 123 traffic is allowed if the installed NTP plugin times out.
+
+For SLES 12 SP3, search the configured matching repositories and install the
+missing plugin packages if available:
+
+```sh
+zypper search -s monitoring-plugins-swap monitoring-plugins-ntp
+sudo zypper install monitoring-plugins-swap monitoring-plugins-ntp
+rpm -ql monitoring-plugins-swap monitoring-plugins-ntp
+```
+
+Use authorized SLES-12 repositories and retain repository signature checks.
+The NRPE custom server and its `monitoring-plugins-nrpe` client package do not
+supply every monitoring plugin. Confirm the installed paths rather than assuming
+that another distribution uses the same directory. If the `command[...]` paths
+need changing, edit them and restart `nrpe.service`; merely installing a missing
+executable at an already configured path does not require an NRPE restart.
+
+Example definitions matching the calls below:
+
+```nrpe
+command[check_swap]=/usr/lib/nagios/plugins/check_swap $ARG1$
+command[check_ntp_time]=/usr/lib/nagios/plugins/check_ntp_time -H $ARG1$ -w $ARG2$ -c $ARG3$
+```
+
+From the monitoring host, using fictional target `192.0.2.20` and NTP server
+`192.0.2.30`:
+
+```sh
+check_nrpe -H 192.0.2.20 -p 5666 -2 \
+  -c check_swap -a '-w 50% -c 20%'
+check_nrpe -H 192.0.2.20 -p 5666 -2 \
+  -c check_ntp_time -a 192.0.2.30 0.5 2
+```
+
+Use the deployment's required client TLS/certificate options too. Do not add
+`-n` when the daemon expects TLS. These definitions require deliberately enabled
+runtime arguments for trusted clients; keep Bash substitution and NRPE's default
+metacharacter protections intact. Prefer fixed commands when arguments are not
+needed; see [configuration examples](configuration-examples.md).
+
+The operator confirmed this missing-plugin cause and successful installation of
+`monitoring-plugins-swap` and `monitoring-plugins-ntp` on a SLES 12 SP3 test host
+on 2026-10-29. This is operator-reported evidence, not an automated lifecycle or
+certificate-authentication test.
+
+For the complete operator-reported journey, including the OS correction, old
+plaintext diagnostic, client/server package confusion, firewall and final plugin
+fix, read the [SLES field note](../website/content/sles12-handshake.md).

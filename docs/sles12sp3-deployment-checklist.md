@@ -17,6 +17,14 @@ also reported; its cause was not established by the supplied evidence.
 This is not a successful installation or TLS validation of the custom 4.1.1
 server. No completed target-host upgrade, reboot or rollback is claimed here.
 
+A subsequent operator report on 2026-10-29 confirmed a running 4.1.1 test-host
+daemon and successful remote version/load checks after permitting NRPE through
+SuSEfirewall2 and removing client `-n`. Missing Swap/NTP executables caused
+`Unable to read output`; installing their separate plugin packages resolved the
+checks. See [plugin troubleshooting](troubleshooting.md#nrpe-unable-to-read-output).
+This later functional evidence does not fill the lifecycle worksheet below or
+prove certificate-authentication policy, reboot persistence or rollback.
+
 ## Before replacing a repository-installed server
 
 Record a baseline on the intended host:

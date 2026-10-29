@@ -27,6 +27,20 @@ migration, authenticated remote check, reboot or rollback was supplied in that
 report. The [SLES-specific checklist](sles12sp3-deployment-checklist.md) separates
 these checks. Hostnames, IPs and raw shell history are intentionally omitted.
 
+Later on 2026-10-29 the operator confirmed a running NRPE 4.1.1 service on a
+SLES 12 SP3 test host. Packet capture showed inbound TCP SYN packets without
+replies; SuSEfirewall2 allowed SSH but dropped NRPE traffic. After a scoped TCP
+5666 firewall allowance, a remote encrypted version query succeeded. Removing
+client `-n` also made the remote load check succeed. Swap/NTP checks then failed
+because their configured executables were absent; the operator confirmed that
+installing `monitoring-plugins-swap` and `monitoring-plugins-ntp` resolved them.
+See [missing-plugin troubleshooting](troubleshooting.md#nrpe-unable-to-read-output).
+
+These are operator-reported functional results. They do not establish mandatory
+client-certificate/hostname verification, package checksum provenance, a completed
+upgrade/rollback procedure or reboot persistence. The separate lifecycle matrix
+remains open; no private hostnames or addresses are published.
+
 For each scenario record passed, failed, blocked or not run, with:
 
 - Date, tester, exact Git commit/release tag, package version and SHA-256.

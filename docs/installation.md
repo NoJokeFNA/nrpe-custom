@@ -313,6 +313,25 @@ For a socket timeout, establish TCP reachability and inspect simultaneous server
 logs before attributing the failure to a certificate or cipher. Repeat the check
 after a controlled test-host reboot using the [SLES deployment worksheet](sles12sp3-deployment-checklist.md).
 
+### Install the required monitoring plugins
+
+The custom NRPE server executes configured plugins but does not include every
+check. Install plugins separately on the monitored host using matching SLES-12
+repositories. For the operator-confirmed Swap and NTP checks:
+
+```sh
+zypper search -s monitoring-plugins-swap monitoring-plugins-ntp
+sudo zypper install monitoring-plugins-swap monitoring-plugins-ntp
+rpm -ql monitoring-plugins-swap monitoring-plugins-ntp
+```
+
+Confirm that the executable paths match the existing `command[...]` definitions
+and run each check as `nagios` before retrying remotely. Missing executables can
+produce `NRPE: Unable to read output`. See the
+[diagnosis, command definitions and remote examples](troubleshooting.md#nrpe-unable-to-read-output).
+Restart NRPE after changing its configuration; installing a plugin at an already
+configured path alone does not require a restart.
+
 ### Optional client on a SLES monitoring host
 
 Install this only when that SLES host also needs the `check_nrpe` plugin:
