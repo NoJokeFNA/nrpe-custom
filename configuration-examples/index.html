@@ -44,23 +44,37 @@ configuration files. Merge reviewed settings into <code>/etc/nagios/nrpe.cfg</co
 Debian or <code>/etc/nrpe.cfg</code> on SLES. Follow the <a href="https://github.com/NagiosEnterprises/nrpe">official NRPE manuals</a>
 for server/client setup, plugin installation and TLS provisioning. Never copy
 the project's test CA into production trust stores.</p>
+<h2 id="nrpe-file-syntax-and-upstream-defaults">NRPE file syntax and upstream defaults</h2>
+<p>NRPE configuration uses flat <code>key=value</code> directives, full-line <code>#</code> comments,
+<code>command[name]=...</code> definitions and optional <code>include</code>/<code>include_dir</code> directives.
+It has no INI section headers. These examples use an NRPE-specific code grammar;
+general INI files use a separate grammar.</p>
+<p>The <a href="https://github.com/NagiosEnterprises/nrpe/blob/master/sample-config/nrpe.cfg.in">upstream sample <code>nrpe.cfg.in</code></a>
+is a <strong>build template</strong>, not the exact installed configuration for every package.
+Placeholders such as <code>@pluginsdir@</code>, <code>@sysconfdir@</code> and <code>@nrpe_port@</code> are resolved
+when building/installing. Keep the configuration shipped with your distribution
+and NRPE version as the starting point. Do not copy upstream master wholesale
+onto an older daemon; supported directives and defaults can differ.</p>
+<p>The fragments below intentionally change selected settings for the described
+scenario. They are not a reproduction of upstream defaults, and do not replace
+the complete sample, included files or distribution-specific service setup.</p>
 <h2 id="hosts-tls-and-fixed-commands">Hosts, TLS and fixed commands</h2>
 <p>Example server settings, replacing the documentation IP and all certificate paths:</p>
-<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">allowed_hosts</span><span class="syntax-o">=</span><span class="syntax-s">127.0.0.1,::1,192.0.2.10</span>
-<span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
-<span class="syntax-na">allow_bash_command_substitution</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
-<span class="syntax-na">ssl_version</span><span class="syntax-o">=</span><span class="syntax-s">TLSv1.2+</span>
-<span class="syntax-na">ssl_use_adh</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
-<span class="syntax-na">ssl_client_certs</span><span class="syntax-o">=</span><span class="syntax-s">2</span>
-<span class="syntax-na">ssl_cacert_file</span><span class="syntax-o">=</span><span class="syntax-s">/etc/nrpe-tls/monitoring-ca.pem</span>
-<span class="syntax-na">ssl_cert_file</span><span class="syntax-o">=</span><span class="syntax-s">/etc/nrpe-tls/server.pem</span>
-<span class="syntax-na">ssl_privatekey_file</span><span class="syntax-o">=</span><span class="syntax-s">/etc/nrpe-tls/server.key</span>
+<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">allowed_hosts</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">127.0.0.1,::1,192.0.2.10</span>
+<span class="syntax-fg-79c0ff">dont_blame_nrpe</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">0</span>
+<span class="syntax-fg-79c0ff">allow_bash_command_substitution</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">0</span>
+<span class="syntax-fg-79c0ff">ssl_version</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">TLSv1.2+</span>
+<span class="syntax-fg-79c0ff">ssl_use_adh</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">0</span>
+<span class="syntax-fg-79c0ff">ssl_client_certs</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">2</span>
+<span class="syntax-fg-79c0ff">ssl_cacert_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/monitoring-ca.pem</span>
+<span class="syntax-fg-79c0ff">ssl_cert_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/server.pem</span>
+<span class="syntax-fg-79c0ff">ssl_privatekey_file</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/etc/nrpe-tls/server.key</span>
 </code></pre>
 <p>For this project's <strong>SLES 12 SP3 NRPE 4.1.1</strong> build with RSA certificates,
 replace the <code>ssl_version</code> and <code>ssl_use_adh</code> settings above with all three lines:</p>
-<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">ssl_version</span><span class="syntax-o">=</span><span class="syntax-s">TLSv1.2</span>
-<span class="syntax-na">ssl_use_adh</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
-<span class="syntax-na">ssl_cipher_list</span><span class="syntax-o">=</span><span class="syntax-s">DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL</span>
+<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">ssl_version</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">TLSv1.2</span>
+<span class="syntax-fg-79c0ff">ssl_use_adh</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">1</span>
+<span class="syntax-fg-79c0ff">ssl_cipher_list</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL</span>
 </code></pre>
 <p>Keep the CA, server key/certificate and mandatory client-certificate settings.
 On this NRPE/OpenSSL combination, <code>ssl_use_adh=0</code> also skips initialization of
@@ -79,8 +93,8 @@ monitoring hosts. Client-certificate verification and IP allowlisting have
 different roles; configure both. Do not reduce TLS settings to make an
 unconfigured client connect.</p>
 <p>Prefer fixed command definitions when caller-supplied arguments are unnecessary:</p>
-<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">command[check_load_standard]</span><span class="syntax-o">=</span><span class="syntax-s">/usr/lib/nagios/plugins/check_load -w 5,4,3 -c 10,8,6</span>
-<span class="syntax-na">command[check_load_busy]</span><span class="syntax-o">=</span><span class="syntax-s">/usr/lib/nagios/plugins/check_load -w 10,8,6 -c 20,16,12</span>
+<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">command</span><span class="syntax-fg-e6edf3">[</span><span class="syntax-fg-d2a8ff">check_load_standard</span><span class="syntax-fg-e6edf3">]</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_load </span><span class="syntax-fg-79c0ff">-w</span><span class="syntax-fg-a5d6ff"> 5,4,3 </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-a5d6ff"> 10,8,6</span>
+<span class="syntax-fg-79c0ff">command</span><span class="syntax-fg-e6edf3">[</span><span class="syntax-fg-d2a8ff">check_load_busy</span><span class="syntax-fg-e6edf3">]</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/usr/lib/nagios/plugins/check_load </span><span class="syntax-fg-79c0ff">-w</span><span class="syntax-fg-a5d6ff"> 10,8,6 </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-a5d6ff"> 20,16,12</span>
 </code></pre>
 <p>These are illustrative thresholds, not capacity recommendations. Install your
 distribution's <code>check_load</code> plugin separately and locate its actual executable;
@@ -88,11 +102,11 @@ SLES may use a different plugin directory. NRPE does not install every monitorin
 plugin. Keep command definitions and plugin/wrapper files owned by an administrator
 and unwritable by the NRPE account.</p>
 <p>From the monitoring host, a fixed check can be requested without <code>-a</code>:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">check_nrpe<span class="syntax-w"> </span>-H<span class="syntax-w"> </span>nrpe.example.internal<span class="syntax-w"> </span>-d<span class="syntax-w"> </span><span class="syntax-m">0</span><span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-A<span class="syntax-w"> </span>/etc/monitoring/tls/monitoring-ca.pem<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-C<span class="syntax-w"> </span>/etc/monitoring/tls/client.pem<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-K<span class="syntax-w"> </span>/etc/monitoring/tls/client.key<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-c<span class="syntax-w"> </span>check_load_standard
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.example.internal</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-A</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/monitoring-ca.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-C</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-K</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.key</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">check_load_standard</span>
 </code></pre>
 <p>Use your client's actual paths and the certificate-name verification options
 supported by its version. A successful encrypted connection alone does not
@@ -106,22 +120,22 @@ Preserve NRPE's default forbidden-metacharacter checks (including single quotes,
 backticks, backslashes, semicolons and newlines) and keep Bash substitution
 disabled. Do not loosen <code>nasty_metachars</code>, put untrusted text in command definitions,
 or expose this interface to arbitrary callers.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
 or <code>busy</code> and maps them to fixed plugin options. Its first argument is an absolute
 plugin path fixed by the administrator in the server configuration; the caller
 does not select that path. It does not use <code>eval</code>, run a shell on received strings,
 or accept arbitrary plugin options. Install it after reviewing it:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-o<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-g<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0755</span><span class="syntax-w"> </span>/usr/local/libexec/nrpe-custom
-sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-o<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-g<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0755</span><span class="syntax-w"> </span>examples/check-load-profile.sh<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>/usr/local/libexec/nrpe-custom/check-load-profile
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-o</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">root</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-g</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">root</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0755</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/local/libexec/nrpe-custom</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-o</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">root</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-g</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">root</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0755</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">examples/check-load-profile.sh</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">/usr/local/libexec/nrpe-custom/check-load-profile</span>
 </code></pre>
 <p>Copy the reviewed example onto the destination first; that command assumes an
 <code>examples/</code> directory in the current location. Test the locally installed wrapper
 as the service account with the actual plugin path before exposing it through NRPE.</p>
 <p>Example definition, using the Debian plugin path:</p>
-<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
-<span class="syntax-na">allow_bash_command_substitution</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
-<span class="syntax-na">command[check_load_profile]</span><span class="syntax-o">=</span><span class="syntax-s">/usr/local/libexec/nrpe-custom/check-load-profile /usr/lib/nagios/plugins/check_load '$ARG1$'</span>
+<pre class="syntax-block" data-language="NRPE config"><code class="language-nrpe"><span class="syntax-fg-79c0ff">dont_blame_nrpe</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">1</span>
+<span class="syntax-fg-79c0ff">allow_bash_command_substitution</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">0</span>
+<span class="syntax-fg-79c0ff">command</span><span class="syntax-fg-e6edf3">[</span><span class="syntax-fg-d2a8ff">check_load_profile</span><span class="syntax-fg-e6edf3">]</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">/usr/local/libexec/nrpe-custom/check-load-profile /usr/lib/nagios/plugins/check_load &#x27;</span><span class="syntax-fg-79c0ff">$ARG1$</span><span class="syntax-fg-a5d6ff">&#x27;</span>
 </code></pre>
 <p>Then request <code>-c check_load_profile -a standard</code> using the same client TLS options
 as above. Requesting <code>unknown</code> should return NRPE status <code>UNKNOWN</code> (3), without
@@ -141,10 +155,11 @@ rejection, not the real plugin's load measurements or production capacity limits
 <p>Restart the relevant service after reviewing the configuration and verify checks
 from the real monitoring host. See <a href="/nrpe-custom/installation/">installation</a>,
 <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a>, and <a href="/nrpe-custom/security/">security</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
+<li><a href="#nrpe-file-syntax-and-upstream-defaults">NRPE file syntax and upstream defaults</a></li>
 <li><a href="#hosts-tls-and-fixed-commands">Hosts, TLS and fixed commands</a></li>
 <li><a href="#optional-named-argument-profiles">Optional named argument profiles</a></li>
 </ul>
@@ -161,7 +176,7 @@ from the real monitoring host. See <a href="/nrpe-custom/installation/">installa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source f27e207</span>
+<span>Source 2ca2f63</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

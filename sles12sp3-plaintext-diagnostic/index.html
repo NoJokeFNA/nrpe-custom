@@ -78,11 +78,11 @@ addresses before running the commands.</strong> <code>server_address</code> must
 the SLES host; <code>allowed_hosts</code> must contain the source address the monitoring
 host actually uses. Check the hostname before working on either machine.</p>
 <p>On the SLES host, inspect the platform and local addresses:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">hostname
-cat<span class="syntax-w"> </span>/etc/os-release
-/usr/sbin/nrpe<span class="syntax-w"> </span>-V
-ip<span class="syntax-w"> </span>-4<span class="syntax-w"> </span>addr<span class="syntax-w"> </span>show
-sudo<span class="syntax-w"> </span>ss<span class="syntax-w"> </span>-ltnp<span class="syntax-w"> </span><span class="syntax-p">|</span><span class="syntax-w"> </span>grep<span class="syntax-w"> </span><span class="syntax-s1">':15666'</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">hostname</span>
+<span class="syntax-fg-ffa657">cat</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/os-release</span>
+<span class="syntax-fg-ffa657">/usr/sbin/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-V</span>
+<span class="syntax-fg-ffa657">ip</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-4</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">addr</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">show</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ss</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ltnp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">|</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ffa657">grep</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;:15666&#x27;</span>
 </code></pre>
 <p>Expect SLES <code>VERSION_ID="12.3"</code> and NRPE 2.15. An NRPE version/usage command
 may exit nonzero after printing its output. Port 15666 must be unused; no output
@@ -94,48 +94,48 @@ record and later remove only that temporary rule.</p>
 <p>NRPE 2.15 does <strong>not</strong> support the foreground option <code>-f</code>. Use its daemon option
 <code>-d</code> with <code>-n</code> to disable TLS for this instance only. A modern <code>ssl_...</code> setting
 in the configuration is not a substitute for that startup option.</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-o<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-g<span class="syntax-w"> </span>nagios<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0750</span><span class="syntax-w"> </span>/run/nrpe-plain-test
-sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-o<span class="syntax-w"> </span>nagios<span class="syntax-w"> </span>-g<span class="syntax-w"> </span>nagios<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0750</span><span class="syntax-w"> </span>/run/nrpe-plain-test/runtime
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-o</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">root</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-g</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0750</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-o</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-g</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0750</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/runtime</span>
 
-sudo<span class="syntax-w"> </span>tee<span class="syntax-w"> </span>/run/nrpe-plain-test/nrpe.cfg<span class="syntax-w"> </span>&gt;/dev/null<span class="syntax-w"> </span><span class="syntax-s">&lt;&lt;'EOF'</span>
-<span class="syntax-s">server_address=192.0.2.20</span>
-<span class="syntax-s">server_port=15666</span>
-<span class="syntax-s">pid_file=/run/nrpe-plain-test/runtime/nrpe.pid</span>
-<span class="syntax-s">nrpe_user=nagios</span>
-<span class="syntax-s">nrpe_group=nagios</span>
-<span class="syntax-s">allowed_hosts=192.0.2.10</span>
-<span class="syntax-s">dont_blame_nrpe=0</span>
-<span class="syntax-s">command_timeout=10</span>
-<span class="syntax-s">connection_timeout=10</span>
-<span class="syntax-s">command[check_plain_test]=/usr/bin/printf 'NRPE_PLAIN_OK\n'</span>
-<span class="syntax-s">EOF</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">tee</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/nrpe.cfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">&gt;</span><span class="syntax-fg-a5d6ff">/dev/null</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">&lt;&lt;</span><span class="syntax-fg-e6edf3">&#x27;EOF&#x27;</span>
+<span class="syntax-fg-a5d6ff">server_address=192.0.2.20</span>
+<span class="syntax-fg-a5d6ff">server_port=15666</span>
+<span class="syntax-fg-a5d6ff">pid_file=/run/nrpe-plain-test/runtime/nrpe.pid</span>
+<span class="syntax-fg-a5d6ff">nrpe_user=nagios</span>
+<span class="syntax-fg-a5d6ff">nrpe_group=nagios</span>
+<span class="syntax-fg-a5d6ff">allowed_hosts=192.0.2.10</span>
+<span class="syntax-fg-a5d6ff">dont_blame_nrpe=0</span>
+<span class="syntax-fg-a5d6ff">command_timeout=10</span>
+<span class="syntax-fg-a5d6ff">connection_timeout=10</span>
+<span class="syntax-fg-a5d6ff">command[check_plain_test]=/usr/bin/printf &#x27;NRPE_PLAIN_OK\n&#x27;</span>
+<span class="syntax-fg-e6edf3">EOF</span>
 
-sudo<span class="syntax-w"> </span>chown<span class="syntax-w"> </span>root:nagios<span class="syntax-w"> </span>/run/nrpe-plain-test/nrpe.cfg
-sudo<span class="syntax-w"> </span>chmod<span class="syntax-w"> </span><span class="syntax-m">0640</span><span class="syntax-w"> </span>/run/nrpe-plain-test/nrpe.cfg
-sudo<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>nagios<span class="syntax-w"> </span><span class="syntax-nb">test</span><span class="syntax-w"> </span>-r<span class="syntax-w"> </span>/run/nrpe-plain-test/nrpe.cfg<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span><span class="syntax-o">&amp;&amp;</span><span class="syntax-w"> </span><span class="syntax-nb">echo</span><span class="syntax-w"> </span><span class="syntax-s1">'Test configuration is readable'</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">chown</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">root:nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/nrpe.cfg</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">chmod</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0640</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/nrpe.cfg</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">test</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-r</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/nrpe.cfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  &amp;&amp; </span><span class="syntax-fg-79c0ff">echo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;Test configuration is readable&#x27;</span>
 </code></pre>
 <p>The root-owned configuration is readable by <code>nagios</code>; its runtime subdirectory
 allows that account to write the separate PID file. Command arguments remain
 disabled. The test defines only a fixed <code>printf</code> command, not production checks.</p>
 <h2 id="2-start-and-inspect-the-test-instance-on-the-sles-host">2. Start and inspect the test instance on the SLES host</h2>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>nagios<span class="syntax-w"> </span>/usr/sbin/nrpe<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-c<span class="syntax-w"> </span>/run/nrpe-plain-test/nrpe.cfg<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-n
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/sbin/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/nrpe.cfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span>
 
-sudo<span class="syntax-w"> </span>ss<span class="syntax-w"> </span>-ltnp<span class="syntax-w"> </span><span class="syntax-p">|</span><span class="syntax-w"> </span>grep<span class="syntax-w"> </span><span class="syntax-s1">':15666'</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ss</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ltnp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">|</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ffa657">grep</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;:15666&#x27;</span>
 </code></pre>
 <p>With <code>-d</code>, the prompt returns because the daemon runs in the background. Confirm
 that <code>ss</code> shows NRPE listening on the chosen local address and port 15666 before
 testing remotely. A returned prompt alone does not establish successful startup.</p>
 <p>For startup errors:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>journalctl<span class="syntax-w"> </span>-t<span class="syntax-w"> </span>nrpe<span class="syntax-w"> </span>--since<span class="syntax-w"> </span><span class="syntax-s1">'5 minutes ago'</span><span class="syntax-w"> </span>--no-pager
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">journalctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-t</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--since</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;5 minutes ago&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
 </code></pre>
 <p>If you change this configuration later, stop <strong>only the test instance</strong> using
 the PID procedure below, then repeat this start command. No systemd reload is
 required for the separate daemon.</p>
 <h2 id="3-run-the-check-from-the-monitoring-host">3. Run the check from the monitoring host</h2>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">/usr/lib/nagios/plugins/check_nrpe<span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-H<span class="syntax-w"> </span><span class="syntax-m">192</span>.0.2.20<span class="syntax-w"> </span>-p<span class="syntax-w"> </span><span class="syntax-m">15666</span><span class="syntax-w"> </span>-2<span class="syntax-w"> </span>-n<span class="syntax-w"> </span>-c<span class="syntax-w"> </span>check_plain_test
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">/usr/lib/nagios/plugins/check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">15666</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">check_plain_test</span>
 </code></pre>
 <p>Adjust the plugin path if needed. <code>-2</code> selects the packet format understood by
 NRPE 2.15; <code>-n</code> selects plaintext, matching the test daemon. Do not modify global
@@ -193,21 +193,21 @@ TLS failure; this minimal test configuration intentionally omits that directive.
 <h2 id="4-stop-the-test-and-remove-its-files-on-the-sles-host">4. Stop the test and remove its files on the SLES host</h2>
 <p>Inspect the PID and command first. It must refer to the separate instance using
 <code>/run/nrpe-plain-test/nrpe.cfg</code>, not the production NRPE daemon:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>ps<span class="syntax-w"> </span>-p<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-k">$(</span>sudo<span class="syntax-w"> </span>cat<span class="syntax-w"> </span>/run/nrpe-plain-test/runtime/nrpe.pid<span class="syntax-k">)</span><span class="syntax-s2">"</span><span class="syntax-w"> </span><span class="syntax-se">\</span>
-<span class="syntax-w">  </span>-o<span class="syntax-w"> </span>pid,user,args
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ps</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;$(</span><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-a5d6ff"> cat /run/nrpe-plain-test/runtime/nrpe.pid)&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-o</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">pid,user,args</span>
 </code></pre>
 <p>After confirming that identity, stop that process:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span><span class="syntax-nb">kill</span><span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-k">$(</span>sudo<span class="syntax-w"> </span>cat<span class="syntax-w"> </span>/run/nrpe-plain-test/runtime/nrpe.pid<span class="syntax-k">)</span><span class="syntax-s2">"</span>
-sudo<span class="syntax-w"> </span>ss<span class="syntax-w"> </span>-ltnp<span class="syntax-w"> </span><span class="syntax-p">|</span><span class="syntax-w"> </span>grep<span class="syntax-w"> </span><span class="syntax-s1">':15666'</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">kill</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;$(</span><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-a5d6ff"> cat /run/nrpe-plain-test/runtime/nrpe.pid)&quot;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ss</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ltnp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">|</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ffa657">grep</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;:15666&#x27;</span>
 </code></pre>
 <p>Wait until port 15666 has no listener. If the PID file is missing or stale, use
 <code>ss</code> and process inspection to identify the test process; do not use <code>killall
 nrpe</code>, stop the production service, or send a signal to an unverified PID.</p>
 <p>Then remove the specific test files and directories:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>rm<span class="syntax-w"> </span>-f<span class="syntax-w"> </span>/run/nrpe-plain-test/runtime/nrpe.pid
-sudo<span class="syntax-w"> </span>rm<span class="syntax-w"> </span>/run/nrpe-plain-test/nrpe.cfg
-sudo<span class="syntax-w"> </span>rmdir<span class="syntax-w"> </span>/run/nrpe-plain-test/runtime
-sudo<span class="syntax-w"> </span>rmdir<span class="syntax-w"> </span>/run/nrpe-plain-test
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-f</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/runtime/nrpe.pid</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/nrpe.cfg</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rmdir</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test/runtime</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rmdir</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/run/nrpe-plain-test</span>
 </code></pre>
 <p>Remove any firewall exception added specifically for this diagnostic. Existing
 production files and the listener on port 5666 are unaffected. The test paths
@@ -217,7 +217,7 @@ under <code>/run</code> are temporary and do not survive reboot.</p>
 and <a href="/nrpe-custom/configuration-examples/#hosts-tls-and-fixed-commands">SLES TLS configuration example</a>.
 The project's NRPE 4.1.1 container tests are separate evidence from this
 user-performed plaintext diagnostic.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/sles12sp3-plaintext-diagnostic.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/sles12sp3-plaintext-diagnostic.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -241,7 +241,7 @@ user-performed plaintext diagnostic.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source f27e207</span>
+<span>Source 2ca2f63</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

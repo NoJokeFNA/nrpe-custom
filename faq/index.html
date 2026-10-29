@@ -71,28 +71,28 @@ state can describe different moments or different listeners.</p>
 <p>When Nagios Core and the NRPE daemon are installed on the same SLES server, and
 the installed units are named <code>nagios.service</code> and <code>nrpe.service</code>, enable and
 start each service:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span><span class="syntax-nb">enable</span><span class="syntax-w"> </span>--now<span class="syntax-w"> </span>nagios.service
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span><span class="syntax-nb">enable</span><span class="syntax-w"> </span>--now<span class="syntax-w"> </span>nrpe.service
-systemctl<span class="syntax-w"> </span>is-active<span class="syntax-w"> </span>nagios.service<span class="syntax-w"> </span>nrpe.service
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">enable</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--now</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">enable</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--now</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">is-active</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
 </code></pre>
 <p><code>enable --now</code> configures startup at boot and starts the service immediately.
 Both should report <code>active</code> for this combined setup. Nagios schedules checks;
 NRPE independently listens for and executes remote plugin requests. If a unit is missing or
 fails, inspect the installed unit names and logs before replacing packages:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">systemctl<span class="syntax-w"> </span>list-unit-files<span class="syntax-w"> </span>nagios.service<span class="syntax-w"> </span>nrpe.service
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>status<span class="syntax-w"> </span>nagios.service<span class="syntax-w"> </span>nrpe.service<span class="syntax-w"> </span>--no-pager
-sudo<span class="syntax-w"> </span>journalctl<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>nagios.service<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>nrpe.service<span class="syntax-w"> </span>-n<span class="syntax-w"> </span><span class="syntax-m">100</span><span class="syntax-w"> </span>--no-pager
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">list-unit-files</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">journalctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">100</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
 </code></pre>
 <p>Package-provided service names vary. For the custom Debian server package in
 this project, the NRPE unit is <code>nagios-nrpe-server.service</code>:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span><span class="syntax-nb">enable</span><span class="syntax-w"> </span>--now<span class="syntax-w"> </span>nagios-nrpe-server.service
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">enable</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--now</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server.service</span>
 </code></pre>
 <p>Follow the <a href="https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/">official Nagios Core documentation</a>
 and <a href="https://github.com/NagiosEnterprises/nrpe">NRPE documentation</a> for complete
 installation and deployment configuration. Enabling a service does not install
 missing plugins, provision TLS credentials or configure monitoring checks.</p>
 <p>Before interpreting an SSL error, also confirm which process owns port 5666:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>ss<span class="syntax-w"> </span>-ltnp<span class="syntax-w"> </span><span class="syntax-s1">'sport = :5666'</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">ss</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-ltnp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;sport = :5666&#x27;</span>
 </code></pre>
 <p>If a manual test daemon still owns the port, an enabled systemd unit alone does
 not prove it is serving requests. Restore the intended managed instance before
@@ -152,7 +152,7 @@ default and disabled Bash command substitution.</p>
 the actual remote check. <code>enable --now</code> does not restart an already active
 service to reload modified configuration. See <a href="/nrpe-custom/installation/">installation</a>
 and <a href="/nrpe-custom/security/">deployment security</a> for this project's custom package scope.</p></div></details></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/faq.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/faq.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -179,7 +179,7 @@ and <a href="/nrpe-custom/security/">deployment security</a> for this project's 
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source f27e207</span>
+<span>Source 2ca2f63</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -39,7 +39,7 @@
     <div class="document-main">
       <div class="eyebrow">Documentation</div>
       <h1>Contributing</h1>
-      <article class="prose"><p>Read <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/AGENTS.md">AGENTS.md</a> and the more specific instructions under <code>scripts/</code>
+      <article class="prose"><p>Read <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/AGENTS.md">AGENTS.md</a> and the more specific instructions under <code>scripts/</code>
 and <code>tests/</code>. Use the existing checkout and preserve unrelated local changes.
 Write code, comments, documentation, and commits in English. Development is
 independent of editors and operating systems; examples use <code>python3</code>.</p>
@@ -49,19 +49,19 @@ independent of editors and operating systems; examples use <code>python3</code>.
 Builds and installation tests require Docker Engine, Linux containers, BuildKit,
 and Compose 2.17+.</p>
 <p>From the repository root:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>pip<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-r<span class="syntax-w"> </span>requirements-menu.txt
-python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>unittest<span class="syntax-w"> </span>discover<span class="syntax-w"> </span>-s<span class="syntax-w"> </span>tests<span class="syntax-w"> </span>-v
-python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>doctor
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">pip</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-r</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">requirements-menu.txt</span>
+<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">unittest</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">discover</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-s</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">tests</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-v</span>
+<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">doctor</span>
 </code></pre>
 <p>For shell syntax checks in Bash, check each script explicitly:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-k">for</span><span class="syntax-w"> </span>script<span class="syntax-w"> </span><span class="syntax-k">in</span><span class="syntax-w"> </span>scripts/*.sh<span class="syntax-w"> </span>examples/*.sh<span class="syntax-p">;</span><span class="syntax-w"> </span><span class="syntax-k">do</span><span class="syntax-w"> </span>bash<span class="syntax-w"> </span>-n<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$script</span><span class="syntax-s2">"</span><span class="syntax-w"> </span><span class="syntax-o">||</span><span class="syntax-w"> </span>exit<span class="syntax-p">;</span><span class="syntax-w"> </span><span class="syntax-k">done</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ff7b72">for</span><span class="syntax-fg-e6edf3"> script </span><span class="syntax-fg-ff7b72">in</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">scripts/*.sh</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">examples/*.sh</span><span class="syntax-fg-e6edf3">; </span><span class="syntax-fg-ff7b72">do</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ffa657">bash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-n</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$script</span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">||</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">exit</span><span class="syntax-fg-e6edf3">; </span><span class="syntax-fg-ff7b72">done</span>
 </code></pre>
 <p>Without menu dependencies, terminal-input tests are reported as skipped. Workflow
 unit tests must remain independent of Docker and network access. Shell syntax
 and unit tests alone do not establish that packages build or arguments work.</p>
 <p>For a changed build or installation path, run the appropriate targets:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>debian12
-python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>sles12sp3
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">verify</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">debian12</span>
+<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">verify</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">sles12sp3</span>
 </code></pre>
 <p>Use <code>--rebuild</code> only when replacing existing artifacts intentionally. Validate all
 affected targets when changing shared packaging behavior. Report exactly which
@@ -107,7 +107,7 @@ Independently authored project code and documentation use the <a href="/nrpe-cus
 Retain all third-party notices; see the <a href="/nrpe-custom/third-party/">license inventory</a>.
 Public binary release preparation follows the <a href="/nrpe-custom/release-plan/">release plan</a>.
 It does not authorize publication or grant new rights to third-party code.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/CONTRIBUTING.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/CONTRIBUTING.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -128,7 +128,7 @@ It does not authorize publication or grant new rights to third-party code.</p></
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source f27e207</span>
+<span>Source 2ca2f63</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

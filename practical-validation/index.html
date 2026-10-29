@@ -75,15 +75,15 @@ different such directory; never pass a private key to <code>--ca-cert</code>. Th
 illustrative test paths, not required installation locations. The <code>Ω</code> deliberately
 exercises Unicode handling; use real folders and certificate paths on your test host.</p>
 <p>From that checkout in PowerShell:</p>
-<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-n">python3</span> <span class="syntax-p">-</span><span class="syntax-n">-version</span>
-<span class="syntax-n">docker</span> <span class="syntax-n">version</span>
-<span class="syntax-n">docker</span> <span class="syntax-n">compose</span> <span class="syntax-n">version</span>
-<span class="syntax-n">docker</span> <span class="syntax-n">buildx</span> <span class="syntax-n">version</span>
-<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">doctor</span>
-<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">verify</span> <span class="syntax-n">debian12</span> <span class="syntax-p">-</span><span class="syntax-n">-ca-cert</span> <span class="syntax-s2">"C:\NRPE validation\Company CA Ω\company-ca.pem"</span> <span class="syntax-p">-</span><span class="syntax-n">-pull</span>
-<span class="syntax-nv">$LASTEXITCODE</span>
-<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">status</span>
-<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">logs</span> <span class="syntax-p">-</span><span class="syntax-n">-last</span>
+<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-fg-e6edf3">python3 </span><span class="syntax-fg-ff7b72">--</span><span class="syntax-fg-e6edf3">version</span>
+<span class="syntax-fg-e6edf3">docker version</span>
+<span class="syntax-fg-e6edf3">docker compose version</span>
+<span class="syntax-fg-e6edf3">docker buildx version</span>
+<span class="syntax-fg-e6edf3">python3 nrpe.py doctor</span>
+<span class="syntax-fg-e6edf3">python3 nrpe.py verify debian12 </span><span class="syntax-fg-ff7b72">--</span><span class="syntax-fg-e6edf3">ca</span><span class="syntax-fg-ff7b72">-</span><span class="syntax-fg-e6edf3">cert </span><span class="syntax-fg-a5d6ff">&quot;C:\NRPE validation\Company CA Ω\company-ca.pem&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">--</span><span class="syntax-fg-e6edf3">pull</span>
+<span class="syntax-fg-79c0ff">$LASTEXITCODE</span>
+<span class="syntax-fg-e6edf3">python3 nrpe.py status</span>
+<span class="syntax-fg-e6edf3">python3 nrpe.py logs </span><span class="syntax-fg-ff7b72">--</span><span class="syntax-fg-e6edf3">last</span>
 </code></pre>
 <p>Use your actual certificate path. The expected result is a complete successful
 build/install/TLS run, with no temporary-path failure at "load local bake
@@ -231,7 +231,7 @@ worked. Record these outcomes separately.</p>
 <p>Add sanitized actual results and their exact environments to the
 <a href="/nrpe-custom/release-plan/#remaining-work-in-priority-order">release plan</a>. Leave scenarios
 open until performed; log any failure before claiming practical platform support.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/practical-validation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/practical-validation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -253,7 +253,7 @@ open until performed; log any failure before claiming practical platform support
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source f27e207</span>
+<span>Source 2ca2f63</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

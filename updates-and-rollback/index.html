@@ -66,20 +66,20 @@ your server's service manager, firewall, local checks, or configuration migratio
 <p>Example root-only configuration backups, run on the destination. Save the printed
 backup path; use that same path when restoring, rather than creating a new one.</p>
 <p>For Debian:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-nv">nrpe_backup_dir</span><span class="syntax-o">=</span><span class="syntax-s2">"/var/backups/nrpe-custom/</span><span class="syntax-k">$(</span>date<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>+%Y%m%dT%H%M%SZ<span class="syntax-k">)</span><span class="syntax-s2">"</span>
-sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0700</span><span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">"</span>
-sudo<span class="syntax-w"> </span>cp<span class="syntax-w"> </span>-a<span class="syntax-w"> </span>/etc/nagios<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">/nagios"</span>
-dpkg-query<span class="syntax-w"> </span>-W<span class="syntax-w"> </span>-f<span class="syntax-o">=</span><span class="syntax-s1">'${Package} ${Version} ${Architecture}\n'</span><span class="syntax-w"> </span>nagios-nrpe-server<span class="syntax-w"> </span><span class="syntax-p">|</span>
-<span class="syntax-w">  </span>sudo<span class="syntax-w"> </span>tee<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">/installed-package.txt"</span><span class="syntax-w"> </span>&gt;<span class="syntax-w"> </span>/dev/null
-<span class="syntax-nb">printf</span><span class="syntax-w"> </span><span class="syntax-s1">'Backup directory: %s\n'</span><span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">"</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-e6edf3">nrpe_backup_dir</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">&quot;/var/backups/nrpe-custom/$(</span><span class="syntax-fg-ffa657">date</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-a5d6ff"> +%Y%m%dT%H%M%SZ)&quot;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0700</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">&quot;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">/nagios&quot;</span>
+<span class="syntax-fg-ffa657">dpkg-query</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-W</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-f=</span><span class="syntax-fg-a5d6ff">&#x27;${Package} ${Version} ${Architecture}\n&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">|</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">tee</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">/installed-package.txt&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">&gt;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/dev/null</span>
+<span class="syntax-fg-79c0ff">printf</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;Backup directory: %s\n&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">&quot;</span>
 </code></pre>
 <p>For SLES 12 SP3:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-nv">nrpe_backup_dir</span><span class="syntax-o">=</span><span class="syntax-s2">"/var/backups/nrpe-custom/</span><span class="syntax-k">$(</span>date<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>+%Y%m%dT%H%M%SZ<span class="syntax-k">)</span><span class="syntax-s2">"</span>
-sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0700</span><span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">"</span>
-sudo<span class="syntax-w"> </span>cp<span class="syntax-w"> </span>-a<span class="syntax-w"> </span>/etc/nrpe.cfg<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">/nrpe.cfg"</span>
-rpm<span class="syntax-w"> </span>-q<span class="syntax-w"> </span>nrpe<span class="syntax-w"> </span>system-user-nagios<span class="syntax-w"> </span><span class="syntax-p">|</span>
-<span class="syntax-w">  </span>sudo<span class="syntax-w"> </span>tee<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">/installed-package.txt"</span><span class="syntax-w"> </span>&gt;<span class="syntax-w"> </span>/dev/null
-<span class="syntax-nb">printf</span><span class="syntax-w"> </span><span class="syntax-s1">'Backup directory: %s\n'</span><span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">"</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-e6edf3">nrpe_backup_dir</span><span class="syntax-fg-ff7b72">=</span><span class="syntax-fg-a5d6ff">&quot;/var/backups/nrpe-custom/$(</span><span class="syntax-fg-ffa657">date</span><span class="syntax-fg-a5d6ff"> </span><span class="syntax-fg-79c0ff">-u</span><span class="syntax-fg-a5d6ff"> +%Y%m%dT%H%M%SZ)&quot;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-m</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0700</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">&quot;</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nrpe.cfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">/nrpe.cfg&quot;</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">system-user-nagios</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">|</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">tee</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">/installed-package.txt&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">&gt;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/dev/null</span>
+<span class="syntax-fg-79c0ff">printf</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;Backup directory: %s\n&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">&quot;</span>
 </code></pre>
 <p>These examples back up the standard main configuration only. Add every configured
 include directory, local plugin/wrapper, service override and external TLS file
@@ -109,16 +109,16 @@ or the binary. Reinstalling a package alone does not restore configuration.</p>
 <h2 id="debian-rollback">Debian rollback</h2>
 <p>Change into the saved <code>previous/</code> directory and verify its original checksum file.
 The following intentionally permits a version downgrade to the local file:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sha256sum<span class="syntax-w"> </span>--check<span class="syntax-w"> </span>SHA256SUMS
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>stop<span class="syntax-w"> </span>nagios-nrpe-server
-sudo<span class="syntax-w"> </span>apt<span class="syntax-w"> </span>install<span class="syntax-w"> </span>--allow-downgrades<span class="syntax-w"> </span>./nagios-nrpe-server_*_amd64.deb
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sha256sum</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--check</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">SHA256SUMS</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">stop</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">apt</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">install</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--allow-downgrades</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nagios-nrpe-server_</span><span class="syntax-fg-79c0ff">*</span><span class="syntax-fg-a5d6ff">_amd64.deb</span>
 </code></pre>
 <p>Set <code>nrpe_backup_dir</code> to the saved path from before the update, then restore the
 reviewed configuration and original ownership/permissions:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>cp<span class="syntax-w"> </span>-a<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">/nagios/."</span><span class="syntax-w"> </span>/etc/nagios/
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>restart<span class="syntax-w"> </span>nagios-nrpe-server
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>status<span class="syntax-w"> </span>nagios-nrpe-server<span class="syntax-w"> </span>--no-pager
-dpkg-query<span class="syntax-w"> </span>-W<span class="syntax-w"> </span>nagios-nrpe-server
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">/nagios/.&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nagios/</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">restart</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+<span class="syntax-fg-ffa657">dpkg-query</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-W</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server</span>
 </code></pre>
 <p>Compare the active include tree with the backup. Copying files back does not
 remove snippets introduced by the failed update; inspect and reconcile those
@@ -126,19 +126,19 @@ before restarting. Restore separately backed-up TLS files, wrappers and service
 overrides as needed. Package scripts may restart the service during rollback too.</p>
 <h2 id="sles-12-sp3-rollback">SLES 12 SP3 rollback</h2>
 <p>From the saved <code>previous/</code> directory:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sha256sum<span class="syntax-w"> </span>--check<span class="syntax-w"> </span>SHA256SUMS
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>stop<span class="syntax-w"> </span>nrpe
-sudo<span class="syntax-w"> </span>rpm<span class="syntax-w"> </span>--upgrade<span class="syntax-w"> </span>--oldpackage<span class="syntax-w"> </span>--verbose<span class="syntax-w"> </span>--hash<span class="syntax-w"> </span>./nrpe-<span class="syntax-o">[</span><span class="syntax-m">0</span>-9<span class="syntax-o">]</span>*.x86_64.rpm
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sha256sum</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--check</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">SHA256SUMS</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">stop</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--upgrade</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--oldpackage</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--verbose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--hash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nrpe-[0-9]</span><span class="syntax-fg-79c0ff">*</span><span class="syntax-fg-a5d6ff">.x86_64.rpm</span>
 </code></pre>
 <p><code>--oldpackage</code> deliberately allows the older saved binary after its original
 checksum is verified. Normal RPM dependency/payload checks stay enabled; resolve
 prerequisites using matching SLES-12 repositories. Keep the real Nagios user;
 restoring an older server does not require removing a shared user package.</p>
 <p>With <code>nrpe_backup_dir</code> set to the saved pre-update backup path:</p>
-<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>cp<span class="syntax-w"> </span>-a<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$nrpe_backup_dir</span><span class="syntax-s2">/nrpe.cfg"</span><span class="syntax-w"> </span>/etc/nrpe.cfg
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>restart<span class="syntax-w"> </span>nrpe
-sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>status<span class="syntax-w"> </span>nrpe<span class="syntax-w"> </span>--no-pager
-rpm<span class="syntax-w"> </span>-q<span class="syntax-w"> </span>nrpe
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-e6edf3">$nrpe_backup_dir</span><span class="syntax-fg-a5d6ff">/nrpe.cfg&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nrpe.cfg</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">restart</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+<span class="syntax-fg-ffa657">rpm</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
 </code></pre>
 <p>Also restore/reconcile included snippets, TLS files, scripts and overrides from
 their backups. Compare <code>.rpmnew</code>/<code>.rpmsave</code> files rather than treating either as
@@ -151,7 +151,7 @@ if the host is unresponsive or package operations are no longer possible.</p>
 <p>A version hold/lock can be a temporary operational choice, but it can also block
 security updates. Record the reason, owner and review date rather than silently
 pinning an old custom package forever. See the <a href="/nrpe-custom/maintenance/">maintenance policy</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/updates-and-rollback.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/2ca2f63d751c304d6627d41f6d06041130216697/docs/updates-and-rollback.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -174,7 +174,7 @@ pinning an old custom package forever. See the <a href="/nrpe-custom/maintenance
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source f27e207</span>
+<span>Source 2ca2f63</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
