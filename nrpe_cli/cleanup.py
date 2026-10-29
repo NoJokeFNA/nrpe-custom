@@ -14,9 +14,8 @@ from .state import artifact, maintenance_guard, reports
 from .targets import TARGETS
 
 
-RETIRED_TARGETS = ('sles15sp3', 'sles15sp4')
 RUN_ID = re.compile(r'[0-9]{8}T[0-9]{6}-[0-9a-f]{8}')
-IMAGE = re.compile(r'nrpe-custom-(?:builder|test(?:-(?:debian1[1-4]|sles12sp3|sles15sp[34]))?):[A-Za-z0-9_][A-Za-z0-9_.-]*')
+IMAGE = re.compile(r'nrpe-custom-(?:builder|test(?:-(?:debian1[1-4]|sles12sp3))?):[A-Za-z0-9_][A-Za-z0-9_.-]*')
 
 
 def ordinary(path):
@@ -48,7 +47,7 @@ def checked_roots(root):
             ordinary(path)
 
 
-def plan(root, older_than=30, keep_runs=5, retired_outputs=False, now=None):
+def plan(root, older_than=30, keep_runs=5, now=None):
     if older_than < 0 or keep_runs < 0:
         raise RuntimeError('Retention days and retained run count must be nonnegative')
     checked_roots(root)
@@ -70,7 +69,7 @@ def plan(root, older_than=30, keep_runs=5, retired_outputs=False, now=None):
         targets = report.get('targets')
         if (report.get('action') not in ('build', 'test', 'verify')
                 or not isinstance(targets, dict) or not targets
-                or not set(targets).issubset((*TARGETS, *RETIRED_TARGETS))
+                or not set(targets).issubset(TARGETS)
                 or not all(isinstance(value, dict) for value in targets.values())):
             continue
         try:
@@ -119,21 +118,6 @@ def plan(root, older_than=30, keep_runs=5, retired_outputs=False, now=None):
         if max([directory.stat().st_mtime] + [s.st_mtime for s in entries]) > cutoff:
             continue
         result.append((directory, sum(s.st_size for s in entries if stat.S_ISREG(s.st_mode))))
-    if retired_outputs:
-        for target in RETIRED_TARGETS:
-            directory = root / 'output' / target
-            if not directory.exists() and not directory.is_symlink():
-                continue
-            ordinary(directory)
-            known = {'SHA256SUMS', 'source-manifest.json', 'user-source-manifest.json',
-                     'macros-source-manifest.json', 'bootstrap-manifest.json', 'obs-sources', 'sources'}
-            if any(p.name not in known and not re.fullmatch(
-                    r'(?:nrpe|system-user-nagios|monitoring-plugins-nrpe|nagios-rpm-macros)-[0-9][A-Za-z0-9_.+~-]*\.rpm',
-                    p.name) for p in directory.iterdir()):
-                continue
-            entries = list(tree(directory))
-            if max([directory.stat().st_mtime] + [s.st_mtime for s in entries]) <= cutoff:
-                result.append((directory, sum(s.st_size for s in entries if stat.S_ISREG(s.st_mode))))
     return result
 
 
@@ -164,9 +148,9 @@ def inspect_images(images):
     return docker, result
 
 
-def clean(root, older_than=30, keep_runs=5, retired_outputs=False, images=(), apply=False):
+def clean(root, older_than=30, keep_runs=5, images=(), apply=False):
     """No changes without --apply; never delete active output or arbitrary state."""
-    selected = plan(root, older_than, keep_runs, retired_outputs)
+    selected = plan(root, older_than, keep_runs)
     docker, image_plan = inspect_images(images)
     for path, size in selected:
         print(f"Would remove {path.relative_to(root)} ({size} bytes)")
@@ -183,7 +167,7 @@ def clean(root, older_than=30, keep_runs=5, retired_outputs=False, images=(), ap
         if locks:
             raise RuntimeError('Cleanup refused: active or unresolved target locks: ' + ', '.join(sorted(locks)))
         # Recheck under the guard; never act on a stale preview.
-        fresh = plan(root, older_than, keep_runs, retired_outputs)
+        fresh = plan(root, older_than, keep_runs)
         if fresh != selected:
             raise RuntimeError('Cleanup candidates changed; preview again')
         if inspect_images(images)[1] != image_plan:

@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 . /etc/os-release
 [[ "$ID" == sles && "$VERSION_ID" == 12.3 && "$(uname -m)" == x86_64 ]] || {
-  echo 'ERROR: Expected a genuine SLES 12 SP3 x86_64 environment, not SLE 15 or Leap' >&2
+  echo 'ERROR: Expected a genuine SLES 12 SP3 x86_64 environment' >&2
   exit 1
 }
 rpm --query --whatprovides 'libssl.so.1.0.0()(64bit)' > /dev/null
