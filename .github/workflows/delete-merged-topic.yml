@@ -16,7 +16,7 @@ jobs:
       contents: write
       pull-requests: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: develop
       - name: Delete only the unchanged merged topic head
