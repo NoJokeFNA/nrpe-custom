@@ -6,9 +6,10 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
-<title>When the OS version was the missing detail · NRPE Custom</title>
+<title>Service checks before TLS changes · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -37,7 +38,7 @@
   <main id="main" class="document">
     <div class="document-main">
       <div class="eyebrow">Field notes</div>
-      <h1>When the OS version was the missing detail</h1>
+      <h1>Service checks before TLS changes</h1>
       <article class="prose"><p><strong>Field note · 28 October 2026 · SLES 12 SP3 · NRPE 2.15 / check_nrpe 4.1.0</strong></p>
 <p>This account is based on the operator's reported commands and output during
 troubleshooting. Hostnames and addresses are anonymized. It is an observation
@@ -71,7 +72,18 @@ command without TLS. A later temporary plaintext test on port 5666 also returned
 the exact cipher/certificate cause or prove a lasting TLS fix. Starting a manual
 daemon also did not make it a systemd-managed service: a second managed start
 failed because another NRPE process was already running.</p>
-<h2 id="the-next-step-was-a-different-build-not-a-weaker-default">The next step was a different build, not a weaker default</h2>
+<h2 id="the-operators-later-clarification-start-the-missing-service">The operator's later clarification: start the missing service</h2>
+<p>The operator later reported that the missing <code>nrpe.service</code> was the cause of
+their non-working checks: starting it alongside <code>nagios.service</code> restored the
+combined setup. A custom package was not needed to correct that service state.
+See the <a href="/nrpe-custom/faq/#nrpe-checks-on-sles-services-first-then-ssltls">combined service and TLS FAQ</a>
+for the service commands and the order of checks.</p>
+<p>This updates the outcome of the account. It does not establish that every
+previous handshake log entry came from a stopped daemon, or identify a cipher
+or certificate fix. The earlier manual/plaintext tests and the eventual managed
+service state are distinct observations. Confirm the current listener and
+repeat the actual monitoring check before changing TLS policy.</p>
+<h2 id="what-the-custom-build-adds-when-it-is-actually-needed">What the custom build adds when it is actually needed</h2>
 <p>The project now targets genuine SLES 12 SP3. Its NRPE 4.1.1 container checks cover
 certificate-authenticated TLS 1.2 against the original OpenSSL ABI; a separate
 modern OpenSSL client test also passed with server identity verification and a
@@ -82,17 +94,19 @@ and <a href="/nrpe-custom/practical-validation/">validation limits</a> before de
 Temporary plaintext instances should be stopped and the intended managed service
 restored; no successful production upgrade or rollback is claimed in this note.</p>
 <h2 id="the-lesson-to-carry-forward">The lesson to carry forward</h2>
-<p>Verify the host and OS before choosing a build target. Record the daemon and
-client versions, then test the smallest useful hypothesis. A successful plain
+<p>Check the managed service and listener first, then verify the host and OS before
+choosing a build target. Record the daemon and client versions, then test the
+smallest useful hypothesis. A successful plain
 connection is evidence about connectivity — not evidence that TLS is configured.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/website/content/sles12-handshake.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/website/content/sles12-handshake.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
 <li><a href="#the-symptom">The symptom</a></li>
 <li><a href="#a-smaller-test-on-a-separate-port">A smaller test, on a separate port</a></li>
 <li><a href="#what-the-result-established">What the result established</a></li>
-<li><a href="#the-next-step-was-a-different-build-not-a-weaker-default">The next step was a different build, not a weaker default</a></li>
+<li><a href="#the-operators-later-clarification-start-the-missing-service">The operator's later clarification: start the missing service</a></li>
+<li><a href="#what-the-custom-build-adds-when-it-is-actually-needed">What the custom build adds when it is actually needed</a></li>
 <li><a href="#the-lesson-to-carry-forward">The lesson to carry forward</a></li>
 </ul>
 </div>
@@ -108,7 +122,7 @@ connection is evidence about connectivity — not evidence that TLS is configure
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

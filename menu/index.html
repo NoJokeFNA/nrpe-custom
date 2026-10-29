@@ -9,6 +9,7 @@
 <title>Interactive terminal menu · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -40,17 +41,21 @@
       <h1>Interactive terminal menu</h1>
       <article class="prose"><p>The menu is an optional frontend to the same controller used by direct commands.
 It does not implement separate build, locking, or cleanup behavior.</p>
-<p>Local retention cleanup is available through <code>python3 nrpe.py clean</code>; see the
-<a href="/nrpe-custom/local-cleanup/">cleanup reference</a>. Its preview is read-only, and deletion
-requires a separate CLI invocation with <code>--apply</code>.</p>
+<p>The workspace overview shows package presence, the latest recorded outcome and
+Docker readiness from the last explicit check. It never checks Docker merely by
+opening the menu, or treats package presence as a successful verification.</p>
+<p><img alt="Terminal menu in an empty workspace" src="/nrpe-custom/assets/terminal-menu.png"></p>
+<p>The screenshot is an actual prompt_toolkit render of an empty temporary workspace,
+not evidence of a package build. Use direct commands for automation; see the
+<a href="/nrpe-custom/assets/cli-help.png">CLI help capture</a> for the command list.</p>
 <h2 id="install-and-start">Install and start</h2>
 <p>From the repository root, install the pinned host-only dependencies:</p>
-<pre><code class="language-sh">python3 -m pip install -r requirements-menu.txt
-python3 nrpe.py
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>pip<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-r<span class="syntax-w"> </span>requirements-menu.txt
+python3<span class="syntax-w"> </span>nrpe.py
 </code></pre>
 <p>If your Python installation is managed by the operating system, use a virtual
 environment instead of overriding its package protections:</p>
-<pre><code class="language-sh">python3 -m venv .venv
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>venv<span class="syntax-w"> </span>.venv
 </code></pre>
 <p>Activate with <code>. .venv/bin/activate</code> on Linux/macOS, or
 <code>.venv\Scripts\Activate.ps1</code> in PowerShell. Then run the installation command
@@ -88,11 +93,27 @@ is not installed in build containers. Direct commands such as
 </tr>
 <tr>
 <td>A</td>
-<td>Select all targets in the multi-selection screen</td>
+<td>Select all currently visible targets, keeping previous selections</td>
+</tr>
+<tr>
+<td>/</td>
+<td>Start filtering labels and descriptions; type letters, including Q</td>
+</tr>
+<tr>
+<td>Backspace</td>
+<td>Edit the filter</td>
+</tr>
+<tr>
+<td>Tab</td>
+<td>Keep the filter and return to selection shortcuts</td>
+</tr>
+<tr>
+<td>?</td>
+<td>Toggle contextual keyboard help</td>
 </tr>
 <tr>
 <td>Escape / Q</td>
-<td>Go back; on the home screen, exit</td>
+<td>Go back; Esc first closes help or clears an active filter; Q is literal text while filtering</td>
 </tr>
 <tr>
 <td>Ctrl+C</td>
@@ -104,23 +125,53 @@ is not installed in build containers. Direct commands such as
 </tr>
 </tbody>
 </table>
-<p>After a workflow or inspection command finishes, its ordinary output remains
-visible in the terminal. Scroll through it, then press Enter to return. Logs are
-also available from the run-selection screen or <code>logs --run &lt;id&gt;</code>.</p>
+<p>Selections and filtering are retained when returning to a directory or the
+workspace. Long lists scroll to the highlighted entry; labels stay on one row
+so a long path cannot consume the file list. Details provide contextual help.
+Complete paths are available in a separate scrollable view.</p>
+<p>During a workflow, the live panel shows the current controller phase, phase/run
+elapsed time, per-target states and a bounded tail of recent output. No percentage
+is guessed. Full Docker output is still written to the run log. Dispatch and
+cancellation stay on the main thread; only rendering runs in a background thread.
+The result screen offers target details, full logs and diagnosis of that run.</p>
+<p>Inspection commands and full logs remain in terminal scrollback until Enter or
+Esc returns to the menu. Logs are also available with <code>logs --run &lt;id&gt;</code>.</p>
 <h2 id="workflow">Workflow</h2>
 <ol>
 <li>Choose build and test, build only, or test existing packages.</li>
-<li>Select one or more targets with Space, then Enter. No target is preselected.</li>
-<li>Choose whether to check for updated base images. Optionally browse for a
-   public PEM/DER company CA certificate, or enter/paste its path directly.</li>
+<li>Select one or more named distributions with Space, then Enter. The first
+   workflow has no selection; later workflows retain the session selection.</li>
+<li>Choose whether to refresh base images for a build. Existing-package tests
+   omit that build option. Optionally browse for a public PEM/DER company CA
+   certificate, or enter/paste its path directly. Esc returns to targets.</li>
 <li>Review the action, targets, base-image refresh, certificate path and output
-   replacement. Cancel is selected by default. SLE-15 media selection was retired.</li>
+   replacement. Cancel is selected by default; Back to options preserves all
+   choices. SLE-15 media selection was retired.</li>
 <li>Select Run. Existing outputs are rebuilt only after this explicit confirmation.</li>
-<li>Read the result and return to the menu.</li>
+<li>Read the recorded per-target result, inspect full logs or explain a failure,
+   then return to the workspace.</li>
 </ol>
-<p>The certificate default follows <code>NRPE_CA_CERT</code>, if configured.
+<p>The certificate default follows <code>NRPE_CA_CERT</code>, if configured. The options show
+whether the choice came from the environment, was selected manually, or was
+explicitly disabled. Invalid environment defaults are validated before review.
+"Do not use a company CA" overrides the environment for this session, without
+changing it; direct commands can use <code>--no-ca-cert</code>. The CLI rejects combining
+that option with <code>--ca-cert</code>. Choices are kept only in memory until the menu exits.</p>
+<p>This CA trusts build downloads. It does not configure NRPE server/client
+certificates or Docker Engine/registry trust.
 See <a href="/nrpe-custom/network/#optional-company-ca-certificate">company CA trust</a> for scope and image-cache details.</p>
-<p>Diagnostics, status, and logs are available directly from the home screen.
+<h2 id="diagnostics-and-cleanup">Diagnostics and cleanup</h2>
+<p>Diagnostics checks Docker explicitly or explains a recorded/local log. For a
+local file, choose build/download or NRPE context and state whether a build CA
+was supplied. Diagnosis reads text; it never runs log content or changes TLS.
+Runs are filterable by date/ID, target, action and outcome.</p>
+<p>Local cleanup exposes retention age, number of runs to keep, retired outputs
+and optional explicit project image tags. It uses the same planner and guards
+as <a href="/nrpe-custom/local-cleanup/">the cleanup CLI</a>. Preview is read-only and remains visible
+before a separate confirmation, with cancellation selected by default. Changed
+candidates require another preview. There is no Docker-wide prune or forced
+removal; current packages and retained evidence remain protected.</p>
+<p>Diagnostics, status, and logs are available from the workspace.
 A failed command returns to the menu after its result is acknowledged. Closing
 the menu does not turn a failed workflow into a passed run: inspect its exit
 message, report, or status. For automation, use direct commands and their exit
@@ -139,6 +190,17 @@ Tab offers path completion. Enter accepts; Escape or an empty value cancels.
 Cancelling returns to the existing browser location. Missing paths and incorrect
 file/directory types show an error with options to retry or cancel. Certificate
 contents still undergo regular validation.</p>
+<h2 id="many-drives-and-long-paths">Many drives and long paths</h2>
+<p>Windows drive letters appear only in <strong>Switch drive...</strong>, not in every directory.
+For twelve attached drives, the file list still contains just the current folder,
+its navigation actions and eligible files. The separate drive selector is
+scrollable and filterable with <code>/</code>; enumeration uses the OS drive mask without
+probing every drive for labels, capacity or connectivity. Only the selected root
+is opened. Unavailable roots show an error and retain the previous directory.</p>
+<p>Cancelling drive selection retains the browser's folder, selection and scroll
+position. Returning to a parent directory restores its highlighted entry. Use
+<strong>Show complete current path</strong> for long paths or <strong>Enter or paste a path...</strong>
+for direct drive/UNC access. Linux keeps ordinary directory/mount navigation.</p>
 <h2 id="terminal-behavior">Terminal behavior</h2>
 <p>Use an interactive terminal on Windows, Linux, or macOS. <code>NO_COLOR</code> requests
 monochrome rendering; selection remains visible through an arrow and reverse
@@ -148,16 +210,26 @@ for restricted terminals, screen-reader workflows where full-screen interfaces
 are unsuitable, redirected output, and CI.</p>
 <p>With no terminal attached, launching without arguments prints CLI help without
 importing the optional dependencies or prompting. If a terminal is attached but
-the dependencies are missing, the CLI prints the installation command.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/menu.md">View this page on GitHub ↗︎</a>
+the dependencies are missing, the CLI prints the installation command.</p>
+<h2 id="validation-limits-for-this-revision">Validation limits for this revision</h2>
+<p>Keyboard/filtering/session-state tests, simulated 0/1/12-drive and unavailable-root
+tests, and an actual Linux PTY cancellation exercise passed locally. The PTY
+exercise used simulated build output to check main-thread interruption, retained
+logs and lock release; it was not a real package build. Real Windows Terminal,
+mapped/network drive and Docker Desktop scenarios remain not run here; use the
+<a href="/nrpe-custom/practical-validation/#windows-docker-desktop">practical validation checklist</a>.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/menu.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
 <li><a href="#install-and-start">Install and start</a></li>
 <li><a href="#controls">Controls</a></li>
 <li><a href="#workflow">Workflow</a></li>
+<li><a href="#diagnostics-and-cleanup">Diagnostics and cleanup</a></li>
 <li><a href="#enter-or-paste-a-path">Enter or paste a path</a></li>
+<li><a href="#many-drives-and-long-paths">Many drives and long paths</a></li>
 <li><a href="#terminal-behavior">Terminal behavior</a></li>
+<li><a href="#validation-limits-for-this-revision">Validation limits for this revision</a></li>
 </ul>
 </div>
 </aside>
@@ -172,7 +244,7 @@ the dependencies are missing, the CLI prints the installation command.</p></arti
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

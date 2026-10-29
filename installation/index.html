@@ -9,6 +9,7 @@
 <title>Installing a custom NRPE package · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -92,7 +93,7 @@ Copy the following files into a dedicated directory on the destination server:</
 select the intended package. Source RPMs, manifests, and Debian build information
 are useful provenance but are not installed on the destination.</p>
 <p>Change into the directory containing the copied files and verify them:</p>
-<pre><code class="language-sh">sha256sum --check SHA256SUMS
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sha256sum<span class="syntax-w"> </span>--check<span class="syntax-w"> </span>SHA256SUMS
 </code></pre>
 <p>Continue only if every entry reports <code>OK</code>. Copy the checksum file through a
 trusted channel alongside the packages; checksums detect changes but do not
@@ -112,15 +113,15 @@ and <a href="/nrpe-custom/maintenance/">maintenance policy</a> describe optional
 boundaries.</p>
 <h2 id="debian-11-12-13-or-14">Debian 11, 12, 13, or 14</h2>
 <p>Check the destination release and architecture:</p>
-<pre><code class="language-sh">cat /etc/os-release
-dpkg --print-architecture
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">cat<span class="syntax-w"> </span>/etc/os-release
+dpkg<span class="syntax-w"> </span>--print-architecture
 </code></pre>
 <p>The architecture must be <code>amd64</code>. Use the package from the matching Debian output
 directory; a Debian 12 package is not a package for every Debian release.</p>
 <p>From the directory with the verified <code>.deb</code> file:</p>
-<pre><code class="language-sh">sudo apt update
-sudo apt install ./nagios-nrpe-server_*_amd64.deb
-dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' nagios-nrpe-server
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>apt<span class="syntax-w"> </span>update
+sudo<span class="syntax-w"> </span>apt<span class="syntax-w"> </span>install<span class="syntax-w"> </span>./nagios-nrpe-server_*_amd64.deb
+dpkg-query<span class="syntax-w"> </span>-W<span class="syntax-w"> </span>-f<span class="syntax-o">=</span><span class="syntax-s1">'${Package} ${Version} ${Architecture}\n'</span><span class="syntax-w"> </span>nagios-nrpe-server
 </code></pre>
 <p>APT resolves runtime dependencies through the destination's configured Debian
 repositories. The explicit <code>./</code> selects the local custom package. Confirm that
@@ -128,17 +129,17 @@ the installed version contains <code>+withargs1</code> (or the custom revision o
 you selected); the upstream version itself is discovered at build time.</p>
 <p>Edit <code>/etc/nagios/nrpe.cfg</code> using your preferred editor. Review the
 <a href="#configure-and-start-nrpe">configuration steps below</a> before restarting.</p>
-<pre><code class="language-sh">sudo systemctl enable nagios-nrpe-server
-sudo systemctl restart nagios-nrpe-server
-sudo systemctl status nagios-nrpe-server --no-pager
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span><span class="syntax-nb">enable</span><span class="syntax-w"> </span>nagios-nrpe-server
+sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>restart<span class="syntax-w"> </span>nagios-nrpe-server
+sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>status<span class="syntax-w"> </span>nagios-nrpe-server<span class="syntax-w"> </span>--no-pager
 </code></pre>
 <p>If startup fails, inspect the service log:</p>
-<pre><code class="language-sh">sudo journalctl -u nagios-nrpe-server -n 100 --no-pager
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>journalctl<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>nagios-nrpe-server<span class="syntax-w"> </span>-n<span class="syntax-w"> </span><span class="syntax-m">100</span><span class="syntax-w"> </span>--no-pager
 </code></pre>
 <h2 id="sles-12-sp3">SLES 12 SP3</h2>
 <p>Check the destination release and architecture:</p>
-<pre><code class="language-sh">cat /etc/os-release
-uname -m
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">cat<span class="syntax-w"> </span>/etc/os-release
+uname<span class="syntax-w"> </span>-m
 </code></pre>
 <p>Expect SLES <code>12.3</code> and <code>x86_64</code>. The current pinned build produces:</p>
 <pre><code class="language-text">nrpe-4.1.1-0.withargs1.x86_64.rpm
@@ -152,24 +153,24 @@ prompts and any <code>.rpmnew</code>/<code>.rpmsave</code> files rather than ass
 replace an existing deployment's policy.</p>
 <p>Use your authorized matching SLES-12 repositories for missing runtime dependencies.
 Review the package requirements and user package first:</p>
-<pre><code class="language-sh">rpm -qp --requires ./nrpe-4.1.1-0.withargs1.x86_64.rpm
-rpm -q system-user-nagios
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">rpm<span class="syntax-w"> </span>-qp<span class="syntax-w"> </span>--requires<span class="syntax-w"> </span>./nrpe-4.1.1-0.withargs1.x86_64.rpm
+rpm<span class="syntax-w"> </span>-q<span class="syntax-w"> </span>system-user-nagios
 </code></pre>
 <p>The minimal test image additionally needs original <code>libwrap0</code> and
 <code>util-linux-systemd</code>; a full server may already provide them. Resolve missing
 prerequisites using the destination's matching repositories, for example:</p>
-<pre><code class="language-sh">sudo zypper refresh
-sudo zypper install libwrap0 util-linux-systemd shadow netcfg grep sed coreutils
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>zypper<span class="syntax-w"> </span>refresh
+sudo<span class="syntax-w"> </span>zypper<span class="syntax-w"> </span>install<span class="syntax-w"> </span>libwrap0<span class="syntax-w"> </span>util-linux-systemd<span class="syntax-w"> </span>shadow<span class="syntax-w"> </span>netcfg<span class="syntax-w"> </span>grep<span class="syntax-w"> </span>sed<span class="syntax-w"> </span>coreutils
 </code></pre>
 <p>Then install the verified local artifacts with normal RPM dependency and payload
 checks. If no suitable user package exists, install the companion and server
 in one transaction:</p>
-<pre><code class="language-sh">sudo rpm --upgrade --verbose --hash \
-  ./system-user-nagios-1.0.0-0.noarch.rpm \
-  ./nrpe-4.1.1-0.withargs1.x86_64.rpm
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>rpm<span class="syntax-w"> </span>--upgrade<span class="syntax-w"> </span>--verbose<span class="syntax-w"> </span>--hash<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>./system-user-nagios-1.0.0-0.noarch.rpm<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>./nrpe-4.1.1-0.withargs1.x86_64.rpm
 </code></pre>
 <p>If a suitable user package is already installed, keep it and install the server:</p>
-<pre><code class="language-sh">sudo rpm --upgrade --verbose --hash ./nrpe-4.1.1-0.withargs1.x86_64.rpm
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>rpm<span class="syntax-w"> </span>--upgrade<span class="syntax-w"> </span>--verbose<span class="syntax-w"> </span>--hash<span class="syntax-w"> </span>./nrpe-4.1.1-0.withargs1.x86_64.rpm
 </code></pre>
 <p>These are locally built unsigned RPMs. Verify their hashes through a trusted
 channel (or the optional release signature when enabled) before installation.
@@ -177,27 +178,27 @@ Never use <code>--nodeps</code>, <code>--nosignature</code> or global repository
 This project's test does not bypass missing dependencies. SLES 12's zypper does
 not provide the newer <code>--allow-unsigned-rpm</code> option used in some SLE-15 examples.</p>
 <p>The matching client RPM is available for a <strong>SLES 12 SP3 monitoring host</strong>:</p>
-<pre><code class="language-sh">sudo rpm --upgrade --verbose --hash ./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>rpm<span class="syntax-w"> </span>--upgrade<span class="syntax-w"> </span>--verbose<span class="syntax-w"> </span>--hash<span class="syntax-w"> </span>./monitoring-plugins-nrpe-4.1.1-0.withargs1.x86_64.rpm
 </code></pre>
 <p>It needs the same real Nagios user and matching runtime libraries. Do not install
 that client RPM on another distribution; use its native client package instead.
 All three binary files are needed to check the unchanged <code>SHA256SUMS</code>, even when
 only the server/user package will be installed on the monitored host.</p>
 <p>Confirm the installed server and user:</p>
-<pre><code class="language-sh">rpm -q nrpe
-getent passwd nagios
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">rpm<span class="syntax-w"> </span>-q<span class="syntax-w"> </span>nrpe
+getent<span class="syntax-w"> </span>passwd<span class="syntax-w"> </span>nagios
 </code></pre>
 <p>Expect <code>nrpe-4.1.1-0.withargs1.x86_64</code> for the current build.
 <code>zypper install nrpe</code> without the local filename can select the repository
 package instead of this custom build.</p>
 <p>Edit <code>/etc/nrpe.cfg</code> using your preferred editor. Review the configuration below
 before restarting:</p>
-<pre><code class="language-sh">sudo systemctl enable nrpe
-sudo systemctl restart nrpe
-sudo systemctl status nrpe --no-pager
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span><span class="syntax-nb">enable</span><span class="syntax-w"> </span>nrpe
+sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>restart<span class="syntax-w"> </span>nrpe
+sudo<span class="syntax-w"> </span>systemctl<span class="syntax-w"> </span>status<span class="syntax-w"> </span>nrpe<span class="syntax-w"> </span>--no-pager
 </code></pre>
 <p>If startup fails:</p>
-<pre><code class="language-sh">sudo journalctl -u nrpe -n 100 --no-pager
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>journalctl<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>nrpe<span class="syntax-w"> </span>-n<span class="syntax-w"> </span><span class="syntax-m">100</span><span class="syntax-w"> </span>--no-pager
 </code></pre>
 <h2 id="configure-and-start-nrpe">Configure and start NRPE</h2>
 <table>
@@ -225,8 +226,8 @@ sudo systemctl status nrpe --no-pager
 default. Keep it at <code>0</code> if the monitoring server should not supply arguments.
 To deliberately enable them, edit the existing settings in the appropriate
 configuration file, for example:</p>
-<pre><code class="language-ini">allowed_hosts=127.0.0.1,::1,192.0.2.10
-dont_blame_nrpe=1
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">allowed_hosts</span><span class="syntax-o">=</span><span class="syntax-s">127.0.0.1,::1,192.0.2.10</span>
+<span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
 </code></pre>
 <p>Replace <code>192.0.2.10</code> with the actual monitoring server address. Define permitted
 commands and validate any <code>$ARG1$</code>, <code>$ARG2$</code>, etc. they accept. Configure production
@@ -244,7 +245,7 @@ provision the destination's NRPE certificates, keys, or operating-system trust.<
 <p>Review future package-manager upgrades: a repository package can supersede a
 local custom version. After upgrades, confirm the installed custom revision
 again and rebuild from reviewed sources when security updates are needed.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/installation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/installation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -266,7 +267,7 @@ again and rebuild from reviewed sources when security updates are needed.</p></a
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

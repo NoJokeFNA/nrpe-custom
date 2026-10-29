@@ -9,6 +9,7 @@
 <title>Contributing · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -38,7 +39,7 @@
     <div class="document-main">
       <div class="eyebrow">Documentation</div>
       <h1>Contributing</h1>
-      <article class="prose"><p>Read <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/AGENTS.md">AGENTS.md</a> and the more specific instructions under <code>scripts/</code>
+      <article class="prose"><p>Read <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/AGENTS.md">AGENTS.md</a> and the more specific instructions under <code>scripts/</code>
 and <code>tests/</code>. Use the existing checkout and preserve unrelated local changes.
 Write code, comments, documentation, and commits in English. Development is
 independent of editors and operating systems; examples use <code>python3</code>.</p>
@@ -48,19 +49,19 @@ independent of editors and operating systems; examples use <code>python3</code>.
 Builds and installation tests require Docker Engine, Linux containers, BuildKit,
 and Compose 2.17+.</p>
 <p>From the repository root:</p>
-<pre><code class="language-sh">python3 -m pip install -r requirements-menu.txt
-python3 -m unittest discover -s tests -v
-python3 nrpe.py doctor
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>pip<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-r<span class="syntax-w"> </span>requirements-menu.txt
+python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>unittest<span class="syntax-w"> </span>discover<span class="syntax-w"> </span>-s<span class="syntax-w"> </span>tests<span class="syntax-w"> </span>-v
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>doctor
 </code></pre>
 <p>For shell syntax checks in Bash, check each script explicitly:</p>
-<pre><code class="language-sh">for script in scripts/*.sh examples/*.sh; do bash -n &quot;$script&quot; || exit; done
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-k">for</span><span class="syntax-w"> </span>script<span class="syntax-w"> </span><span class="syntax-k">in</span><span class="syntax-w"> </span>scripts/*.sh<span class="syntax-w"> </span>examples/*.sh<span class="syntax-p">;</span><span class="syntax-w"> </span><span class="syntax-k">do</span><span class="syntax-w"> </span>bash<span class="syntax-w"> </span>-n<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$script</span><span class="syntax-s2">"</span><span class="syntax-w"> </span><span class="syntax-o">||</span><span class="syntax-w"> </span>exit<span class="syntax-p">;</span><span class="syntax-w"> </span><span class="syntax-k">done</span>
 </code></pre>
 <p>Without menu dependencies, terminal-input tests are reported as skipped. Workflow
 unit tests must remain independent of Docker and network access. Shell syntax
 and unit tests alone do not establish that packages build or arguments work.</p>
 <p>For a changed build or installation path, run the appropriate targets:</p>
-<pre><code class="language-sh">python3 nrpe.py verify debian12
-python3 nrpe.py verify sles12sp3
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>debian12
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>sles12sp3
 </code></pre>
 <p>Use <code>--rebuild</code> only when replacing existing artifacts intentionally. Validate all
 affected targets when changing shared packaging behavior. Report exactly which
@@ -106,7 +107,7 @@ Independently authored project code and documentation use the <a href="/nrpe-cus
 Retain all third-party notices; see the <a href="/nrpe-custom/third-party/">license inventory</a>.
 Public binary release preparation follows the <a href="/nrpe-custom/release-plan/">release plan</a>.
 It does not authorize publication or grant new rights to third-party code.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/CONTRIBUTING.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/CONTRIBUTING.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -127,7 +128,7 @@ It does not authorize publication or grant new rights to third-party code.</p></
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

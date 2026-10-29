@@ -9,6 +9,7 @@
 <title>Cleaning local workflow data · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -41,8 +42,11 @@
       <article class="prose"><p><code>clean</code> previews eligible data by default. It does not install packages, change
 the target server, remove current packages or contact Docker unless an image is
 explicitly selected.</p>
-<pre><code class="language-sh">python3 nrpe.py clean
-python3 nrpe.py clean --older-than 60 --keep-runs 10
+<p>The terminal menu exposes the same options under <strong>Local cleanup</strong>. It shows
+the read-only preview before a separate deletion confirmation, defaults to
+cancellation and rejects a changed candidate list until it is previewed again.</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean<span class="syntax-w"> </span>--older-than<span class="syntax-w"> </span><span class="syntax-m">60</span><span class="syntax-w"> </span>--keep-runs<span class="syntax-w"> </span><span class="syntax-m">10</span>
 </code></pre>
 <p>The defaults are 30 days and at least five retained runs. Only completed,
 recognized run directories containing <code>report.json</code> and optionally <code>run.log</code>
@@ -56,7 +60,7 @@ release candidates, downloaded releases, locks, certificates
 and arbitrary working directories are never cleanup candidates. Back up evidence
 you need beyond that retention policy before deleting it.</p>
 <h2 id="apply-an-inspected-selection">Apply an inspected selection</h2>
-<pre><code class="language-sh">python3 nrpe.py clean --older-than 60 --keep-runs 10 --apply
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean<span class="syntax-w"> </span>--older-than<span class="syntax-w"> </span><span class="syntax-m">60</span><span class="syntax-w"> </span>--keep-runs<span class="syntax-w"> </span><span class="syntax-m">10</span><span class="syntax-w"> </span>--apply
 </code></pre>
 <p><code>--apply</code> is explicit deletion consent, including in non-interactive use. The
 tool recalculates the plan under a maintenance guard; changed candidates abort
@@ -74,16 +78,16 @@ containers before manually removing that marker. Never remove a live lock.</p>
 <h2 id="retired-sles-output">Retired SLES output</h2>
 <p>Include expired output for the explicitly retired <code>sles15sp3</code> and <code>sles15sp4</code>
 targets only when requested:</p>
-<pre><code class="language-sh">python3 nrpe.py clean --retired-outputs
-python3 nrpe.py clean --retired-outputs --apply
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean<span class="syntax-w"> </span>--retired-outputs
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean<span class="syntax-w"> </span>--retired-outputs<span class="syntax-w"> </span>--apply
 </code></pre>
 <p>The same age threshold applies. A retired directory with an unknown top-level
 file is retained for manual review. The active <code>sles12sp3</code> and Debian outputs
 remain protected. This does not remove published SLE-15 releases or their
 historical verification evidence from GitHub or Git.</p>
 <h2 id="individually-selected-docker-images">Individually selected Docker images</h2>
-<pre><code class="language-sh">python3 nrpe.py clean --image nrpe-custom-builder:sles15sp3
-python3 nrpe.py clean --image nrpe-custom-builder:sles15sp3 --apply
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean<span class="syntax-w"> </span>--image<span class="syntax-w"> </span>nrpe-custom-builder:sles15sp3
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>clean<span class="syntax-w"> </span>--image<span class="syntax-w"> </span>nrpe-custom-builder:sles15sp3<span class="syntax-w"> </span>--apply
 </code></pre>
 <p>Repeat <code>--image</code> to select more than one explicit <code>nrpe-custom</code> builder/test
 image tag. Docker is required for the preview too. Base images, bare IDs and
@@ -94,7 +98,7 @@ Docker to refuse deletion; the tool does not override that protection.</p>
 <p>This command does not prune Docker globally or remove containers, networks,
 volumes or BuildKit caches. Removing an image tag may reclaim little space when
 layers are shared. Manage Docker Desktop/Engine storage separately if necessary.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/local-cleanup.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/local-cleanup.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -115,7 +119,7 @@ layers are shared. Manage Docker Desktop/Engine storage separately if necessary.
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

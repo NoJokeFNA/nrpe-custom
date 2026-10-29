@@ -9,6 +9,7 @@
 <title>nrpe-custom · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -72,10 +73,10 @@ and <strong>Docker Compose 2.17+</strong>. On Windows, start Docker Desktop and 
 Linux engine to become ready. Make sure <code>python3 --version</code> works in your shell.
 ARM hosts need <code>linux/amd64</code> emulation. Allow disk space for separate builder and
 test images; Docker's <code>vfs</code> storage driver can consume considerably more space.</p>
-<pre><code class="language-sh">git clone https://github.com/NoJokeFNA/nrpe-custom.git
-cd nrpe-custom
-python3 nrpe.py doctor
-python3 nrpe.py verify debian12
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">git<span class="syntax-w"> </span>clone<span class="syntax-w"> </span>https://github.com/NoJokeFNA/nrpe-custom.git
+<span class="syntax-nb">cd</span><span class="syntax-w"> </span>nrpe-custom
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>doctor
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>debian12
 </code></pre>
 <p>This builds the package and tests its installation and NRPE argument handling.
 Find packages in <code>output/&lt;target&gt;/</code> and run reports in <code>.nrpe/runs/&lt;run-id&gt;/</code>.
@@ -84,14 +85,18 @@ Builds and tests install packages inside containers, not on your workstation.</p
 protects targets against concurrent runs, and records logs and test results.</p>
 <h2 id="interactive-menu">Interactive menu</h2>
 <p>Install the optional menu dependencies in your Python environment:</p>
-<pre><code class="language-sh">python3 -m pip install -r requirements-menu.txt
-python3 nrpe.py
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>pip<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-r<span class="syntax-w"> </span>requirements-menu.txt
+python3<span class="syntax-w"> </span>nrpe.py
 </code></pre>
 <p>Use <strong>↑/↓ and Enter</strong> to navigate, <strong>Space</strong> to toggle targets, <strong>A</strong> to select all,
 and <strong>Esc</strong> to go back. Select build/test actions, diagnose Docker, inspect status,
 or choose a previous run's logs. Select an optional company CA certificate
 through its browser, or enter/paste its path directly.
 The menu reviews your choices before running and returns after each command.
+It retains choices within the session, shows real workflow phases and results,
+and offers log diagnosis and preview-first cleanup. Use <code>/</code> to filter lists;
+Windows drives live in a separate <strong>Switch drive...</strong> selector so many attached
+drives do not crowd out files.
 Colors highlight selection and errors; <code>NO_COLOR</code> enables monochrome output.
 See <a href="/nrpe-custom/menu/">menu installation and controls</a>, including virtual environments.</p>
 <p>Direct commands do not require the menu dependencies. Without an interactive
@@ -197,13 +202,13 @@ Use <code>--help</code> or <code>&lt;command&gt; --help</code> for details.</p>
 <code>--rebuild</code> explicitly. <code>--pull</code> checks for updated base images; it does not check
 whether a built NRPE package is current. Debian source versions are discovered
 when building; SLES sources stay pinned until reviewed and updated.</p>
-<pre><code class="language-sh">python3 nrpe.py verify debian12 debian13 --pull
-python3 nrpe.py verify sles12sp3 --rebuild
-python3 nrpe.py test debian11
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>debian12<span class="syntax-w"> </span>debian13<span class="syntax-w"> </span>--pull
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>sles12sp3<span class="syntax-w"> </span>--rebuild
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span><span class="syntax-nb">test</span><span class="syntax-w"> </span>debian11
 </code></pre>
 <p>For company HTTPS inspection, optionally select a local public CA certificate
 (PEM or DER); TLS verification remains enabled:</p>
-<pre><code class="language-powershell">python3 nrpe.py verify sles12sp3 --ca-cert &quot;C:\Certificates\Company-Root.cer&quot;
+<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">verify</span> <span class="syntax-n">sles12sp3</span> <span class="syntax-p">-</span><span class="syntax-n">-ca-cert</span> <span class="syntax-s2">"C:\Certificates\Company-Root.cer"</span>
 </code></pre>
 <p>No certificate is required by default or included in the exported NRPE package. See
 <a href="/nrpe-custom/network/#optional-company-ca-certificate">company CA setup and Docker trust limits</a>.</p>
@@ -281,8 +286,8 @@ dependency monitoring and target deprecation.</p>
 </tr>
 </tbody>
 </table>
-<pre><code class="language-ini">allowed_hosts=&lt;nagios-server-ip&gt;,127.0.0.1,::1
-dont_blame_nrpe=1
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">allowed_hosts</span><span class="syntax-o">=</span><span class="syntax-s">&lt;nagios-server-ip&gt;,127.0.0.1,::1</span>
+<span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
 </code></pre>
 <p>Replace the placeholder, define permitted commands with validated arguments,
 configure trusted TLS certificates, and restrict the firewall to the intended
@@ -304,7 +309,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <li><a href="/nrpe-custom/updates-and-rollback/">Updates and rollback</a>: retain packages/configuration and recover deployments.</li>
 <li><a href="/nrpe-custom/configuration-examples/">Configuration examples</a>: fixed checks, TLS and restricted argument profiles.</li>
 <li><a href="/nrpe-custom/maintenance/">Support and maintenance</a>: verification boundaries, dependencies and source updates.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
 <li><a href="/nrpe-custom/git-workflow/">Git workflow</a>: human authorship, integration, promotion and guarded branch cleanup.</li>
 <li><a href="/nrpe-custom/releases/">Release automation</a>: per-master-push packages, sources, licenses and verification.</li>
 <li><a href="/nrpe-custom/architecture/">Architecture</a>: control flow and every script's purpose.</li>
@@ -323,7 +328,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <p>These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review
 upstream security updates and retain provenance with the artifacts you deploy.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/README.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/README.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -349,7 +354,7 @@ upstream security updates and retain provenance with the artifacts you deploy.</
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

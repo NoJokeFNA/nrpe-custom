@@ -9,6 +9,7 @@
 <title>NRPE configuration examples · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -45,21 +46,21 @@ for server/client setup, plugin installation and TLS provisioning. Never copy
 the project's test CA into production trust stores.</p>
 <h2 id="hosts-tls-and-fixed-commands">Hosts, TLS and fixed commands</h2>
 <p>Example server settings, replacing the documentation IP and all certificate paths:</p>
-<pre><code class="language-ini">allowed_hosts=127.0.0.1,::1,192.0.2.10
-dont_blame_nrpe=0
-allow_bash_command_substitution=0
-ssl_version=TLSv1.2+
-ssl_use_adh=0
-ssl_client_certs=2
-ssl_cacert_file=/etc/nrpe-tls/monitoring-ca.pem
-ssl_cert_file=/etc/nrpe-tls/server.pem
-ssl_privatekey_file=/etc/nrpe-tls/server.key
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">allowed_hosts</span><span class="syntax-o">=</span><span class="syntax-s">127.0.0.1,::1,192.0.2.10</span>
+<span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
+<span class="syntax-na">allow_bash_command_substitution</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
+<span class="syntax-na">ssl_version</span><span class="syntax-o">=</span><span class="syntax-s">TLSv1.2+</span>
+<span class="syntax-na">ssl_use_adh</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
+<span class="syntax-na">ssl_client_certs</span><span class="syntax-o">=</span><span class="syntax-s">2</span>
+<span class="syntax-na">ssl_cacert_file</span><span class="syntax-o">=</span><span class="syntax-s">/etc/nrpe-tls/monitoring-ca.pem</span>
+<span class="syntax-na">ssl_cert_file</span><span class="syntax-o">=</span><span class="syntax-s">/etc/nrpe-tls/server.pem</span>
+<span class="syntax-na">ssl_privatekey_file</span><span class="syntax-o">=</span><span class="syntax-s">/etc/nrpe-tls/server.key</span>
 </code></pre>
 <p>For this project's <strong>SLES 12 SP3 NRPE 4.1.1</strong> build with RSA certificates,
 replace the <code>ssl_version</code> and <code>ssl_use_adh</code> settings above with all three lines:</p>
-<pre><code class="language-ini">ssl_version=TLSv1.2
-ssl_use_adh=1
-ssl_cipher_list=DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">ssl_version</span><span class="syntax-o">=</span><span class="syntax-s">TLSv1.2</span>
+<span class="syntax-na">ssl_use_adh</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
+<span class="syntax-na">ssl_cipher_list</span><span class="syntax-o">=</span><span class="syntax-s">DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL</span>
 </code></pre>
 <p>Keep the CA, server key/certificate and mandatory client-certificate settings.
 On this NRPE/OpenSSL combination, <code>ssl_use_adh=0</code> also skips initialization of
@@ -78,8 +79,8 @@ monitoring hosts. Client-certificate verification and IP allowlisting have
 different roles; configure both. Do not reduce TLS settings to make an
 unconfigured client connect.</p>
 <p>Prefer fixed command definitions when caller-supplied arguments are unnecessary:</p>
-<pre><code class="language-ini">command[check_load_standard]=/usr/lib/nagios/plugins/check_load -w 5,4,3 -c 10,8,6
-command[check_load_busy]=/usr/lib/nagios/plugins/check_load -w 10,8,6 -c 20,16,12
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">command[check_load_standard]</span><span class="syntax-o">=</span><span class="syntax-s">/usr/lib/nagios/plugins/check_load -w 5,4,3 -c 10,8,6</span>
+<span class="syntax-na">command[check_load_busy]</span><span class="syntax-o">=</span><span class="syntax-s">/usr/lib/nagios/plugins/check_load -w 10,8,6 -c 20,16,12</span>
 </code></pre>
 <p>These are illustrative thresholds, not capacity recommendations. Install your
 distribution's <code>check_load</code> plugin separately and locate its actual executable;
@@ -87,11 +88,11 @@ SLES may use a different plugin directory. NRPE does not install every monitorin
 plugin. Keep command definitions and plugin/wrapper files owned by an administrator
 and unwritable by the NRPE account.</p>
 <p>From the monitoring host, a fixed check can be requested without <code>-a</code>:</p>
-<pre><code class="language-sh">check_nrpe -H nrpe.example.internal -d 0 \
-  -A /etc/monitoring/tls/monitoring-ca.pem \
-  -C /etc/monitoring/tls/client.pem \
-  -K /etc/monitoring/tls/client.key \
-  -c check_load_standard
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">check_nrpe<span class="syntax-w"> </span>-H<span class="syntax-w"> </span>nrpe.example.internal<span class="syntax-w"> </span>-d<span class="syntax-w"> </span><span class="syntax-m">0</span><span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>-A<span class="syntax-w"> </span>/etc/monitoring/tls/monitoring-ca.pem<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>-C<span class="syntax-w"> </span>/etc/monitoring/tls/client.pem<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>-K<span class="syntax-w"> </span>/etc/monitoring/tls/client.key<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>-c<span class="syntax-w"> </span>check_load_standard
 </code></pre>
 <p>Use your client's actual paths and the certificate-name verification options
 supported by its version. A successful encrypted connection alone does not
@@ -105,22 +106,22 @@ Preserve NRPE's default forbidden-metacharacter checks (including single quotes,
 backticks, backslashes, semicolons and newlines) and keep Bash substitution
 disabled. Do not loosen <code>nasty_metachars</code>, put untrusted text in command definitions,
 or expose this interface to arbitrary callers.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
 or <code>busy</code> and maps them to fixed plugin options. Its first argument is an absolute
 plugin path fixed by the administrator in the server configuration; the caller
 does not select that path. It does not use <code>eval</code>, run a shell on received strings,
 or accept arbitrary plugin options. Install it after reviewing it:</p>
-<pre><code class="language-sh">sudo install -d -o root -g root -m 0755 /usr/local/libexec/nrpe-custom
-sudo install -o root -g root -m 0755 examples/check-load-profile.sh \
-  /usr/local/libexec/nrpe-custom/check-load-profile
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-d<span class="syntax-w"> </span>-o<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-g<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0755</span><span class="syntax-w"> </span>/usr/local/libexec/nrpe-custom
+sudo<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-o<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-g<span class="syntax-w"> </span>root<span class="syntax-w"> </span>-m<span class="syntax-w"> </span><span class="syntax-m">0755</span><span class="syntax-w"> </span>examples/check-load-profile.sh<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>/usr/local/libexec/nrpe-custom/check-load-profile
 </code></pre>
 <p>Copy the reviewed example onto the destination first; that command assumes an
 <code>examples/</code> directory in the current location. Test the locally installed wrapper
 as the service account with the actual plugin path before exposing it through NRPE.</p>
 <p>Example definition, using the Debian plugin path:</p>
-<pre><code class="language-ini">dont_blame_nrpe=1
-allow_bash_command_substitution=0
-command[check_load_profile]=/usr/local/libexec/nrpe-custom/check-load-profile /usr/lib/nagios/plugins/check_load '$ARG1$'
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
+<span class="syntax-na">allow_bash_command_substitution</span><span class="syntax-o">=</span><span class="syntax-s">0</span>
+<span class="syntax-na">command[check_load_profile]</span><span class="syntax-o">=</span><span class="syntax-s">/usr/local/libexec/nrpe-custom/check-load-profile /usr/lib/nagios/plugins/check_load '$ARG1$'</span>
 </code></pre>
 <p>Then request <code>-c check_load_profile -a standard</code> using the same client TLS options
 as above. Requesting <code>unknown</code> should return NRPE status <code>UNKNOWN</code> (3), without
@@ -140,7 +141,7 @@ rejection, not the real plugin's load measurements or production capacity limits
 <p>Restart the relevant service after reviewing the configuration and verify checks
 from the real monitoring host. See <a href="/nrpe-custom/installation/">installation</a>,
 <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a>, and <a href="/nrpe-custom/security/">security</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -160,7 +161,7 @@ from the real monitoring host. See <a href="/nrpe-custom/installation/">installa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

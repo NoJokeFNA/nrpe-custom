@@ -9,6 +9,7 @@
 <title>Per-push package releases · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -38,7 +39,7 @@
     <div class="document-main">
       <div class="eyebrow">Documentation</div>
       <h1>Per-push package releases</h1>
-      <article class="prose"><p>Each push to <code>master</code> runs the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/.github/workflows/release.yml">release workflow</a>.
+      <article class="prose"><p>Each push to <code>master</code> runs the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/.github/workflows/release.yml">release workflow</a>.
 The repository's visibility is unchanged. Topic/develop pushes do not publish
 releases. Release-relevant PRs run the build and archive checks without publishing;
 manual workflow dispatch is also validation-only.</p>
@@ -104,12 +105,12 @@ No partial target subset is presented as a complete release.</p>
 <p>Use a clean committed checkout. Install ordinary inspection tools (<code>dpkg-dev</code>,
 <code>rpm</code>, <code>rpm2cpio</code>, <code>cpio</code>) on the inspection runner, not custom output packages on
 the workstation. After a fresh <code>python3 nrpe.py verify &lt;target&gt;</code> run:</p>
-<pre><code class="language-sh">python3 scripts/prepare_release.py target --target debian12 \
-  --commit &quot;$(git rev-parse HEAD)&quot; --destination .nrpe/target-bundles
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>scripts/prepare_release.py<span class="syntax-w"> </span>target<span class="syntax-w"> </span>--target<span class="syntax-w"> </span>debian12<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>--commit<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-k">$(</span>git<span class="syntax-w"> </span>rev-parse<span class="syntax-w"> </span>HEAD<span class="syntax-k">)</span><span class="syntax-s2">"</span><span class="syntax-w"> </span>--destination<span class="syntax-w"> </span>.nrpe/target-bundles
 </code></pre>
 <p>Repeat for all five targets, then:</p>
-<pre><code class="language-sh">python3 scripts/prepare_release.py assemble --commit &quot;$(git rev-parse HEAD)&quot; \
-  --incoming .nrpe/target-bundles --destination .nrpe/release
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>scripts/prepare_release.py<span class="syntax-w"> </span>assemble<span class="syntax-w"> </span>--commit<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-k">$(</span>git<span class="syntax-w"> </span>rev-parse<span class="syntax-w"> </span>HEAD<span class="syntax-k">)</span><span class="syntax-s2">"</span><span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>--incoming<span class="syntax-w"> </span>.nrpe/target-bundles<span class="syntax-w"> </span>--destination<span class="syntax-w"> </span>.nrpe/release
 </code></pre>
 <p>Use new/empty staging directories; existing archives are not silently replaced.
 Old reports without source/workflow identity cannot be used for releases. The
@@ -121,7 +122,7 @@ it does not trigger an insecure fallback. Successful container tests do not prov
 production systemd, TLS, firewall or monitoring configuration is correct. Follow
 <a href="/nrpe-custom/installation/">installation</a>, <a href="/nrpe-custom/updates-and-rollback/">rollback</a> and the
 <a href="/nrpe-custom/maintenance/">support policy</a> on real systems.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/releases.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/releases.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -142,7 +143,7 @@ production systemd, TLS, firewall or monitoring configuration is correct. Follow
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -9,6 +9,7 @@
 <title>Branches, commits and integration · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -41,13 +42,13 @@
       <article class="prose"><p><code>master</code> is the default and release branch. <code>develop</code> is the integration branch.
 <strong>Never delete either branch.</strong> New work starts from current <code>develop</code> on one
 of <code>feat/...</code>, <code>fix/...</code>, <code>refactor/...</code>, or <code>remove/...</code>.</p>
-<pre><code class="language-sh">git fetch origin
-git switch develop
-git pull --ff-only origin develop
-git switch -c feat/example
-# Make and test the change, then stage explicit paths and commit.
-git push -u origin feat/example
-gh pr create --base develop
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">git<span class="syntax-w"> </span>fetch<span class="syntax-w"> </span>origin
+git<span class="syntax-w"> </span>switch<span class="syntax-w"> </span>develop
+git<span class="syntax-w"> </span>pull<span class="syntax-w"> </span>--ff-only<span class="syntax-w"> </span>origin<span class="syntax-w"> </span>develop
+git<span class="syntax-w"> </span>switch<span class="syntax-w"> </span>-c<span class="syntax-w"> </span>feat/example
+<span class="syntax-c1"># Make and test the change, then stage explicit paths and commit.</span>
+git<span class="syntax-w"> </span>push<span class="syntax-w"> </span>-u<span class="syntax-w"> </span>origin<span class="syntax-w"> </span>feat/example
+gh<span class="syntax-w"> </span>pr<span class="syntax-w"> </span>create<span class="syntax-w"> </span>--base<span class="syntax-w"> </span>develop
 </code></pre>
 <p>Use a PR/MR into <code>develop</code>. Promote the tested integration branch using a PR
 from <code>develop</code> into <code>master</code>; never route a topic directly into <code>master</code>.
@@ -90,7 +91,7 @@ state, and remove the corresponding local topic only when its work is integrated
 Never use <code>gh pr merge --delete-branch</code> for a develop-to-master promotion.
 Legacy branches outside the named prefixes are not automatically removed.</p>
 <h2 id="server-side-protection-one-time-administrator-action">Server-side protection: one-time administrator action</h2>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/.github/rulesets/long-lived-branches.json">ruleset template</a> protects both
 long-lived branches against deletion and force-pushes, requires PRs and resolved
 review threads, and requires the branch/author policy and all fast CI checks.
 It does not impose an extra reviewer count on a single-maintainer repository.</p>
@@ -101,8 +102,8 @@ Both branches have deletion/force-push protection, PR and resolved-thread
 requirements, and all six fast status checks from the template. The default
 branch remains <code>master</code>; unrestricted automatic head-branch deletion is off.</p>
 <p>Inspect effective rules when checking or changing repository settings:</p>
-<pre><code class="language-sh">gh api repos/NoJokeFNA/nrpe-custom/rules/branches/master
-gh api repos/NoJokeFNA/nrpe-custom/rules/branches/develop
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">gh<span class="syntax-w"> </span>api<span class="syntax-w"> </span>repos/NoJokeFNA/nrpe-custom/rules/branches/master
+gh<span class="syntax-w"> </span>api<span class="syntax-w"> </span>repos/NoJokeFNA/nrpe-custom/rules/branches/develop
 </code></pre>
 <p>For a new repository, an administrator can apply the template through GitHub's
 Rules/Rulesets settings or API, subject to plan and permissions. The connected
@@ -113,7 +114,7 @@ branch <code>master</code> and global head-branch deletion disabled. Repository 
 are separate from workflow guards; verify both rather than assuming that a
 committed template establishes protection.</p>
 <p>See <a href="/nrpe-custom/releases/">release automation</a> for what a master push does.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/git-workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/git-workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -134,7 +135,7 @@ committed template establishes protection.</p>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

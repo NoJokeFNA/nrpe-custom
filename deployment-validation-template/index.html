@@ -9,6 +9,7 @@
 <title>Disposable VM deployment validation record · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -112,22 +113,22 @@ missing, mark the relevant scenarios <strong>blocked</strong> and stop before in
 <h2 id="read-only-baseline-inventory">Read-only baseline inventory</h2>
 <p>On the VM, record its actual identity and service definition. Use the correct
 branch below; these commands do not install packages or restart services:</p>
-<pre><code class="language-sh">cat /etc/os-release
-uname -m
-cat /proc/sys/kernel/random/boot_id
-getent passwd nagios
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">cat<span class="syntax-w"> </span>/etc/os-release
+uname<span class="syntax-w"> </span>-m
+cat<span class="syntax-w"> </span>/proc/sys/kernel/random/boot_id
+getent<span class="syntax-w"> </span>passwd<span class="syntax-w"> </span>nagios
 </code></pre>
 <p>Debian:</p>
-<pre><code class="language-sh">dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' nagios-nrpe-server
-systemctl cat nagios-nrpe-server.service
-systemctl is-enabled nagios-nrpe-server.service
-systemctl is-active nagios-nrpe-server.service
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">dpkg-query<span class="syntax-w"> </span>-W<span class="syntax-w"> </span>-f<span class="syntax-o">=</span><span class="syntax-s1">'${Package} ${Version} ${Architecture}\n'</span><span class="syntax-w"> </span>nagios-nrpe-server
+systemctl<span class="syntax-w"> </span>cat<span class="syntax-w"> </span>nagios-nrpe-server.service
+systemctl<span class="syntax-w"> </span>is-enabled<span class="syntax-w"> </span>nagios-nrpe-server.service
+systemctl<span class="syntax-w"> </span>is-active<span class="syntax-w"> </span>nagios-nrpe-server.service
 </code></pre>
 <p>SLES 12 SP3:</p>
-<pre><code class="language-sh">rpm -q --queryformat '%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n' nrpe
-systemctl cat nrpe.service
-systemctl is-enabled nrpe.service
-systemctl is-active nrpe.service
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">rpm<span class="syntax-w"> </span>-q<span class="syntax-w"> </span>--queryformat<span class="syntax-w"> </span><span class="syntax-s1">'%{NAME} %{VERSION}-%{RELEASE} %{ARCH}\n'</span><span class="syntax-w"> </span>nrpe
+systemctl<span class="syntax-w"> </span>cat<span class="syntax-w"> </span>nrpe.service
+systemctl<span class="syntax-w"> </span>is-enabled<span class="syntax-w"> </span>nrpe.service
+systemctl<span class="syntax-w"> </span>is-active<span class="syntax-w"> </span>nrpe.service
 </code></pre>
 <p>On a fresh VM the package or service may not exist; record that outcome instead
 of treating missing baseline components as an installation pass. Save a baseline
@@ -213,7 +214,7 @@ the disposable VM identity, snapshot and recovery prerequisites.</p>
 with actual results for the exact tested OS and artifacts. Leave other targets
 open. Windows Docker Desktop validation uses its own procedure and is not
 established by completing this VM worksheet.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/deployment-validation-template.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/deployment-validation-template.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -235,7 +236,7 @@ established by completing this VM worksheet.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

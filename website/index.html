@@ -9,6 +9,7 @@
 <title>Documentation website and GitHub Pages · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -68,13 +69,28 @@ list changes: capture that command's output, render it as plain escaped text in
 a local terminal-style browser view, and take a screenshot. Keep machine names,
 paths and private infrastructure out of the capture. No screenshot tooling is
 required to build or use the website.</p>
+<p><code>website/assets/terminal-menu.png</code> shows the current menu rendered by
+prompt_toolkit in an empty temporary workspace. Its actual terminal screen cells
+were captured at 100 columns by 24 rows and rendered as escaped text for the
+screenshot. It shows no successful build or real infrastructure; the homepage
+and menu guide share this image. Refresh it when navigation or presentation
+changes, preserving the same empty-workspace provenance.</p>
 <h2 id="local-preview">Local preview</h2>
+<p>Fenced code blocks with a recognized language use build-time Pygments syntax
+highlighting and a language label. The palette is independently authored to fit
+the dark code panels; token colors meet a 4.5:1 contrast ratio against that
+background. Shell, PowerShell, INI, YAML, JSON, Python and diff fences are covered.
+Unknown/unlabelled languages, plain output and Mermaid fences remain unchanged;
+there is no speculative language detection. Inline code keeps its existing style.</p>
+<p>Colors are static HTML/CSS: no browser highlighter, CDN or remote grammar is
+loaded. Original code text, indentation, entities and Unicode are preserved for
+the copy button. Build-time dependencies remain separate from the NRPE CLI.</p>
 <p>Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
 website dependency:</p>
-<pre><code class="language-sh">python3 -m venv .nrpe/site-venv
-.nrpe/site-venv/bin/python -m pip install -r requirements-website.txt
-.nrpe/site-venv/bin/python website/build.py
-python3 -m http.server 8000 --directory .nrpe/site
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>venv<span class="syntax-w"> </span>.nrpe/site-venv
+.nrpe/site-venv/bin/python<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>pip<span class="syntax-w"> </span>install<span class="syntax-w"> </span>-r<span class="syntax-w"> </span>requirements-website.txt
+.nrpe/site-venv/bin/python<span class="syntax-w"> </span>website/build.py
+python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>http.server<span class="syntax-w"> </span><span class="syntax-m">8000</span><span class="syntax-w"> </span>--directory<span class="syntax-w"> </span>.nrpe/site
 </code></pre>
 <p>Open <code>http://localhost:8000/nrpe-custom/</code>. On Windows use
 <code>.nrpe\site-venv\Scripts\python.exe</code> for environment-local Python commands.
@@ -83,16 +99,16 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
 <p>Work on a topic branch, review and integrate into develop. Publication requires
 a separate explicit maintainer request. From the exact clean develop or master
 commit that should be shown on the website:</p>
-<pre><code class="language-sh">.nrpe/site-venv/bin/python website/build.py
-.nrpe/site-venv/bin/python website/publish.py
-.nrpe/site-venv/bin/python website/publish.py --push
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">.nrpe/site-venv/bin/python<span class="syntax-w"> </span>website/build.py
+.nrpe/site-venv/bin/python<span class="syntax-w"> </span>website/publish.py
+.nrpe/site-venv/bin/python<span class="syntax-w"> </span>website/publish.py<span class="syntax-w"> </span>--push
 </code></pre>
 <p>The default is a read-only preview. <code>--push</code> checks source identity, base path,
 all asset hashes and the human author/committer. A separate temporary Git index
@@ -122,7 +138,7 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -144,7 +160,7 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

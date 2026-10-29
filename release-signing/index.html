@@ -9,6 +9,7 @@
 <title>Release signature setup and verification · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -57,8 +58,8 @@ unchanged. No signing key or secret is generated or configured by this change.</
 <h2 id="enroll-a-maintainer-controlled-key">Enroll a maintainer-controlled key</h2>
 <p>Use OpenSSH 8.2+ with <code>ssh-keygen -Y</code> signature support. On a trusted workstation,
 outside the checkout, create a dedicated key if none exists:</p>
-<pre><code class="language-sh">ssh-keygen -t ed25519 -N '' -C nrpe-custom-release -f ./nrpe-release-signing
-ssh-keygen -lf ./nrpe-release-signing.pub
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">ssh-keygen<span class="syntax-w"> </span>-t<span class="syntax-w"> </span>ed25519<span class="syntax-w"> </span>-N<span class="syntax-w"> </span><span class="syntax-s1">''</span><span class="syntax-w"> </span>-C<span class="syntax-w"> </span>nrpe-custom-release<span class="syntax-w"> </span>-f<span class="syntax-w"> </span>./nrpe-release-signing
+ssh-keygen<span class="syntax-w"> </span>-lf<span class="syntax-w"> </span>./nrpe-release-signing.pub
 </code></pre>
 <p>The CI key must be unencrypted for noninteractive use. Protect its private file
 and backup; do not reuse an administrator/login key or commit the private key.
@@ -104,8 +105,8 @@ and confirm its fingerprint independently. A public key shipped alongside an
 untrusted download does not authenticate that download. Download all release
 assets into one otherwise empty directory, including <code>SHA256SUMS.sig</code>.</p>
 <p>From a trusted checkout containing the verification helper:</p>
-<pre><code class="language-sh">python3 scripts/release_signature.py verify --directory /path/to/downloaded-release \
-  --allowed-signers /path/to/trusted-release-allowed-signers
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>scripts/release_signature.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>--directory<span class="syntax-w"> </span>/path/to/downloaded-release<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>--allowed-signers<span class="syntax-w"> </span>/path/to/trusted-release-allowed-signers
 </code></pre>
 <p>The helper first authenticates the checksum manifest, then requires the exact
 asset set and verifies every payload hash. It rejects missing signatures,
@@ -113,10 +114,10 @@ unknown signers, extra/missing files, links, invalid checksum paths and changes.
 It does not extract or install packages. Treat any nonzero exit as failure;
 unsigned historical releases cannot pass this authentication check.</p>
 <p>The equivalent signature-only OpenSSH command on a POSIX host is:</p>
-<pre><code class="language-sh">ssh-keygen -Y verify -f /path/to/trusted-release-allowed-signers \
-  -I nrpe-custom-release -n nrpe-custom-release \
-  -s /path/to/downloaded-release/SHA256SUMS.sig \
-  &lt; /path/to/downloaded-release/SHA256SUMS
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">ssh-keygen<span class="syntax-w"> </span>-Y<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>-f<span class="syntax-w"> </span>/path/to/trusted-release-allowed-signers<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>-I<span class="syntax-w"> </span>nrpe-custom-release<span class="syntax-w"> </span>-n<span class="syntax-w"> </span>nrpe-custom-release<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>-s<span class="syntax-w"> </span>/path/to/downloaded-release/SHA256SUMS.sig<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>&lt;<span class="syntax-w"> </span>/path/to/downloaded-release/SHA256SUMS
 </code></pre>
 <p>That command authenticates the manifest only. The Python helper additionally
 checks completeness and hashes. On Windows, use a recent OpenSSH installation
@@ -126,15 +127,15 @@ stdin example above.</p>
 <p>For a complete candidate produced by <a href="/nrpe-custom/releases/#local-candidate-preparation">release preparation</a>,
 the signing CLI accepts the name of an environment variable containing the
 private key. It never accepts the key itself as a command-line argument:</p>
-<pre><code class="language-sh">NRPE_LOCAL_SIGNING_KEY=&quot;$(cat /secure/path/nrpe-release-signing)&quot; \
-  python3 scripts/release_signature.py sign --directory .nrpe/release \
-  --allowed-signers packaging/release-allowed-signers --key-env NRPE_LOCAL_SIGNING_KEY
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-nv">NRPE_LOCAL_SIGNING_KEY</span><span class="syntax-o">=</span><span class="syntax-s2">"</span><span class="syntax-k">$(</span>cat<span class="syntax-w"> </span>/secure/path/nrpe-release-signing<span class="syntax-k">)</span><span class="syntax-s2">"</span><span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>python3<span class="syntax-w"> </span>scripts/release_signature.py<span class="syntax-w"> </span>sign<span class="syntax-w"> </span>--directory<span class="syntax-w"> </span>.nrpe/release<span class="syntax-w"> </span><span class="syntax-se">\</span>
+<span class="syntax-w">  </span>--allowed-signers<span class="syntax-w"> </span>packaging/release-allowed-signers<span class="syntax-w"> </span>--key-env<span class="syntax-w"> </span>NRPE_LOCAL_SIGNING_KEY
 </code></pre>
 <p>Use a shell with tracing disabled. Test using disposable keys for development;
 never upload private keys or logs containing them. Signing refuses an existing
 signature rather than replacing it. Signing and verification commands do not
 upload or publish anything.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/release-signing.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/release-signing.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -156,7 +157,7 @@ upload or publish anything.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

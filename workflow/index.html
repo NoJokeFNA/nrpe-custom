@@ -9,6 +9,7 @@
 <title>Workflow reference · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -57,13 +58,13 @@ Bash is needed inside containers and for optional local shell syntax checks.</p>
 files, checks Docker readiness, and records results. Direct Compose commands
 bypass the controller's checks, logs, and target locks.</p>
 <p>From the repository root on Windows, Linux, or macOS:</p>
-<pre><code class="language-sh">python3 nrpe.py doctor
-python3 nrpe.py verify debian12
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>doctor
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>debian12
 </code></pre>
 <p>Ensure that <code>python3 --version</code> reports Python 3.9 or newer. On Windows, make
 sure your Python installation provides <code>python3</code> in PATH.</p>
 <p>Run without arguments for an interactive action and target menu:</p>
-<pre><code class="language-powershell">python3 nrpe.py
+<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span>
 </code></pre>
 <p>The arrow-key menu returns after each command. Use arrows and Enter to navigate,
 Space to toggle targets, and A to select all targets. Escape returns to the
@@ -111,11 +112,11 @@ messages are in English. Use <code>--help</code> or <code>&lt;command&gt; --help
 </tbody>
 </table>
 <p>Select one target, multiple targets, or <code>all</code> by itself:</p>
-<pre><code class="language-powershell">python3 nrpe.py verify debian12 debian13
-python3 nrpe.py verify all
-python3 nrpe.py test debian14
-python3 nrpe.py status
-python3 nrpe.py logs --last
+<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">verify</span> <span class="syntax-n">debian12</span> <span class="syntax-n">debian13</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">verify</span> <span class="syntax-n">all</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">test</span> <span class="syntax-n">debian14</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">status</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">logs</span> <span class="syntax-p">-</span><span class="syntax-n">-last</span>
 </code></pre>
 <p>SLES 12 SP3 uses a genuine digest-pinned 12.3 image and a hash-pinned set of
 original SLE-12 Server/SDK RPMs. A modern input stage downloads sources; native
@@ -261,17 +262,17 @@ is still active. Existing Compose networks and builder caches are retained.</p>
 <p>The custom packages compile argument support while leaving runtime arguments
 disabled. On a real target server, deliberately configure <code>/etc/nagios/nrpe.cfg</code>
 on Debian, or <code>/etc/nrpe.cfg</code> for this SLES/OBS recipe:</p>
-<pre><code class="language-ini">allowed_hosts=&lt;nagios-server-ip&gt;,127.0.0.1,::1
-dont_blame_nrpe=1
+<pre class="syntax-block" data-language="INI / config"><code class="language-ini"><span class="syntax-na">allowed_hosts</span><span class="syntax-o">=</span><span class="syntax-s">&lt;nagios-server-ip&gt;,127.0.0.1,::1</span>
+<span class="syntax-na">dont_blame_nrpe</span><span class="syntax-o">=</span><span class="syntax-s">1</span>
 </code></pre>
 <p>Replace the placeholder with the permitted Nagios server's address, review
 firewall rules, TLS, command definitions, and argument validation, then restart
 <code>nagios-nrpe-server</code> on Debian or <code>nrpe</code> on SLES. Bash command substitution must remain disabled. Build and
 test containers never apply these settings to the development host.</p>
 <h2 id="development-and-validation">Development and validation</h2>
-<pre><code class="language-sh">python3 -m unittest discover -s tests -v
-for script in scripts/*.sh; do bash -n &quot;$script&quot; || exit; done
-python3 nrpe.py doctor
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>-m<span class="syntax-w"> </span>unittest<span class="syntax-w"> </span>discover<span class="syntax-w"> </span>-s<span class="syntax-w"> </span>tests<span class="syntax-w"> </span>-v
+<span class="syntax-k">for</span><span class="syntax-w"> </span>script<span class="syntax-w"> </span><span class="syntax-k">in</span><span class="syntax-w"> </span>scripts/*.sh<span class="syntax-p">;</span><span class="syntax-w"> </span><span class="syntax-k">do</span><span class="syntax-w"> </span>bash<span class="syntax-w"> </span>-n<span class="syntax-w"> </span><span class="syntax-s2">"</span><span class="syntax-nv">$script</span><span class="syntax-s2">"</span><span class="syntax-w"> </span><span class="syntax-o">||</span><span class="syntax-w"> </span>exit<span class="syntax-p">;</span><span class="syntax-w"> </span><span class="syntax-k">done</span>
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>doctor
 </code></pre>
 <p>For affected targets, run <code>python3 nrpe.py verify &lt;target&gt;</code>. Unit tests cover CLI
 routing, Docker diagnostics, run reports, artifact identity, locking, cleanup,
@@ -279,8 +280,8 @@ and the Debian/RPM recipe transformations without requiring Docker or network ac
 They do not replace real package and integration tests. Windows-specific error
 messages and process handling also need validation on Windows.</p>
 <p>Implementation is in <code>nrpe_cli/</code>; <code>nrpe.py</code> is the public entry point. Docker
-runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/AGENTS.md">AGENTS.md</a> and the
-additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/tests/AGENTS.md">test</a> instructions apply.
+runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/AGENTS.md">AGENTS.md</a> and the
+additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/tests/AGENTS.md">test</a> instructions apply.
 Write code, comments, documentation, and commits in English; follow
 <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits 1.0.0</a>.</p>
 <h2 id="repeatability-and-updates">Repeatability and updates</h2>
@@ -292,7 +293,7 @@ security updates and rebuild custom packages when official sources change; do
 not assume APT automatically replaces every custom version as intended.</p>
 <p>Official sources: <a href="https://sources.debian.org/src/nagios-nrpe/">Debian NRPE sources</a>
 and <a href="https://packages.debian.org/src:nagios-nrpe">source package information</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -319,7 +320,7 @@ and <a href="https://packages.debian.org/src:nagios-nrpe">source package informa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

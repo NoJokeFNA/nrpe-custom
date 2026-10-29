@@ -9,6 +9,7 @@
 <title>Build and NRPE diagnostics · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -43,9 +44,9 @@ the local run log. Recognized failures add contextual hints. Successful commands
 do not emit failure hints, including when a retry recovered from an earlier
 error. Hints classify observed messages; they do not establish a root cause.</p>
 <h2 id="inspect-an-existing-log">Inspect an existing log</h2>
-<pre><code class="language-sh">python3 nrpe.py diagnose ./build.log
-python3 nrpe.py diagnose ./build.log --ca-configured
-python3 nrpe.py diagnose ./redacted-nrpe.log --context nrpe
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>diagnose<span class="syntax-w"> </span>./build.log
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>diagnose<span class="syntax-w"> </span>./build.log<span class="syntax-w"> </span>--ca-configured
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>diagnose<span class="syntax-w"> </span>./redacted-nrpe.log<span class="syntax-w"> </span>--context<span class="syntax-w"> </span>nrpe
 </code></pre>
 <p><code>diagnose</code> reads a local text file without Docker or a connection to the server.
 It executes no log content, prints category hints rather than raw lines, and
@@ -122,7 +123,7 @@ for the custom NRPE 4.1.1 build. Do not apply modern <code>ssl_*</code> directiv
 options. A manually started daemon is not managed by systemd; a failed second
 service start can simply mean its port/PID is already occupied. Do not launch
 another instance or remove live locks to hide that condition.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -143,7 +144,7 @@ another instance or remove live locks to hide that condition.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -9,6 +9,7 @@
 <title>Architecture and maintenance map · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -108,6 +109,10 @@ automation. It does not bypass target locks or artifact validation.</p>
 <tr>
 <td><code>nrpe_cli/targets.py</code></td>
 <td>Shared target list and package filename conventions</td>
+</tr>
+<tr>
+<td><code>nrpe_cli/progress.py</code></td>
+<td>Optional context-local presentation events; controller owns execution and evidence</td>
 </tr>
 <tr>
 <td><code>nrpe_cli/certificates.py</code></td>
@@ -313,7 +318,7 @@ are a different concern: Debian discovers sources through APT at build time;
 SLES uses explicitly reviewed pinned manifests. The controller does not yet
 compare a complete remote source/recipe identity to decide whether existing
 outputs need rebuilding. See <a href="/nrpe-custom/workflow/#repeatability-and-updates">repeatability</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/architecture.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/architecture.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -335,7 +340,7 @@ outputs need rebuilding. See <a href="/nrpe-custom/workflow/#repeatability-and-u
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

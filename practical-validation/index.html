@@ -9,6 +9,7 @@
 <title>Practical validation beyond container CI · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -69,18 +70,20 @@ to the tested host/artifacts, not automatically to every supported platform.</p>
 and terminal; include Compose 5.6.1 and Buildx 0.38.1 when reproducing the original
 report, then test current supported versions separately. Use a clean checkout in
 a path containing spaces and non-ASCII characters, for example
-<code>C:\NRPE validation\Prüfung\nrpe-custom</code>. Put a public test CA certificate in a
-different such directory; never pass a private key to <code>--ca-cert</code>.</p>
+<code>C:\NRPE validation\Project Ω\nrpe-custom</code>. Put a public test CA certificate in a
+different such directory; never pass a private key to <code>--ca-cert</code>. These are
+illustrative test paths, not required installation locations. The <code>Ω</code> deliberately
+exercises Unicode handling; use real folders and certificate paths on your test host.</p>
 <p>From that checkout in PowerShell:</p>
-<pre><code class="language-powershell">python3 --version
-docker version
-docker compose version
-docker buildx version
-python3 nrpe.py doctor
-python3 nrpe.py verify debian12 --ca-cert &quot;C:\NRPE validation\Prüfung CA\company-ca.pem&quot; --pull
-$LASTEXITCODE
-python3 nrpe.py status
-python3 nrpe.py logs --last
+<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-n">python3</span> <span class="syntax-p">-</span><span class="syntax-n">-version</span>
+<span class="syntax-n">docker</span> <span class="syntax-n">version</span>
+<span class="syntax-n">docker</span> <span class="syntax-n">compose</span> <span class="syntax-n">version</span>
+<span class="syntax-n">docker</span> <span class="syntax-n">buildx</span> <span class="syntax-n">version</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">doctor</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">verify</span> <span class="syntax-n">debian12</span> <span class="syntax-p">-</span><span class="syntax-n">-ca-cert</span> <span class="syntax-s2">"C:\NRPE validation\Company CA Ω\company-ca.pem"</span> <span class="syntax-p">-</span><span class="syntax-n">-pull</span>
+<span class="syntax-nv">$LASTEXITCODE</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">status</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">logs</span> <span class="syntax-p">-</span><span class="syntax-n">-last</span>
 </code></pre>
 <p>Use your actual certificate path. The expected result is a complete successful
 build/install/TLS run, with no temporary-path failure at "load local bake
@@ -122,8 +125,28 @@ definitions". For intentional repeat builds of existing output, add <code>--rebu
 <td>Exit 130, interrupted run recorded, locks released by normal cleanup; inspect any remaining project containers before retrying</td>
 </tr>
 <tr>
-<td>Optional menu: arrows, Space, Enter, Esc and cancellation</td>
-<td>Correct navigation, explicit rebuild consent and return to menu without unintended execution</td>
+<td>Menu: arrows, filtering with <code>/</code>, Space/A, Enter, Esc and resize down to 60×16</td>
+<td>Correct navigation and visible focus; no action runs while browsing</td>
+</tr>
+<tr>
+<td>Menu: Back through targets/options/review, then cancel</td>
+<td>Targets, CA choice and options persist only for the session; no rebuild on cancellation</td>
+</tr>
+<tr>
+<td>Menu: 0/1/12+ drive roots; mapped/disconnected roots; quoted long/UNC paths</td>
+<td>Drives stay in their own selector; failure/cancel retains the directory and focus; complete path remains inspectable</td>
+</tr>
+<tr>
+<td>Menu: explicit CA removal while <code>NRPE_CA_CERT</code> is set</td>
+<td>This session omits the CA; environment and runtime NRPE TLS settings remain unchanged</td>
+</tr>
+<tr>
+<td>Menu: live phase display and Ctrl+C during actual build/test</td>
+<td>Original exit/report outcome, retained logs and normal container/lock cleanup</td>
+</tr>
+<tr>
+<td>Menu: cleanup preview, cancellation, changed candidates, then approved disposable data</td>
+<td>Preview never deletes; changed scope requires another preview; protected evidence remains</td>
 </tr>
 </tbody>
 </table>
@@ -208,7 +231,7 @@ worked. Record these outcomes separately.</p>
 <p>Add sanitized actual results and their exact environments to the
 <a href="/nrpe-custom/release-plan/#remaining-work-in-priority-order">release plan</a>. Leave scenarios
 open until performed; log any failure before claiming practical platform support.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/practical-validation.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/practical-validation.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -230,7 +253,7 @@ open until performed; log any failure before claiming practical platform support
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -9,6 +9,7 @@
 <title>Third-party provenance and license inventory · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -66,7 +67,7 @@ are verified but are not release assets. Historical releases are unchanged.</p>
 </tr>
 <tr>
 <td>SLES NRPE <code>4.1.1</code></td>
-<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/packaging/sles12sp3-source.json">Pinned source manifest</a>, revision <code>835292739a5736a9d8f0460f670b6f15</code>; actual upstream archive, modified spec and existing custom binary's license output</td>
+<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/packaging/sles12sp3-source.json">Pinned source manifest</a>, revision <code>835292739a5736a9d8f0460f670b6f15</code>; actual upstream archive, modified spec and existing custom binary's license output</td>
 <td><strong>Resolved:</strong> <code>src/utils.c:display_license()</code> explicitly allows compilation, linking and use with OpenSSL and grants GPLv2-or-later. This is evidence from the SLES source itself. The earlier search missed the word "exemption". Preserve the <a href="/nrpe-custom/license-notices/">upstream notice and full GPL text</a>; see the <a href="/nrpe-custom/sles-license-review/">source review</a>.</td>
 </tr>
 <tr>
@@ -96,7 +97,7 @@ are verified but are not release assets. Historical releases are unchanged.</p>
 </tr>
 <tr>
 <td><code>system-user-nagios</code> <code>1.0.0-0</code></td>
-<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/packaging/sles12sp3-user-source.json">Pinned manifest</a>, revision <code>b979817ae6424675519c86e80add617a</code>; actual original spec extracted from the source RPM and hash-verified</td>
+<td><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/packaging/sles12sp3-user-source.json">Pinned manifest</a>, revision <code>b979817ae6424675519c86e80add617a</code>; actual original spec extracted from the source RPM and hash-verified</td>
 <td><strong>Resolved:</strong> the source spec itself explicitly declares MIT and retains the SUSE LLC 2024 copyright/licensing header. The missing standalone full text is supplied as a <a href="/nrpe-custom/notices/system-user-nagios-MIT.txt">downstream companion notice</a>, not represented as an original upstream file or a new project license grant. Preserve the spec and README and include that notice in release assets.</td>
 </tr>
 </tbody>
@@ -165,6 +166,12 @@ original documentation and notices. Bundling the renderer would require its
 actual license text and a separate dependency inventory. Website CSS, templates
 and browser JavaScript are independently authored project code; no external
 JavaScript framework, analytics SDK or font bundle is shipped.</p>
+<p>The build-only syntax highlighter is <code>Pygments==2.21.0</code>. Its installed wheel's
+<code>pygments-2.21.0.dist-info/licenses/LICENSE</code> was inspected and contains BSD-2-Clause
+terms; wheel metadata records the same SPDX expression. It is installed
+separately, not vendored into the repository, shipped in NRPE packages or sent
+to browsers. Generated HTML token spans and scoped CSS use this project's own
+color palette. No Pierre/Tree/Shiki library or third-party theme is bundled.</p>
 <p>Docker images, OpenSSL, system libraries, Debian/SUSE repository packages,
 monitoring plugins, and SLES installation media retain their own licenses.
 The current release scope is the custom server packages, the SLES user package,
@@ -189,7 +196,7 @@ candidate completeness and provenance checks.</p>
 No endorsement or support entitlement from Nagios, Debian, or SUSE is implied.
 Metadata labels alone do not establish that an arbitrary release bundle retains
 all required notices. See the <a href="/nrpe-custom/release-plan/">release plan</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/THIRD_PARTY.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/THIRD_PARTY.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -211,7 +218,7 @@ all required notices. See the <a href="/nrpe-custom/release-plan/">release plan<
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

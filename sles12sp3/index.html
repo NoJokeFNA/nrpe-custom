@@ -9,6 +9,7 @@
 <title>SLES 12 SP3 RPM target · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -43,8 +44,8 @@
 <code>libssl.so.1.0.0</code> and <code>libcrypto.so.1.0.0</code>. Previous SLES 15 SP3/SP4 test results
 do not validate this platform. The active target is now <code>sles12sp3</code>; old releases
 are not overwritten or relabeled.</p>
-<pre><code class="language-sh">python3 nrpe.py verify sles12sp3
-python3 nrpe.py test sles12sp3
+<pre class="syntax-block" data-language="Shell"><code class="language-sh">python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span>verify<span class="syntax-w"> </span>sles12sp3
+python3<span class="syntax-w"> </span>nrpe.py<span class="syntax-w"> </span><span class="syntax-nb">test</span><span class="syntax-w"> </span>sles12sp3
 </code></pre>
 <p>Use <code>--rebuild</code> to deliberately replace existing local outputs. Old SLE-15 RPMs
 must not be installed or copied into this target's output directory.</p>
@@ -57,7 +58,7 @@ OpenSSL 1.0.2j. <code>SLES_BASE_IMAGE</code> can select an approved equivalent, 
 native guard rejects other distributions/releases and requires the OpenSSL 1.0
 ABI. The runtime image contains no compiler or preinstalled NRPE server.</p>
 <p>The historical image has no configured repositories and the old SP3 backports
-index is empty. Instead, the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/packaging/sles12sp3-bootstrap.json">bootstrap manifest</a>
+index is empty. Instead, the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/packaging/sles12sp3-bootstrap.json">bootstrap manifest</a>
 pins original SLE-12 GA/SP3 Server and SDK RPMs available through SUSE's public
 OBS API. Each entry records its original URL, size, SHA-256, name, version,
 architecture, vendor and SUSE signing key. No SLE-15 or Leap package is used.</p>
@@ -74,16 +75,16 @@ compiled/packaged by SLES 12's own tools. The former <code>--sles-media</code> o
 SLE-15 module/ISO layout were removed; an ISO is not required by this workflow.</p>
 <h2 id="sources-and-package-identities">Sources and package identities</h2>
 <ul>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/packaging/sles12sp3-source.json">NRPE</a>: reviewed immutable OBS revision
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/packaging/sles12sp3-source.json">NRPE</a>: reviewed immutable OBS revision
   <code>835292739a5736a9d8f0460f670b6f15</code>, version <code>4.1.1</code>, local Release <code>0.withargs1</code>.
   Command arguments remain compiled in, runtime-disabled by default; Bash command
   substitution stays disabled. This is a native rebuild, not a reproduction of
   the old installed NRPE 2.15 package.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/packaging/sles12sp3-macros-source.json">Nagios build macros</a>: immutable OBS
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/packaging/sles12sp3-macros-source.json">Nagios build macros</a>: immutable OBS
   revision <code>a911087cc73b87e04465861110d43754</code>, version <code>0.14-0</code>, built natively.
   The upstream spec explicitly supports SLES 12. This build dependency is not
   faked or supplied by a SLE-15 binary.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/packaging/sles12sp3-user-source.json">Nagios user package</a>: pinned original
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/packaging/sles12sp3-user-source.json">Nagios user package</a>: pinned original
   <code>system-user-nagios 1.0.0-0</code>, built natively after the macros. Existing users
   and groups are handled by the original package scripts.</li>
 </ul>
@@ -97,6 +98,11 @@ client/server source/version relationship, the bootstrap manifest and component
 notices. See <a href="/nrpe-custom/sles-license-review/">license evidence</a> and the
 <a href="/nrpe-custom/license-notices/">notice directory</a>.</p>
 <h2 id="tls-and-the-original-handshake-failure">TLS and the original handshake failure</h2>
+<p>The operator later clarified that starting the missing <code>nrpe.service</code> restored
+the checks in their combined Nagios/NRPE setup. Check the
+<a href="/nrpe-custom/faq/#nrpe-checks-on-sles-services-first-then-ssltls">services-first FAQ</a> before
+replacing packages. That service-state fix did not require a custom build and
+is separate from the old binary's certificate-authentication limitations.</p>
 <p>For the user-performed pre-upgrade diagnostic with NRPE 2.15 and <code>check_nrpe</code>
 4.1.0, see <a href="/nrpe-custom/sles12sp3-plaintext-diagnostic/">isolating an NRPE TLS handshake failure</a>.
 It documents a separate temporary plaintext instance, the successful result and
@@ -131,7 +137,7 @@ and <a href="/nrpe-custom/practical-validation/">practical validation</a> before
 support end as 2019-06-30 and LTSS end as 2022-06-30. This is a requested legacy
 compatibility build, not extended vendor maintenance or certification. Historical
 package/image availability can change and does not guarantee security support.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/sles12sp3.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/sles12sp3.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -153,7 +159,7 @@ package/image availability can change and does not guarantee security support.</
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>

@@ -9,6 +9,7 @@
 <title>Network and firewall requirements · NRPE Custom</title>
 <link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -196,13 +197,16 @@ produce a TLS hint; the original output and exit code are preserved.</p>
 organization's issuing CA. For errors such as <code>Curl error 60</code> / <code>self signed
 certificate in certificate chain</code>, select the public root or intermediate CA
 provided by your administrator:</p>
-<pre><code class="language-powershell">python3 nrpe.py verify sles12sp3 --ca-cert &quot;C:\Certificates\Company-Root.cer&quot;
-python3 nrpe.py test debian12 --ca-cert &quot;C:\Certificates\Company-Root.cer&quot;
+<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">verify</span> <span class="syntax-n">sles12sp3</span> <span class="syntax-p">-</span><span class="syntax-n">-ca-cert</span> <span class="syntax-s2">"C:\Certificates\Company-Root.cer"</span>
+<span class="syntax-n">python3</span> <span class="syntax-n">nrpe</span><span class="syntax-p">.</span><span class="syntax-n">py</span> <span class="syntax-n">test</span> <span class="syntax-n">debian12</span> <span class="syntax-p">-</span><span class="syntax-n">-ca-cert</span> <span class="syntax-s2">"C:\Certificates\Company-Root.cer"</span>
 </code></pre>
 <p>The option is supported by <code>build</code>, <code>test</code>, <code>verify</code>, and <code>build.py</code>, for every
 target. The menu includes a certificate file browser under Workflow options.
 Alternatively set <code>NRPE_CA_CERT</code> to the local file path; the explicit <code>--ca-cert</code>
-option takes precedence. With neither configured, no extra CA is added.</p>
+option takes precedence. With neither configured, no extra CA is added.
+Use <code>--no-ca-cert</code> to explicitly omit the company CA even when <code>NRPE_CA_CERT</code>
+is set; it cannot be combined with <code>--ca-cert</code>. The menu offers the same
+session-only override without changing the process environment.</p>
 <p>Supply <strong>one public X.509 certificate</strong>, in PEM or DER format. <code>.cer</code>, <code>.crt</code>, and
 <code>.pem</code> filenames are supported; the contents determine the format. Bundles and
 private keys are rejected. This is a CA for repository HTTPS, not a production
@@ -232,7 +236,7 @@ separate trust stores. Configure those through your organization's Docker
 instructions if required. Host pip/Git trust is also separate. Use <code>nrpe.py</code> to
 prepare the secret and its cache identity; direct Compose commands do not
 normalize DER input or calculate that identity for you.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/e4ce000b2457e767401435f21aa072f33879eade/docs/network.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f27e2070eaa3b1c40d4c560f3b812c99e95319d2/docs/network.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc"><span>On this page</span><div class="toc">
 <ul>
@@ -259,7 +263,7 @@ normalize DER input or calculate that identity for you.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source e4ce000</span>
+<span>Source f27e207</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics or third-party fonts.</p>
 </footer>
