@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Verify NRPE transport and certificate authentication · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<span>NRPE Custom</span>
+</a>
+<a class="collection-link" href="/nrpe-custom/overview/">Documentation <span aria-hidden="true">▾</span>
+</a>
+<div class="header-tools">
+<a class="header-source" href="https://github.com/NoJokeFNA/nrpe-custom">Source code ↗</a>
+<a class="header-download" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Get NRPE packages</a><label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+</div>
+</header>
+<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a aria-current="page" href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="doc-breadcrumb">
+<a href="/nrpe-custom/">NRPE Custom</a>
+<span>/</span>
+<a href="/nrpe-custom/overview/">Documentation</a>
+</div>
+      <h1>Verify NRPE transport and certificate authentication</h1>
+      <p class="article-meta">Source d9a8e6e</p>
+      <article class="prose"><p>A successful encrypted NRPE query is useful evidence, but does not by itself
+prove certificate or hostname verification. Run these checks from the actual
+monitoring host, in order. Use test credentials and an isolated target for
+negative tests. Follow the <a href="/nrpe-custom/installation/">installation guide</a> and
+<a href="https://github.com/NagiosEnterprises/nrpe">upstream manuals</a> for provisioning.</p>
+<p>Examples use fictional target <code>192.0.2.20</code>, monitoring host <code>192.0.2.10</code> and
+certificate name <code>nrpe.example.internal</code>. Replace these and all file paths.
+The OpenSSL examples require a modern monitoring-client OpenSSL with
+<code>-verify_hostname</code> and <code>-verify_return_error</code> support; check its local help.
+Do not replace the SLES target's system OpenSSL to run client-side diagnostics.</p>
+<h2 id="1-establish-the-actual-server-and-tcp-path">1. Establish the actual server and TCP path</h2>
+<p>On the monitored host, run the read-only
+<a href="/nrpe-custom/troubleshooting/#read-only-target-server-inspection">server diagnostic</a>.
+Confirm daemon version/package, intended managed service, configuration and
+listener. On the monitoring host:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">ip</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">route</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">get</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span>
+<span class="syntax-fg-ffa657">nc</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-vz</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-w</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">5666</span>
+</code></pre>
+<p>Expected: the route selects the intended monitoring source and TCP connects.
+If it times out, inspect the target's listener, simultaneous packet capture and
+firewall. Repeated inbound SYN packets without SYN-ACK are not a TLS handshake.
+A failed TCP check cannot be repaired by adding a CA or changing ciphers.</p>
+<h2 id="2-distinguish-encryption-from-authentication">2. Distinguish encryption from authentication</h2>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">5666</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-2</span>
+</code></pre>
+<p>Without <code>-n</code>, the client attempts SSL/TLS. A returned <code>NRPE v4.1.1</code> demonstrates
+a completed encrypted NRPE exchange with that running endpoint. Record the
+actual version returned. <code>-2</code> selects packet format, not plaintext. A client
+using <code>-n</code> against a TLS daemon can produce <code>Receive header underflow</code>.</p>
+<p>Commented <code>ssl_*</code> settings mean daemon defaults apply, not that TLS is disabled.
+Read included configuration files too. A successful default-mode query does not
+prove CA trust, the intended server identity or mandatory client certificates.
+If the server requires certificates, supply its intended client options rather
+than weakening that policy to make this simple example succeed.</p>
+<h2 id="3-verify-the-servers-chain-and-identity-explicitly">3. Verify the server's chain and identity explicitly</h2>
+<p>For the documented SLES 12 SP3/NRPE 4.1.1 policy, provision the
+<a href="/nrpe-custom/installation/#sles-certificate-authenticated-tls">complete authenticated TLS configuration</a>
+first. On a modern monitoring host:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">openssl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">s_client</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-connect</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">192.0.2.20:5666</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-servername</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.example.internal</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-verify_hostname</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.example.internal</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-verify_return_error</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-CAfile</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/monitoring-ca.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-cert</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-key</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.key</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-tls1_2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-cipher</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-ff7b72">&lt;</span><span class="syntax-fg-a5d6ff">/dev/null</span>
+<span class="syntax-fg-79c0ff">printf</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;OpenSSL exit status: %s\n&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;</span><span class="syntax-fg-79c0ff">$?</span><span class="syntax-fg-a5d6ff">&quot;</span>
+</code></pre>
+<p>Expected: successful chain/name verification, TLS 1.2 and the intended
+authenticated cipher. Require a successful verification result and inspect the
+complete output, not just a displayed certificate. These protocol/cipher options
+are specific to the documented SLES policy, not a universal configuration for
+all targets. Do not ignore a nonzero verification result or treat a displayed
+certificate as proof that verification succeeded.</p>
+<p>This is a TLS diagnostic, not an NRPE request: no valid NRPE packet is sent after
+the handshake. The daemon can log a later packet/read error when the diagnostic
+disconnects. An OpenSSL EOF/connection-close failure is not a passing full
+application test; distinguish certificate/handshake evidence from that close.
+Record this separately from the real check below.</p>
+<h2 id="4-require-rejection-of-invalid-credentials-on-a-test-target">4. Require rejection of invalid credentials on a test target</h2>
+<p>After the positive test, repeat against the <strong>same target and port</strong>:</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="4. Require rejection of invalid credentials on a test target table"><table>
+<thead>
+<tr>
+<th>Change</th>
+<th>Expected result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use a wrong expected hostname with <code>-verify_hostname</code></td>
+<td>Server identity verification fails</td>
+</tr>
+<tr>
+<td>Use a different, valid but unrelated test CA file</td>
+<td>Server chain verification fails</td>
+</tr>
+<tr>
+<td>Omit <code>-cert</code> and <code>-key</code> while server <code>ssl_client_certs=2</code></td>
+<td>Server rejects the client for missing credentials</td>
+</tr>
+<tr>
+<td>Present a client certificate from an untrusted test CA</td>
+<td>Server rejects the client certificate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Confirm rejection in simultaneous daemon/client logs. A timeout or TCP failure
+is not proof that certificate enforcement worked. Do not weaken the server to
+make a negative test pass; restore the original intended client options after
+each test. Keep private keys and certificate contents out of published evidence.</p>
+<h2 id="5-execute-a-real-permitted-nrpe-check">5. Execute a real permitted NRPE check</h2>
+<p>For the same SLES policy, with a configured fixed command:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">check_nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-H</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.20</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-p</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">5666</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">0</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-S</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">TLSv1.2</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-L</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-A</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/monitoring-ca.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-C</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.pem</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-K</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/monitoring/tls/client.key</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">-c</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">check_load_standard</span>
+</code></pre>
+<p>Verify the plugin exists and runs as the service user. Compare its expected
+output/status with the remote result. NRPE plugin status 1/2/3 can represent
+WARNING/CRITICAL/UNKNOWN rather than a transport failure.</p>
+<p>Do not assume <code>check_nrpe -A</code> implements hostname verification: verify the exact
+client version's behavior and available options. An independent OpenSSL hostname
+test does not add that behavior to future Nagios checks. Record what each client
+actually verifies and provision credentials/access controls accordingly.</p>
+<h2 id="evidence-to-retain">Evidence to retain</h2>
+<p>Record daemon/client/OpenSSL versions, exact package identity, sanitized command,
+negotiated protocol/cipher, verification outcomes and application output/status.
+Keep four distinct results: TCP reachability, encrypted NRPE exchange, server
+chain/name verification and client-certificate enforcement. None substitutes for
+<a href="/nrpe-custom/deployment-validation-template/">reboot, update and rollback validation</a>.
+Build-time <code>--ca-cert</code> configures repository HTTPS, not deployed NRPE credentials.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/docs/tls-validation.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc">
+<span>On this page</span><div class="toc">
+<ul>
+<li><a href="#1-establish-the-actual-server-and-tcp-path">1. Establish the actual server and TCP path</a></li>
+<li><a href="#2-distinguish-encryption-from-authentication">2. Distinguish encryption from authentication</a></li>
+<li><a href="#3-verify-the-servers-chain-and-identity-explicitly">3. Verify the server's chain and identity explicitly</a></li>
+<li><a href="#4-require-rejection-of-invalid-credentials-on-a-test-target">4. Require rejection of invalid credentials on a test target</a></li>
+<li><a href="#5-execute-a-real-permitted-nrpe-check">5. Execute a real permitted NRPE check</a></li>
+<li><a href="#evidence-to-retain">Evidence to retain</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source d9a8e6e</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

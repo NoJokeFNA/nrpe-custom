@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Validation status: 29 October 2026 · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<span>NRPE Custom</span>
+</a>
+<a class="collection-link" href="/nrpe-custom/overview/">Documentation <span aria-hidden="true">▾</span>
+</a>
+<div class="header-tools">
+<a class="header-source" href="https://github.com/NoJokeFNA/nrpe-custom">Source code ↗</a>
+<a class="header-download" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Get NRPE packages</a><label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+</div>
+</header>
+<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="doc-breadcrumb">
+<a href="/nrpe-custom/">NRPE Custom</a>
+<span>/</span>
+<a href="/nrpe-custom/overview/">Documentation</a>
+</div>
+      <h1>Validation status: 29 October 2026</h1>
+      <p class="article-meta">Source d9a8e6e</p>
+      <article class="prose"><p>This record distinguishes automated checks, operator reports and work blocked by
+external prerequisites. It is not a certificate of production readiness.</p>
+<h2 id="completed-in-the-development-environment">Completed in the development environment</h2>
+<ul>
+<li>A read-only Bash target-server diagnostic was tested with isolated fixtures,
+  including missing plugins, include cycles and configuration shell expressions
+  that must never be executed. This does not install NRPE on this workstation.</li>
+<li>CSS consolidation was compared against the previous rendered site across six
+  routes, four viewport widths and normal/expanded-navigation/focus states.
+  The 72 combinations matched the compared computed layout/appearance properties
+  after normalizing the footer's source label.</li>
+<li>Browser regression checks cover responsive layout, independent sidebar scroll,
+  footer alignment, field-note anchors/current section, no-JavaScript article
+  links, FAQ filtering, search and keyboard/mobile navigation. They use Chromium
+  in the development environment; CI configuration also runs them.</li>
+<li>The <a href="/nrpe-custom/tls-validation/">TLS procedure</a> separates transport, encryption, server
+  verification and client-certificate enforcement. Documentation is not a
+  completed test of the operator's certificate policy.</li>
+</ul>
+<p>Record the actual commit and CI results before merging or publishing. Local
+passes do not establish that a remote CI run has already completed.</p>
+<h2 id="operator-reported-sles-results">Operator-reported SLES results</h2>
+<p>The <a href="/nrpe-custom/field-notes/sles12-handshake/">field note</a> records NRPE 4.1.1 active
+under systemd and successful remote version/load/Swap/NTP checks after fixing
+firewall access, removing client <code>-n</code> and installing missing plugins. The raw
+host details are private. These reports do not supply a verified binary checksum,
+mandatory certificate/hostname verification, reboot, upgrade or rollback record.</p>
+<h2 id="blocked-isolated-host-lifecycle-and-windows-docker-desktop">Blocked: isolated host lifecycle and Windows Docker Desktop</h2>
+<p>The execution environment has no <code>/dev/kvm</code>, QEMU/libvirt tooling, configured
+VPN or supplied access to isolated Debian/SLES hosts. The operator has described
+a SLES test host, but no management access was provided to this task. No host
+reboot, package upgrade/downgrade or remote configuration change was performed.
+Do not reinterpret existing container checks as those results.</p>
+<p>Use the <a href="/nrpe-custom/deployment-validation-template/">deployment worksheet</a> per target:
+record the baseline package/checksum/configuration and recovery snapshot, install
+the candidate, test service/plugins/access/TLS, reboot the isolated host, then
+perform upgrade and rollback between distinct verified versions. Use the
+<a href="/nrpe-custom/practical-validation/#windows-docker-desktop">Windows checklist</a> on an actual
+Windows Docker Desktop host. Leave scenarios blocked/not run until real evidence
+is supplied. A running Linux container is not a substitute for these prerequisites.</p>
+<h2 id="release-signing-prerequisite">Release signing prerequisite</h2>
+<p>No maintainer public release key has been enrolled in the tracked signer file.
+Production signing cannot be enabled meaningfully until the maintainer controls
+the key/backup, independently confirms its public fingerprint, and configures
+the CI secret and signing mode. Follow <a href="/nrpe-custom/release-signing/">release signature setup</a>.
+The maintainer confirmed that no dedicated key exists yet and selected prepared
+setup with enrollment left open. The <a href="/nrpe-custom/release-signing/#check-readiness-without-accessing-private-keys">readiness checker</a>
+reports that block without reading private material or changing GitHub settings.
+The actual GitHub signing variable could not be read with the connected access;
+its existence/value is therefore unverified. A disposable-key test validates
+signing code, not production enrollment. No
+master promotion or new package release is authorized by this status record.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/docs/validation-status.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc">
+<span>On this page</span><div class="toc">
+<ul>
+<li><a href="#completed-in-the-development-environment">Completed in the development environment</a></li>
+<li><a href="#operator-reported-sles-results">Operator-reported SLES results</a></li>
+<li><a href="#blocked-isolated-host-lifecycle-and-windows-docker-desktop">Blocked: isolated host lifecycle and Windows Docker Desktop</a></li>
+<li><a href="#release-signing-prerequisite">Release signing prerequisite</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source d9a8e6e</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

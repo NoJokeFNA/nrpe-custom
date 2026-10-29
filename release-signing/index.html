@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a aria-current="page" href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group" open><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a aria-current="page" href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Release signature setup and verification</h1>
-      <p class="article-meta">Source db75a5d</p>
+      <p class="article-meta">Source d9a8e6e</p>
       <article class="prose"><p>SSH Ed25519 signatures authenticate the release's <code>SHA256SUMS</code> manifest using an
 independently trusted maintainer key. That manifest covers all five target
 archives, workflow sources, notices, metadata and notes. This signs the release
@@ -142,8 +142,32 @@ private key. It never accepts the key itself as a command-line argument:</p>
 <p>Use a shell with tracing disabled. Test using disposable keys for development;
 never upload private keys or logs containing them. Signing refuses an existing
 signature rather than replacing it. Signing and verification commands do not
-upload or publish anything.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/docs/release-signing.md">View this page on GitHub ↗︎</a>
+upload or publish anything.</p>
+<h2 id="check-readiness-without-accessing-private-keys">Check readiness without accessing private keys</h2>
+<p>Before enabling signing, inspect the reviewed public signer file and available
+local tool:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">scripts/check_release_signing.py</span>
+</code></pre>
+<p>Optionally check the specific GitHub variable and secret's <strong>metadata</strong> using
+owner-authorized <code>gh</code> access:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">scripts/check_release_signing.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--repository</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">NoJokeFNA/nrpe-custom</span>
+</code></pre>
+<p>The checker prints public SHA-256 fingerprints, never creates/reads a private key,
+never changes GitHub configuration and returns nonzero for missing/invalid public
+enrollment or missing/inaccessible requested metadata. It only queries
+<code>NRPE_RELEASE_SIGNING</code> and metadata for <code>NRPE_RELEASE_SIGNING_KEY</code>; GitHub does
+not expose the secret's value. Metadata cannot establish that the secret matches
+the enrolled public key. Even exit 0 is not proof of a verified signed release.</p>
+<p>On 2026-10-29 the maintainer confirmed that no dedicated release key exists yet
+and requested prepared setup with enrollment explicitly left open. The local
+check found no enrolled public key. The GitHub signing variable could not be
+read through the connected credentials; this cannot distinguish an unset setting
+from insufficient permission. No setting was changed and no production key was
+generated. Complete the workstation key creation/enrollment steps above, retain
+an owner-controlled backup and independently communicate the approved fingerprint
+before activation. Master promotion and the first signed release remain separate
+explicit maintainer actions.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/docs/release-signing.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -152,6 +176,7 @@ upload or publish anything.</p></article>
 <li><a href="#enroll-a-maintainer-controlled-key">Enroll a maintainer-controlled key</a></li>
 <li><a href="#consumer-verification">Consumer verification</a></li>
 <li><a href="#local-signing-check">Local signing check</a></li>
+<li><a href="#check-readiness-without-accessing-private-keys">Check readiness without accessing private keys</a></li>
 </ul>
 </div>
 </aside>
@@ -166,7 +191,7 @@ upload or publish anything.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source db75a5d</span>
+<span>Source d9a8e6e</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

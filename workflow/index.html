@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a aria-current="page" href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a aria-current="page" href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Workflow reference</h1>
-      <p class="article-meta">Source db75a5d</p>
+      <p class="article-meta">Source d9a8e6e</p>
       <article class="prose"><p>Build Debian <code>nagios-nrpe-server</code> packages and a SLES 12 SP3
 <code>nrpe</code> RPM using the distribution packaging recipes, with command arguments
 compiled in and runtime argument handling disabled by default.</p>
@@ -288,8 +288,8 @@ and the Debian/RPM recipe transformations without requiring Docker or network ac
 They do not replace real package and integration tests. Windows-specific error
 messages and process handling also need validation on Windows.</p>
 <p>Implementation is in <code>nrpe_cli/</code>; <code>nrpe.py</code> is the public entry point. Docker
-runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/AGENTS.md">AGENTS.md</a> and the
-additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/tests/AGENTS.md">test</a> instructions apply.
+runs build and test scripts from <code>scripts/</code>. Root <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/AGENTS.md">AGENTS.md</a> and the
+additional <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/scripts/AGENTS.md">script</a> and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/tests/AGENTS.md">test</a> instructions apply.
 Write code, comments, documentation, and commits in English; follow
 <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits 1.0.0</a>.</p>
 <h2 id="repeatability-and-updates">Repeatability and updates</h2>
@@ -301,7 +301,7 @@ security updates and rebuild custom packages when official sources change; do
 not assume APT automatically replaces every custom version as intended.</p>
 <p>Official sources: <a href="https://sources.debian.org/src/nagios-nrpe/">Debian NRPE sources</a>
 and <a href="https://packages.debian.org/src:nagios-nrpe">source package information</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/docs/workflow.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/docs/workflow.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -329,7 +329,7 @@ and <a href="https://packages.debian.org/src:nagios-nrpe">source package informa
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source db75a5d</span>
+<span>Source d9a8e6e</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

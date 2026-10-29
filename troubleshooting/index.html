@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a aria-current="page" href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a aria-current="page" href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,11 +46,36 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Build and NRPE diagnostics</h1>
-      <p class="article-meta">Source db75a5d</p>
+      <p class="article-meta">Source d9a8e6e</p>
       <article class="prose"><p>Failed workflow commands retain their original exit status and raw output in
 the local run log. Recognized failures add contextual hints. Successful commands
 do not emit failure hints, including when a retry recovered from an earlier
 error. Hints classify observed messages; they do not establish a root cause.</p>
+<h2 id="read-only-target-server-inspection">Read-only target-server inspection</h2>
+<p>Copy the reviewed <code>scripts/diagnose-server.sh</code> onto the monitored Linux host;
+it requires Bash and standard Linux tools, not Python or Docker. For SLES:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">bash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">scripts/diagnose-server.sh</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--config</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nrpe.cfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">--unit</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--monitor-ip</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.10</span>
+</code></pre>
+<p>For Debian:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">bash</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">scripts/diagnose-server.sh</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--config</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nagios/nrpe.cfg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">--unit</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nagios-nrpe-server.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--monitor-ip</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">192.0.2.10</span>
+</code></pre>
+<p>Replace the documentation address with the actual monitoring source. It checks
+OS identity, the daemon version and package owner, service/startup state,
+listeners, configuration/includes, relevant TLS settings and configured plugin
+executables. It never sources the configuration or executes plugins, installs
+packages, restarts services or changes the firewall. Command arguments and key
+contents are not printed. Complex executable expressions are flagged for manual
+review instead of evaluated. Existing files do not prove successful plugin or
+TLS operation.</p>
+<p>Run without root first. Where authorized, running with <code>sudo bash ...</code> also lets
+it check configuration/plugin access as the systemd service user using <code>runuser</code>.
+Missing permissions/tools are reported; they are not a successful validation.
+Exit 1 means failed checks, 2 means invalid usage, and 0 means no failed checks;
+review all warnings even on exit 0. Output can contain private file paths and
+listener addresses: review/redact it before sharing. Remote reachability,
+firewall rules and certificate authentication require separate tests below.</p>
 <h2 id="inspect-an-existing-log">Inspect an existing log</h2>
 <pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">diagnose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./build.log</span>
 <span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">diagnose</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./build.log</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--ca-configured</span>
@@ -186,11 +211,12 @@ certificate-authentication test.</p>
 <p>For the complete operator-reported journey, including the OS correction, old
 plaintext diagnostic, client/server package confusion, firewall and final plugin
 fix, read the <a href="/nrpe-custom/field-notes/sles12-handshake/">SLES field note</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/db75a5d457267cfc92f09198344140acca25f2b8/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/docs/troubleshooting.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
 <ul>
+<li><a href="#read-only-target-server-inspection">Read-only target-server inspection</a></li>
 <li><a href="#inspect-an-existing-log">Inspect an existing log</a></li>
 <li><a href="#interpret-the-categories">Interpret the categories</a></li>
 <li><a href="#nrpe-on-a-deployed-sles-12-sp3-host">NRPE on a deployed SLES 12 SP3 host</a></li>
@@ -209,7 +235,7 @@ fix, read the <a href="/nrpe-custom/field-notes/sles12-handshake/">SLES field no
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source db75a5d</span>
+<span>Source d9a8e6e</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
