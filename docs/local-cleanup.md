@@ -48,26 +48,11 @@ the same workspace while applying cleanup. After a crash, a retained
 `.nrpe/locks/maintenance` directory must be inspected along with processes and
 containers before manually removing that marker. Never remove a live lock.
 
-## Retired SLES output
-
-Include expired output for the explicitly retired `sles15sp3` and `sles15sp4`
-targets only when requested:
-
-```sh
-python3 nrpe.py clean --retired-outputs
-python3 nrpe.py clean --retired-outputs --apply
-```
-
-The same age threshold applies. A retired directory with an unknown top-level
-file is retained for manual review. The active `sles12sp3` and Debian outputs
-remain protected. This does not remove published SLE-15 releases or their
-historical verification evidence from GitHub or Git.
-
 ## Individually selected Docker images
 
 ```sh
-python3 nrpe.py clean --image nrpe-custom-builder:sles15sp3
-python3 nrpe.py clean --image nrpe-custom-builder:sles15sp3 --apply
+python3 nrpe.py clean --image nrpe-custom-builder:sles12sp3
+python3 nrpe.py clean --image nrpe-custom-builder:sles12sp3 --apply
 ```
 
 Repeat `--image` to select more than one explicit `nrpe-custom` builder/test

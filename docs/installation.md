@@ -3,7 +3,7 @@
 Run these commands on the destination Linux server. Python, Docker, and this
 checkout are needed on the build workstation, not on the destination server.
 Use a package built for the destination's distribution release and architecture.
-The current SLES target is **SLES 12 SP3 x86_64**, not every SLES 15 service pack.
+The current SLES target is **SLES 12 SP3 x86_64**.
 
 For the complete NRPE server/client and Nagios setup, use the
 [official NRPE documentation](https://github.com/NagiosEnterprises/nrpe) and
@@ -167,7 +167,7 @@ rpm -qp --requires ./nrpe-4.1.1-0.withargs1.x86_64.rpm
 
 Expect server identity `nrpe 4.1.1-0.withargs1 x86_64` and payload entries for
 `/usr/sbin/nrpe`, `/etc/nrpe.cfg`, `nrpe.service` and `tmpfiles.d/nrpe.conf`.
-Use the SLES-12 build, not a SLE-15 RPM or repository. Keep the old package and
+Use the build and repositories matching SLES 12 SP3. Keep the old package and
 [root-only configuration/include/key backups](updates-and-rollback.md#before-an-update)
 before changing an existing installation. Review `.rpmnew`/`.rpmsave` files;
 a preserved old configuration header is not evidence of the executable version.

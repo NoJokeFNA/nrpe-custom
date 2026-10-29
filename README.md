@@ -81,8 +81,7 @@ Direct commands do not require the menu dependencies. Without an interactive
 terminal, launching without arguments prints help and never prompts.
 
 The affected deployment is **SLES 12 SP3**, with old NRPE 2.15/OpenSSL 1.0.2.
-The previous SLES-15 target was based on an incorrect platform assumption and
-has been replaced. See the [SLES guide](docs/sles12sp3.md) and [FAQ](docs/faq.md)
+See the [SLES guide](docs/sles12sp3.md) and [FAQ](docs/faq.md)
 for the native rebuild and TLS/service diagnosis.
 
 ## Supported targets
@@ -101,7 +100,7 @@ Target availability depends on distribution repositories and image availability.
 A listed target is not a promise of ongoing upstream security maintenance. In
 particular, historical archives do not extend a distribution's support period.
 The SLES target uses a pinned genuine 12.3 image and verified original SLE-12
-inputs; no ISO, SLE-15 packages or replacement distribution is used. Its native
+inputs; no ISO or replacement distribution is used. Its native
 build and certificate-authenticated TLS 1.2 integration passed locally on
 2026-10-28. Container results do not establish production deployment readiness.
 Use your run reports to identify the exact tested package bytes.
@@ -252,7 +251,7 @@ These checks do not replace package builds and runtime integration tests.
 - [Security](docs/security.md): argument risks and safe issue reporting.
 - [Release and maintenance plan](docs/release-plan.md): open work and future release requirements.
 - [Release history](docs/release-history.md): published versions and exact validation evidence.
-- [Local cleanup](docs/local-cleanup.md): preview expired runs and explicitly selected retired outputs/images.
+- [Local cleanup](docs/local-cleanup.md): preview expired runs and explicitly selected project images.
 - [Troubleshooting](docs/troubleshooting.md): contextual build hints and read-only diagnosis of NRPE/server logs.
 - [Documentation website](docs/website.md): local preview, field notes and reviewed publication to GitHub Pages.
 

@@ -738,13 +738,12 @@ def diagnostics_menu(root, dispatch):
 def cleanup_menu(root, dispatch):
     """Use the existing cleanup planner, preview first, then explicit consent."""
     from .cleanup import IMAGE, inspect_images, plan
-    days, keep, retired, images = 30, 5, False, []
+    days, keep, images = 30, 5, []
     while True:
         answer = choose('Local cleanup / retention options', [
             ('preview', 'Preview eligible files and selected images'),
             ('days', f'Minimum completed-run age: {days} days'),
             ('keep', f'Keep at least the newest {keep} runs'),
-            ('retired', f'Include retired output directories: {"yes" if retired else "no"}'),
             ('image', 'Add an explicit project image tag'),
             ('clear-images', f'Clear selected images ({len(images)})'), (None, 'Back to workspace')],
             description='Current packages and retained evidence are protected. Preview never deletes; image selection never prunes Docker.')
@@ -767,9 +766,6 @@ def cleanup_menu(root, dispatch):
             else:
                 keep = number
             continue
-        if answer == 'retired':
-            retired = not retired
-            continue
         if answer == 'clear-images':
             images = []
             continue
@@ -782,12 +778,10 @@ def cleanup_menu(root, dispatch):
                     images.append(image)
             continue
         arguments = ['clean', '--older-than', str(days), '--keep-runs', str(keep)]
-        if retired:
-            arguments.append('--retired-outputs')
         for image in images:
             arguments.extend(['--image', image])
         try:
-            before = plan(root, days, keep, retired)
+            before = plan(root, days, keep)
             image_before = inspect_images(images)[1]
             code = dispatch(arguments)
             pause(code)  # Let the full preview remain readable before confirmation.
@@ -798,7 +792,7 @@ def cleanup_menu(root, dispatch):
                               description='Only the selected retention scope is affected; changes since preview require a new review.')
             if approved is not True:
                 continue
-            if plan(root, days, keep, retired) != before or inspect_images(images)[1] != image_before:
+            if plan(root, days, keep) != before or inspect_images(images)[1] != image_before:
                 choose('Cleanup candidates changed; preview again', [(None, 'Back to options')])
                 continue
             pause(dispatch([*arguments, '--apply']))

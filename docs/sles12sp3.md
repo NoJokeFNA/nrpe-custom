@@ -2,17 +2,15 @@
 
 The affected deployment is **SLES 12 SP3**, confirmed by `/etc/os-release` on
 2026-10-28. Its original package is NRPE `2.15-4.24`, linked to
-`libssl.so.1.0.0` and `libcrypto.so.1.0.0`. Previous SLES 15 SP3/SP4 test results
-do not validate this platform. The active target is now `sles12sp3`; old releases
-are not overwritten or relabeled.
+`libssl.so.1.0.0` and `libcrypto.so.1.0.0`. The target is `sles12sp3`.
 
 ```sh
 python3 nrpe.py verify sles12sp3
 python3 nrpe.py test sles12sp3
 ```
 
-Use `--rebuild` to deliberately replace existing local outputs. Old SLE-15 RPMs
-must not be installed or copied into this target's output directory.
+Use `--rebuild` to deliberately replace existing local outputs. Use only matching
+SLES 12 SP3 RPMs in this target's output directory.
 
 ## Build architecture and matching inputs
 
@@ -31,7 +29,7 @@ The historical image has no configured repositories and the old SP3 backports
 index is empty. Instead, the [bootstrap manifest](../packaging/sles12sp3-bootstrap.json)
 pins original SLE-12 GA/SP3 Server and SDK RPMs available through SUSE's public
 OBS API. Each entry records its original URL, size, SHA-256, name, version,
-architecture, vendor and SUSE signing key. No SLE-15 or Leap package is used.
+architecture, vendor and SUSE signing key.
 
 A separate Python download stage fetches and hash-checks those RPMs and the
 pinned OBS sources. A company CA is added only to that process's TLS context;
@@ -43,8 +41,7 @@ RPM dependency checks; no registration credentials or license terms are supplied
 or accepted by this workflow. No system OpenSSL replacement is required.
 
 Python is not needed in the old target image. NRPE and its support packages are
-compiled/packaged by SLES 12's own tools. The former `--sles-media` option and
-SLE-15 module/ISO layout were removed; an ISO is not required by this workflow.
+compiled/packaged by SLES 12's own tools. An ISO is not required by this workflow.
 
 ## Sources and package identities
 
@@ -56,7 +53,7 @@ SLE-15 module/ISO layout were removed; an ISO is not required by this workflow.
 - [Nagios build macros](../packaging/sles12sp3-macros-source.json): immutable OBS
   revision `a911087cc73b87e04465861110d43754`, version `0.14-0`, built natively.
   The upstream spec explicitly supports SLES 12. This build dependency is not
-  faked or supplied by a SLE-15 binary.
+  faked or supplied by an incompatible binary.
 - [Nagios user package](../packaging/sles12sp3-user-source.json): pinned original
   `system-user-nagios 1.0.0-0`, built natively after the macros. Existing users
   and groups are handled by the original package scripts.

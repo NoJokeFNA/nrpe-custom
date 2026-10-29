@@ -1,9 +1,7 @@
 # Release preparation plan
 
 Status: SLES 12 SP3 support published, updated 2026-10-29. The actual deployment
-was confirmed as SLES **12.3**, NRPE 2.15-4.24 and the OpenSSL 1.0 ABI. The
-previous SLE-15 targets were based on an incorrect platform assumption; their
-published test evidence remains historical and is not relabeled.
+was confirmed as SLES **12.3**, NRPE 2.15-4.24 and the OpenSSL 1.0 ABI.
 
 New work stays on a topic branch. Pushes, PR creation and merges into
 develop or master require an explicit maintainer request. Changes are handled
@@ -40,16 +38,15 @@ sequentially. See [Git workflow](git-workflow.md).
 - [ ] Continue recurring [maintenance review](maintenance.md#human-review-cadence),
   including the legacy SLES 12 SP3 lifecycle and upstream NRPE updates.
 
-The dated [2026-10-27 review](maintenance-reviews/2026-10-27.md) records the old
-SP4 scope. SLES 12 SP3's published general/LTSS end dates are 2019-06-30 and
+SLES 12 SP3's published general/LTSS end dates are 2019-06-30 and
 2022-06-30; archive access is not an extension of vendor support. See the
 [SUSE lifecycle](https://www.suse.com/lifecycle/).
 
 ## Published evidence and future releases
 
 The current [SLES 12 SP3 release](release-history.md#sles-12-sp3-release-2026-10-28)
-passed all five target gates and publication. Historical SLE-15 results retain
-their actual platform labels in the [release history](release-history.md).
+passed all five target gates and publication; see the linked release history
+for its exact source commit and artifacts.
 
 Each future release must pass the [publication gate](releases.md#build-and-publication-gate)
 for its exact clean commit. Previous passes, local tests and runtime-only reports

@@ -57,8 +57,8 @@ class CliTests(unittest.TestCase):
                          ('verify', ['debian11', 'debian12', 'debian13', 'debian14', 'sles12sp3']))
 
     @patch('nrpe_cli.cli.execute')
-    def test_previous_service_pack_is_not_silently_reinterpreted(self, execute):
-        for target in ('sles15sp3', 'sles15sp4', 'sles12sp5'):
+    def test_unsupported_target_is_not_silently_reinterpreted(self, execute):
+        for target in ('unknown-platform', 'sles12sp2', 'sles12sp5'):
             with self.subTest(target=target), contextlib.redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit) as error:
                     cli.main(['verify', target], self.root)

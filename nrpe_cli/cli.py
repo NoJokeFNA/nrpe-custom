@@ -129,7 +129,6 @@ def parser():
                          help='minimum age of completion and files in days (default: 30)')
     cleanup.add_argument('--keep-runs', type=int, default=5, metavar='COUNT',
                          help='retain at least this many newest runs, plus current evidence (default: 5)')
-    cleanup.add_argument('--retired-outputs', action='store_true', help='Include expired SLES-15 output directories')
     cleanup.add_argument('--image', action='append', default=[], metavar='REFERENCE',
                          help='Explicit project image tag to remove; may be repeated')
     cleanup.add_argument('--apply', action='store_true', help='Perform the displayed cleanup instead of previewing')
@@ -175,7 +174,7 @@ def main(argv=None, root=ROOT):
         if args.action == "logs":
             return show_logs(root, args.run)
         if args.action == 'clean':
-            return clean(root, args.older_than, args.keep_runs, args.retired_outputs, args.image, args.apply)
+            return clean(root, args.older_than, args.keep_runs, args.image, args.apply)
         if args.action == 'diagnose':
             diagnostics = FailureDiagnostics()
             with args.file.open(encoding='utf-8', errors='replace') as log:

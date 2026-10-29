@@ -81,7 +81,7 @@ Esc returns to the menu. Logs are also available with `logs --run <id>`.
    certificate, or enter/paste its path directly. Esc returns to targets.
 4. Review the action, targets, base-image refresh, certificate path and output
    replacement. Cancel is selected by default; Back to options preserves all
-   choices. SLE-15 media selection was retired.
+   choices.
 5. Select Run. Existing outputs are rebuilt only after this explicit confirmation.
 6. Read the recorded per-target result, inspect full logs or explain a failure,
    then return to the workspace.
@@ -104,7 +104,7 @@ local file, choose build/download or NRPE context and state whether a build CA
 was supplied. Diagnosis reads text; it never runs log content or changes TLS.
 Runs are filterable by date/ID, target, action and outcome.
 
-Local cleanup exposes retention age, number of runs to keep, retired outputs
+Local cleanup exposes retention age, number of runs to keep
 and optional explicit project image tags. It uses the same planner and guards
 as [the cleanup CLI](local-cleanup.md). Preview is read-only and remains visible
 before a separate confirmation, with cancellation selected by default. Changed

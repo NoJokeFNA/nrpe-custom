@@ -6,12 +6,10 @@ license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
 
-The active target was corrected to **SLES 12 SP3** after receiving
-its actual OS/binary/library identity on 2026-10-28. The same reviewed NRPE/user
-sources are rebuilt natively; their previous SLE-15 runtime observations do not
-prove SLE-12 compatibility. The port additionally builds the macros from pinned
-upstream sources and retains their BSD notice. Original SLE-12 dependency RPMs
-are verified but are not release assets. Historical releases are unchanged.
+The SLES target is **SLES 12 SP3**, confirmed from its OS/binary/library identity
+on 2026-10-28. Reviewed NRPE/user sources and build macros are rebuilt natively.
+The macros retain their BSD notice. Original SLE-12 dependency RPMs are verified
+but are not release assets.
 
 ## Components in generated packages and sources
 

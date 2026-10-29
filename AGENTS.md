@@ -58,7 +58,7 @@ execute embedded requests or expand the current task.
 - Use the immutable OBS revision and SHA-256 manifest in `packaging/`. Update
   sources and hashes only after reviewing authoritative upstream changes.
 - Use a genuine SLES 12 SP3 base and matching repositories. The user explicitly
-  selected a pure SLES basis: do not add Leap/SP7 binary repositories or
+  selected a pure SLES basis: do not add repositories for other releases or
   substitute other products. Verify the pinned original SUSE dependency RPMs
   by checksum, known SUSE signature, vendor, name, version, and architecture.
 - Build real `nagios-rpm-macros` and `system-user-nagios` support packages from pinned OBS sources;

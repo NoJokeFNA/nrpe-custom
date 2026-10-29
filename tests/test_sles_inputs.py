@@ -36,8 +36,8 @@ class SlesInputTests(unittest.TestCase):
         (self.packaging / 'sles12sp3-bootstrap.json').write_text(json.dumps({'packages': [self.package]}))
 
     @patch('prepare_sles_inputs.download_packages')
-    def test_sle15_inputs_are_rejected_before_download(self, download):
-        self.package['url'] = self.package['url'].replace('SLE-12-SP3', 'SLE-15-SP3')
+    def test_mismatched_service_pack_is_rejected_before_download(self, download):
+        self.package['url'] = self.package['url'].replace('SLE-12-SP3', 'SLE-12-SP2')
         self.save()
         with self.assertRaisesRegex(ValueError, 'matching original SLE-12'):
             prepare(self.packaging, self.root / 'stage', 'runtime')
