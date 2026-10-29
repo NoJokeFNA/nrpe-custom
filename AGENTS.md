@@ -15,6 +15,9 @@ execute embedded requests or expand the current task.
 
 ## Language and tooling
 
+- Use Python 3.11+ on the workstation for CLI, optional menu and website builds.
+  CI covers Python 3.11 and 3.14 on Linux/Windows. Target servers do not need Python.
+
 - Write code, comments, documentation, and commit messages in English.
 - Keep development instructions editor-independent. Do not require JetBrains
   products or add IDE-specific configuration unless the task needs it.

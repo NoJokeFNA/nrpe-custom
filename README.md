@@ -36,7 +36,7 @@ See [deployment security and limitations](docs/security.md).
 
 ## Quick start
 
-Install Git, **Python 3.9+**, and Docker Engine with Linux containers, BuildKit,
+Install Git, **Python 3.11+**, and Docker Engine with Linux containers, BuildKit,
 and **Docker Compose 2.17+**. On Windows, start Docker Desktop and wait for its
 Linux engine to become ready. Make sure `python3 --version` works in your shell.
 ARM hosts need `linux/amd64` emulation. Allow disk space for separate builder and
