@@ -53,15 +53,18 @@ review of previously unexamined source bytes.
 
 ## Host-only optional menu dependencies
 
-`requirements-menu.txt` pins `prompt-toolkit==3.0.52` and `wcwidth==0.2.13`.
+`requirements-menu.txt` pins `prompt-toolkit==3.0.53` and `wcwidth==0.9.4`.
 These libraries are downloaded by the user through pip; they are not vendored
 into this checkout or installed in the NRPE server package. The exact pinned
 wheels were downloaded without installation and their actual notices inspected:
 
 | Distribution | License evidence | Wheel SHA-256 |
 | --- | --- | --- |
-| `prompt_toolkit-3.0.52-py3-none-any.whl` | `prompt_toolkit-3.0.52.dist-info/licenses/LICENSE`: BSD three-clause terms, Jonathan Slenders, 2014 | `9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955` |
-| `wcwidth-0.2.13-py2.py3-none-any.whl` | `wcwidth-0.2.13.dist-info/LICENSE`: MIT, Jeff Quast, 2014; additional Markus Kuhn 2007 permission/warranty notice | `3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859` |
+| `prompt_toolkit-3.0.53-py3-none-any.whl` | `prompt_toolkit-3.0.53.dist-info/licenses/LICENSE`: BSD three-clause terms, Jonathan Slenders, 2014 | `01c0891d7f9237d5e339f7d3e42cdae80b7534abb1c7c0e3352efba6231492f2` |
+| `wcwidth-0.9.4-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl` | `wcwidth-0.9.4.dist-info/licenses/LICENSE`: MIT, Jeff Quast, 2014; additional Markus Kuhn 2007 permission/warranty notice | `b185c8b927b23af2721be1783499d1cfa5c028b098b0858951b4ae224477f1c2` |
+
+The wcwidth hash above identifies the reviewed Linux x86_64 wheel; other
+platform wheels have different hashes. Their runtime selection is handled by pip.
 
 Before distributing a bundled Python application, include these actual license
 files and inventory any additional shipped dependencies. Do not substitute the
@@ -78,9 +81,11 @@ as part of the server packages.
 ## Build and runtime dependencies
 
 `requirements-website.txt` pins the separate build-only renderer
-`Markdown==3.8.2` (Python-Markdown). Its installed wheel's
-`markdown-3.8.2.dist-info/licenses/LICENSE.md` was inspected and contains
-BSD-3-Clause terms; wheel metadata records the same SPDX expression. The
+`Markdown==3.11.2` (Python-Markdown). Its installed wheel's
+`markdown-3.11.2.dist-info/licenses/LICENSE.md` was inspected and contains
+BSD-3-Clause terms; wheel metadata records the same SPDX expression. The reviewed
+`markdown-3.11.2-py3-none-any.whl` SHA-256 is
+`f80390747a2a0ff2ba54da074ce4f862f72a6685f608cd2637b646a6d83993f5`. The
 renderer is installed separately, not vendored, bundled into NRPE packages or
 copied into the static site. Generated pages retain the licenses of their
 original documentation and notices. Bundling the renderer would require its
