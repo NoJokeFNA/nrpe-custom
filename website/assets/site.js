@@ -153,15 +153,18 @@ if (filter) {
   });
   update();
 }
-// Reuse the existing page outline instead of adding another navigation rail.
-if (faq.length) {
-  const links = [...document.querySelectorAll('.page-toc a[href^="#"]')];
+// Documentation and field notes share the same section tracking.
+const outlineLinks = [...document.querySelectorAll('.page-toc a[href^="#"]')];
+if (outlineLinks.length) {
+  const links = outlineLinks;
   const targets = links.map(link => document.getElementById(decodeURIComponent(link.hash.slice(1))));
   let scheduled = false;
   const track = () => {
     scheduled = false;
     const visible = targets.filter(target => target && !target.closest('[hidden]'));
-    const active = visible.filter(target => target.getBoundingClientRect().top <= 160).at(-1) || visible[0];
+    const atBottom = window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    const active = atBottom ? visible.at(-1)
+      : visible.filter(target => target.getBoundingClientRect().top <= 160).at(-1) || visible[0];
     links.forEach((link, index) => {
       if (targets[index] === active) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
@@ -196,4 +199,13 @@ for (const block of document.querySelectorAll('.prose pre')) {
     setTimeout(() => { button.textContent = 'Copy'; }, 1800);
   });
   block.append(button);
+}
+
+// Keep article sections available without crowding a narrow reading column.
+const articleOutline = document.querySelector('.article-outline');
+if (articleOutline) {
+  const narrowArticle = window.matchMedia('(max-width: 1100px)');
+  const adaptOutline = () => { articleOutline.open = !narrowArticle.matches; };
+  narrowArticle.addEventListener('change', adaptOutline);
+  adaptOutline();
 }

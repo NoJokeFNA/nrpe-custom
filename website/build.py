@@ -175,7 +175,7 @@ def layout(title, content, pages, slug, base, toc='', source=None, commit=None, 
         if label:
             content = content[label.end():]
         body = template('field-note.html', base=base, article_label=esc(article_label),
-                        title=esc(title), content=content, source_link=source_link)
+                        title=esc(title), content=content, source_link=source_link, toc=toc)
     else:
         body = template('document.html', overview_url=page_url('overview', base), base=base,
                         sidebar=sidebar(pages, slug, base), title=esc(title),
