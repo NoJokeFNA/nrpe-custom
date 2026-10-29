@@ -24,6 +24,7 @@ from markdown.extensions import Extension
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from website.highlighting import colorize, stylesheet
 from website.diagrams import render_diagrams
+from website.faq import render_faq
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'NoJokeFNA/nrpe-custom'
@@ -120,12 +121,7 @@ def render(root, source, pages, base, commit, diagram_assets):
                 + html.escape(label + ' table', quote=True) + '">' + match[0] + '</div>')
     content = re.sub(r'<table>.*?</table>', table_region, content, flags=re.S)
     if pages[source] == 'faq':
-        sections = re.split(r'<h2 id="([^"]+)">(.*?)</h2>', content)
-        content = sections[0] + '<div class="faq-tools"><label for="faq-filter">Find an answer</label><input id="faq-filter" type="search" placeholder="Try TLS, SLES or services…"><p id="faq-count" aria-live="polite"></p></div>'
-        for offset in range(1, len(sections), 3):
-            content += ('<details class="faq-item" id="' + sections[offset] + '"><summary><h2>'
-                        + sections[offset + 1] + '</h2></summary><div class="faq-answer">'
-                        + sections[offset + 2] + '</div></details>')
+        content = render_faq(content)
     return title, content, converter.toc
 
 

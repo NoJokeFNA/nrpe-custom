@@ -32,7 +32,7 @@ class SiteTests(unittest.TestCase):
         self.assertIn('Custom NRPE builds.', home)
         self.assertIn('/nrpe-custom/faq/', home)
         faq = (self.output / 'faq/index.html').read_text()
-        self.assertIn('class="faq-item"', faq)
+        self.assertIn('class="faq-question"', faq)
         self.assertIn('What happened to SLES 15', faq)
         self.assertNotIn('AGENTS.md', manifest['files'])
         self.assertFalse(any(name.endswith(('.key', '.pem', '.log')) for name in manifest['files']))
