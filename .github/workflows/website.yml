@@ -41,6 +41,15 @@ jobs:
         run: python -m unittest discover -s website/tests -v
       - name: Build and check every internal page and anchor
         run: python website/build.py
+      - name: Test responsive layout and browser interactions
+        run: node --test website/browser-tests.mjs
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: documentation-browser-failures
+          path: .nrpe/browser-results/
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/upload-artifact@v7
         with:
           name: documentation-preview
