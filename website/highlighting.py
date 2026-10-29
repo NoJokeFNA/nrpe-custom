@@ -1,56 +1,95 @@
-"""Build-time syntax colors, preserving code text and language classes."""
+"""Shiki tokens become static, CSP-compatible code HTML and scoped CSS."""
 
+from functools import lru_cache
 import html
+import json
+from pathlib import Path
 import re
+import shutil
+import subprocess
 
-from pygments import highlight
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import get_lexer_by_name
-from pygments.style import Style
-from pygments.token import Comment, Error, Generic, Keyword, Literal, Name, Number, Operator, String, Token
-from pygments.util import ClassNotFound
-
-
-class DocumentationStyle(Style):
-    background_color = '#122b32'
-    styles = {
-        Token: '#e1ece1', Comment: '#a5b9b2', Keyword: '#c4afff',
-        Name: '#add3ef', Name.Builtin: '#88d5e8', Name.Function: '#91d9ca',
-        Name.Attribute: '#9de3b8', Name.Tag: '#9de3b8',
-        Literal: '#e9cb8e', String: '#e9cb8e', Number: '#f4b79c',
-        Operator: '#88d5e8', Error: '#ffb5b5',
-        Generic.Deleted: '#ffb5b5', Generic.Inserted: '#9de3b8',
-        Generic.Heading: 'bold #add3ef', Generic.Subheading: 'bold #add3ef',
-    }
-
-
-FORMATTER = HtmlFormatter(nowrap=True, classprefix='syntax-', style=DocumentationStyle)
+ROOT = Path(__file__).resolve().parent
 BLOCK = re.compile(r'<pre><code class="language-([A-Za-z0-9_+.-]+)">(.*?)</code></pre>', re.S)
-LABELS = {'sh': 'Shell', 'bash': 'Bash', 'powershell': 'PowerShell', 'ps1': 'PowerShell',
-          'ini': 'INI / config', 'python': 'Python', 'yaml': 'YAML', 'json': 'JSON',
+LANGUAGES = {
+    'sh': 'bash', 'bash': 'bash', 'shell': 'bash', 'shellscript': 'bash',
+    'powershell': 'powershell', 'ps1': 'powershell', 'ini': 'ini',
+    'nrpe': 'nrpe', 'nrpe.cfg': 'nrpe', 'python': 'python', 'py': 'python',
+    'yaml': 'yaml', 'yml': 'yaml', 'json': 'json', 'dockerfile': 'dockerfile', 'diff': 'diff',
+}
+LABELS = {'sh': 'Shell', 'bash': 'Bash', 'powershell': 'PowerShell', 'ini': 'INI',
+          'nrpe': 'NRPE config', 'python': 'Python', 'yaml': 'YAML', 'json': 'JSON',
           'dockerfile': 'Dockerfile', 'diff': 'Diff'}
 
 
+def color(value):
+    if not isinstance(value, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', value):
+        raise RuntimeError('Shiki returned an unsupported theme color')
+    return value.lower()
+
+
+@lru_cache(maxsize=256)
+def tokenize(requests):
+    node = shutil.which('node')
+    if not node:
+        raise RuntimeError('Website syntax highlighting needs Node.js 24 and npm ci --prefix website --ignore-scripts')
+    try:
+        result = subprocess.run([node, str(ROOT / 'shiki.mjs')],
+                                input=json.dumps(requests, ensure_ascii=False),
+                                capture_output=True, text=True, encoding='utf-8',
+                                cwd=ROOT, timeout=30, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise RuntimeError('Shiki did not complete; check the Node.js 24 website build setup') from exc
+    if result.returncode:
+        raise RuntimeError('Shiki failed. Use Node.js 24 and install pinned dependencies with '
+                           'npm ci --prefix website --ignore-scripts.\n' + result.stderr[-2000:])
+    response = json.loads(result.stdout)
+    if len(response['blocks']) != len(requests):
+        raise RuntimeError('Shiki returned an unexpected number of code blocks')
+    return response
+
+
 def colorize(content):
+    matches = list(BLOCK.finditer(content))
+    requests = tuple((LANGUAGES[match[1].lower()], html.unescape(match[2]))
+                     for match in matches if match[1].lower() in LANGUAGES)
+    if not requests:
+        return content
+    blocks = iter(tokenize(requests)['blocks'])
+
     def block(match):
-        language, escaped = match.groups()
-        if language.lower() in ('text', 'plaintext', 'mermaid'):
+        language = LANGUAGES.get(match[1].lower())
+        if language is None:
             return match[0]
-        try:
-            lexer = get_lexer_by_name(language, stripnl=False, ensurenl=False, tabsize=0)
-        except ClassNotFound:
-            return match[0]
-        source = html.unescape(escaped)
-        # HTML formatting terminates the final line; omit only that added LF.
-        colored = highlight(source, lexer, FORMATTER)
-        if not source.endswith('\n') and colored.endswith('\n'):
-            colored = colored[:-1]
-        label = html.escape(LABELS.get(language.lower(), language), quote=True)
-        return (f'<pre class="syntax-block" data-language="{label}">'
-                f'<code class="language-{language}">{colored}</code></pre>')
+        lines, actual = [], []
+        for line in next(blocks):
+            rendered, text = [], []
+            for token in line:
+                token_text = token['content']
+                text.append(token_text)
+                classes = ['syntax-fg-' + color(token['color'])[1:]]
+                if token.get('bgColor'):
+                    classes.append('syntax-bg-' + color(token['bgColor'])[1:])
+                for mask, name in ((1, 'italic'), (2, 'bold'), (4, 'underline')):
+                    if token.get('fontStyle', 0) & mask:
+                        classes.append('syntax-' + name)
+                rendered.append('<span class="' + ' '.join(classes) + '">' + html.escape(token_text) + '</span>')
+            lines.append(''.join(rendered))
+            actual.append(''.join(text))
+        if '\n'.join(actual) != html.unescape(match[2]):
+            raise RuntimeError('Shiki changed code text; refusing to publish changed commands')
+        label = LABELS.get(match[1].lower(), LABELS.get(language, language))
+        return (f'<pre class="syntax-block" data-language="{html.escape(label)}">'
+                f'<code class="language-{match[1]}">' + '\n'.join(lines) + '</code></pre>')
     return BLOCK.sub(block, content)
 
 
 def stylesheet():
-    # Omit formatter-wide pre/line-number rules; colors belong only to code tokens.
-    return '\n'.join(FORMATTER.get_token_style_defs('.prose pre code')) + '\n'
+    theme = tokenize(())
+    lines = [f'.prose pre.syntax-block {{ background: {color(theme["bg"])}; color: {color(theme["fg"])}; }}']
+    for value in sorted({color(value) for value in theme['palette']}):
+        lines.append(f'.prose pre code .syntax-fg-{value[1:]} {{ color: {value}; }}')
+        lines.append(f'.prose pre code .syntax-bg-{value[1:]} {{ background-color: {value}; }}')
+    lines += ['.prose pre code .syntax-italic { font-style: italic; }',
+              '.prose pre code .syntax-bold { font-weight: bold; }',
+              '.prose pre code .syntax-underline { text-decoration: underline; }']
+    return '\n'.join(lines) + '\n'

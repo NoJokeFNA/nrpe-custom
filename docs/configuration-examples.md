@@ -6,11 +6,29 @@ Debian or `/etc/nrpe.cfg` on SLES. Follow the [official NRPE manuals](https://gi
 for server/client setup, plugin installation and TLS provisioning. Never copy
 the project's test CA into production trust stores.
 
+## NRPE file syntax and upstream defaults
+
+NRPE configuration uses flat `key=value` directives, full-line `#` comments,
+`command[name]=...` definitions and optional `include`/`include_dir` directives.
+It has no INI section headers. These examples use an NRPE-specific code grammar;
+general INI files use a separate grammar.
+
+The [upstream sample `nrpe.cfg.in`](https://github.com/NagiosEnterprises/nrpe/blob/master/sample-config/nrpe.cfg.in)
+is a **build template**, not the exact installed configuration for every package.
+Placeholders such as `@pluginsdir@`, `@sysconfdir@` and `@nrpe_port@` are resolved
+when building/installing. Keep the configuration shipped with your distribution
+and NRPE version as the starting point. Do not copy upstream master wholesale
+onto an older daemon; supported directives and defaults can differ.
+
+The fragments below intentionally change selected settings for the described
+scenario. They are not a reproduction of upstream defaults, and do not replace
+the complete sample, included files or distribution-specific service setup.
+
 ## Hosts, TLS and fixed commands
 
 Example server settings, replacing the documentation IP and all certificate paths:
 
-```ini
+```nrpe
 allowed_hosts=127.0.0.1,::1,192.0.2.10
 dont_blame_nrpe=0
 allow_bash_command_substitution=0
@@ -25,7 +43,7 @@ ssl_privatekey_file=/etc/nrpe-tls/server.key
 For this project's **SLES 12 SP3 NRPE 4.1.1** build with RSA certificates,
 replace the `ssl_version` and `ssl_use_adh` settings above with all three lines:
 
-```ini
+```nrpe
 ssl_version=TLSv1.2
 ssl_use_adh=1
 ssl_cipher_list=DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL
@@ -51,7 +69,7 @@ unconfigured client connect.
 
 Prefer fixed command definitions when caller-supplied arguments are unnecessary:
 
-```ini
+```nrpe
 command[check_load_standard]=/usr/lib/nagios/plugins/check_load -w 5,4,3 -c 10,8,6
 command[check_load_busy]=/usr/lib/nagios/plugins/check_load -w 10,8,6 -c 20,16,12
 ```
@@ -105,7 +123,7 @@ as the service account with the actual plugin path before exposing it through NR
 
 Example definition, using the Debian plugin path:
 
-```ini
+```nrpe
 dont_blame_nrpe=1
 allow_bash_command_substitution=0
 command[check_load_profile]=/usr/local/libexec/nrpe-custom/check-load-profile /usr/lib/nagios/plugins/check_load '$ARG1$'

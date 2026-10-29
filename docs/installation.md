@@ -206,7 +206,7 @@ default. Keep it at `0` if the monitoring server should not supply arguments.
 To deliberately enable them, edit the existing settings in the appropriate
 configuration file, for example:
 
-```ini
+```nrpe
 allowed_hosts=127.0.0.1,::1,192.0.2.10
 dont_blame_nrpe=1
 ```

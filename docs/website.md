@@ -45,26 +45,36 @@ changes, preserving the same empty-workspace provenance.
 
 ## Local preview
 
-Fenced code blocks with a recognized language use build-time Pygments syntax
-highlighting and a language label. The palette is independently authored to fit
-the dark code panels; token colors meet a 4.5:1 contrast ratio against that
-background. Shell, PowerShell, INI, YAML, JSON, Python and diff fences are covered.
-Unknown/unlabelled languages, plain output and Mermaid fences remain unchanged;
-there is no speculative language detection. Inline code keeps its existing style.
+Fenced code blocks use **Shiki 4.5.0** with the bundled **GitHub Dark Default**
+theme. Shell/Bash, PowerShell, INI, Python, YAML, JSON, Dockerfile and diff use
+Shiki's existing TextMate grammars. NRPE snippets use a small project-owned
+TextMate grammar for flat directives, full-line comments, `command[name]`,
+`$ARGn$` and upstream build-template placeholders. General INI and NRPE files
+are distinct languages; see [the configuration reference](configuration-examples.md#nrpe-file-syntax-and-upstream-defaults).
 
-Colors are static HTML/CSS: no browser highlighter, CDN or remote grammar is
-loaded. Original code text, indentation, entities and Unicode are preserved for
-the copy button. Build-time dependencies remain separate from the NRPE CLI.
+Colors and font styles come from the theme, including token background colors.
+The Python builder turns tokens into scoped CSS classes so no inline style or
+browser highlighter is needed. No Shiki runtime, grammar, WASM, CDN or remote font
+is loaded by visitors. Code text, indentation, entities and Unicode are checked
+for exact preservation before publication. Plain/unknown languages and Mermaid
+remain unchanged; there is no speculative language detection.
 
-Use Python 3.9+ and an isolated environment; the NRPE CLI does not need the
-website dependency:
+Use **Node.js 24 LTS** and **Python 3.9+** on the website build workstation.
+Neither Node nor website dependencies are needed for the NRPE CLI or destination
+servers. Install locked npm dependencies without package lifecycle scripts:
 
 ```sh
+npm ci --prefix website --ignore-scripts --no-fund
 python3 -m venv .nrpe/site-venv
 .nrpe/site-venv/bin/python -m pip install -r requirements-website.txt
 .nrpe/site-venv/bin/python website/build.py
 python3 -m http.server 8000 --directory .nrpe/site
 ```
+
+The renderer runs local Node processes with bounded timeouts and caches repeated
+code batches during a build. It never downloads grammars while rendering. Missing
+Node/dependencies are build errors with installation guidance, not silent plain-
+text publication. CI audits both the npm lockfile and Python renderer requirements.
 
 Open `http://localhost:8000/nrpe-custom/`. On Windows use
 `.nrpe\site-venv\Scripts\python.exe` for environment-local Python commands.

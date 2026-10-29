@@ -212,7 +212,7 @@ Review the server's configuration before enabling arguments:
 | Debian | `/etc/nagios/nrpe.cfg` | `nagios-nrpe-server` |
 | SLES/OBS recipe | `/etc/nrpe.cfg` | `nrpe` |
 
-```ini
+```nrpe
 allowed_hosts=<nagios-server-ip>,127.0.0.1,::1
 dont_blame_nrpe=1
 ```
