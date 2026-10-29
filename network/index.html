@@ -7,9 +7,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
 <title>Network and firewall requirements · NRPE Custom</title>
-<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
 <link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -33,8 +34,10 @@
 </header>
 <button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
   <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
     <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a aria-current="page" href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
   </aside>
   <main id="main" class="document">
     <div class="document-main">
@@ -44,7 +47,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Network and firewall requirements</h1>
-      <p class="article-meta">Source c854aed</p>
+      <p class="article-meta">Source 686f2f3</p>
       <article class="prose"><p>Separate build-time downloads from production NRPE traffic. Builds require
 outbound access, not an inbound NRPE port on the workstation. The default
 integration test keeps both client and server inside one container over loopback.</p>
@@ -203,8 +206,8 @@ produce a TLS hint; the original output and exit code are preserved.</p>
 organization's issuing CA. For errors such as <code>Curl error 60</code> / <code>self signed
 certificate in certificate chain</code>, select the public root or intermediate CA
 provided by your administrator:</p>
-<pre class="syntax-block" data-language="PowerShell"><code class="language-powershell"><span class="syntax-fg-e6edf3">python3 nrpe.py verify sles12sp3 </span><span class="syntax-fg-ff7b72">--</span><span class="syntax-fg-e6edf3">ca</span><span class="syntax-fg-ff7b72">-</span><span class="syntax-fg-e6edf3">cert </span><span class="syntax-fg-a5d6ff">&quot;C:\Certificates\Company-Root.cer&quot;</span>
-<span class="syntax-fg-e6edf3">python3 nrpe.py test debian12 </span><span class="syntax-fg-ff7b72">--</span><span class="syntax-fg-e6edf3">ca</span><span class="syntax-fg-ff7b72">-</span><span class="syntax-fg-e6edf3">cert </span><span class="syntax-fg-a5d6ff">&quot;C:\Certificates\Company-Root.cer&quot;</span>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">verify</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">sles12sp3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--ca-cert</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;./local-certificates/company-root.cer&quot;</span>
+<span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">test</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">debian12</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--ca-cert</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;./local-certificates/company-root.cer&quot;</span>
 </code></pre>
 <p>The option is supported by <code>build</code>, <code>test</code>, <code>verify</code>, and <code>build.py</code>, for every
 target. The menu includes a certificate file browser under Workflow options.
@@ -242,7 +245,7 @@ separate trust stores. Configure those through your organization's Docker
 instructions if required. Host pip/Git trust is also separate. Use <code>nrpe.py</code> to
 prepare the secret and its cache identity; direct Compose commands do not
 normalize DER input or calculate that identity for you.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c854aed19eb1a0bb70ec7fb153d33a5f0ec88532/docs/network.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/686f2f37a4e7458cc14638f39d7391c951fc4d89/docs/network.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -270,11 +273,12 @@ normalize DER input or calculate that identity for you.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source c854aed</span>
+<span>Source 686f2f3</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
 <script type="module" src="/nrpe-custom/assets/site.js">
 </script>
+
 </body>
 </html>

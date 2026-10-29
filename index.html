@@ -7,9 +7,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
 <title>Custom NRPE builds. Clear, practical docs. · NRPE Custom</title>
-<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
 <link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/terminal-demo.css">
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -58,8 +59,8 @@
 </div>
 <figure class="product-art">
 <span class="art-label">YOUR WORKSTATION. YOUR BUILD.</span>
-<img src="/nrpe-custom/assets/cli-help.png" width="1280" height="720" alt="Actual NRPE Custom CLI help output">
-<figcaption>Direct commands, with the build and verification steps in your hands.</figcaption>
+<a href="#try-cli" aria-label="Try the interactive CLI demo"><img src="/nrpe-custom/assets/cli-help.png" width="1280" height="720" alt="Actual NRPE Custom CLI help output"></a>
+<figcaption>Direct commands, with the build and verification steps in your hands. <a href="#try-cli">Try the interactive demo ↓</a></figcaption>
 </figure>
 </div>
 </section>
@@ -71,10 +72,27 @@
 <a class="button button-primary" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Download NRPE packages</a>
 <span>Open source · Corresponding sources and checksums included</span>
 </div>
-<figure class="product-screen">
-<img src="/nrpe-custom/assets/terminal-menu.png" width="1325" height="770" alt="Actual keyboard-driven NRPE Custom menu in an empty workspace">
-</figure>
-<p class="product-caption">Actual terminal menu in an empty workspace. Runtime arguments stay disabled until explicitly enabled.</p>
+<div class="product-screen demo-host"><section class="terminal-demo" id="try-cli" data-terminal-demo aria-label="Interactive NRPE CLI demonstration" hidden>
+  <header class="demo-bar"><strong>NRPE Custom</strong><span class="demo-badge">Interactive simulation</span><button type="button" data-demo-reset>Reset</button></header>
+  <div class="demo-controls"><label for="demo-target">Target</label><select id="demo-target" data-demo-target><option>debian12</option><option>debian11</option><option>debian13</option><option>debian14</option><option>sles12sp3</option></select><span data-demo-phase>Ready</span><button type="button" data-demo-cancel disabled>Cancel run</button></div>
+  <div class="demo-body">
+    <nav class="demo-menu" aria-label="Demo actions">
+      <button type="button" data-demo-command="verify" tabindex="0">Build &amp; verify</button>
+      <button type="button" data-demo-command="status" tabindex="-1">Package status</button>
+      <button type="button" data-demo-command="doctor" tabindex="-1">Docker diagnostics</button>
+      <button type="button" data-demo-command="logs" tabindex="-1">Run logs</button>
+      <button type="button" data-demo-command="clean" tabindex="-1">Preview cleanup</button>
+      <button type="button" data-demo-command="help" tabindex="-1">Help &amp; commands</button>
+    </nav>
+    <pre class="demo-output" data-demo-output role="log" aria-live="polite" aria-relevant="additions" aria-label="Simulated command output" tabindex="0"></pre>
+  </div>
+  <div class="demo-confirm" data-demo-confirm hidden><p data-demo-question></p><button type="button" data-demo-yes>Confirm</button><button type="button" data-demo-no>Cancel</button></div>
+  <form class="demo-input" data-demo-form><label for="demo-command" aria-label="Command">$</label><input id="demo-command" data-demo-input type="text" autocomplete="off" spellcheck="false" placeholder="Try: python3 nrpe.py verify debian12" aria-label="Enter a simulated NRPE command"><button type="submit">Run</button></form>
+  <p class="demo-hint">Use ↑ ↓ and Enter in the menu, or type a command. Escape / Ctrl+C cancels a run. Example data only; no commands execute on your machine.</p>
+</section>
+<noscript><figure class="demo-fallback"><img src="/nrpe-custom/assets/terminal-menu.png" width="1325" height="770" alt="NRPE terminal menu in an empty workspace"><figcaption>Enable JavaScript to try the interactive simulation.</figcaption></figure></noscript>
+</div>
+<p class="product-caption">Try the workflow with sample data. Runtime arguments stay disabled by default in the real packages.</p>
 </div>
 </section>
 <section class="start-section" aria-labelledby="start-title">
@@ -210,11 +228,12 @@
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source c854aed</span>
+<span>Source 686f2f3</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
 <script type="module" src="/nrpe-custom/assets/site.js">
 </script>
+<script type="module" src="/nrpe-custom/assets/terminal-demo.js"></script>
 </body>
 </html>

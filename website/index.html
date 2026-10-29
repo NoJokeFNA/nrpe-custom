@@ -7,9 +7,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
 <title>Documentation website and GitHub Pages · NRPE Custom</title>
-<link rel="icon" href="/nrpe-custom/assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
 <link rel="stylesheet" href="/nrpe-custom/assets/site.css">
 <link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+
 </head>
 <body data-base="/nrpe-custom">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -33,8 +34,10 @@
 </header>
 <button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
   <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
     <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
   </aside>
   <main id="main" class="document">
     <div class="document-main">
@@ -44,7 +47,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Documentation website and GitHub Pages</h1>
-      <p class="article-meta">Source c854aed</p>
+      <p class="article-meta">Source 686f2f3</p>
       <article class="prose"><p>The website is static HTML/CSS/JavaScript with no analytics, remote fonts,
 submission database or hosted backend. Existing Markdown remains the source of
 documentation. The builder rewrites internal links, creates a local search index
@@ -61,8 +64,10 @@ full-width blue selection, local search and a separate article outline. Field
 notes feature the existing reported account and label guide links separately;
 report bodies and metadata still come from canonical Markdown.</p>
 <p>Inter Variable is self-hosted with its verbatim SIL Open Font License under
-<code>website/assets/Inter-OFL.txt</code>. No JetBrains logo, illustrations or JetBrains
-font files are bundled. The former animated hero is retired with this layout.</p>
+<code>website/assets/Inter-OFL.txt</code>. JetBrains Mono Regular/Bold is self-hosted for code and the browser demo with
+its verbatim SIL OFL notice at <code>website/assets/JetBrainsMono-OFL.txt</code>. Ligatures
+are disabled for unambiguous commands. The project mark and favicon are its own
+NRPE logo; no JetBrains logo or illustrations are bundled. The former animated hero is retired with this layout.</p>
 <p>The homepage links to GitHub's latest release rather than hardcoding a release
 version. Its supported-target table is derived from the README table, keeping
 target names and package formats in one source. The project story summarizes
@@ -80,6 +85,18 @@ were captured at 100 columns by 24 rows and rendered as escaped text for the
 screenshot. It shows no successful build or real infrastructure; the homepage
 and menu guide share this image. Refresh it when navigation or presentation
 changes, preserving the same empty-workspace provenance.</p>
+<h2 id="interactive-browser-demo">Interactive browser demo</h2>
+<p>The homepage replaces its large menu image with an in-memory CLI simulation.
+Users can navigate by arrows/Enter or enter the supported command subset.
+Build/test phases, package state, logs and expired reports are sample data;
+no shell, Docker, host access or backend runs in the browser. The demo resets
+on reload, supports Escape/Ctrl+C cancellation and asks before rebuilding or
+applying cleanup. Cleanup retains the sample packages and current evidence.</p>
+<p>Maintain these examples alongside changes to the real CLI/menu. A real-browser
+website test covers cancellation, rebuild consent, preview/apply cleanup,
+literal input, reset and mobile layout. Without JavaScript the original menu
+image remains available. The documentation sidebar uses a full-height column
+with independently sticky navigation so its background meets the footer.</p>
 <h2 id="faq-structure">FAQ structure</h2>
 <p>The <a href="/nrpe-custom/faq/">FAQ</a> remains canonical Markdown: level-two headings define topics,
 level-three headings define questions, and level-four headings divide longer
@@ -136,7 +153,7 @@ published by the guarded publisher. Rebuilds replace only a directory carrying
 this builder's manifest; arbitrary directories, unknown added files and the
 workflow-state root are refused. In-checkout output belongs under
 <code>.nrpe/site/&lt;name&gt;</code>, not <code>.nrpe</code> itself.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/c854aed19eb1a0bb70ec7fb153d33a5f0ec88532/.github/workflows/website.yml">website workflow</a> tests rendering, links
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/686f2f37a4e7458cc14638f39d7391c951fc4d89/.github/workflows/website.yml">website workflow</a> tests rendering, links
 and publication guards and uploads a preview artifact. It never commits or
 publishes automatically, preserving human-only Git authorship.</p>
 <h2 id="reviewed-publication-to-gh-pages">Reviewed publication to gh-pages</h2>
@@ -175,12 +192,13 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup</a>.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/c854aed19eb1a0bb70ec7fb153d33a5f0ec88532/docs/website.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/686f2f37a4e7458cc14638f39d7391c951fc4d89/docs/website.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
 <ul>
 <li><a href="#homepage-content-and-cli-capture">Homepage content and CLI capture</a></li>
+<li><a href="#interactive-browser-demo">Interactive browser demo</a></li>
 <li><a href="#faq-structure">FAQ structure</a></li>
 <li><a href="#diagrams-and-wide-tables">Diagrams and wide tables</a></li>
 <li><a href="#local-preview">Local preview</a></li>
@@ -200,11 +218,12 @@ claiming successful hosting. See
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source c854aed</span>
+<span>Source 686f2f3</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
 <script type="module" src="/nrpe-custom/assets/site.js">
 </script>
+
 </body>
 </html>
