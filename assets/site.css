@@ -2680,3 +2680,10 @@ html,.sidebar-content,.page-toc,.table-scroll{scrollbar-width:thin;scrollbar-col
 .sidebar-content::-webkit-scrollbar-thumb,.page-toc::-webkit-scrollbar-thumb,.table-scroll::-webkit-scrollbar-thumb{background:#b7b7bf;border-radius:5px;border:2px solid #f8f8fa}
 .sidebar-content::-webkit-scrollbar-thumb:hover{background:#93939c}
 .prose pre{scrollbar-width:thin;scrollbar-color:#606772 #151922}
+
+/* Compact legal/navigation footer. */
+.site-footer{padding:16px 32px;gap:6px 24px;align-items:center}
+.site-footer .footer-brand{font-size:16px;line-height:24px;margin:0}
+.site-footer .footer-links{font-size:11px;gap:6px 14px;margin:0}
+.site-footer .footer-note{font-size:11px;line-height:18px;margin:0}
+@media(max-width:720px){.site-footer{padding:18px 22px}.site-footer .footer-links{margin-top:10px}.site-footer .footer-note{margin-top:10px}}
