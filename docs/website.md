@@ -13,15 +13,15 @@ invented testimonial or production TLS claim. New reports follow the
 
 ## Homepage content and CLI capture
 
-The hero's "Built from real problems." line gently fades out, then reveals letters
-70 ms apart with a 180 ms fade and small vertical transition per letter. Cycles
-start 60 seconds apart, leaving the complete sentence visible between cycles.
-Letter spacing stays reserved so the heading does not move while typing.
-Reduced-motion preferences and missing JavaScript keep the full heading static.
-Animation stops while the tab or heading is hidden. Returning to the heading
-preserves the scheduled interval; an elapsed interval starts a fresh 60-second
-wait instead of immediately replaying. There is no visible animation control.
-Screen readers receive the complete sentence once, without repeated announcements.
+The product homepage, help documentation and editorial field notes use distinct
+layouts from the approved design exploration. Documentation has a compact tree,
+full-width blue selection, local search and a separate article outline. Field
+notes feature the existing reported account and label guide links separately;
+report bodies and metadata still come from canonical Markdown.
+
+Inter Variable is self-hosted with its verbatim SIL Open Font License under
+`website/assets/Inter-OFL.txt`. No JetBrains logo, illustrations or JetBrains
+font files are bundled. The former animated hero is retired with this layout.
 
 The homepage links to GitHub's latest release rather than hardcoding a release
 version. Its supported-target table is derived from the README table, keeping

@@ -86,7 +86,8 @@ copied into the static site. Generated pages retain the licenses of their
 original documentation and notices. Bundling the renderer would require its
 actual license text and a separate dependency inventory. Website CSS, templates
 and browser JavaScript are independently authored project code; no external
-JavaScript framework, analytics SDK or font bundle is shipped.
+JavaScript framework or analytics SDK is shipped. The locally hosted font and
+its retained notice are listed below.
 
 The build-only syntax highlighter is `shiki@4.5.0`, pinned with integrity-checked
 transitive dependencies in `website/package-lock.json`. Installed `shiki`,
@@ -137,3 +138,11 @@ Keep the project's unofficial-build wording and NRPE's `LEGAL` trademark notice.
 No endorsement or support entitlement from Nagios, Debian, or SUSE is implied.
 Metadata labels alone do not establish that an arbitrary release bundle retains
 all required notices. See the [release plan](docs/release-plan.md).
+
+## Self-hosted website font
+
+The website bundles Inter Variable from the official
+[Inter project](https://github.com/rsms/inter), licensed under SIL OFL 1.1.
+The verbatim notice is retained as `website/assets/Inter-OFL.txt` alongside
+`InterVariable.woff2`; the font is served locally and is not an NRPE dependency.
+No JetBrains font files, logos or illustrations are distributed.
