@@ -41,7 +41,7 @@ another suite, SLES service pack, or Leap packages to preserve a passing result.
 
 [Dependabot](../.github/dependabot.yml) checks Python requirements, locked website
 npm dependencies and GitHub Actions version tags weekly and proposes update PRs into `develop`, without automatic
-merging. Bot proposals need human-reviewed/authored integration under the
+merging. Genuine Dependabot PRs may merge into develop after review under the
 [Git policy](git-workflow.md).
 Actions use official major-version tags such as `actions/setup-python@v6`, as
 selected by the maintainer. Dependabot proposes major-version changes through PRs;
