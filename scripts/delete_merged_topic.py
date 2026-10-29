@@ -6,6 +6,10 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.check_git_policy import is_dependabot_pr
 
 
 def output(command):
@@ -20,7 +24,8 @@ def cleanup(event, repository, call=output):
             or branch in ('master', 'develop')
             or head.get('repo', {}).get('full_name') != repository
             or base.get('repo', {}).get('full_name') != repository
-            or not re.match(r'^(feat|fix|refactor|remove)/', branch)):
+            or not (re.match(r'^(feat|fix|refactor|remove)/', branch)
+                    or is_dependabot_pr(pr, repository))):
         return False
     if not re.fullmatch('[0-9a-f]{40}', sha):
         raise ValueError('Invalid expected head SHA')

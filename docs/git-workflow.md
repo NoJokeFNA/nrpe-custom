@@ -32,16 +32,23 @@ starting the next integration.
 
 ## Attribution
 
-Commits carry the existing human author identity. Do not add co-author trailers,
+Authored work carries the existing human author identity. Do not add co-author trailers,
 AI attribution, or generated-with/by lines. Never rewrite old history to change
 attribution. The policy check rejects invalid routes, recognizable bot identities,
 missing author identities and attribution trailers. Git metadata alone cannot
 prove that an author is human; maintainers must review it.
 
-Dependabot PRs are proposals targeting `develop`, not exceptions to this policy.
-Review their changes and bring approved updates onto a correctly named topic
-branch with the human author's commit before integration. Do not merge bot-authored
-commits or automatically merge update PRs.
+Genuine Dependabot PRs into `develop` are the sole approved bot exception.
+The policy checks GitHub's PR event for the official `dependabot[bot]` login,
+numeric identity and Bot account type, a `dependabot/...` head, and the same
+repository on both sides. The event's refs and SHAs must match the checked PR.
+Only Dependabot's exact official author name/email are exempted; arbitrary bots,
+AI attribution and co-author/generated-with trailers remain prohibited.
+
+Review update diffs, upstream release notes and compatibility checks before
+merging a Dependabot PR directly into `develop`. Do not enable automatic merges.
+Accepted Dependabot commits remain valid during a subsequent same-repository
+`develop`-to-`master` promotion. A bot branch cannot target master directly.
 
 ## Topic branch cleanup
 
@@ -63,7 +70,9 @@ prefixes are retained. `master` and `develop` are always excluded.
 After a successful merge, update local `develop`, inspect local changes and PR
 state, and remove the corresponding local topic only when its work is integrated.
 Never use `gh pr merge --delete-branch` for a develop-to-master promotion.
-Legacy branches outside the named prefixes are not automatically removed.
+Successfully merged genuine Dependabot branches use the same guarded cleanup,
+including the unchanged-head lease and open-PR checks. Other branches outside
+the named prefixes are not automatically removed.
 
 ## Server-side protection: one-time administrator action
 
