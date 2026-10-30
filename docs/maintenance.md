@@ -137,5 +137,5 @@ recipes change. Record exact package versions and evidence dates; do not infer
 argument support from the OS family alone.
 
 The [30 October 2026 package review](package-reviews/2026-10-30.md) adds five
-regular-package runtime probes and records current Arch/FreeBSD source findings.
+regular-package runtime probes and records current Arch source and FreeBSD source/binary findings.
 These are separate from the project custom-package release matrix.

@@ -262,5 +262,42 @@
         }
       ]
     }
+  ],
+  "binary_reviews": [
+    {
+      "system": "FreeBSD 14 amd64",
+      "package": "nrpe",
+      "version": "4.2.0",
+      "origin": "net-mgmt/nrpe",
+      "abi": "FreeBSD:14:amd64",
+      "url": "https://pkg.freebsd.org/FreeBSD:14:amd64/latest/All/nrpe-4.2.0.pkg",
+      "archive_sha256": "59d5a7ed9080ff83845e3c867ae925c5dae95c80622f7441374768fc27116b44",
+      "daemon_sha256": "6242a6b028df29fc9a45bf3aab481ca6f7dcdc0bdae71ce0bb3354777b28d19c",
+      "options": {
+        "ARGS": "off",
+        "MONPLUGINS": "off",
+        "NAGPLUGINS": "on",
+        "SSL": "on"
+      },
+      "annotations": {
+        "FreeBSD_version": "1404000",
+        "build_timestamp": "2026-10-26T17:42:51+0000",
+        "built_by": "poudriere-git-3.4.8-3-gd92fb7c0",
+        "flavor": "default",
+        "port_checkout_unclean": "no",
+        "port_git_hash": "d2f1c09d371059391b05bac91cad8a40e2b0f6e6",
+        "ports_top_checkout_unclean": "no",
+        "ports_top_git_hash": "7bbf4905e58740335e0e9c8580ef075c7611ea8a"
+      },
+      "evidence": "static binary disassembly and macro-guarded diagnostics",
+      "argument_enabled_diagnostics_present": true,
+      "compile_disabled_diagnostic_present": false,
+      "runtime_policy_branch_address": "0x20cef3",
+      "policy_diagnostic_address": "0x205156",
+      "result": "compiled argument handling present; no compile-option patch indicated for this binary",
+      "runtime": "not tested",
+      "tls": "not tested",
+      "transport_integrity": "verified HTTPS download; independent repository signature verification not performed"
+    }
   ]
 }
