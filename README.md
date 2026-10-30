@@ -88,13 +88,13 @@ for the native rebuild and TLS/service diagnosis.
 
 All package outputs target `linux/amd64` (`x86_64` for RPM).
 
-| Target | Distribution | Package | Source policy |
+| Target | Distribution | Package / format | Source policy |
 | --- | --- | --- | --- |
-| `debian11` | Debian 11 Bullseye | `nagios-nrpe-server` `.deb` | Discover through APT; archived security packages |
-| `debian12` | Debian 12 Bookworm | `nagios-nrpe-server` `.deb` | Discover through APT |
-| `debian13` | Debian 13 Trixie | `nagios-nrpe-server` `.deb` | Discover through APT |
-| `debian14` | Debian 14 Forky | `nagios-nrpe-server` `.deb` | Discover through APT; moving testing suite |
-| `sles12sp3` | SLES 12 SP3 | `nrpe` `.rpm` + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
+| `debian11` | Debian 11 Bullseye | `nagios-nrpe-server` (DEB) | Discover through APT; archived security packages |
+| `debian12` | Debian 12 Bookworm | `nagios-nrpe-server` (DEB) | Discover through APT |
+| `debian13` | Debian 13 Trixie | `nagios-nrpe-server` (DEB) | Discover through APT |
+| `debian14` | Debian 14 Forky | `nagios-nrpe-server` (DEB) | Discover through APT; moving testing suite |
+| `sles12sp3` | SLES 12 SP3 | `nrpe` (RPM) + companion user RPM | Reviewed, pinned OBS sources; genuine SLES base |
 
 The [package compatibility matrix](docs/package-compatibility.md) distinguishes
 systems that need an argument-enabled build, packages that already enable it,
