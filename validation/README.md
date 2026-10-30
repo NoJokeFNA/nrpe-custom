@@ -66,7 +66,9 @@ systemd/OpenRC boot, plugin coverage, upgrade or rollback results. See the
 Resolve the [latest stable upstream release](https://api.github.com/repos/NagiosEnterprises/nrpe/releases/latest)
 at the start of each review and record its tag, release URL, publication date,
 immutable source identity and archive digest. Do not treat a previously reviewed
-version as the current latest. Exclude draft/prerelease builds unless explicitly
+version as the current latest. Link the newest report from the website's
+**Test results** navigation entry and the compatibility overview, preserving
+earlier report URLs. Exclude draft/prerelease builds unless explicitly
 reviewing one.
 
 Test the newest candidate available from each selected OS release's own supported

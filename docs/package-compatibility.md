@@ -5,11 +5,10 @@ needed because the installed NRPE package lacks required command-argument or
 TLS/SSL support. It applies to the listed package and requirement, not every
 installation of that OS.
 
-The project changes native packaging options rather than implementing an OS
-patch. Argument support needs both `--enable-command-args` at build time and a
-deliberate runtime policy (`dont_blame_nrpe=1`). A disabled runtime setting alone
-does not establish that compilation is missing. Keep Bash command substitution
-disabled and use [reviewed command definitions](configuration-examples.md).
+For exact tested versions, argument settings, TLS checks and source/binary
+inspection, open **[Test results — 30 October 2026](package-reviews/2026-10-30.md)**.
+That report is also available as **Test results** in the documentation navigation.
+This page summarizes the patch decision; the report keeps the technical evidence.
 
 **Assessment:** **Yes** means a custom build is needed for the stated requirement;
 **No** means the reviewed regular package already provides it; **Unconfirmed**
@@ -21,24 +20,17 @@ patch firewall rules, missing plugins or TLS configuration.
 
 ## Version selection
 
-Each new review uses the latest stable upstream release **and** the newest
-candidate from each OS release's refreshed native repositories, with separate
-results. On 30 October 2026, upstream latest was **4.2.0**, while Ubuntu 24.04's
-regular package candidate was **4.1.0-1ubuntu3**. The
-[actual 4.2.0 build/TLS comparison](package-reviews/2026-10-30.md#latest-stable-upstream-comparison)
-confirms that a default upstream build still needs `--enable-command-args` for
-remote arguments. Previously recorded versions remain dated evidence; they do
-not define which version the next review should test.
+New reviews compare the latest stable upstream release with the newest candidate
+from each OS release's refreshed native repositories. The
+[test results](package-reviews/2026-10-30.md#latest-stable-upstream-comparison)
+record the current 4.2.0 upstream check and distribution versions separately.
+Previous versions remain dated evidence, not pins for the next review.
 
 ## Confirmed packaging and runtime findings
 
-The versions below identify inspected or recorded examples, not a promise that
-they are the latest packages in every repository. Evidence is either a source
-review or the explicitly listed container argument probe; neither establishes
-production TLS or host lifecycle behavior. TLS follow-up results are recorded
-separately below. The [dated follow-up](package-reviews/2026-10-30.md) records the method,
-versions, scope and FreeBSD source/binary findings.
-Only the targets marked **supported** are implemented by this tool.
+Each row applies to the exact listed package. Source inspection, container tests
+and native-host validation are different evidence levels; follow the linked
+source markers for details. Only targets marked **supported** are implemented.
 
 | System / inspected package | Compiled arguments | Assessment: tool patch needed? | Tool support |
 | --- | --- | --- | --- |
@@ -112,14 +104,10 @@ not automatically a rebuilt binary.
   The [native build guide](sles12sp3.md) describes the actual policy changes;
   the [operator field note](../website/content/sles12-handshake.md) separates the
   old server, client/server package confusion, firewall and plugin problems.
-- **[F] FreeBSD:** the official [port Makefile](https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile)
-  identifies version 4.2.0 and an off-by-default `ARGS` option. The
-  [follow-up](package-reviews/2026-10-30.md#freebsd-why-the-first-classification-needed-correction)
-  records why Ports-generated `--disable-command-args` cannot be assumed to leave
-  the compiled macro disabled in the reviewed upstream configure block. The
-  [official binary follow-up](package-reviews/2026-10-30.md#freebsd-official-binary-follow-up)
-  confirms argument-enabled request handling in the reviewed FreeBSD 14 amd64
-  package despite its `ARGS=off` metadata. No native runtime or TLS pass is claimed.
+- **[F] FreeBSD:** the [official port](https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile)
+  and the [exact official binary](package-reviews/2026-10-30.md#freebsd-official-binary-follow-up)
+  were inspected. The report explains why `ARGS=off` does not describe the compiled
+  behavior of that binary. Native runtime and TLS checks remain open.
 - **[U] Ubuntu:** the official [4.1.3-1ubuntu1 acceptance record](https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html)
   explicitly records Ubuntu's addition of `--enable-command-args` and the
   retained disabled runtime default. The record is dated 20 December 2024.
