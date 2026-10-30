@@ -7,7 +7,8 @@ new supported build target or a production diagnostic. Use
 
 The probe requires container root and `NRPE_DISPOSABLE_PROBE=1`. Do not set that
 marker on an existing/shared container or a production system. Install the exact
-package through the matching distribution's normal repositories first, preserving
+candidate package through freshly refreshed matching distribution repositories
+first; do not pin an older version just to match a previous result. Preserve
 TLS and package-signature checks. The image must contain `/bin/echo`, a real
 package-provided `nrpe` or `nagios` account, NRPE 4.x and its `check_nrpe` client.
 Do not publish any container ports. Provide HTTPS trust only to the package
@@ -59,3 +60,37 @@ establishes only the described local certificate checks. Neither mode establishe
 systemd/OpenRC boot, plugin coverage, upgrade or rollback results. See the
 [dated review](../docs/package-reviews/2026-10-30.md) and
 [compatibility matrix](../docs/package-compatibility.md).
+
+## Version selection for each new review
+
+Resolve the [latest stable upstream release](https://api.github.com/repos/NagiosEnterprises/nrpe/releases/latest)
+at the start of each review and record its tag, release URL, publication date,
+immutable source identity and archive digest. Do not treat a previously reviewed
+version as the current latest. Link the newest report from the website's
+**Test results** navigation entry and the compatibility overview, preserving
+earlier report URLs. Exclude draft/prerelease builds unless explicitly
+reviewing one.
+
+Test the newest candidate available from each selected OS release's own supported
+repositories after refreshing metadata. A distribution can ship an older upstream
+version with maintained packaging/backports; record that exact package separately
+from upstream. Do not introduce repositories for another release to force a newer
+number. The existing dated results describe what was tested, not a rolling claim
+about the newest version.
+
+Also compare the latest upstream release in an isolated source build. To reuse
+the protocol harness for that comparison, point it at both reviewed build outputs:
+
+```sh
+NRPE_DISPOSABLE_PROBE=1 NRPE_PROBE_TRANSPORT=tls \
+  NRPE_PROBE_SERVER=/tmp/nrpe-build/src/nrpe \
+  NRPE_PROBE_CLIENT=/tmp/nrpe-build/src/check_nrpe \
+  sh /run/probe-installed-nrpe.sh
+```
+
+The same container/account prerequisites apply. Record that these are source-build
+binaries, not files installed by the distribution package. Compare a default build
+with an explicitly argument-enabled build and retain the TLS negative controls.
+A Linux source-build pass does not establish native FreeBSD or legacy SLES ABI
+compatibility. Project release recipe upgrades still require reviewed native
+packaging, source integrity, licensing and complete target verification.

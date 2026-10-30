@@ -98,6 +98,13 @@ review date. Record later reviews separately rather than overwriting that eviden
 
 ## Reviewing source and recipe updates
 
+For every new package-compatibility review, resolve the latest stable upstream
+release and record its tag/date/source digest. Compare that release separately
+from the latest candidate in each OS release's refreshed native repositories.
+Follow the [research procedure](../validation/README.md#version-selection-for-each-new-review).
+Old dated results must not be presented as a current-latest claim. A newer
+upstream release triggers review; it does not silently replace native packaging.
+
 Debian discovers its suite's official source version at build time. `--pull`
 refreshes base images, not an existing exported package's source identity.
 Preserve previous outputs, then explicitly rebuild and verify updates.
