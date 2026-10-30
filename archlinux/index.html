@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Optional Arch Linux package · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<span>NRPE Custom</span>
+</a>
+<a class="collection-link" href="/nrpe-custom/overview/">Documentation <span aria-hidden="true">▾</span>
+</a>
+<div class="header-tools">
+<a class="header-source" href="https://github.com/NoJokeFNA/nrpe-custom">Source code ↗</a>
+<a class="header-download" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Get NRPE packages</a><label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+</div>
+</header>
+<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/package-reviews/2026-10-30/">Test results</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a aria-current="page" href="/nrpe-custom/archlinux/">Arch Linux (optional)</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="doc-breadcrumb">
+<a href="/nrpe-custom/">NRPE Custom</a>
+<span>/</span>
+<a href="/nrpe-custom/overview/">Documentation</a>
+</div>
+      <h1>Optional Arch Linux package</h1>
+      <p class="article-meta">Source d6cb301</p>
+      <article class="prose"><p><code>archlinux</code> builds a native x86_64 package from the latest reviewed stable NRPE
+release, currently <strong>4.2.0</strong>, with compiled command-argument support. It is an
+explicit opt-in target and is <strong>excluded from <code>all</code> and the five-target release
+bundle</strong>. It is not the former official Arch package or an AUR release.</p>
+<h2 id="security-policy-difference">Security policy difference</h2>
+<p>Arch deliberately removed argument support from its former official package;
+see <a href="https://security.archlinux.org/AVG-587">AVG-587</a> and
+<a href="https://bugs.archlinux.org/task/66574">FS#66574</a>. This custom package changes
+that policy. A successful test or a warning does not make arbitrary shell input
+safe, and enabling arguments is not a fix for the historical CVEs. Current
+upstream fixes and the historical policy are evaluated separately in the
+<a href="/nrpe-custom/package-reviews/2026-10-30/#current-arch-package-and-upstream-fixes">test report</a>.</p>
+<p>The shipped configuration keeps <code>dont_blame_nrpe=0</code> and Bash substitution disabled.
+The CLI, package installation output and installed policy notice identify this
+difference. Prefer fixed commands when remote arguments are unnecessary. Require
+reviewed commands, argument validation, restricted network access and appropriate
+TLS before enabling arguments; follow <a href="/nrpe-custom/security/">deployment security</a>.</p>
+<p><strong>Upgrades preserve locally modified configurations.</strong> An old configuration may
+already contain <code>dont_blame_nrpe=1</code>, even if its previous binary rejected all
+arguments. Review that setting before starting the new daemon. Do not assume the
+new package's safe default overwrites an existing configuration.</p>
+<h2 id="build-and-test">Build and test</h2>
+<p>On the workstation:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">verify</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">archlinux</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--pull</span>
+</code></pre>
+<p>For an intentional replacement of existing local outputs, add <code>--rebuild</code>.
+The optional <code>--ca-cert</code> works as for other targets and preserves HTTPS and
+repository-signature checks. Company CAs can remain in local builder/test image
+layers; do not distribute those images without the appropriate approval.</p>
+<p>The builder uses the official Arch base-devel image, fully refreshes its matching
+rolling repositories, and runs <code>makepkg</code> as an unprivileged account. It compares
+the latest stable upstream release with <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/packaging/archlinux-source.json">the reviewed manifest</a>.
+A new upstream release fails for source, license and native-package review; it
+does not silently keep using a stale version or publish unreviewed sources.
+No packages are installed on the workstation host.</p>
+<p>The custom package version is recorded in PKGBUILD as <code>4.2.0-1.1</code>; it is not
+created by renaming a binary. A later recipe change for the same upstream version
+must increment the custom package revision. The source archive checksum, license
+hashes and recipe are exported and checked before release staging.</p>
+<h2 id="outputs-and-archive-preparation">Outputs and archive preparation</h2>
+<p><code>output/archlinux/</code> contains:</p>
+<ul>
+<li><code>nrpe-4.2.0-1.1-x86_64.pkg.tar.zst</code>: daemon and matching client.</li>
+<li><code>sources/nrpe-4.2.0-1.1.src.tar.gz</code>: complete native source package, including
+  the exact upstream archive and all packaging inputs.</li>
+<li><code>build-recipe/</code>, <code>source-manifest.json</code>, <code>ARGUMENT-POLICY.md</code> and <code>SHA256SUMS</code>.</li>
+</ul>
+<p>After committing the reviewed workflow and running <code>verify</code> from that exact clean
+checkout, prepare a source-complete archive on a Linux staging workstation with
+GNU tar and zstd:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">python3</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">scripts/prepare_release.py</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">target</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--target</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">archlinux</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-79c0ff">--commit</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&quot;$(</span><span class="syntax-fg-ffa657">git</span><span class="syntax-fg-a5d6ff"> rev-parse HEAD)&quot;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--destination</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">.nrpe/arch-release</span>
+</code></pre>
+<p>Staging requires a complete successful verify run bound to that commit and the
+unchanged binary/source bytes. It validates the native package metadata, exact
+recipe, installation notice, upstream archive and license texts. Dirty/stale
+results cannot be used to stage a release.</p>
+<p>The separate <strong>Optional Arch Linux package</strong> CI workflow runs on relevant PRs
+and can be dispatched manually. It uploads a source-complete archive as a build
+artifact; it has no release publishing permissions and does not automatically
+create GitHub Releases. Public release publication remains an explicit maintainer
+action. The native package is unsigned; checksums alone do not authenticate a
+publisher. A signed archive manifest does not create a pacman package signature.</p>
+<h2 id="install-or-replace-an-existing-package">Install or replace an existing package</h2>
+<p>Use a fully updated, isolated <strong>Arch Linux x86_64</strong> host first. Arch is rolling;
+this is not a package for an older frozen snapshot or an Arch derivative. Check
+the installed version, source and local patches before replacing a newer or
+separately maintained package. Never force conflicts with <code>--overwrite</code> or bypass
+dependencies/signatures. Follow the official
+<a href="https://wiki.archlinux.org/title/System_maintenance">Arch system maintenance guidance</a>
+and <a href="https://github.com/NagiosEnterprises/nrpe">NRPE documentation</a> for the complete
+system, plugin and TLS setup.</p>
+<p>For an existing installation, record its state and keep the previous package
+archive, configuration, unit overrides and plugins for rollback:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">pacman</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-Q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
+<span class="syntax-fg-ffa657">pacman</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-Ql</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cat</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">cp</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-a</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/root/nrpe-config-before-custom</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">stop</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+</code></pre>
+<p>If the old deployment used <code>nrpe.socket</code>, disable and stop that socket before
+switching to this standalone daemon. This package does not ship socket activation.
+Perform the normal full Arch upgrade in a maintenance window before installing
+a package built against the current rolling libraries; avoid partial upgrades.</p>
+<p>Transfer the output into a dedicated directory and retain the complete file set
+if using its full checksum manifest. Check it before installation:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">sha256sum</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--check</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">SHA256SUMS</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">pacman</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-Syu</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">pacman</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-U</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">./nrpe-4.2.0-1.1-x86_64.pkg.tar.zst</span>
+</code></pre>
+<p>The package name stays <strong><code>nrpe</code></strong>, so pacman upgrades the installed package rather
+than creating a second daemon. Its backup entry preserves a modified
+<code>/etc/nrpe/nrpe.cfg</code>; inspect any <code>.pacnew</code> file and deliberately merge required
+settings. Recheck <code>dont_blame_nrpe</code> before restarting. Package installation does
+not enable or restart the daemon automatically. <code>monitoring-plugins</code> or individual
+custom plugins are separate prerequisites; this package supplies NRPE only.</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">pacman</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-Q</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe</span>
+<span class="syntax-fg-ffa657">/usr/bin/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-V</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">grep</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-nE</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;^(dont_blame_nrpe|allow_bash_command_substitution)=&#x27;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/etc/nrpe/nrpe.cfg</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">daemon-reload</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">enable</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--now</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span>
+<span class="syntax-fg-ffa657">sudo</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">systemctl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">status</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.service</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--no-pager</span>
+</code></pre>
+<p>The native paths match the AUR convention: daemon <code>/usr/bin/nrpe</code>, client
+<code>/usr/lib/monitoring-plugins/check_nrpe</code>, configuration <code>/etc/nrpe/nrpe.cfg</code>,
+service <code>nrpe.service</code>, account <code>nrpe</code>, runtime directory <code>/run/nrpe</code>.
+The policy notice is installed under
+<code>/usr/share/licenses/nrpe/ARGUMENT-POLICY.md</code> and license/OpenSSL notices are
+preserved beside it. Verify real monitoring requests using the intended TLS
+policy; see <a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a>.</p>
+<p>For rollback, stop the daemon, reinstall the saved previous native package with
+pacman, restore its configuration and unit overrides, reload systemd definitions
+and restart the previous deployment. Do not overwrite unrelated files or enable
+an old socket and standalone listener on the same port. Test that procedure on
+the isolated host before relying on it in production.</p>
+<h2 id="validation-scope">Validation scope</h2>
+<p>A genuine Arch container build and fresh pacman installation passed locally on
+30 October 2026. Checks cover package/version identity, real sysusers account
+creation, unit-file verification, safe packaged defaults, configuration preservation
+on same-version reinstallation, both argument settings,
+two argument pairs over certificate-authenticated TLS, Bash-substitution and
+metacharacter rejection, unrelated CA rejection and missing client-certificate
+rejection. Corresponding source and license identities were also validated.</p>
+<p>Containers do not boot systemd. Real service startup, existing-config upgrades,
+reboot, rollback, firewall and production Nagios/plugin behavior remain separate
+<a href="/nrpe-custom/practical-validation/">host validation</a> tasks. These tests are not a complete
+security audit. The build is repeatable, not bit-for-bit reproducible: live Arch
+repository transactions and base images can change.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/archlinux.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc">
+<span>On this page</span><div class="toc">
+<ul>
+<li><a href="#security-policy-difference">Security policy difference</a></li>
+<li><a href="#build-and-test">Build and test</a></li>
+<li><a href="#outputs-and-archive-preparation">Outputs and archive preparation</a></li>
+<li><a href="#install-or-replace-an-existing-package">Install or replace an existing package</a></li>
+<li><a href="#validation-scope">Validation scope</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source d6cb301</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

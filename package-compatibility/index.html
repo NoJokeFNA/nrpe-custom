@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a aria-current="page" href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/package-reviews/2026-10-30/">Test results</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a aria-current="page" href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/package-reviews/2026-10-30/">Test results</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/archlinux/">Arch Linux (optional)</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>NRPE package compatibility matrix</h1>
-      <p class="article-meta">Source d532e24</p>
+      <p class="article-meta">Source d6cb301</p>
       <article class="prose"><p>Reviewed: <strong>30 October 2026</strong>. The assessment answers whether a custom build is
 needed because the installed NRPE package lacks required command-argument or
 TLS/SSL support. It applies to the listed package and requirement, not every
@@ -185,8 +185,8 @@ than assuming every binary uses the defaults.</p>
 <tbody>
 <tr>
 <td>Arch Linux / AUR <code>nrpe 4.1.2-1</code></td>
-<td>Current AUR recipe omits the configure option; exact upstream source leaves the macro undefined when the option is absent. Official core/extra query found no <code>nrpe</code> package <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
-<td>Source-level rebuild candidate; no AUR build/runtime test yet. The old official issue <a href="https://bugs.archlinux.org/task/66574">R</a> remains historical context</td>
+<td>Inspected AUR recipe omits argument support <a href="/nrpe-custom/package-reviews/2026-10-30/#arch-current-repository-absence-and-aur-source-review">AR</a>. The former official package deliberately disabled it for security reasons <a href="https://security.archlinux.org/AVG-587">R</a></td>
+<td>The separate <a href="/nrpe-custom/archlinux/">optional custom target</a> uses reviewed current upstream sources. No automatic patch recommendation; AUR runtime remains untested</td>
 </tr>
 <tr>
 <td>Debian-derived distributions using unchanged Debian NRPE packaging</td>
@@ -200,6 +200,14 @@ than assuming every binary uses the defaults.</p>
 </tr>
 </tbody>
 </table></div>
+<p>The separate <strong><a href="/nrpe-custom/archlinux/">optional Arch target</a></strong> is implemented and passed
+native container packaging/install/TLS/rejection checks. It changes the historical
+security policy deliberately, is excluded from <code>all</code>, and does not establish the
+behavior or security of an AUR-installed binary.</p>
+<p>A disabled feature can be an intentional security restriction. Its absence alone
+is not a packaging defect or a recommendation to enable it. This tool enables
+argument support when explicitly needed; it does not fix the cited vulnerabilities
+by enabling that support. Prefer fixed commands when arguments are unnecessary.</p>
 <p>A candidate row adds no CLI target, build recipe or compatibility guarantee.
 FreeBSD requires native BSD build/install/service validation. Existing Debian
 or SLES packages must not be installed on another distribution or architecture;
@@ -224,9 +232,9 @@ not automatically a rebuilt binary.</p>
 <li><strong><a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">D</a> Debian:</strong> inspected <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">4.1.3-1 build rules</a>
   omit <code>--enable-command-args</code>. Recorded Debian 11–14 source/custom versions and
   actual project build/install/TLS evidence are in the linked release history.
-  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
+  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
   option insertion and rejects an already-enabled recipe.</li>
-<li><strong><a href="https://api.opensuse.org/public/source/server:monitoring/nrpe/nrpe.spec?rev=835292739a5736a9d8f0460f670b6f15">S</a> SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
+<li><strong><a href="https://api.opensuse.org/public/source/server:monitoring/nrpe/nrpe.spec?rev=835292739a5736a9d8f0460f670b6f15">S</a> SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
   identifies NRPE 4.1.1 at revision <code>835292739a5736a9d8f0460f670b6f15</code>.
   The <a href="/nrpe-custom/sles12sp3/">native build guide</a> describes the actual policy changes;
   the <a href="/nrpe-custom/field-notes/sles12-handshake/">operator field note</a> separates the
@@ -242,12 +250,16 @@ not automatically a rebuilt binary.</p>
   identifies 4.1.3-r0 and passes <code>--enable-command-args</code> to configure.</li>
 <li>
 <p><strong><a href="https://bugs.archlinux.org/task/66574">R</a> Arch:</strong> the official <a href="https://bugs.archlinux.org/task/66574">FS#66574 report</a>
-  identifies version 4.0.2 and the maintainer's May 2020 decision. It provides
-  historical evidence, not an independently checked current package.</p>
+  identifies NRPE 4.0.2 and the May 2020 refusal to restore the feature, explicitly
+  citing <a href="https://security.archlinux.org/AVG-587">AVG-587</a>. The
+  <a href="https://security.archlinux.org/ASA-201801-14">2018 advisory</a> records disabling
+  argument support as the security measure. This establishes the historical
+  official-package decision, not the intent of today's AUR maintainer or a
+  current-version vulnerability assessment.</p>
 </li>
 <li>
 <p><strong><a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a> Runtime/source follow-up:</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/">30 October 2026 review</a>
-  and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/docs/package-reviews/2026-10-30.json">machine-readable identities/results</a>.
+  and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/package-reviews/2026-10-30.json">machine-readable identities/results</a>.
   Five container probes passed; Arch's current AUR evidence is source-only.</p>
 </li>
 </ul>
@@ -276,7 +288,7 @@ source link, relevant configure options and evidence type. Keep source inspectio
 container protocol results and real-host outcomes distinct. Recheck moving
 branches before acting on their entries and update changed findings rather than
 silently extending them to all releases of a distribution.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -302,7 +314,7 @@ silently extending them to all releases of a distribution.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d532e24</span>
+<span>Source d6cb301</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
