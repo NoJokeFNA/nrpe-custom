@@ -19,3 +19,5 @@ local-media/
 local-certificates/
 /work/
 /website/node_modules/
+
+/output/archlinux/

@@ -65,9 +65,14 @@ than assuming every binary uses the defaults.
 
 | Candidate | Available evidence | Remaining work |
 | --- | --- | --- |
-| Arch Linux / AUR `nrpe 4.1.2-1` | Inspected AUR recipe omits argument support [AR]. The former official package deliberately disabled it for security reasons [R] [AS] | Optional build requires security-policy and native-package review. No automatic patch recommendation or supported target; AUR runtime remains untested |
+| Arch Linux / AUR `nrpe 4.1.2-1` | Inspected AUR recipe omits argument support [AR]. The former official package deliberately disabled it for security reasons [R] [AS] | The separate [optional custom target](archlinux.md) uses reviewed current upstream sources. No automatic patch recommendation; AUR runtime remains untested |
 | Debian-derived distributions using unchanged Debian NRPE packaging | Possible inherited build behavior, not independently confirmed here | Identify the exact release, package source/version and architecture before classifying it; Ubuntu demonstrates why inheritance cannot be assumed |
 | Other distributions/repositories | Not reviewed by this matrix | Review their current recipe and installed package; absence from this page means unknown, not affected or unaffected |
+
+The separate **[optional Arch target](archlinux.md)** is implemented and passed
+native container packaging/install/TLS/rejection checks. It changes the historical
+security policy deliberately, is excluded from `all`, and does not establish the
+behavior or security of an AUR-installed binary.
 
 A disabled feature can be an intentional security restriction. Its absence alone
 is not a packaging defect or a recommendation to enable it. This tool enables

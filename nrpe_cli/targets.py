@@ -8,7 +8,13 @@ TARGET_CONFIG = {
 TARGET_CONFIG["sles12sp3"] = {
     "pattern": "nrpe-[0-9]*.x86_64.rpm", "prefix": "nrpe-", "suffix": ".x86_64.rpm",
 }
+DEFAULT_TARGETS = tuple(TARGET_CONFIG)
+TARGET_CONFIG["archlinux"] = {
+    "pattern": "nrpe-[0-9]*-x86_64.pkg.tar.zst", "prefix": "nrpe-", "suffix": "-x86_64.pkg.tar.zst",
+}
 TARGETS = tuple(TARGET_CONFIG)
+ARCH_NOTICE = ("Optional Arch build: compiles arguments contrary to the former distribution security policy. "
+               "Arguments stay disabled by default; review docs/archlinux.md before deployment.")
 
 
 def package_files(root, target):

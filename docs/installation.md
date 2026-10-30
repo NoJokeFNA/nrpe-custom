@@ -12,6 +12,11 @@ This guide covers deployment of the custom packages and essential configuration
 checks; it does not replace those manuals or distribution-specific plugin and
 TLS instructions.
 
+For the optional native Arch package, use the separate
+[Arch installation and replacement guide](archlinux.md#install-or-replace-an-existing-package).
+It explains the intentional security-policy difference and existing-configuration
+handling; the Debian/RPM instructions below do not apply to Arch.
+
 ## Prepare the files
 
 Build and test the selected target on the workstation with, for example,

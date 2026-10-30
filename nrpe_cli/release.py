@@ -11,7 +11,7 @@ import tarfile
 import tempfile
 
 from .state import artifact, reports, workflow_identity
-from .targets import TARGETS
+from .targets import TARGETS, DEFAULT_TARGETS
 from scripts.export_debian_sources import source_files
 from scripts.sles_source import patch_spec
 
@@ -126,6 +126,9 @@ def validate_sources(root, target, evidence, notices):
             for name in ('LICENSE.md', 'LEGAL', 'debian/copyright'):
                 data = (extracted / name).read_bytes()
                 (notices / Path(name).name).write_bytes(data)
+    elif target == 'archlinux':
+        from scripts.arch_source import validate_export
+        allowed = validate_export(root, directory, evidence, notices)
     else:
         allowed = {'SHA256SUMS', 'source-manifest.json', 'user-source-manifest.json', 'macros-source-manifest.json', 'bootstrap-manifest.json'}
         pairs = [('nrpe', 'source-manifest.json', 'sles12sp3-source.json'),
@@ -273,6 +276,11 @@ def verify_archive(path, target, commit):
             if not any(n.startswith('sources/') and marker in n for n in assets):
                 raise RuntimeError('Missing corresponding Debian source')
         required = ['licenses/LICENSE.md', 'licenses/LEGAL', 'licenses/copyright']
+    elif target == 'archlinux':
+        required = ['licenses/archlinux/LICENSE.md', 'licenses/archlinux/LEGAL']
+        if ('ARGUMENT-POLICY.md' not in assets or 'source-manifest.json' not in assets
+                or not any(n.startswith('sources/') and n.endswith('.src.tar.gz') for n in assets)):
+            raise RuntimeError('Missing optional Arch policy or corresponding source')
     else:
         required = ['licenses/sles12sp3/' + n for n in (
             'NRPE-GPL-2.0.md', 'NRPE-LEGAL.txt', 'NRPE-license-notice.txt',
@@ -295,10 +303,10 @@ def verify_archive(path, target, commit):
 def assemble(root, incoming, commit, destination):
     if workflow_identity(root) != {'commit': commit, 'dirty': False}:
         raise RuntimeError('Exact clean workflow checkout required')
-    expected = {'nrpe-custom-' + t + '.tar.gz' for t in TARGETS}
+    expected = {'nrpe-custom-' + t + '.tar.gz' for t in DEFAULT_TARGETS}
     if {p.name for p in incoming.iterdir()} != expected:
         raise RuntimeError('All five target archives, and no extra assets, are required')
-    manifests = [verify_archive(incoming / ('nrpe-custom-' + t + '.tar.gz'), t, commit) for t in TARGETS]
+    manifests = [verify_archive(incoming / ('nrpe-custom-' + t + '.tar.gz'), t, commit) for t in DEFAULT_TARGETS]
     destination.mkdir(parents=True, exist_ok=False)
     for name in expected:
         shutil.copyfile(incoming / name, destination / name)

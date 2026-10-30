@@ -4,6 +4,17 @@ x-nrpe-test: &nrpe-test
   profiles: [integration]
 
 services:
+  test-archlinux:
+    <<: *nrpe-test
+    build:
+      context: .
+      dockerfile: docker/archlinux/test.Dockerfile
+      secrets: [nrpe_ca_cert]
+      args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
+    image: nrpe-custom-test:archlinux
+    volumes:
+      - ./output/archlinux:/packages:ro
   test-sles12sp3:
     <<: *nrpe-test
     build:

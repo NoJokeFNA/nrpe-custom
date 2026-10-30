@@ -1,0 +1,50 @@
+# Project-authored native packaging; see ARGUMENT-POLICY.md before deployment.
+pkgname=nrpe
+pkgver=4.2.0
+pkgrel=1.1
+pkgdesc='Optional unofficial NRPE with compiled arguments, disabled at runtime'
+arch=('x86_64')
+options=('!debug')
+url='https://github.com/NagiosEnterprises/nrpe'
+license=('GPL-2.0-or-later')
+depends=('glibc' 'openssl' 'systemd')
+backup=('etc/nrpe/nrpe.cfg')
+install=nrpe.install
+source=("nrpe-$pkgver.tar.gz" 'nrpe.service' 'nrpe.sysusers' 'ARGUMENT-POLICY.md' 'nrpe.install')
+sha256sums=('0d1eac6845d360b200b037f2b8c0199f1acbe3bea36ad72236ad619e5447e555'
+            '5b69c72caa5885984fbb6df6d2f99831444284e8f9d8a7ed675956c0749bc09e'
+            '9a71c15219351d6fcff41d4a81f5930f235fc8ca56bf4075639a574c1c091806'
+            '5f259f65e4d8234b811920e1f6077aad8d8ce4c1525374f54354aa8438dc249c'
+            '3135fd8932e9f860db2e6f1f5b6743064145a061bb7a6371bd1768e74c9aad7b')
+
+build() {
+  cd "$srcdir/nrpe-$pkgver"
+  ./configure --prefix=/usr --sysconfdir=/etc/nrpe \
+    --libexecdir=/usr/lib/monitoring-plugins --localstatedir=/var \
+    --with-nrpe-user=nrpe --with-nrpe-group=nrpe \
+    --with-nagios-user=nrpe --with-nagios-group=nrpe \
+    --with-piddir=/run/nrpe --enable-command-args
+  grep -qx '#define ENABLE_COMMAND_ARGUMENTS 1' include/config.h
+  ! grep -Eq '^#define ENABLE_BASH_COMMAND_SUBSTITUTION[[:space:]]+1' include/config.h
+  make all
+}
+
+package() {
+  cd "$srcdir/nrpe-$pkgver"
+  install -Dm755 src/nrpe "$pkgdir/usr/bin/nrpe"
+  install -Dm755 src/check_nrpe "$pkgdir/usr/lib/monitoring-plugins/check_nrpe"
+  install -Dm644 sample-config/nrpe.cfg "$pkgdir/etc/nrpe/nrpe.cfg"
+  sed -i 's/^dont_blame_nrpe=.*/dont_blame_nrpe=0/;s/^allow_bash_command_substitution=.*/allow_bash_command_substitution=0/' "$pkgdir/etc/nrpe/nrpe.cfg"
+  grep -qx 'dont_blame_nrpe=0' "$pkgdir/etc/nrpe/nrpe.cfg"
+  for file in LICENSE.md LEGAL; do
+    install -Dm644 "$file" "$pkgdir/usr/share/licenses/nrpe/$file"
+  done
+  local license_status=0
+  src/nrpe -l > "$pkgdir/usr/share/licenses/nrpe/UPSTREAM-NOTICE.txt" || license_status=$?
+  # Upstream's informational license command returns UNKNOWN (3).
+  [[ "$license_status" == 0 || "$license_status" == 3 ]]
+  grep -q 'exemption that compiling, linking, and/or using OpenSSL is allowed' "$pkgdir/usr/share/licenses/nrpe/UPSTREAM-NOTICE.txt"
+  install -Dm644 "$srcdir/nrpe.service" "$pkgdir/usr/lib/systemd/system/nrpe.service"
+  install -Dm644 "$srcdir/nrpe.sysusers" "$pkgdir/usr/lib/sysusers.d/nrpe.conf"
+  install -Dm644 "$srcdir/ARGUMENT-POLICY.md" "$pkgdir/usr/share/licenses/nrpe/ARGUMENT-POLICY.md"
+}

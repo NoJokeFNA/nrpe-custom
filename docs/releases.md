@@ -5,6 +5,11 @@ The repository's visibility is unchanged. Topic/develop pushes do not publish
 releases. Release-relevant PRs run the build and archive checks without publishing;
 manual workflow dispatch is also validation-only.
 
+The [optional Arch target](archlinux.md) has a separate validation-only workflow
+and source-complete build artifact. It is excluded from the five-target bundle
+and automatic release publication. Arch publication is an explicit maintainer
+action, with its argument-policy difference clearly retained in the archive.
+
 ## Build and publication gate
 
 1. Run the Linux/Windows unit matrix, shell/Compose checks and dependency audit.

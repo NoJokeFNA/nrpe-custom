@@ -267,7 +267,7 @@
         "recipe_hash_unchanged": true,
         "extra_security_or_argument_enabling_patch_in_recipe": false
       },
-      "optional_target_status": "possible future opt-in native target; warning alone insufficient; no Arch build/runtime/release implemented"
+      "optional_target_status": "separate optional native custom 4.2.0-1.1 target implemented and container tested; original AUR binary/runtime remains untested"
     },
     {
       "system": "FreeBSD ports",

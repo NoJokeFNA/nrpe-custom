@@ -12,7 +12,7 @@ from .cleanup import clean
 from .docker import check_docker
 from .diagnostics import FailureDiagnostics
 from .state import ROOT, artifact, reports
-from .targets import TARGETS, package_files
+from .targets import TARGETS, DEFAULT_TARGETS, ARCH_NOTICE, package_files
 
 
 def doctor(root):
@@ -22,6 +22,9 @@ def doctor(root):
                 "docker/sles12sp3/build.Dockerfile", "docker/sles12sp3/test.Dockerfile",
                 "scripts/build.sh", "scripts/export_debian_sources.py", "scripts/verify.sh",
                 "scripts/integration-test.sh", "scripts/test-nrpe-protocol.sh",
+                "docker/archlinux/build.Dockerfile", "docker/archlinux/test.Dockerfile",
+                "scripts/build-arch.sh", "scripts/integration-test-arch.sh", "scripts/arch_source.py",
+                "packaging/archlinux/PKGBUILD", "packaging/archlinux-source.json",
                 "scripts/build-sles.sh", "scripts/build-sles-user.sh", "scripts/integration-test-sles.sh",
                 "scripts/prepare_sles_inputs.py", "scripts/sles_source.py", "scripts/fetch_sles_packages.py",
                 "scripts/verify-sles-packages.sh", "scripts/verify-sles-environment.sh",
@@ -111,7 +114,7 @@ def parser():
     ):
         command = commands.add_parser(action, help=help_text)
         command.add_argument("targets", nargs="+", choices=(*TARGETS, "all"), metavar="TARGET",
-                             help="one or more targets: " + ", ".join(TARGETS) + "; or all by itself")
+                             help="one or more targets: " + ", ".join(TARGETS) + "; or all (regular targets only)")
         command.add_argument("--pull", action="store_true",
                              help="check for updated base images before building images")
         trust = command.add_mutually_exclusive_group()
@@ -185,7 +188,9 @@ def main(argv=None, root=ROOT):
             return 0
         if "all" in args.targets and len(args.targets) != 1:
             command_parser.error("Use 'all' alone, or list specific targets.")
-        targets = list(TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
+        targets = list(DEFAULT_TARGETS) if args.targets == ["all"] else list(dict.fromkeys(args.targets))
+        if "archlinux" in targets:
+            print("NOTICE: " + ARCH_NOTICE)
         rebuild = getattr(args, "rebuild", False)
         if args.action in ("build", "verify") and not rebuild:
             existing = [target for target in targets if package_files(root, target)]
