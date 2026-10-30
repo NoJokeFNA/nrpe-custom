@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/package-compatibility/">Package compatibility</a><a aria-current="page" href="/nrpe-custom/package-reviews/2026-10-30/">Test results</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,8 +46,11 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Distribution NRPE package review: 30 October 2026</h1>
-      <p class="article-meta">Source 9ab76e7</p>
-      <article class="prose"><p>This follow-up replaces broad OS-family assumptions with installed-package
+      <p class="article-meta">Source d532e24</p>
+      <article class="prose"><p>Use <strong><a href="/nrpe-custom/package-compatibility/">Package compatibility</a></strong> for the patch decision.
+This dated test report records exact versions, methods, results and remaining
+limits; it is the evidence behind that overview, not a second support matrix.</p>
+<p>This follow-up replaces broad OS-family assumptions with installed-package
 observations. Five regular Linux package installations were tested sequentially
 in disposable x86_64 containers. No custom project package was installed in
 these probes, no host package was installed and no container port was published.</p>
@@ -57,9 +60,9 @@ these probes, no host package was installed and no container port was published.
 <tr>
 <th>Actual OS</th>
 <th>Installed server/client packages</th>
-<th>Policy 0</th>
-<th>Policy 1</th>
-<th>Compile-option change needed for these arguments?</th>
+<th>Arguments disabled (<code>0</code>)</th>
+<th>Arguments enabled (<code>1</code>)</th>
+<th>Argument patch needed?</th>
 </tr>
 </thead>
 <tbody>
@@ -100,7 +103,11 @@ these probes, no host package was installed and no container port was published.
 </tr>
 </tbody>
 </table></div>
-<p>Both policies first passed a fixed-command baseline returning
+<p>The numbers refer to the daemon setting <code>dont_blame_nrpe</code>, not a TLS version
+or security profile. <code>0</code> rejects client-supplied command arguments; <code>1</code> permits
+them only when argument support is compiled in. Fixed commands work in either
+case. Keep <code>0</code> unless remote arguments are deliberately required.</p>
+<p>Both settings first passed a fixed-command baseline returning
 <code>NRPE_BASELINE_OK</code>. The argument-disabled requests returned exit 3 with a header
 underflow message; the deliberately enabled requests returned exit 0 and exactly
 <code>NRPE_ARG_PROBE:ALPHA:BETA</code>. This shows why header underflow alone is not a unique
@@ -110,6 +117,65 @@ not a claim about every release, architecture or third-party rebuild. EPEL 9 on
 AlmaLinux does not establish an actual RHEL, Rocky or Oracle Linux host result.
 Alpine's stable-branch package also differs from the previously reviewed master
 recipe; preserve that distinction in the matrix.</p>
+<h2 id="latest-stable-upstream-comparison">Latest stable upstream comparison</h2>
+<p>Checked on <strong>30 October 2026</strong> using the authoritative
+<a href="https://api.github.com/repos/NagiosEnterprises/nrpe/releases/latest">latest stable release endpoint</a>:
+<strong><a href="https://github.com/NagiosEnterprises/nrpe/releases/tag/nrpe-4.2.0">NRPE 4.2.0</a></strong>,
+published <strong>21 October 2026</strong>. The official <code>nrpe-4.2.0.tar.gz</code> asset matched
+GitHub's reported SHA-256:
+<code>0d1eac6845d360b200b037f2b8c0199f1acbe3bea36ad72236ad619e5447e555</code>.
+This is a dated latest-release check, not a permanent pin for future research.</p>
+<p>Two builds of that unchanged archive were exercised in a fresh Ubuntu 24.04
+container with GCC 13.3.0 and OpenSSL 3.0.13. Neither was installed on the host
+or exported as a distribution package. Both used the real package-provided
+<code>nagios</code> account and the same local certificate-authenticated TLS 1.2 probe.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Latest stable upstream comparison table"><table>
+<thead>
+<tr>
+<th>NRPE 4.2.0 build</th>
+<th>Arguments disabled (<code>0</code>)</th>
+<th>Arguments enabled (<code>1</code>)</th>
+<th>TLS certificate controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default configure options</td>
+<td>Rejected</td>
+<td>Rejected</td>
+<td>Passed</td>
+</tr>
+<tr>
+<td>With <code>--enable-command-args</code></td>
+<td>Rejected</td>
+<td>Exact ALPHA/BETA response</td>
+<td>Passed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both builds passed fixed-command baselines for both settings, rejected an
+unrelated server CA and a missing client certificate, and passed a trusted
+baseline afterwards. The generated header left <code>ENABLE_COMMAND_ARGUMENTS</code>
+undefined in the default build and defined it in the argument-enabled build.
+Thus upgrading to 4.2.0 alone does not activate compiled argument support.
+The TLS pass establishes only the documented local certificate checks, not
+hostname validation, production PKI, native FreeBSD or legacy SLES compatibility.</p>
+<p>The container refreshed Ubuntu 24.04 package metadata before building. Its latest
+regular <code>nagios-nrpe-server</code> and <code>nagios-nrpe-plugin</code> candidates were still
+<code>4.1.0-1ubuntu3</code>. Those are a separate finding from the newest upstream release:
+regular-package tests answer whether the package an operator can install needs
+a rebuild; upstream tests check the current upstream behavior.</p>
+<p>Build method: install the matching container's GCC, make, libc/OpenSSL development
+packages and regular NRPE packages through normal verified APT repositories.
+Extract the verified release into two separate temporary directories. Run
+<code>./configure --with-nrpe-user=nagios --with-nrpe-group=nagios --with-ssl-lib=/usr/lib/x86_64-linux-gnu</code>,
+adding <code>--enable-command-args</code> only for the second build, then <code>make -j2 all</code>.
+Run the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/validation/README.md#version-selection-for-each-new-review">probe</a>
+with explicit server/client paths to each build's <code>src/nrpe</code> and <code>src/check_nrpe</code>.
+No command-argument option is passed for the default build; the earlier FreeBSD
+finding explains why an explicit disable option is not an equivalent control in
+this upstream configure implementation. Preserve the recorded source and binary
+identities in the JSON evidence and discard the container after the probe.</p>
 <h2 id="procedure-and-integrity-boundary">Procedure and integrity boundary</h2>
 <ol>
 <li>Start an official matching base image with no published port and a read-only
@@ -122,15 +188,15 @@ recipe; preserve that distinction in the matrix.</p>
    NRPE. Package authenticity/dependency checks were not disabled.</li>
 <li>Record OS, exact installed versions, package origin/source where exposed,
    daemon/client versions and SHA-256 hashes. The
-   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9ab76e759408b2630338caf37956fc04536f0cb9/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
+   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
    observed binary hashes. Binary hashes are not package archive signatures.</li>
 <li>Use a real package-provided service account and temporary configuration,
    with a foreground daemon bound only to <code>127.0.0.1:15666</code>. Disable Bash
    command substitution. Test a fixed <code>/bin/echo</code> baseline before each policy,
    then a command with the controlled <code>$ARG1$</code> / <code>$ARG2$</code> pair.</li>
 <li>Stop only the probe's daemon, remove its temporary files and discard the
-   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9ab76e759408b2630338caf37956fc04536f0cb9/validation/probe-installed-nrpe.sh">protocol helper</a>
-   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9ab76e759408b2630338caf37956fc04536f0cb9/validation/README.md">its requirements</a> document the equivalent
+   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/validation/probe-installed-nrpe.sh">protocol helper</a>
+   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/validation/README.md">its requirements</a> document the equivalent
    check without installing packages or changing packaged configuration.</li>
 </ol>
 <p>The base image digest is recorded, but package repositories were live and not
@@ -276,12 +342,13 @@ policies over certificate-authenticated TLS with the negative controls above.</p
   release or derivative. Prioritize an actual missing feature over adding targets
   whose regular packages already provide the needed capability.</li>
 </ul></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/9ab76e759408b2630338caf37956fc04536f0cb9/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d532e2492dbcfb1f7c6e498be0b9d1a3110c7850/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
 <ul>
 <li><a href="#runtime-observations">Runtime observations</a></li>
+<li><a href="#latest-stable-upstream-comparison">Latest stable upstream comparison</a></li>
 <li><a href="#procedure-and-integrity-boundary">Procedure and integrity boundary</a></li>
 <li><a href="#tls-follow-up">TLS follow-up</a></li>
 <li><a href="#arch-current-repository-absence-and-aur-source-review">Arch: current repository absence and AUR source review</a></li>
@@ -302,7 +369,7 @@ policies over certificate-authenticated TLS with the negative controls above.</p
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 9ab76e7</span>
+<span>Source d532e24</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
