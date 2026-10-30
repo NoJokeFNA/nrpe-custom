@@ -12,11 +12,13 @@ deliberate runtime policy (`dont_blame_nrpe=1`). A disabled runtime setting alon
 does not establish that compilation is missing. Keep Bash command substitution
 disabled and use [reviewed command definitions](configuration-examples.md).
 
-## Confirmed packaging findings
+## Confirmed packaging and runtime findings
 
 The versions below identify inspected or recorded examples, not a promise that
-they are the latest packages in every repository. Source review establishes the
-listed build options; it is not an installation/TLS test on those other systems.
+they are the latest packages in every repository. Evidence is either a source
+review or the explicitly listed container argument probe; neither establishes
+production TLS or host lifecycle behavior. The [dated follow-up](package-reviews/2026-10-30.md) records the method,
+versions, scope and corrected FreeBSD interpretation.
 Only the targets marked **supported** are implemented by this tool.
 
 | System / inspected package | Compiled arguments | Assessment | Tool support |
@@ -26,7 +28,12 @@ Only the targets marked **supported** are implemented by this tool.
 | Debian 13; recorded source `4.1.3-1` | Not enabled by the inspected distribution recipe | Same build-option requirement [D] | **Supported:** `debian13`, amd64 |
 | Debian 14 / Forky; recorded source `4.1.3-1` | Not enabled by that recorded recipe | Moving suite: inspect the actual newly selected source before rebuilding [D] | **Supported:** `debian14`, amd64 |
 | SLES 12 SP3; installed old server `2.15-4.24`, project recipe `4.1.1` | The pinned OBS 4.1.1 recipe already enables arguments | Distinct case: native newer daemon, preserved OpenSSL ABI, Bash substitution disabled; not simply the Debian option change [S] | **Supported:** `sles12sp3`, x86_64 |
-| FreeBSD; current inspected `net-mgmt/nrpe` port `4.2.0` | `ARGS` exists but is absent from `OPTIONS_DEFAULT` | A port build with `ARGS` enabled is the existing packaging mechanism if arguments are needed [F] | **Not supported** |
+| FreeBSD; inspected port `4.2.0` | **Native binary not verified:** `ARGS` defaults off, but upstream handles the generated disable option unexpectedly | Native header/binary/protocol check required; no confirmed patch need [F] | **Not supported** |
+| Ubuntu 22.04; `4.0.3-1ubuntu2` | Confirmed by container argument probe | Regular package rejects arguments at policy 0 and returns exact arguments at policy 1 [P] | **Not supported** |
+| Ubuntu 24.04; `4.1.0-1ubuntu3` | Confirmed by container argument probe | No compile-option change needed for the tested feature [P] | **Not supported** |
+| Alpine 3.22.7; `nrpe 4.1.1-r0` | Confirmed by container argument probe | No compile-option change needed for the tested feature [P] | **Not supported** |
+| Fedora 43; `nrpe 4.1.3-4.fc43` | Confirmed by container argument probe | No compile-option change needed for the tested feature [P] | **Not supported** |
+| AlmaLinux 9.8 / EPEL 9; `nrpe 4.1.2-2.el9` | Confirmed by container argument probe | No compile-option change needed; no claim for an actual RHEL host [P] | **Not supported** |
 | Ubuntu; inspected `plucky-proposed` source `4.1.3-1ubuntu1` | Explicitly enabled by Ubuntu's packaging change | This example does not need our compile-option change; runtime arguments remain disabled by default [U] | **Not supported** |
 | Alpine; inspected `aports` master recipe `nrpe 4.1.3-r0` | Explicit `--enable-command-args` | This recipe does not need our compile-option change [A] | **Not supported** |
 
@@ -47,7 +54,7 @@ than assuming every binary uses the defaults.
 
 | Candidate | Available evidence | Remaining work |
 | --- | --- | --- |
-| Arch Linux | Official issue FS#66574 records NRPE `4.0.2` built without arguments in May 2020; the request to enable them was closed as “Won't implement” [R] | Inspect today's official PKGBUILD and actual package options; do not present the 2020 report as a current runtime test |
+| Arch Linux / AUR `nrpe 4.1.2-1` | Current AUR recipe omits the configure option; exact upstream source leaves the macro undefined when the option is absent. Official core/extra query found no `nrpe` package [P] | Source-level rebuild candidate; no AUR build/runtime test yet. The old official issue [R] remains historical context |
 | Debian-derived distributions using unchanged Debian NRPE packaging | Possible inherited build behavior, not independently confirmed here | Identify the exact release, package source/version and architecture before classifying it; Ubuntu demonstrates why inheritance cannot be assumed |
 | Other distributions/repositories | Not reviewed by this matrix | Review their current recipe and installed package; absence from this page means unknown, not affected or unaffected |
 
@@ -69,8 +76,10 @@ our amd64 outputs are not ARM packages for a Raspberry Pi.
   the [operator field note](../website/content/sles12-handshake.md) separates the
   old server, client/server package confusion, firewall and plugin problems.
 - **[F] FreeBSD:** the official [port Makefile](https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile)
-  identifies version 4.2.0, defines `ARGS`, maps it to `command-args` and defaults
-  to SSL plus the selected plugin flavor, without `ARGS`.
+  identifies version 4.2.0 and an off-by-default `ARGS` option. The
+  [follow-up](package-reviews/2026-10-30.md#freebsd-why-the-first-classification-needed-correction)
+  records why Ports-generated `--disable-command-args` cannot be assumed to leave
+  the compiled macro disabled in the reviewed upstream configure block.
 - **[U] Ubuntu:** the official [4.1.3-1ubuntu1 acceptance record](https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html)
   explicitly records Ubuntu's addition of `--enable-command-args` and the
   retained disabled runtime default. The record is dated 20 December 2024.
@@ -79,6 +88,10 @@ our amd64 outputs are not ARM packages for a Raspberry Pi.
 - **[R] Arch:** the official [FS#66574 report](https://bugs.archlinux.org/task/66574)
   identifies version 4.0.2 and the maintainer's May 2020 decision. It provides
   historical evidence, not an independently checked current package.
+
+- **[P] Runtime/source follow-up:** [30 October 2026 review](package-reviews/2026-10-30.md)
+  and [machine-readable identities/results](package-reviews/2026-10-30.json).
+  Five container probes passed; Arch's current AUR evidence is source-only.
 
 ## Classify a real installation
 

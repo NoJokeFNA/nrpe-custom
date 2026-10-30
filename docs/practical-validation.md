@@ -161,3 +161,7 @@ open until performed; log any failure before claiming practical platform support
 
 See the [dated validation status](validation-status.md) for the current distinction
 between local checks, operator reports and unavailable host access.
+
+The [distribution-package review](package-reviews/2026-10-30.md) checks argument
+capability of regular Linux packages in disposable containers. Its loopback
+plaintext observations do not close any TLS or host lifecycle scenario above.

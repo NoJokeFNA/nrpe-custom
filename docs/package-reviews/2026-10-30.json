@@ -1,0 +1,185 @@
+{
+  "review_date": "2026-10-30",
+  "records": [
+    {
+      "id": "ubuntu2204",
+      "image_tag": "ubuntu:22.04",
+      "image_id": "sha256:a7b0f6af325461862a99c677cf3229ca5241d9f4f4289bd00cc2cce91a3aff23",
+      "repository_digests": [
+        "ubuntu@sha256:076e7bf82319619f28dd0aa9c02ab34b055ad37100395b4f49a2ffba04fb5e11"
+      ],
+      "os_id": "ubuntu",
+      "os_version": "22.04",
+      "architecture": "x86_64",
+      "packages": [
+        "nagios-nrpe-plugin 4.0.3-1ubuntu2 amd64",
+        "nagios-nrpe-server 4.0.3-1ubuntu2 amd64"
+      ],
+      "binary_sha256": {
+        "/usr/sbin/nrpe": "1e685cc29dcbc9084960031fb7d1b258c90e467fe32cf20ffbbd125423839ad2",
+        "/usr/lib/nagios/plugins/check_nrpe": "007af9e61fddf0327c5e7aed1927207eee40b97ba81bde9043a805b21e75c6c7"
+      },
+      "evidence": "container-runtime",
+      "baselines": {
+        "policy_0": "passed",
+        "policy_1": "passed"
+      },
+      "argument_rejected_when_disabled": true,
+      "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+    },
+    {
+      "id": "ubuntu2404",
+      "image_tag": "ubuntu:24.04",
+      "image_id": "sha256:d9b8c34d61a9b9a3c44cab883d7d2f2619d674966ab520186f799cf32e3e0377",
+      "repository_digests": [
+        "ubuntu@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852"
+      ],
+      "os_id": "ubuntu",
+      "os_version": "24.04",
+      "architecture": "x86_64",
+      "packages": [
+        "nagios-nrpe-plugin 4.1.0-1ubuntu3 amd64",
+        "nagios-nrpe-server 4.1.0-1ubuntu3 amd64"
+      ],
+      "binary_sha256": {
+        "/usr/sbin/nrpe": "e2bc5fbaa3149b058b968d9ce4fc98782867b93c473d7e0626293fb6bb07b96b",
+        "/usr/lib/nagios/plugins/check_nrpe": "e9c1ca253893a095d02651f67c77d41625dffe7b7cdb3d02df69fb24bc82197e"
+      },
+      "evidence": "container-runtime",
+      "baselines": {
+        "policy_0": "passed",
+        "policy_1": "passed"
+      },
+      "argument_rejected_when_disabled": true,
+      "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+    },
+    {
+      "id": "alpine322",
+      "image_tag": "alpine:3.22",
+      "image_id": "sha256:24ab38714e948bd49d24d566e97c1c104b63f85c2e642685e72393b37cfb9862",
+      "repository_digests": [
+        "alpine@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f"
+      ],
+      "os_id": "alpine",
+      "os_version": "3.22.7",
+      "architecture": "x86_64",
+      "packages": [
+        "nrpe 4.1.1-r0 x86_64",
+        "nrpe-plugin 4.1.1-r0 x86_64"
+      ],
+      "binary_sha256": {
+        "/usr/bin/nrpe": "28d02a17af2b6fea6272674cbe08c777da2972abf44269c5650a961dc5ae35ba",
+        "/usr/lib/nagios/plugins/check_nrpe": "389e4043ed31a55570530ed2b8fb289954bd7e99d0b7e5719d0b284395a4013c"
+      },
+      "evidence": "container-runtime",
+      "baselines": {
+        "policy_0": "passed",
+        "policy_1": "passed"
+      },
+      "argument_rejected_when_disabled": true,
+      "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+    },
+    {
+      "id": "fedora43",
+      "image_tag": "fedora:43",
+      "image_id": "sha256:8162d27a3b7f2b6c9d347c152189725e91e5af3a189ac5f691005556bcedbcf7",
+      "repository_digests": [
+        "fedora@sha256:a651ddf48ea28a06ed4e1e6519f51c9f47e7a5a138722ade87369b8fbb7e5b42"
+      ],
+      "os_id": "fedora",
+      "os_version": "43",
+      "architecture": "x86_64",
+      "packages": [
+        "nrpe 4.1.3-4.fc43 x86_64 SOURCE=nrpe-4.1.3-4.fc43.src.rpm",
+        "nagios-plugins-nrpe 4.1.3-4.fc43 x86_64 SOURCE=nrpe-4.1.3-4.fc43.src.rpm"
+      ],
+      "binary_sha256": {
+        "/usr/sbin/nrpe": "93008f6ae1eb853aed93461efa6f5c378f3db719f29a3d4954950dd2d96aa339",
+        "/usr/lib64/nagios/plugins/check_nrpe": "d1ee8d03acc04080a5c1413b499a099d1746a381211f5c59eea971d96829e02d"
+      },
+      "evidence": "container-runtime",
+      "baselines": {
+        "policy_0": "passed",
+        "policy_1": "passed"
+      },
+      "argument_rejected_when_disabled": true,
+      "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+    },
+    {
+      "id": "almalinux9-epel",
+      "image_tag": "almalinux:9",
+      "image_id": "sha256:4cb2de47e3ee6f44013f5dedd6a8eec5e9cd0bb73ddf27728fa607f5d3915a6c",
+      "repository_digests": [
+        "almalinux@sha256:245f8aab832fe800aa42bdab5fad75ebbd8e0b4c9f24820a83c638b177857ae2"
+      ],
+      "os_id": "almalinux",
+      "os_version": "9.8",
+      "architecture": "x86_64",
+      "packages": [
+        "nrpe 4.1.2-2.el9 x86_64 SOURCE=nrpe-4.1.2-2.el9.src.rpm",
+        "nagios-plugins-nrpe 4.1.2-2.el9 x86_64 SOURCE=nrpe-4.1.2-2.el9.src.rpm"
+      ],
+      "binary_sha256": {
+        "/usr/sbin/nrpe": "fc230f9b2bf6f7e0e742d569e7873da8df45a630b79d4d2777103e3920db2738",
+        "/usr/lib64/nagios/plugins/check_nrpe": "5fe0c7e2d16082d68a16de1249b4fdda68abe3773fa29eb1aed18e26e1b8e3eb"
+      },
+      "evidence": "container-runtime",
+      "baselines": {
+        "policy_0": "passed",
+        "policy_1": "passed"
+      },
+      "argument_rejected_when_disabled": true,
+      "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+    },
+    {
+      "id": "arch-current",
+      "image_tag": "archlinux:base",
+      "image_id": "sha256:bf2533a05fd2eeef8f3d1f60fe73649d4ee099b1594868af7b588f268763cbb9",
+      "repository_digests": [
+        "archlinux@sha256:e82623936fa1a69700b48e98b058df6eaab18b737c27473a7234a40fdecb9413"
+      ],
+      "os_id": "arch",
+      "os_version": "20261025.0.616225",
+      "architecture": "x86_64",
+      "packages": [],
+      "binary_sha256": {},
+      "evidence": "package-unavailable",
+      "result": "nrpe not found in the queried core/extra repository metadata; no installed-package protocol test"
+    }
+  ],
+  "source_reviews": [
+    {
+      "system": "Arch AUR",
+      "package": "nrpe",
+      "version": "4.1.2-1",
+      "recipe_url": "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=nrpe",
+      "recipe_sha256": "79addbf2a2509429f6ccb8e422a3061ddba9f58e7fed36b90c18df82a414f46b",
+      "result": "configure invocation omits command-args option; upstream 4.1.2 enables macro only if option supplied; source review only; no AUR build executed"
+    },
+    {
+      "system": "FreeBSD ports",
+      "version": "4.2.0",
+      "result": "ARGS defaults off, but ports emits --disable-command-args and the reviewed upstream configure fragment defines the macro whenever the option is present; actual FreeBSD binary behavior not established",
+      "upstream_commit": "cf47f059637fe4ad23dd4a5f2612e2787ce7c09d",
+      "configure_fragment_probe": [
+        {
+          "option": "omitted",
+          "macro_defined": false
+        },
+        {
+          "option": "disable",
+          "macro_defined": true
+        },
+        {
+          "option": "enable",
+          "macro_defined": true
+        }
+      ]
+    }
+  ]
+}
