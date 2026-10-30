@@ -26,7 +26,23 @@
       },
       "argument_rejected_when_disabled": true,
       "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
-      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim",
+      "tls_probe": {
+        "result": "passed",
+        "tls_version": "TLSv1.2",
+        "baselines": {
+          "policy_0": "passed",
+          "policy_1": "passed",
+          "after_negative_controls": "passed"
+        },
+        "argument_rejected_when_disabled": true,
+        "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "server_cipher_allowlist": "DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL",
+        "binary_hashes_match_plaintext_round": true,
+        "scope": "certificate-authenticated IPv4 loopback; shared temporary test identity; no hostname, TLS 1.3, remote-client, service-manager or lifecycle claim"
+      }
     },
     {
       "id": "ubuntu2404",
@@ -53,7 +69,23 @@
       },
       "argument_rejected_when_disabled": true,
       "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
-      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim",
+      "tls_probe": {
+        "result": "passed",
+        "tls_version": "TLSv1.2",
+        "baselines": {
+          "policy_0": "passed",
+          "policy_1": "passed",
+          "after_negative_controls": "passed"
+        },
+        "argument_rejected_when_disabled": true,
+        "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "server_cipher_allowlist": "DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL",
+        "binary_hashes_match_plaintext_round": true,
+        "scope": "certificate-authenticated IPv4 loopback; shared temporary test identity; no hostname, TLS 1.3, remote-client, service-manager or lifecycle claim"
+      }
     },
     {
       "id": "alpine322",
@@ -80,7 +112,24 @@
       },
       "argument_rejected_when_disabled": true,
       "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
-      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim",
+      "tls_probe": {
+        "result": "passed",
+        "tls_version": "TLSv1.2",
+        "baselines": {
+          "policy_0": "passed",
+          "policy_1": "passed",
+          "after_negative_controls": "passed"
+        },
+        "argument_rejected_when_disabled": true,
+        "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "server_cipher_allowlist": "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL",
+        "binary_hashes_match_plaintext_round": true,
+        "scope": "certificate-authenticated IPv4 loopback; shared temporary test identity; no hostname, TLS 1.3, remote-client, service-manager or lifecycle claim",
+        "initial_dhe_only_result": "handshake failed: no shared cipher; adding authenticated ECDHE suite passed without binary changes"
+      }
     },
     {
       "id": "fedora43",
@@ -107,7 +156,23 @@
       },
       "argument_rejected_when_disabled": true,
       "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
-      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim",
+      "tls_probe": {
+        "result": "passed",
+        "tls_version": "TLSv1.2",
+        "baselines": {
+          "policy_0": "passed",
+          "policy_1": "passed",
+          "after_negative_controls": "passed"
+        },
+        "argument_rejected_when_disabled": true,
+        "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "server_cipher_allowlist": "DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL",
+        "binary_hashes_match_plaintext_round": true,
+        "scope": "certificate-authenticated IPv4 loopback; shared temporary test identity; no hostname, TLS 1.3, remote-client, service-manager or lifecycle claim"
+      }
     },
     {
       "id": "almalinux9-epel",
@@ -134,7 +199,23 @@
       },
       "argument_rejected_when_disabled": true,
       "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
-      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim"
+      "scope": "plaintext IPv4 loopback; no TLS, service-manager, reboot or lifecycle claim",
+      "tls_probe": {
+        "result": "passed",
+        "tls_version": "TLSv1.2",
+        "baselines": {
+          "policy_0": "passed",
+          "policy_1": "passed",
+          "after_negative_controls": "passed"
+        },
+        "argument_rejected_when_disabled": true,
+        "argument_response_when_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "server_cipher_allowlist": "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:!aNULL:!eNULL",
+        "binary_hashes_match_plaintext_round": true,
+        "scope": "certificate-authenticated IPv4 loopback; shared temporary test identity; no hostname, TLS 1.3, remote-client, service-manager or lifecycle claim"
+      }
     },
     {
       "id": "arch-current",

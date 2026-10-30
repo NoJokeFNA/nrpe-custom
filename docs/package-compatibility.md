@@ -1,10 +1,9 @@
 # NRPE package compatibility matrix
 
-Reviewed: **30 October 2026**. This is a package/build-feature matrix, not a list
-of operating systems that universally need a patch. A custom argument-enabled
-build is relevant only when remote arguments are required and the installed
-server package lacks compiled argument support. Fixed local commands do not
-require that feature.
+Reviewed: **30 October 2026**. The assessment answers whether a custom build is
+needed because the installed NRPE package lacks required command-argument or
+TLS/SSL support. It applies to the listed package and requirement, not every
+installation of that OS.
 
 The project changes native packaging options rather than implementing an OS
 patch. Argument support needs both `--enable-command-args` at build time and a
@@ -12,30 +11,39 @@ deliberate runtime policy (`dont_blame_nrpe=1`). A disabled runtime setting alon
 does not establish that compilation is missing. Keep Bash command substitution
 disabled and use [reviewed command definitions](configuration-examples.md).
 
+**Assessment:** **Yes** means a custom build is needed for the stated requirement;
+**No** means the reviewed regular package already provides it; **Unconfirmed**
+means the evidence is insufficient. Debian's **Yes** applies only when remote
+arguments are needed. SLES's **Yes** refers to replacing the cited legacy 2.15
+server, not every SLES installation or an unconditional requirement for this tool:
+a compatible maintained regular package can also replace it. The tool does not
+patch firewall rules, missing plugins or TLS configuration.
+
 ## Confirmed packaging and runtime findings
 
 The versions below identify inspected or recorded examples, not a promise that
 they are the latest packages in every repository. Evidence is either a source
 review or the explicitly listed container argument probe; neither establishes
-production TLS or host lifecycle behavior. The [dated follow-up](package-reviews/2026-10-30.md) records the method,
+production TLS or host lifecycle behavior. TLS follow-up results are recorded
+separately below. The [dated follow-up](package-reviews/2026-10-30.md) records the method,
 versions, scope and corrected FreeBSD interpretation.
 Only the targets marked **supported** are implemented by this tool.
 
-| System / inspected package | Compiled arguments | Assessment | Tool support |
+| System / inspected package | Compiled arguments | Assessment: tool patch needed? | Tool support |
 | --- | --- | --- | --- |
-| Debian 11; recorded source `4.0.3-1` | Not enabled by the distribution recipe | Argument-enabled rebuild needed if remote arguments are required [D] | **Supported:** `debian11`, amd64 |
-| Debian 12; recorded source `4.1.0-1` | Not enabled by the distribution recipe | Same build-option requirement [D] | **Supported:** `debian12`, amd64 |
-| Debian 13; recorded source `4.1.3-1` | Not enabled by the inspected distribution recipe | Same build-option requirement [D] | **Supported:** `debian13`, amd64 |
-| Debian 14 / Forky; recorded source `4.1.3-1` | Not enabled by that recorded recipe | Moving suite: inspect the actual newly selected source before rebuilding [D] | **Supported:** `debian14`, amd64 |
-| SLES 12 SP3; installed old server `2.15-4.24`, project recipe `4.1.1` | The pinned OBS 4.1.1 recipe already enables arguments | Distinct case: native newer daemon, preserved OpenSSL ABI, Bash substitution disabled; not simply the Debian option change [S] | **Supported:** `sles12sp3`, x86_64 |
-| FreeBSD; inspected port `4.2.0` | **Native binary not verified:** `ARGS` defaults off, but upstream handles the generated disable option unexpectedly | Native header/binary/protocol check required; no confirmed patch need [F] | **Not supported** |
-| Ubuntu 22.04; `4.0.3-1ubuntu2` | Confirmed by container argument probe | Regular package rejects arguments at policy 0 and returns exact arguments at policy 1 [P] | **Not supported** |
-| Ubuntu 24.04; `4.1.0-1ubuntu3` | Confirmed by container argument probe | No compile-option change needed for the tested feature [P] | **Not supported** |
-| Alpine 3.22.7; `nrpe 4.1.1-r0` | Confirmed by container argument probe | No compile-option change needed for the tested feature [P] | **Not supported** |
-| Fedora 43; `nrpe 4.1.3-4.fc43` | Confirmed by container argument probe | No compile-option change needed for the tested feature [P] | **Not supported** |
-| AlmaLinux 9.8 / EPEL 9; `nrpe 4.1.2-2.el9` | Confirmed by container argument probe | No compile-option change needed; no claim for an actual RHEL host [P] | **Not supported** |
-| Ubuntu; inspected `plucky-proposed` source `4.1.3-1ubuntu1` | Explicitly enabled by Ubuntu's packaging change | This example does not need our compile-option change; runtime arguments remain disabled by default [U] | **Not supported** |
-| Alpine; inspected `aports` master recipe `nrpe 4.1.3-r0` | Explicit `--enable-command-args` | This recipe does not need our compile-option change [A] | **Not supported** |
+| Debian 11; recorded source `4.0.3-1` | Not enabled by the distribution recipe | **Yes** [D] | **Supported:** `debian11`, amd64 |
+| Debian 12; recorded source `4.1.0-1` | Not enabled by the distribution recipe | **Yes** [D] | **Supported:** `debian12`, amd64 |
+| Debian 13; recorded source `4.1.3-1` | Not enabled by the inspected distribution recipe | **Yes** [D] | **Supported:** `debian13`, amd64 |
+| Debian 14 / Forky; recorded source `4.1.3-1` | Not enabled by that recorded recipe | **Yes** [D] | **Supported:** `debian14`, amd64 |
+| SLES 12 SP3; installed old server `2.15-4.24`, project recipe `4.1.1` | The pinned OBS 4.1.1 recipe already enables arguments | **Yes** [S] | **Supported:** `sles12sp3`, x86_64 |
+| FreeBSD; inspected port `4.2.0` | **Native binary not verified:** `ARGS` defaults off, but upstream handles the generated disable option unexpectedly | **Unconfirmed** [F] | **Not supported** |
+| Ubuntu 22.04; `4.0.3-1ubuntu2` | Confirmed by container argument probe | **No** [P] | **Not supported** |
+| Ubuntu 24.04; `4.1.0-1ubuntu3` | Confirmed by container argument probe | **No** [P] | **Not supported** |
+| Alpine 3.22.7; `nrpe 4.1.1-r0` | Confirmed by container argument probe | **No** [P] | **Not supported** |
+| Fedora 43; `nrpe 4.1.3-4.fc43` | Confirmed by container argument probe | **No** [P] | **Not supported** |
+| AlmaLinux 9.8 / EPEL 9; `nrpe 4.1.2-2.el9` | Confirmed by container argument probe | **No** [P] | **Not supported** |
+| Ubuntu; inspected `plucky-proposed` source `4.1.3-1ubuntu1` | Explicitly enabled by Ubuntu's packaging change | **No** [U] | **Not supported** |
+| Alpine; inspected `aports` master recipe `nrpe 4.1.3-r0` | Explicit `--enable-command-args` | **No** [A] | **Not supported** |
 
 For Debian, recorded versions come from the
 [published package evidence](release-history.md#sles-12-sp3-release-2026-10-28).
@@ -62,6 +70,24 @@ A candidate row adds no CLI target, build recipe or compatibility guarantee.
 FreeBSD requires native BSD build/install/service validation. Existing Debian
 or SLES packages must not be installed on another distribution or architecture;
 our amd64 outputs are not ARM packages for a Raspberry Pi.
+
+## TLS and patch necessity
+
+A TLS failure alone is **not** a reason to apply this tool's patch. First check
+TCP reachability, matching TLS settings, trusted certificates, permissions and
+the actual daemon version using [Verify TLS & identity](tls-validation.md).
+A custom build or newer server can be necessary when the installed binary
+cannot provide the required TLS/SSL support. This tool enables compiled
+arguments on Debian and provides a native newer server for the cited legacy
+SLES case; its current changes are not a general fix for every TLS failure.
+
+The [dated TLS follow-up](package-reviews/2026-10-30.md#tls-follow-up) records
+successful certificate-authenticated TLS 1.2 tests for the five container-tested
+regular packages above. Their assessment remains **No** for the tested argument
+and TLS requirements. A passing
+TLS test adds no need for a custom build; a failed handshake remains unconfirmed
+until its cause is established. Certificate-policy changes need configuration,
+not automatically a rebuilt binary.
 
 ## Evidence sources
 
