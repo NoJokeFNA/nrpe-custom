@@ -26,7 +26,7 @@ they are the latest packages in every repository. Evidence is either a source
 review or the explicitly listed container argument probe; neither establishes
 production TLS or host lifecycle behavior. TLS follow-up results are recorded
 separately below. The [dated follow-up](package-reviews/2026-10-30.md) records the method,
-versions, scope and corrected FreeBSD interpretation.
+versions, scope and FreeBSD source/binary findings.
 Only the targets marked **supported** are implemented by this tool.
 
 | System / inspected package | Compiled arguments | Assessment: tool patch needed? | Tool support |
@@ -36,7 +36,7 @@ Only the targets marked **supported** are implemented by this tool.
 | Debian 13; recorded source `4.1.3-1` | Not enabled by the inspected distribution recipe | **Yes** [D] | **Supported:** `debian13`, amd64 |
 | Debian 14 / Forky; recorded source `4.1.3-1` | Not enabled by that recorded recipe | **Yes** [D] | **Supported:** `debian14`, amd64 |
 | SLES 12 SP3; installed old server `2.15-4.24`, project recipe `4.1.1` | The pinned OBS 4.1.1 recipe already enables arguments | **Yes** [S] | **Supported:** `sles12sp3`, x86_64 |
-| FreeBSD; inspected port `4.2.0` | **Native binary not verified:** `ARGS` defaults off, but upstream handles the generated disable option unexpectedly | **Unconfirmed** [F] | **Not supported** |
+| FreeBSD 14 amd64; official `nrpe 4.2.0` package | Argument-enabled code confirmed in the official binary; runtime/TLS not tested | **No** [F] | **Not supported** |
 | Ubuntu 22.04; `4.0.3-1ubuntu2` | Confirmed by container argument probe | **No** [P] | **Not supported** |
 | Ubuntu 24.04; `4.1.0-1ubuntu3` | Confirmed by container argument probe | **No** [P] | **Not supported** |
 | Alpine 3.22.7; `nrpe 4.1.1-r0` | Confirmed by container argument probe | **No** [P] | **Not supported** |
@@ -105,7 +105,10 @@ not automatically a rebuilt binary.
   identifies version 4.2.0 and an off-by-default `ARGS` option. The
   [follow-up](package-reviews/2026-10-30.md#freebsd-why-the-first-classification-needed-correction)
   records why Ports-generated `--disable-command-args` cannot be assumed to leave
-  the compiled macro disabled in the reviewed upstream configure block.
+  the compiled macro disabled in the reviewed upstream configure block. The
+  [official binary follow-up](package-reviews/2026-10-30.md#freebsd-official-binary-follow-up)
+  confirms argument-enabled request handling in the reviewed FreeBSD 14 amd64
+  package despite its `ARGS=off` metadata. No native runtime or TLS pass is claimed.
 - **[U] Ubuntu:** the official [4.1.3-1ubuntu1 acceptance record](https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html)
   explicitly records Ubuntu's addition of `--enable-command-args` and the
   retained disabled runtime default. The record is dated 20 December 2024.
@@ -145,3 +148,11 @@ source link, relevant configure options and evidence type. Keep source inspectio
 container protocol results and real-host outcomes distinct. Recheck moving
 branches before acting on their entries and update changed findings rather than
 silently extending them to all releases of a distribution.
+
+[D]: https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/
+[S]: https://api.opensuse.org/public/source/server:monitoring/nrpe/nrpe.spec?rev=835292739a5736a9d8f0460f670b6f15
+[F]: package-reviews/2026-10-30.md#freebsd-official-binary-follow-up
+[P]: package-reviews/2026-10-30.md#tls-follow-up
+[U]: https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html
+[A]: https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD
+[R]: https://bugs.archlinux.org/task/66574
