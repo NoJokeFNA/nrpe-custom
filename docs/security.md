@@ -25,6 +25,22 @@ Packages keep `dont_blame_nrpe=0`. Enable it only for a reviewed deployment with
 restricted commands, validated arguments, trusted clients, and appropriate TLS.
 Do not expose NRPE to the public Internet or enable Bash command substitution.
 
+A distribution may deliberately omit argument support for security reasons.
+Arch's [AVG-587](https://security.archlinux.org/AVG-587) and
+[ASA-201801-14](https://security.archlinux.org/ASA-201801-14) document that historical
+choice; [FS#66574](https://bugs.archlinux.org/task/66574) later declined to restore
+it. An argument-enabled custom build changes that security posture. It must not
+be presented as a security fix or an unconditional packaging correction. Fixed
+local commands avoid the need to enable remote arguments. Historical advisory
+status and current-version vulnerability status require separate evaluation;
+passing benign argument and TLS tests is not a command-injection security audit.
+The [upstream changelog](https://github.com/NagiosEnterprises/nrpe/blob/nrpe-4.2.0/CHANGELOG.md)
+already lists a CVE-2014-2913 fix under 3.0.0, and current code contains additional
+argument/substitution checks. The historical advisories must not be presented
+as proof that every current argument-enabled build has those exact defects.
+An optional native target may document a deliberate policy difference, but it
+still requires current source review and target validation before publication.
+
 Use the distribution-specific configuration and service paths documented in the
 [README](../README.md#using-a-built-package). Restrict both `allowed_hosts` and
 network access to the intended monitoring servers. The allowlist does not replace
