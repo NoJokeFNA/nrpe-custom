@@ -1,3 +1,3 @@
 # Optional host-only UI dependencies. Build containers use the standard library.
-prompt-toolkit==3.0.52
-wcwidth==0.2.13
+prompt-toolkit==3.0.53
+wcwidth==0.9.4

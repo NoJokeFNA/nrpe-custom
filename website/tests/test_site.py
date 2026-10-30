@@ -29,15 +29,31 @@ class SiteTests(unittest.TestCase):
         validate(self.output, '/nrpe-custom')
         self.assertGreaterEqual(manifest['pages'], 32)
         home = (self.output / 'index.html').read_text()
-        self.assertIn('Custom NRPE builds.', home)
+        self.assertIn('The right NRPE build.', home)
         self.assertIn('/nrpe-custom/faq/', home)
         faq = (self.output / 'faq/index.html').read_text()
         self.assertIn('class="faq-question"', faq)
-        self.assertIn('What happened to SLES 15', faq)
+        self.assertIn('Which SLES version does this project target?', faq)
         self.assertNotIn('AGENTS.md', manifest['files'])
         self.assertFalse(any(name.endswith(('.key', '.pem', '.log')) for name in manifest['files']))
         self.assertEqual((self.output / 'notices/NRPE-GPL-2.0.md').read_bytes(),
                          (PROJECT / 'packaging/licenses/sles12sp3/NRPE-GPL-2.0.md').read_bytes())
+
+    def test_editorial_reports_keep_canonical_content_and_local_font_notice(self):
+        build(self.output)
+        notes = (self.output / 'field-notes/index.html').read_text()
+        article = (self.output / 'field-notes/sles12-handshake/index.html').read_text()
+        self.assertIn('class="editorial-feature"', notes)
+        self.assertIn('BUILD GUIDE', notes)
+        self.assertIn('Service checks before TLS changes', notes)
+        self.assertIn('NRPE_PLAIN_OK', article)
+        self.assertIn('not a recommendation to disable production TLS', article)
+        self.assertNotIn('class="sidebar"', article)
+        self.assertIn('class="page-toc field-note-toc"', article)
+        self.assertIn('class="article-outline" open', article)
+        self.assertIn('href="#the-symptom"', article)
+        self.assertIn('id="the-symptom"', article)
+        self.assertIn('SIL OPEN FONT LICENSE', (self.output / 'assets/Inter-OFL.txt').read_text())
 
     def test_docs_remain_the_content_source_and_search_is_local(self):
         build(self.output)

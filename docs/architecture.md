@@ -144,3 +144,19 @@ are a different concern: Debian discovers sources through APT at build time;
 SLES uses explicitly reviewed pinned manifests. The controller does not yet
 compare a complete remote source/recipe identity to decide whether existing
 outputs need rebuilding. See [repeatability](workflow.md#repeatability-and-updates).
+
+## Future website structure (deferred)
+
+A component-oriented structure, evaluated from the maintainer's supplied website
+example, is a useful future direction: shared page layouts, reusable UI partials,
+separate content collections with validated metadata, and small route definitions.
+Apply those responsibilities to the existing static renderer before introducing
+another framework. Keep Markdown as the canonical documentation source, local
+assets and current link/publication guards.
+
+No framework migration is scheduled by this note. An Astro evaluation would need
+static output compatible with GitHub Pages, project-base-path support, equivalent
+Markdown/code/diagram rendering, source and license review, and the same browser
+and publication checks. The reference's standalone Node server configuration is
+not a drop-in deployment for this project. Do not copy its unlicensed source or
+add a server dependency solely to reproduce its directory names.

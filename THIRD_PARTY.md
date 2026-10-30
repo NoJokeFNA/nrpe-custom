@@ -6,12 +6,10 @@ license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
 
-The active target was corrected to **SLES 12 SP3** after receiving
-its actual OS/binary/library identity on 2026-10-28. The same reviewed NRPE/user
-sources are rebuilt natively; their previous SLE-15 runtime observations do not
-prove SLE-12 compatibility. The port additionally builds the macros from pinned
-upstream sources and retains their BSD notice. Original SLE-12 dependency RPMs
-are verified but are not release assets. Historical releases are unchanged.
+The SLES target is **SLES 12 SP3**, confirmed from its OS/binary/library identity
+on 2026-10-28. Reviewed NRPE/user sources and build macros are rebuilt natively.
+The macros retain their BSD notice. Original SLE-12 dependency RPMs are verified
+but are not release assets.
 
 ## Components in generated packages and sources
 
@@ -53,15 +51,18 @@ review of previously unexamined source bytes.
 
 ## Host-only optional menu dependencies
 
-`requirements-menu.txt` pins `prompt-toolkit==3.0.52` and `wcwidth==0.2.13`.
+`requirements-menu.txt` pins `prompt-toolkit==3.0.53` and `wcwidth==0.9.4`.
 These libraries are downloaded by the user through pip; they are not vendored
 into this checkout or installed in the NRPE server package. The exact pinned
 wheels were downloaded without installation and their actual notices inspected:
 
 | Distribution | License evidence | Wheel SHA-256 |
 | --- | --- | --- |
-| `prompt_toolkit-3.0.52-py3-none-any.whl` | `prompt_toolkit-3.0.52.dist-info/licenses/LICENSE`: BSD three-clause terms, Jonathan Slenders, 2014 | `9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955` |
-| `wcwidth-0.2.13-py2.py3-none-any.whl` | `wcwidth-0.2.13.dist-info/LICENSE`: MIT, Jeff Quast, 2014; additional Markus Kuhn 2007 permission/warranty notice | `3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859` |
+| `prompt_toolkit-3.0.53-py3-none-any.whl` | `prompt_toolkit-3.0.53.dist-info/licenses/LICENSE`: BSD three-clause terms, Jonathan Slenders, 2014 | `01c0891d7f9237d5e339f7d3e42cdae80b7534abb1c7c0e3352efba6231492f2` |
+| `wcwidth-0.9.4-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl` | `wcwidth-0.9.4.dist-info/licenses/LICENSE`: MIT, Jeff Quast, 2014; additional Markus Kuhn 2007 permission/warranty notice | `b185c8b927b23af2721be1783499d1cfa5c028b098b0858951b4ae224477f1c2` |
+
+The wcwidth hash above identifies the reviewed Linux x86_64 wheel; other
+platform wheels have different hashes. Their runtime selection is handled by pip.
 
 Before distributing a bundled Python application, include these actual license
 files and inventory any additional shipped dependencies. Do not substitute the
@@ -78,15 +79,18 @@ as part of the server packages.
 ## Build and runtime dependencies
 
 `requirements-website.txt` pins the separate build-only renderer
-`Markdown==3.8.2` (Python-Markdown). Its installed wheel's
-`markdown-3.8.2.dist-info/licenses/LICENSE.md` was inspected and contains
-BSD-3-Clause terms; wheel metadata records the same SPDX expression. The
+`Markdown==3.11.2` (Python-Markdown). Its installed wheel's
+`markdown-3.11.2.dist-info/licenses/LICENSE.md` was inspected and contains
+BSD-3-Clause terms; wheel metadata records the same SPDX expression. The reviewed
+`markdown-3.11.2-py3-none-any.whl` SHA-256 is
+`f80390747a2a0ff2ba54da074ce4f862f72a6685f608cd2637b646a6d83993f5`. The
 renderer is installed separately, not vendored, bundled into NRPE packages or
 copied into the static site. Generated pages retain the licenses of their
 original documentation and notices. Bundling the renderer would require its
 actual license text and a separate dependency inventory. Website CSS, templates
 and browser JavaScript are independently authored project code; no external
-JavaScript framework, analytics SDK or font bundle is shipped.
+JavaScript framework or analytics SDK is shipped. The locally hosted font and
+its retained notice are listed below.
 
 The build-only syntax highlighter is `shiki@4.5.0`, pinned with integrity-checked
 transitive dependencies in `website/package-lock.json`. Installed `shiki`,
@@ -137,3 +141,14 @@ Keep the project's unofficial-build wording and NRPE's `LEGAL` trademark notice.
 No endorsement or support entitlement from Nagios, Debian, or SUSE is implied.
 Metadata labels alone do not establish that an arbitrary release bundle retains
 all required notices. See the [release plan](docs/release-plan.md).
+
+## Self-hosted website font
+
+The website bundles Inter Variable from the official
+[Inter project](https://github.com/rsms/inter), licensed under SIL OFL 1.1.
+The verbatim notice is retained as `website/assets/Inter-OFL.txt` alongside
+`InterVariable.woff2`; the font is served locally and is not an NRPE dependency.
+JetBrains Mono Regular/Bold from the [official project](https://github.com/JetBrains/JetBrainsMono)
+is additionally served locally under SIL OFL 1.1, with its full notice retained
+as `website/assets/JetBrainsMono-OFL.txt`. Font files are unmodified. No JetBrains
+logos or illustrations are distributed.

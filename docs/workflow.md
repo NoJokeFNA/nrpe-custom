@@ -6,7 +6,7 @@ compiled in and runtime argument handling disabled by default.
 
 ## Requirements
 
-- Python 3.9 or newer; direct commands have no third-party Python dependencies.
+- Python 3.11 or newer; direct commands have no third-party Python dependencies.
 - Optional arrow-key menu: from the repository root, use `python3 -m pip install -r requirements-menu.txt`.
 - Docker Engine with BuildKit, Linux containers, and Docker Compose 2.17 or newer.
 - Access from containers to the matching Debian or SLES/OBS repositories.
@@ -29,12 +29,12 @@ python3 nrpe.py doctor
 python3 nrpe.py verify debian12
 ```
 
-Ensure that `python3 --version` reports Python 3.9 or newer. On Windows, make
+Ensure that `python3 --version` reports Python 3.11 or newer. On Windows, make
 sure your Python installation provides `python3` in PATH.
 
 Run without arguments for an interactive action and target menu:
 
-```powershell
+```sh
 python3 nrpe.py
 ```
 
@@ -59,7 +59,7 @@ messages are in English. Use `--help` or `<command> --help` for command-specific
 
 Select one target, multiple targets, or `all` by itself:
 
-```powershell
+```sh
 python3 nrpe.py verify debian12 debian13
 python3 nrpe.py verify all
 python3 nrpe.py test debian14
@@ -69,8 +69,8 @@ python3 nrpe.py logs --last
 
 SLES 12 SP3 uses a genuine digest-pinned 12.3 image and a hash-pinned set of
 original SLE-12 Server/SDK RPMs. A modern input stage downloads sources; native
-SLES tools verify package signatures and compile/install the result. No SLE-15
-binary or ISO layout is used, and the obsolete `--sles-media` option is removed.
+SLES tools verify package signatures and compile/install the result. No ISO is
+required.
 See the [SLES guide](sles12sp3.md).
 
 ## Targets and package builds
@@ -159,7 +159,7 @@ commits and artifacts. Unit tests alone do not establish package/runtime success
 ## Results, logs, and concurrent runs
 
 Use [local cleanup](local-cleanup.md) to preview expired run logs/reports and
-explicitly selected retired output or Docker images. `python3 nrpe.py clean`
+explicitly selected project Docker images. `python3 nrpe.py clean`
 does not delete anything; deletion requires `--apply` and respects workflow locks.
 
 Each build/test/verify invocation receives a unique run ID and writes:

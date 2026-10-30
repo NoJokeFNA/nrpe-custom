@@ -30,19 +30,20 @@ ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'NoJokeFNA/nrpe-custom'
 BASE = '/nrpe-custom'
 GROUPS = (
-    ('Start here', ('overview', 'installation', 'workflow', 'faq')),
+    ('Getting started', ('overview', 'package-compatibility', 'installation', 'workflow', 'faq')),
     ('Build and diagnose', ('sles12sp3', 'network', 'menu', 'local-cleanup', 'troubleshooting')),
-    ('Deploy carefully', ('configuration-examples', 'updates-and-rollback', 'security', 'practical-validation')),
-    ('Project reference', ('architecture', 'maintenance', 'releases', 'release-history',
+    ('Deployment', ('configuration-examples', 'tls-validation', 'sles12sp3-deployment-checklist', 'updates-and-rollback', 'security', 'practical-validation')),
+    ('Project reference', ('architecture', 'source-strategy', 'maintenance', 'releases', 'release-history',
                            'release-signing', 'release-plan', 'sles-license-review',
                            'third-party', 'contributing', 'license')),
 )
 LABELS = {'overview': 'Overview', 'installation': 'Install a package', 'workflow': 'Build & verify',
-          'faq': 'Frequently asked questions', 'sles12sp3': 'SLES 12 SP3', 'network': 'Network & company CA',
+          'package-compatibility': 'Package compatibility', 'faq': 'Frequently asked questions', 'sles12sp3': 'SLES 12 SP3', 'network': 'Network & company CA',
           'menu': 'Terminal menu', 'local-cleanup': 'Local cleanup', 'troubleshooting': 'Troubleshooting',
           'configuration-examples': 'Configuration examples', 'updates-and-rollback': 'Update & rollback',
-          'security': 'Security', 'practical-validation': 'Validation limits', 'architecture': 'Architecture',
-          'maintenance': 'Maintenance', 'releases': 'Release workflow', 'release-history': 'Release history',
+          'tls-validation': 'Verify TLS & identity', 'security': 'Security', 'practical-validation': 'Validation limits', 'architecture': 'Architecture',
+          'sles12sp3-deployment-checklist': 'SLES deployment checklist',
+          'source-strategy': 'Source & patch strategy', 'maintenance': 'Maintenance', 'releases': 'Release workflow', 'release-history': 'Release history',
           'release-signing': 'Release signatures', 'release-plan': 'Open work',
           'sles-license-review': 'SLES license review', 'third-party': 'Third-party notices',
           'contributing': 'Contributing', 'license': 'Project license'}
@@ -158,21 +159,46 @@ def template(name, **values):
 
 def layout(title, content, pages, slug, base, toc='', source=None, commit=None, dirty=True, home=False):
     esc = html.escape
-    active = 'Field notes' if slug.startswith('field-notes') else 'FAQ' if slug == 'faq' else 'Documentation'
-    nav = ''.join('<a ' + ('aria-current="page" ' if active == name and not home else '')
-                  + 'href="' + page_url(path, base) + '">' + name + '</a>'
-                  for name, path in (('Documentation', 'overview'), ('FAQ', 'faq'), ('Field notes', 'field-notes')))
     meta = ('Working copy' if dirty else 'Source ' + commit[:7]) if commit else 'Local preview'
     source_link = ''
     if source:
         source_link = ('<a class="source-link" href="https://github.com/' + REPOSITORY + '/blob/'
                        + (commit or 'develop') + '/' + quote(source.as_posix(), safe='/')
                        + '">View this page on GitHub ↗︎</a>')
-    body = content if home else template('document.html', overview_url=page_url('overview', base),
-             sidebar=sidebar(pages, slug, base), section=active, title=esc(title), content=content,
-             source_link=source_link, toc=toc)
-    toggle = '' if home else '<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button>'
-    return template('layout.html', title=esc(title), body=body, nav=nav, meta=esc(meta), base=base, docs_toggle=toggle)
+    editorial = slug == 'field-notes' or (slug.startswith('field-notes/')
+                                         and not slug.endswith('/contributing-a-note'))
+    if home or slug == 'field-notes':
+        body = content
+    elif editorial:
+        label = re.match(r'^\s*<p><strong>(Field note.*?)</strong></p>', content, re.S)
+        article_label = plain(label[1]) if label else 'Field note'
+        if label:
+            content = content[label.end():]
+        body = template('field-note.html', base=base, article_label=esc(article_label),
+                        title=esc(title), content=content, source_link=source_link, toc=toc)
+    else:
+        body = template('document.html', overview_url=page_url('overview', base), base=base,
+                        sidebar=sidebar(pages, slug, base), title=esc(title),
+                        content=content, source_link=source_link, toc=toc, meta=esc(meta))
+    toggle = '' if home or editorial else '<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button>'
+    header = template('header-' + ('home' if home else 'blog' if editorial else 'document') + '.html',
+                      base=base, search=template('search.html'))
+    return template('layout.html', title=esc(title), body=body, header=header,
+                    meta=esc(meta), base=base, docs_toggle=toggle)
+
+
+def notes_index(stories, base):
+    featured = next((s for s in stories if s[0] == 'field-notes/sles12-handshake'), None)
+    if not featured:
+        raise ValueError('The featured field note must exist in the canonical Markdown')
+    _, title, label, summary = featured
+    others = ''.join('<a class="story-card" href="' + page_url(slug, base) + '"><h2>'
+                     + html.escape(name) + '</h2><p>' + html.escape(description) + '</p></a>'
+                     for slug, name, _, description in stories if slug != featured[0])
+    return template('notes.html', base=base, feature_title=html.escape(title),
+                    feature_meta=html.escape(label), feature_summary=html.escape(summary),
+                    feature_date=html.escape(label.split('·')[1].strip().upper()),
+                    more_notes=others)
 
 
 def homepage(base, root=ROOT):
@@ -182,13 +208,7 @@ def homepage(base, root=ROOT):
     rows = [line for line in target_section.splitlines() if line.startswith('|')]
     compact = ['| ' + ' | '.join(line.split('|')[1:4]) + ' |' for line in rows]
     supported_targets = markdown.markdown('\n'.join(compact), extensions=['tables'])
-    return template('home.html', supported_targets=supported_targets, base=base,
-                    **{key + '_url': page_url(slug, base) for key, slug in (
-        ('overview', 'overview'), ('installation', 'installation'), ('faq', 'faq'),
-        ('workflow', 'workflow'), ('menu', 'menu'), ('releases', 'releases'),
-        ('contributing', 'contributing'), ('note_guide', 'field-notes/contributing-a-note'),
-        ('troubleshooting', 'troubleshooting'), ('field_note', 'field-notes/sles12-handshake'),
-        ('validation', 'practical-validation'))})
+    return template('home.html', supported_targets=supported_targets, base=base)
 
 
 def build(output, root=ROOT, base=BASE):
@@ -235,15 +255,8 @@ def build(output, root=ROOT, base=BASE):
             if slug.startswith('field-notes/') and not slug.endswith('/contributing-a-note'):
                 paragraphs = re.findall(r'<p>(.*?)</p>', content, re.S)
                 stories.append((slug, title, plain(paragraphs[0]) if paragraphs else 'Field note',
-                                plain(paragraphs[1])[:180] if len(paragraphs) > 1 else 'A reviewed report from actual troubleshooting.'))
-        cards = ''.join('<a class="story-card" href="' + page_url(slug, base) + '"><span class="eyebrow">'
-                        + html.escape(label) + '</span><h2>' + html.escape(title) + ' <span>↗︎</span></h2><p>'
-                        + html.escape(summary) + '</p><span class="tag">Reported observation</span></a>'
-                        for slug, title, label, summary in stories)
-        notes = ('<p class="lead">Practical reports from actual troubleshooting. Observations are kept separate from assumptions and untested outcomes.</p>'
-                 + cards + '<p>Have a useful experience to share? See <a href="'
-                 + page_url('field-notes/contributing-a-note', base)
-                 + '">how to contribute a field note</a>. We do not publish unverified testimonials or production credentials.</p>')
+                                plain(paragraphs[1]) if len(paragraphs) > 1 else 'A reviewed report from actual troubleshooting.'))
+        notes = notes_index(stories, base)
         write('field-notes', layout('Notes from the field', notes, pages, 'field-notes', base, commit=commit, dirty=dirty))
         write('', layout('Custom NRPE builds. Clear, practical docs.', homepage(base, root), pages, '', base, commit=commit, dirty=dirty, home=True))
         (stage / '404.html').write_text(layout('That page is not here', '<p>The address may have changed. <a href="' + page_url('overview', base) + '">Browse the documentation</a> or use search to find the next step.</p>', pages, '404', base, commit=commit, dirty=dirty), encoding='utf-8')

@@ -107,28 +107,18 @@ class CleanupTests(CleanupFixture, unittest.TestCase):
         self.assertTrue(runtime.exists())
         self.assertFalse(expired.exists())
 
-    def test_retired_outputs_require_explicit_selection_and_age(self):
-        expired = self.root / 'output/sles15sp3'
-        expired.mkdir(parents=True)
-        (expired / 'nrpe-4.1.1-1.x86_64.rpm').write_bytes(b'old')
-        self.age(expired)
-        current = self.root / 'output/sles12sp3'
-        current.mkdir()
-        (current / 'nrpe-4.1.1-0.withargs1.x86_64.rpm').write_bytes(b'current')
-        self.age(current)
-        cleanup.clean(self.root, apply=True)
-        self.assertTrue(expired.exists())
-        cleanup.clean(self.root, retired_outputs=True, apply=True)
+    def test_cleanup_keeps_all_package_outputs_including_unknown_directories(self):
+        for target in ('sles12sp3', 'debian12', 'unknown-platform'):
+            directory = self.root / 'output' / target
+            directory.mkdir(parents=True)
+            (directory / 'package.bin').write_bytes(b'keep package')
+            self.age(directory)
+        expired = self.report(1)
+        self.report(2)
+        cleanup.clean(self.root, keep_runs=0, apply=True)
         self.assertFalse(expired.exists())
-        self.assertTrue(current.exists())
-
-    def test_retired_output_with_unknown_files_is_kept(self):
-        directory = self.root / 'output/sles15sp4'
-        directory.mkdir(parents=True)
-        (directory / 'my-backup.pem').write_text('private operator file')
-        self.age(directory)
-        cleanup.clean(self.root, retired_outputs=True, apply=True)
-        self.assertTrue(directory.exists())
+        for target in ('sles12sp3', 'debian12', 'unknown-platform'):
+            self.assertEqual((self.root / 'output' / target / 'package.bin').read_bytes(), b'keep package')
 
     def test_active_or_interrupted_target_lock_blocks_all_deletion(self):
         expired = self.report(1)
@@ -224,7 +214,7 @@ class ImageCleanupTests(CleanupFixture, unittest.TestCase):
     @patch('nrpe_cli.cleanup.subprocess.check_output', return_value='')
     @patch('nrpe_cli.cleanup.subprocess.run')
     def test_selected_image_preview_does_not_remove_and_apply_never_forces(self, run, containers, docker):
-        image = 'nrpe-custom-builder:sles15sp3'
+        image = 'nrpe-custom-builder:sles12sp3'
         run.return_value = subprocess.CompletedProcess([], 0, json.dumps([{'Id': 'sha256:' + 'a' * 64}]), '')
         cleanup.clean(self.root, images=[image])
         self.assertFalse(any('rm' in call.args[0] for call in run.call_args_list))
@@ -239,5 +229,5 @@ class ImageCleanupTests(CleanupFixture, unittest.TestCase):
         self.report(2)
         run.return_value = subprocess.CompletedProcess([], 0, json.dumps([{'Id': 'sha256:' + 'a' * 64}]), '')
         with self.assertRaisesRegex(RuntimeError, 'used by'):
-            cleanup.clean(self.root, keep_runs=0, images=['nrpe-custom-builder:sles15sp3'], apply=True)
+            cleanup.clean(self.root, keep_runs=0, images=['nrpe-custom-builder:sles12sp3'], apply=True)
         self.assertTrue(expired.exists())

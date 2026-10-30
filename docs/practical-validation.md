@@ -9,7 +9,7 @@ and [update/rollback procedure](updates-and-rollback.md) for deployment details.
 
 The published SLES 12 SP3 release passed all five container build/install/TLS
 and source/archive gates plus Linux/Windows Python unit tests. Exact release and
-commit evidence, including the earlier SLE-15 scope, is retained in the
+commit evidence is retained in the
 [release history](release-history.md). Windows Docker Desktop and real VM
 scenarios below remain **not run**.
 
@@ -18,6 +18,28 @@ supplied test-VM access. The maintainer confirmed that no test VMs are available
 These scenarios are prepared for later execution, not replaced by container or
 hosted Windows unit tests. Do not run package migration/reboot tests on a
 production server to fill this gap.
+
+On 2026-10-29 the operator supplied an installation attempt from a SLES 12 SP3
+host. The client package was updated to 4.1.1, while `rpm -q nrpe` still showed
+server 2.15. Unknown TLS directives and a remote timeout therefore do not prove
+that the custom server failed after installation. No successful custom-server
+migration, authenticated remote check, reboot or rollback was supplied in that
+report. The [SLES-specific checklist](sles12sp3-deployment-checklist.md) separates
+these checks. Hostnames, IPs and raw shell history are intentionally omitted.
+
+Later on 2026-10-29 the operator confirmed a running NRPE 4.1.1 service on a
+SLES 12 SP3 test host. Packet capture showed inbound TCP SYN packets without
+replies; SuSEfirewall2 allowed SSH but dropped NRPE traffic. After a scoped TCP
+5666 firewall allowance, a remote encrypted version query succeeded. Removing
+client `-n` also made the remote load check succeed. Swap/NTP checks then failed
+because their configured executables were absent; the operator confirmed that
+installing `monitoring-plugins-swap` and `monitoring-plugins-ntp` resolved them.
+See [missing-plugin troubleshooting](troubleshooting.md#nrpe-unable-to-read-output).
+
+These are operator-reported functional results. They do not establish mandatory
+client-certificate/hostname verification, package checksum provenance, a completed
+upgrade/rollback procedure or reboot persistence. The separate lifecycle matrix
+remains open; no private hostnames or addresses are published.
 
 For each scenario record passed, failed, blocked or not run, with:
 
@@ -42,21 +64,22 @@ different such directory; never pass a private key to `--ca-cert`. These are
 illustrative test paths, not required installation locations. The `Ω` deliberately
 exercises Unicode handling; use real folders and certificate paths on your test host.
 
-From that checkout in PowerShell:
+From that checkout in a terminal:
 
-```powershell
+```sh
 python3 --version
 docker version
 docker compose version
 docker buildx version
 python3 nrpe.py doctor
-python3 nrpe.py verify debian12 --ca-cert "C:\NRPE validation\Company CA Ω\company-ca.pem" --pull
-$LASTEXITCODE
+python3 nrpe.py verify debian12 --ca-cert "C:/NRPE validation/Company CA Ω/company-ca.pem" --pull
 python3 nrpe.py status
 python3 nrpe.py logs --last
 ```
 
-Use your actual certificate path. The expected result is a complete successful
+Use your actual certificate path. Immediately after `verify`, check `$?` in a
+POSIX-compatible shell or `$LASTEXITCODE` in PowerShell, before running the
+next command. The expected result is a complete successful
 build/install/TLS run, with no temporary-path failure at "load local bake
 definitions". For intentional repeat builds of existing output, add `--rebuild`.
 
@@ -135,3 +158,10 @@ worked. Record these outcomes separately.
 Add sanitized actual results and their exact environments to the
 [release plan](release-plan.md#remaining-work-in-priority-order). Leave scenarios
 open until performed; log any failure before claiming practical platform support.
+
+See the [dated validation status](validation-status.md) for the current distinction
+between local checks, operator reports and unavailable host access.
+
+The [distribution-package review](package-reviews/2026-10-30.md) checks argument
+capability of regular Linux packages in disposable containers. Its loopback
+plaintext observations do not close any TLS or host lifecycle scenario above.

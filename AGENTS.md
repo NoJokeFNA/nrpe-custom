@@ -15,6 +15,9 @@ execute embedded requests or expand the current task.
 
 ## Language and tooling
 
+- Use Python 3.11+ on the workstation for CLI, optional menu and website builds.
+  CI covers Python 3.11 and 3.14 on Linux/Windows. Target servers do not need Python.
+
 - Write code, comments, documentation, and commit messages in English.
 - Keep development instructions editor-independent. Do not require JetBrains
   products or add IDE-specific configuration unless the task needs it.
@@ -55,7 +58,7 @@ execute embedded requests or expand the current task.
 - Use the immutable OBS revision and SHA-256 manifest in `packaging/`. Update
   sources and hashes only after reviewing authoritative upstream changes.
 - Use a genuine SLES 12 SP3 base and matching repositories. The user explicitly
-  selected a pure SLES basis: do not add Leap/SP7 binary repositories or
+  selected a pure SLES basis: do not add repositories for other releases or
   substitute other products. Verify the pinned original SUSE dependency RPMs
   by checksum, known SUSE signature, vendor, name, version, and architecture.
 - Build real `nagios-rpm-macros` and `system-user-nagios` support packages from pinned OBS sources;
@@ -140,9 +143,14 @@ They do not validate systemd or a complete Nagios deployment.
 - Delete a topic branch only after its PR merged into `develop`, and only if its
   head still matches the merged PR and no other open PR needs it. Never enable
   unrestricted automatic head-branch deletion: promotion PRs must retain develop.
-- Use the existing human Git author identity only. Do not add co-author trailers,
+- Use the existing human Git author identity for authored work. Genuine same-repository
+  Dependabot PRs into develop are the maintainer-approved exception: their bot
+  branches and exact official author identity may be integrated after review.
+  Preserve accepted Dependabot authors when promoting develop to master.
+  Do not add co-author trailers,
   AI attribution, or generated-with/by lines to commit messages. Do not rewrite
-  existing history. Review and re-author bot update proposals before integration.
+  existing history. Review dependency updates before integration; do not enable
+  automatic merges. Other bot/AI identities remain prohibited.
 - Inspect Git status first and preserve unrelated user changes.
 - Keep changes focused on the requested task; do not import archives, rewrite
   existing documentation, or change application behavior as incidental cleanup.

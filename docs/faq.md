@@ -93,6 +93,13 @@ original OpenSSL 1.0.2 library. TLS 1.3 requires a newer TLS library and is not
 provided by this build. `disable_syslog=0` is unknown to the old daemon;
 commenting it out removes the warning but does not fix TLS compatibility.
 
+**Check the server package, not just the client version.** Installing
+`monitoring-plugins-nrpe` updates `check_nrpe`; it does not replace the daemon
+provided by `nrpe`. The operator's later installation attempt still showed
+server 2.15 after installing client 4.1.1. Follow the
+[server-package identity and installation checks](installation.md#choose-the-server-package)
+and [SLES deployment checklist](sles12sp3-deployment-checklist.md).
+
 The message `Could not complete SSL handshake. 1` alone does not identify a
 specific cipher, certificate or trust failure. Compare the actual server/client
 versions, command, TLS settings and simultaneous logs. Do not disable encryption
@@ -106,7 +113,7 @@ includes anonymized examples, the encountered errors and cleanup; it does not
 recommend disabling TLS in production.
 
 For NRPE 4.1.1 on SLES 12, also review the
-[authenticated DHE-RSA example](configuration-examples.md#hosts-tls-and-fixed-commands).
+[complete authenticated DHE-RSA policy](installation.md#sles-certificate-authenticated-tls).
 With this old OpenSSL integration, `ssl_use_adh=0` skips DH initialization and
 can produce `no shared cipher` with modern clients. Use the complete documented
 policy, which explicitly excludes anonymous ciphers, rather than enabling ADH
@@ -119,24 +126,13 @@ alone. It was tested against OpenSSL 3.5.7 with certificate verification intact.
 **SLES 12 SP3**, confirmed by `/etc/os-release`. The active target is
 `sles12sp3`; see the [native build guide](sles12sp3.md).
 
-### What happened to SLES 15 SP3 and SP4?
-
-Those targets came from an incorrect assumption about the affected server's OS.
-It was subsequently identified as SLES 12 SP3 with NRPE 2.15 and OpenSSL 1.0.2.
-The active SLES-15 Dockerfiles, manifests, media setup and target guides have
-been removed. There is no supported SLES-15 build target in the current workflow.
-
-The remaining explanation is consolidated here. Historical release results and
-dated license/maintenance observations retain their original platform labels in
-the [release history](release-history.md) and linked reviews. They do not prove
-SLES 12 compatibility, and old SLE-15 RPMs must not be installed on SLES 12.
-The [cleanup command](local-cleanup.md#retired-sles-output) still recognizes old
-local output names solely to remove them explicitly; CLI tests reject those
-names as build targets. These references do not restore SLES-15 support.
-
 ### When do I actually need a custom build?
 
 **Use the distribution package when it already provides the required feature.**
+The [package compatibility matrix](package-compatibility.md) records inspected
+versions, sources and review dates, including confirmed cases and open candidates.
+It distinguishes package build options from this tool's supported targets.
+
 A custom build makes sense when a required compiled feature is missing. Before
 rebuilding, distinguish service/configuration problems from missing features:
 

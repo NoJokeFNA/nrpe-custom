@@ -57,8 +57,9 @@ branch was deleted; master and develop were retained.
 was published from commit `517fbfb97d7efb7b19570c509fa2287e8251d412` by
 [successful run 40571542343](https://github.com/NoJokeFNA/nrpe-custom/actions/runs/40571542343).
 The run passed the Linux/Windows Python 3.9/3.14 unit matrix, shell/Compose checks,
-dependency audit, all five fresh build/install/TLS tests, source and license
-validation, archive assembly and publication. Local preparation also passed
+dependency audit, source/license validation, archive assembly and publication.
+The table below records the Debian package versions from that release; SLES 12
+SP3 validation is recorded separately above. Local preparation also passed
 132 unit tests with the pinned menu requirements.
 
 | Target | Published custom server version |
@@ -67,13 +68,6 @@ validation, archive assembly and publication. Local preparation also passed
 | Debian 12 | `4.1.0-1+withargs1` |
 | Debian 13 | `4.1.3-1+withargs1` |
 | Debian 14 | `4.1.3-1+withargs1` |
-| SLES 15 SP4 | `4.1.1-150400.95.2.withargs1` |
-
-All 11 published assets were independently downloaded after publication. Their
-complete file set and SHA-256 hashes matched `SHA256SUMS`; all five target
-archives passed the archive verifier and their manifests matched `release.json`
-and the release commit. This is integrity and completeness evidence, not a signed
-attestation or a native Windows/systemd/production deployment test.
 
 The SLES source/license questions are closed for the pinned inputs. Native
 Windows Docker Desktop and real Debian/SLES VM tests remain unrun; see the
@@ -101,7 +95,8 @@ verification and a separate client certificate. A missing client certificate
 was rejected. The [SLES TLS configuration](configuration-examples.md#hosts-tls-and-fixed-commands)
 records the NRPE-specific DH initialization requirement without permitting
 anonymous ciphers. All 142 unit tests, shell syntax, Compose/doctor checks and
-documentation links/snippets passed. A SLE-15 base was explicitly rejected.
+documentation links/snippets passed. The native environment guard rejected a
+base with the wrong OS release.
 
 These results identify the implementation commit, not every later documentation
 or integration commit. Fresh per-commit reports and candidate archives remain
@@ -109,5 +104,4 @@ local under `.nrpe/`; the exact eventual release commit must pass the gate again
 
 Syntax/unit tests are separate from package/runtime proof. Container tests do
 not establish production systemd, TLS, firewall, plugins or rollback readiness.
-Do not deploy a SLE-15 binary or replace the server's system OpenSSL to imitate
-this test. See [practical validation](practical-validation.md).
+Use matching SLES 12 SP3 binaries and retain the server's system OpenSSL. See [practical validation](practical-validation.md).

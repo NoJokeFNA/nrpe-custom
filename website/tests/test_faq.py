@@ -18,7 +18,6 @@ class FaqTests(unittest.TestCase):
 
     def test_existing_question_and_diagnostic_links_remain_available(self):
         anchors = ('which-sles-version-does-this-project-target',
-                   'what-happened-to-sles-15-sp3-and-sp4',
                    'nrpe-checks-on-sles-services-first-then-ssltls',
                    'does-a-separate-nrpe-agent-also-need-nagios-core-locally',
                    'when-do-i-actually-need-a-custom-build',
@@ -27,7 +26,7 @@ class FaqTests(unittest.TestCase):
         for anchor in anchors:
             with self.subTest(anchor=anchor):
                 self.assertEqual(self.content.count('id="' + anchor + '"'), 1)
-        self.assertEqual(self.content.count('class="question-link"'), 5)
+        self.assertEqual(self.content.count('class="question-link"'), 4)
 
     def test_answers_and_commands_are_present_without_expand_controls_or_javascript(self):
         self.assertNotIn('<details', self.content)

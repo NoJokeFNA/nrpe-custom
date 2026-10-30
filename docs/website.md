@@ -13,15 +13,20 @@ invented testimonial or production TLS claim. New reports follow the
 
 ## Homepage content and CLI capture
 
-The hero's "Built from real problems." line gently fades out, then reveals letters
-70 ms apart with a 180 ms fade and small vertical transition per letter. Cycles
-start 60 seconds apart, leaving the complete sentence visible between cycles.
-Letter spacing stays reserved so the heading does not move while typing.
-Reduced-motion preferences and missing JavaScript keep the full heading static.
-Animation stops while the tab or heading is hidden. Returning to the heading
-preserves the scheduled interval; an elapsed interval starts a fresh 60-second
-wait instead of immediately replaying. There is no visible animation control.
-Screen readers receive the complete sentence once, without repeated announcements.
+The product homepage, help documentation and editorial field notes use distinct
+layouts from the approved design exploration. Documentation has a compact tree,
+full-width blue selection, local search and a separate article outline. Field
+notes feature the existing reported account and label guide links separately;
+report bodies and metadata still come from canonical Markdown. Individual field
+notes also have a sticky section outline on the right with direct heading links
+and current-section tracking. On narrow screens it becomes an initially collapsed
+“On this page” list above the article; links remain available without JavaScript.
+
+Inter Variable is self-hosted with its verbatim SIL Open Font License under
+`website/assets/Inter-OFL.txt`. JetBrains Mono Regular/Bold is self-hosted for code examples with
+its verbatim SIL OFL notice at `website/assets/JetBrainsMono-OFL.txt`. Ligatures
+are disabled for unambiguous commands. The project mark and favicon are its own
+NRPE logo; no JetBrains logo or illustrations are bundled. The former animated hero is retired with this layout.
 
 The homepage links to GitHub's latest release rather than hardcoding a release
 version. Its supported-target table is derived from the README table, keeping
@@ -42,6 +47,10 @@ were captured at 100 columns by 24 rows and rendered as escaped text for the
 screenshot. It shows no successful build or real infrastructure; the homepage
 and menu guide share this image. Refresh it when navigation or presentation
 changes, preserving the same empty-workspace provenance.
+
+The documentation sidebar uses a full-height column with independently sticky,
+scrollable navigation so its background meets the footer. The project favicon
+matches the blue/teal NRPE mark. Code uses self-hosted JetBrains Mono.
 
 ## FAQ structure
 
@@ -69,7 +78,10 @@ remain disabled. The NRPE CLI and destination servers need none of these tools.
 Diagrams use strict mode and plain SVG text; external resources, active SVG
 content and per-diagram configuration overrides are rejected. Each figure has
 an accessible label, a full-size link and collapsed source. Visitors need no
-Mermaid runtime or JavaScript to see diagrams. Tables expose keyboard-focusable
+Mermaid runtime or JavaScript to see diagrams. Previews retain the SVG's native
+size instead of stretching a narrow flowchart across the article. Tall diagrams
+use a keyboard-scrollable preview capped at 560 pixels or 65% of the viewport;
+the existing full-size link exposes the complete SVG. Tables expose keyboard-focusable
 horizontal scrolling when needed; code and URL tokens stay intact rather than
 wrapping their final characters onto separate lines.
 
@@ -88,7 +100,7 @@ browser highlighter is needed. No Shiki runtime, grammar, WASM, CDN or remote fo
 is loaded by visitors. Code text, indentation, entities and Unicode are checked
 for exact preservation before publication. Plain/unknown languages remain unchanged; Mermaid renders as static diagrams; there is no speculative language detection.
 
-Use **Node.js 24 LTS** and **Python 3.9+** on the website build workstation.
+Use **Node.js 24 LTS** and **Python 3.11+** on the website build workstation.
 Neither Node nor website dependencies are needed for the NRPE CLI or destination
 servers. Install locked npm dependencies without package lifecycle scripts:
 
@@ -161,3 +173,31 @@ must complete setup in Settings. A pushed branch alone does not prove the
 website is live. Deployment and HTTP/browser checks must complete before
 claiming successful hosting. See
 [GitHub Pages setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+
+
+## Stylesheet maintenance
+
+Shared colors use the existing `:root` tokens (`--accent`, `--ink`, `--muted`,
+`--line`, `--paper`). Extend the relevant component rule instead of appending a
+second unconditional override for the same selector. Keep responsive rules at
+their cascade boundaries and validate desktop/mobile layout and interaction
+states when consolidating styles. A future component/layout/content structure
+is recorded separately in [architecture](architecture.md#future-website-structure-deferred).
+
+## Browser regression checks
+
+After building the static site, run the same browser checks used by CI:
+
+```sh
+node --test website/browser-tests.mjs
+```
+
+Use the existing pinned npm dependencies and a local Chrome/Chromium executable;
+set `NRPE_WEBSITE_BROWSER` if automatic discovery does not find it. The suite
+serves the built files on a temporary loopback port and rejects external runtime
+requests. It checks responsive overflow, sidebar scrolling/footer alignment,
+article outline/anchors, FAQ filtering, search and keyboard/mobile controls.
+Failure screenshots go to ignored `.nrpe/browser-results/` and are uploaded by
+CI for seven days. No deployment or package build is performed by these tests.
+They complement static links and rendering tests; they do not replace testing
+with actual assistive technology or native Windows terminals.

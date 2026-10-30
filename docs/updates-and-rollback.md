@@ -57,7 +57,7 @@ for the actual include paths; do not assume Debian's layout.
 
 ## Install and check the replacement
 
-Install the explicit local file from `replacement/` using APT or zypper as in the
+Install the explicit local file from `replacement/` using APT on Debian or RPM on SLES as in the
 [installation guide](installation.md). Package scripts can start or restart NRPE;
 use your site's maintenance/access controls during the transaction. Review
 configuration prompts rather than automatically forcing new or old files.
