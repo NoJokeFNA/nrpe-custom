@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>NRPE configuration examples</h1>
-      <p class="article-meta">Source 9f3fcd5</p>
+      <p class="article-meta">Source 4dc7aaf</p>
       <article class="prose"><p>These fragments illustrate a restricted deployment; they are not complete
 configuration files. Merge reviewed settings into <code>/etc/nagios/nrpe.cfg</code> on
 Debian or <code>/etc/nrpe.cfg</code> on SLES. Follow the <a href="https://github.com/NagiosEnterprises/nrpe">official NRPE manuals</a>
@@ -119,7 +119,7 @@ Preserve NRPE's default forbidden-metacharacter checks (including single quotes,
 backticks, backslashes, semicolons and newlines) and keep Bash substitution
 disabled. Do not loosen <code>nasty_metachars</code>, put untrusted text in command definitions,
 or expose this interface to arbitrary callers.</p>
-<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
+<p>The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/examples/check-load-profile.sh">example wrapper</a> accepts only <code>standard</code>
 or <code>busy</code> and maps them to fixed plugin options. Its first argument is an absolute
 plugin path fixed by the administrator in the server configuration; the caller
 does not select that path. It does not use <code>eval</code>, run a shell on received strings,
@@ -156,7 +156,7 @@ from the real monitoring host. See <a href="/nrpe-custom/installation/">installa
 <a href="/nrpe-custom/updates-and-rollback/">updates and rollback</a>, and <a href="/nrpe-custom/security/">security</a>.</p>
 <p>Use the <a href="/nrpe-custom/tls-validation/">ordered TLS validation procedure</a> to distinguish
 TCP reachability, encryption, server identity and client-certificate enforcement.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/docs/configuration-examples.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -178,7 +178,7 @@ TCP reachability, encryption, server identity and client-certificate enforcement
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 9f3fcd5</span>
+<span>Source 4dc7aaf</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

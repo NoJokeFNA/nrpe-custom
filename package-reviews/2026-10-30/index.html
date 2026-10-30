@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>Distribution NRPE package review: 30 October 2026 · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<span>NRPE Custom</span>
+</a>
+<a class="collection-link" href="/nrpe-custom/overview/">Documentation <span aria-hidden="true">▾</span>
+</a>
+<div class="header-tools">
+<a class="header-source" href="https://github.com/NoJokeFNA/nrpe-custom">Source code ↗</a>
+<a class="header-download" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Get NRPE packages</a><label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+</div>
+</header>
+<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="doc-breadcrumb">
+<a href="/nrpe-custom/">NRPE Custom</a>
+<span>/</span>
+<a href="/nrpe-custom/overview/">Documentation</a>
+</div>
+      <h1>Distribution NRPE package review: 30 October 2026</h1>
+      <p class="article-meta">Source 4dc7aaf</p>
+      <article class="prose"><p>This follow-up replaces broad OS-family assumptions with installed-package
+observations. Five regular Linux package installations were tested sequentially
+in disposable x86_64 containers. No custom project package was installed in
+these probes, no host package was installed and no container port was published.</p>
+<h2 id="runtime-observations">Runtime observations</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Runtime observations table"><table>
+<thead>
+<tr>
+<th>Actual OS</th>
+<th>Installed server/client packages</th>
+<th>Policy 0</th>
+<th>Policy 1</th>
+<th>Compile-option change needed for these arguments?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ubuntu 22.04</td>
+<td><code>nagios-nrpe-server</code> / <code>nagios-nrpe-plugin</code> <code>4.0.3-1ubuntu2</code></td>
+<td>Rejected</td>
+<td>Exact ALPHA/BETA response</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ubuntu 24.04</td>
+<td><code>nagios-nrpe-server</code> / <code>nagios-nrpe-plugin</code> <code>4.1.0-1ubuntu3</code></td>
+<td>Rejected</td>
+<td>Exact ALPHA/BETA response</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Alpine 3.22.7</td>
+<td><code>nrpe</code> / <code>nrpe-plugin</code> <code>4.1.1-r0</code></td>
+<td>Rejected</td>
+<td>Exact ALPHA/BETA response</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Fedora 43</td>
+<td><code>nrpe</code> / <code>nagios-plugins-nrpe</code> <code>4.1.3-4.fc43</code></td>
+<td>Rejected</td>
+<td>Exact ALPHA/BETA response</td>
+<td>No</td>
+</tr>
+<tr>
+<td>AlmaLinux 9.8 with EPEL 9</td>
+<td><code>nrpe</code> / <code>nagios-plugins-nrpe</code> <code>4.1.2-2.el9</code></td>
+<td>Rejected</td>
+<td>Exact ALPHA/BETA response</td>
+<td>No</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both policies first passed a fixed-command baseline returning
+<code>NRPE_BASELINE_OK</code>. The argument-disabled requests returned exit 3 with a header
+underflow message; the deliberately enabled requests returned exit 0 and exactly
+<code>NRPE_ARG_PROBE:ALPHA:BETA</code>. This shows why header underflow alone is not a unique
+TLS diagnosis. The controlled probe used plaintext consistently on both ends.</p>
+<p>These versions and repositories are observations of the tested transaction,
+not a claim about every release, architecture or third-party rebuild. EPEL 9 on
+AlmaLinux does not establish an actual RHEL, Rocky or Oracle Linux host result.
+Alpine's stable-branch package also differs from the previously reviewed master
+recipe; preserve that distinction in the matrix.</p>
+<h2 id="procedure-and-integrity-boundary">Procedure and integrity boundary</h2>
+<ol>
+<li>Start an official matching base image with no published port and a read-only
+   mount of the reviewed helper. Keep the configured proxy and mount its public
+   CA bundle separately where HTTPS tools require it.</li>
+<li>Install the distribution's regular NRPE daemon and client through normal
+   APT, APK or DNF repositories. Ubuntu used its matching Universe packages;
+   Alpine used matching v3.22 repositories; Fedora used matching Fedora repos;
+   AlmaLinux first installed its regular EPEL repository package, then EPEL 9
+   NRPE. Package authenticity/dependency checks were not disabled.</li>
+<li>Record OS, exact installed versions, package origin/source where exposed,
+   daemon/client versions and SHA-256 hashes. The
+   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
+   observed binary hashes. Binary hashes are not package archive signatures.</li>
+<li>Use a real package-provided service account and temporary configuration,
+   with a foreground daemon bound only to <code>127.0.0.1:15666</code>. Disable Bash
+   command substitution. Test a fixed <code>/bin/echo</code> baseline before each policy,
+   then a command with the controlled <code>$ARG1$</code> / <code>$ARG2$</code> pair.</li>
+<li>Stop only the probe's daemon, remove its temporary files and discard the
+   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/validation/probe-installed-nrpe.sh">protocol helper</a>
+   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/validation/README.md">its requirements</a> document the equivalent
+   check without installing packages or changing packaged configuration.</li>
+</ol>
+<p>The base image digest is recorded, but package repositories were live and not
+snapshotted. This is dated evidence, not a bit-for-bit reproducible build.
+The probe establishes no TLS or certificate policy, systemd/OpenRC startup,
+reboot, production-plugin behavior, update or rollback guarantee. None of the
+reviewed systems becomes a supported custom-build target through this test.</p>
+<h2 id="arch-current-repository-absence-and-aur-source-review">Arch: current repository absence and AUR source review</h2>
+<p>The <code>archlinux:base</code> image identified itself as <code>20261025.0.616225</code>. The initial
+package refresh encountered proxy-CA trust errors. Using the mounted CA explicitly
+in pacman's curl downloader corrected HTTPS verification without disabling it.
+The successfully retrieved core/extra repository metadata then reported
+<code>target not found: nrpe</code>. No Arch package installation or protocol pass is claimed.
+This is an observation of those repositories and architecture, not proof that
+NRPE is unavailable from every Arch package source.</p>
+<p>The public <a href="https://aur.archlinux.org/packages/nrpe">AUR metadata</a> identifies
+<code>nrpe 4.1.2-1</code>. The inspected
+<a href="https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=nrpe">PKGBUILD</a> does not
+pass a command-argument configure option. The exact
+<a href="https://github.com/NagiosEnterprises/nrpe/blob/nrpe-4.1.2/configure.ac">upstream 4.1.2 configure source</a>
+only defines <code>ENABLE_COMMAND_ARGUMENTS</code> when the option is supplied. This is a
+current source-level candidate for an argument-enabled rebuild. No AUR build
+code was executed, and no AUR binary was installed. Its recipe SHA-256 is recorded
+in the JSON evidence. The old <a href="https://bugs.archlinux.org/task/66574">Arch issue</a>
+remains historical context, not today's runtime result.</p>
+<h2 id="freebsd-why-the-first-classification-needed-correction">FreeBSD: why the first classification needed correction</h2>
+<p>The <a href="https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile">NRPE 4.2.0 port</a>
+defines <code>ARGS</code> but does not enable it by default. That declaration alone is
+<strong>not proof that a built binary lacks arguments</strong>. The
+<a href="https://github.com/freebsd/freebsd-ports/blob/main/Mk/bsd.options.mk">Ports options helper</a>
+turns a disabled <code>ARGS_CONFIGURE_ENABLE=command-args</code> into
+<code>--disable-command-args</code>. However, the reviewed upstream
+<a href="https://github.com/NagiosEnterprises/nrpe/blob/nrpe-4.2.0/configure">4.2.0 generated configure block</a>
+checks whether the option was provided, then defines the macro without testing
+whether its value is <code>yes</code> or <code>no</code>.</p>
+<p>An isolated execution of that exact, small configure block from upstream commit
+<code>cf47f059637fe4ad23dd4a5f2612e2787ce7c09d</code> produced:</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="FreeBSD: why the first classification needed correction table"><table>
+<thead>
+<tr>
+<th>Configure-option state</th>
+<th><code>ENABLE_COMMAND_ARGUMENTS</code> defined</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Omitted</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Supplied with value <code>no</code> (disable)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Supplied with value <code>yes</code> (enable)</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>This validates the configure-fragment behavior, not an actual FreeBSD package
+or service. A native package-options, generated-header and protocol check is
+still required. The matrix therefore no longer treats FreeBSD as a confirmed
+argument-disabled binary or a confirmed need for our patch. No upstream bug
+report or new security advisory is claimed by this observation.</p>
+<h2 id="next-checks">Next checks</h2>
+<ul>
+<li>Build and exercise the reviewed Arch AUR recipe and an explicitly
+  argument-enabled revision in a disposable native environment before claiming
+  runtime compatibility. Preserve source integrity and real package versioning.</li>
+<li>Inspect a native FreeBSD binary/generated header and run both argument policies.
+  No BSD VM or access was available here; Linux containers cannot establish it.</li>
+<li>Recheck a specific package version before applying these findings to a new
+  release or derivative. Prioritize an actual missing feature over adding targets
+  whose regular packages already provide the needed capability.</li>
+</ul></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc">
+<span>On this page</span><div class="toc">
+<ul>
+<li><a href="#runtime-observations">Runtime observations</a></li>
+<li><a href="#procedure-and-integrity-boundary">Procedure and integrity boundary</a></li>
+<li><a href="#arch-current-repository-absence-and-aur-source-review">Arch: current repository absence and AUR source review</a></li>
+<li><a href="#freebsd-why-the-first-classification-needed-correction">FreeBSD: why the first classification needed correction</a></li>
+<li><a href="#next-checks">Next checks</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 4dc7aaf</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>

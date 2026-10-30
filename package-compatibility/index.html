@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>NRPE package compatibility matrix</h1>
-      <p class="article-meta">Source 9f3fcd5</p>
+      <p class="article-meta">Source 4dc7aaf</p>
       <article class="prose"><p>Reviewed: <strong>30 October 2026</strong>. This is a package/build-feature matrix, not a list
 of operating systems that universally need a patch. A custom argument-enabled
 build is relevant only when remote arguments are required and the installed
@@ -57,12 +57,14 @@ patch. Argument support needs both <code>--enable-command-args</code> at build t
 deliberate runtime policy (<code>dont_blame_nrpe=1</code>). A disabled runtime setting alone
 does not establish that compilation is missing. Keep Bash command substitution
 disabled and use <a href="/nrpe-custom/configuration-examples/">reviewed command definitions</a>.</p>
-<h2 id="confirmed-packaging-findings">Confirmed packaging findings</h2>
+<h2 id="confirmed-packaging-and-runtime-findings">Confirmed packaging and runtime findings</h2>
 <p>The versions below identify inspected or recorded examples, not a promise that
-they are the latest packages in every repository. Source review establishes the
-listed build options; it is not an installation/TLS test on those other systems.
+they are the latest packages in every repository. Evidence is either a source
+review or the explicitly listed container argument probe; neither establishes
+production TLS or host lifecycle behavior. The <a href="/nrpe-custom/package-reviews/2026-10-30/">dated follow-up</a> records the method,
+versions, scope and corrected FreeBSD interpretation.
 Only the targets marked <strong>supported</strong> are implemented by this tool.</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Confirmed packaging findings table"><table>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Confirmed packaging and runtime findings table"><table>
 <thead>
 <tr>
 <th>System / inspected package</th>
@@ -103,9 +105,39 @@ Only the targets marked <strong>supported</strong> are implemented by this tool.
 <td><strong>Supported:</strong> <code>sles12sp3</code>, x86_64</td>
 </tr>
 <tr>
-<td>FreeBSD; current inspected <code>net-mgmt/nrpe</code> port <code>4.2.0</code></td>
-<td><code>ARGS</code> exists but is absent from <code>OPTIONS_DEFAULT</code></td>
-<td>A port build with <code>ARGS</code> enabled is the existing packaging mechanism if arguments are needed [F]</td>
+<td>FreeBSD; inspected port <code>4.2.0</code></td>
+<td><strong>Native binary not verified:</strong> <code>ARGS</code> defaults off, but upstream handles the generated disable option unexpectedly</td>
+<td>Native header/binary/protocol check required; no confirmed patch need [F]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>Ubuntu 22.04; <code>4.0.3-1ubuntu2</code></td>
+<td>Confirmed by container argument probe</td>
+<td>Regular package rejects arguments at policy 0 and returns exact arguments at policy 1 [P]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>Ubuntu 24.04; <code>4.1.0-1ubuntu3</code></td>
+<td>Confirmed by container argument probe</td>
+<td>No compile-option change needed for the tested feature [P]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>Alpine 3.22.7; <code>nrpe 4.1.1-r0</code></td>
+<td>Confirmed by container argument probe</td>
+<td>No compile-option change needed for the tested feature [P]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>Fedora 43; <code>nrpe 4.1.3-4.fc43</code></td>
+<td>Confirmed by container argument probe</td>
+<td>No compile-option change needed for the tested feature [P]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>AlmaLinux 9.8 / EPEL 9; <code>nrpe 4.1.2-2.el9</code></td>
+<td>Confirmed by container argument probe</td>
+<td>No compile-option change needed; no claim for an actual RHEL host [P]</td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
@@ -144,9 +176,9 @@ than assuming every binary uses the defaults.</p>
 </thead>
 <tbody>
 <tr>
-<td>Arch Linux</td>
-<td>Official issue FS#66574 records NRPE <code>4.0.2</code> built without arguments in May 2020; the request to enable them was closed as “Won't implement” [R]</td>
-<td>Inspect today's official PKGBUILD and actual package options; do not present the 2020 report as a current runtime test</td>
+<td>Arch Linux / AUR <code>nrpe 4.1.2-1</code></td>
+<td>Current AUR recipe omits the configure option; exact upstream source leaves the macro undefined when the option is absent. Official core/extra query found no <code>nrpe</code> package [P]</td>
+<td>Source-level rebuild candidate; no AUR build/runtime test yet. The old official issue [R] remains historical context</td>
 </tr>
 <tr>
 <td>Debian-derived distributions using unchanged Debian NRPE packaging</td>
@@ -169,24 +201,33 @@ our amd64 outputs are not ARM packages for a Raspberry Pi.</p>
 <li><strong>[D] Debian:</strong> inspected <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">4.1.3-1 build rules</a>
   omit <code>--enable-command-args</code>. Recorded Debian 11–14 source/custom versions and
   actual project build/install/TLS evidence are in the linked release history.
-  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
+  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
   option insertion and rejects an already-enabled recipe.</li>
-<li><strong>[S] SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
+<li><strong>[S] SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
   identifies NRPE 4.1.1 at revision <code>835292739a5736a9d8f0460f670b6f15</code>.
   The <a href="/nrpe-custom/sles12sp3/">native build guide</a> describes the actual policy changes;
   the <a href="/nrpe-custom/field-notes/sles12-handshake/">operator field note</a> separates the
   old server, client/server package confusion, firewall and plugin problems.</li>
 <li><strong>[F] FreeBSD:</strong> the official <a href="https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile">port Makefile</a>
-  identifies version 4.2.0, defines <code>ARGS</code>, maps it to <code>command-args</code> and defaults
-  to SSL plus the selected plugin flavor, without <code>ARGS</code>.</li>
+  identifies version 4.2.0 and an off-by-default <code>ARGS</code> option. The
+  <a href="/nrpe-custom/package-reviews/2026-10-30/#freebsd-why-the-first-classification-needed-correction">follow-up</a>
+  records why Ports-generated <code>--disable-command-args</code> cannot be assumed to leave
+  the compiled macro disabled in the reviewed upstream configure block.</li>
 <li><strong>[U] Ubuntu:</strong> the official <a href="https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html">4.1.3-1ubuntu1 acceptance record</a>
   explicitly records Ubuntu's addition of <code>--enable-command-args</code> and the
   retained disabled runtime default. The record is dated 20 December 2024.</li>
 <li><strong>[A] Alpine:</strong> the official <a href="https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD">APKBUILD</a>
   identifies 4.1.3-r0 and passes <code>--enable-command-args</code> to configure.</li>
-<li><strong>[R] Arch:</strong> the official <a href="https://bugs.archlinux.org/task/66574">FS#66574 report</a>
+<li>
+<p><strong>[R] Arch:</strong> the official <a href="https://bugs.archlinux.org/task/66574">FS#66574 report</a>
   identifies version 4.0.2 and the maintainer's May 2020 decision. It provides
-  historical evidence, not an independently checked current package.</li>
+  historical evidence, not an independently checked current package.</p>
+</li>
+<li>
+<p><strong>[P] Runtime/source follow-up:</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/">30 October 2026 review</a>
+  and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/docs/package-reviews/2026-10-30.json">machine-readable identities/results</a>.
+  Five container probes passed; Arch's current AUR evidence is source-only.</p>
+</li>
 </ul>
 <h2 id="classify-a-real-installation">Classify a real installation</h2>
 <ol>
@@ -213,12 +254,12 @@ source link, relevant configure options and evidence type. Keep source inspectio
 container protocol results and real-host outcomes distinct. Recheck moving
 branches before acting on their entries and update changed findings rather than
 silently extending them to all releases of a distribution.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/4dc7aaf3e4318580ae9b4e1525fdb0359ad7ff45/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
 <ul>
-<li><a href="#confirmed-packaging-findings">Confirmed packaging findings</a></li>
+<li><a href="#confirmed-packaging-and-runtime-findings">Confirmed packaging and runtime findings</a></li>
 <li><a href="#historical-evidence-and-open-candidates">Historical evidence and open candidates</a></li>
 <li><a href="#evidence-sources">Evidence sources</a></li>
 <li><a href="#classify-a-real-installation">Classify a real installation</a></li>
@@ -237,7 +278,7 @@ silently extending them to all releases of a distribution.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 9f3fcd5</span>
+<span>Source 4dc7aaf</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
