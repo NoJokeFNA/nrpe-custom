@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>NRPE package compatibility matrix</h1>
-      <p class="article-meta">Source 7258261</p>
+      <p class="article-meta">Source 1eddd7b</p>
       <article class="prose"><p>Reviewed: <strong>30 October 2026</strong>. The assessment answers whether a custom build is
 needed because the installed NRPE package lacks required command-argument or
 TLS/SSL support. It applies to the listed package and requirement, not every
@@ -69,7 +69,7 @@ they are the latest packages in every repository. Evidence is either a source
 review or the explicitly listed container argument probe; neither establishes
 production TLS or host lifecycle behavior. TLS follow-up results are recorded
 separately below. The <a href="/nrpe-custom/package-reviews/2026-10-30/">dated follow-up</a> records the method,
-versions, scope and corrected FreeBSD interpretation.
+versions, scope and FreeBSD source/binary findings.
 Only the targets marked <strong>supported</strong> are implemented by this tool.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Confirmed packaging and runtime findings table"><table>
 <thead>
@@ -84,79 +84,79 @@ Only the targets marked <strong>supported</strong> are implemented by this tool.
 <tr>
 <td>Debian 11; recorded source <code>4.0.3-1</code></td>
 <td>Not enabled by the distribution recipe</td>
-<td><strong>Yes</strong> [D]</td>
+<td><strong>Yes</strong> <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">D</a></td>
 <td><strong>Supported:</strong> <code>debian11</code>, amd64</td>
 </tr>
 <tr>
 <td>Debian 12; recorded source <code>4.1.0-1</code></td>
 <td>Not enabled by the distribution recipe</td>
-<td><strong>Yes</strong> [D]</td>
+<td><strong>Yes</strong> <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">D</a></td>
 <td><strong>Supported:</strong> <code>debian12</code>, amd64</td>
 </tr>
 <tr>
 <td>Debian 13; recorded source <code>4.1.3-1</code></td>
 <td>Not enabled by the inspected distribution recipe</td>
-<td><strong>Yes</strong> [D]</td>
+<td><strong>Yes</strong> <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">D</a></td>
 <td><strong>Supported:</strong> <code>debian13</code>, amd64</td>
 </tr>
 <tr>
 <td>Debian 14 / Forky; recorded source <code>4.1.3-1</code></td>
 <td>Not enabled by that recorded recipe</td>
-<td><strong>Yes</strong> [D]</td>
+<td><strong>Yes</strong> <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">D</a></td>
 <td><strong>Supported:</strong> <code>debian14</code>, amd64</td>
 </tr>
 <tr>
 <td>SLES 12 SP3; installed old server <code>2.15-4.24</code>, project recipe <code>4.1.1</code></td>
 <td>The pinned OBS 4.1.1 recipe already enables arguments</td>
-<td><strong>Yes</strong> [S]</td>
+<td><strong>Yes</strong> <a href="https://api.opensuse.org/public/source/server:monitoring/nrpe/nrpe.spec?rev=835292739a5736a9d8f0460f670b6f15">S</a></td>
 <td><strong>Supported:</strong> <code>sles12sp3</code>, x86_64</td>
 </tr>
 <tr>
-<td>FreeBSD; inspected port <code>4.2.0</code></td>
-<td><strong>Native binary not verified:</strong> <code>ARGS</code> defaults off, but upstream handles the generated disable option unexpectedly</td>
-<td><strong>Unconfirmed</strong> [F]</td>
+<td>FreeBSD 14 amd64; official <code>nrpe 4.2.0</code> package</td>
+<td>Argument-enabled code confirmed in the official binary; runtime/TLS not tested</td>
+<td><strong>No</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/#freebsd-official-binary-follow-up">F</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>Ubuntu 22.04; <code>4.0.3-1ubuntu2</code></td>
 <td>Confirmed by container argument probe</td>
-<td><strong>No</strong> [P]</td>
+<td><strong>No</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>Ubuntu 24.04; <code>4.1.0-1ubuntu3</code></td>
 <td>Confirmed by container argument probe</td>
-<td><strong>No</strong> [P]</td>
+<td><strong>No</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>Alpine 3.22.7; <code>nrpe 4.1.1-r0</code></td>
 <td>Confirmed by container argument probe</td>
-<td><strong>No</strong> [P]</td>
+<td><strong>No</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>Fedora 43; <code>nrpe 4.1.3-4.fc43</code></td>
 <td>Confirmed by container argument probe</td>
-<td><strong>No</strong> [P]</td>
+<td><strong>No</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>AlmaLinux 9.8 / EPEL 9; <code>nrpe 4.1.2-2.el9</code></td>
 <td>Confirmed by container argument probe</td>
-<td><strong>No</strong> [P]</td>
+<td><strong>No</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>Ubuntu; inspected <code>plucky-proposed</code> source <code>4.1.3-1ubuntu1</code></td>
 <td>Explicitly enabled by Ubuntu's packaging change</td>
-<td><strong>No</strong> [U]</td>
+<td><strong>No</strong> <a href="https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html">U</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 <tr>
 <td>Alpine; inspected <code>aports</code> master recipe <code>nrpe 4.1.3-r0</code></td>
 <td>Explicit <code>--enable-command-args</code></td>
-<td><strong>No</strong> [A]</td>
+<td><strong>No</strong> <a href="https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD">A</a></td>
 <td><strong>Not supported</strong></td>
 </tr>
 </tbody>
@@ -184,8 +184,8 @@ than assuming every binary uses the defaults.</p>
 <tbody>
 <tr>
 <td>Arch Linux / AUR <code>nrpe 4.1.2-1</code></td>
-<td>Current AUR recipe omits the configure option; exact upstream source leaves the macro undefined when the option is absent. Official core/extra query found no <code>nrpe</code> package [P]</td>
-<td>Source-level rebuild candidate; no AUR build/runtime test yet. The old official issue [R] remains historical context</td>
+<td>Current AUR recipe omits the configure option; exact upstream source leaves the macro undefined when the option is absent. Official core/extra query found no <code>nrpe</code> package <a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a></td>
+<td>Source-level rebuild candidate; no AUR build/runtime test yet. The old official issue <a href="https://bugs.archlinux.org/task/66574">R</a> remains historical context</td>
 </tr>
 <tr>
 <td>Debian-derived distributions using unchanged Debian NRPE packaging</td>
@@ -220,34 +220,37 @@ until its cause is established. Certificate-policy changes need configuration,
 not automatically a rebuilt binary.</p>
 <h2 id="evidence-sources">Evidence sources</h2>
 <ul>
-<li><strong>[D] Debian:</strong> inspected <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">4.1.3-1 build rules</a>
+<li><strong><a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">D</a> Debian:</strong> inspected <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">4.1.3-1 build rules</a>
   omit <code>--enable-command-args</code>. Recorded Debian 11–14 source/custom versions and
   actual project build/install/TLS evidence are in the linked release history.
-  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
+  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
   option insertion and rejects an already-enabled recipe.</li>
-<li><strong>[S] SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
+<li><strong><a href="https://api.opensuse.org/public/source/server:monitoring/nrpe/nrpe.spec?rev=835292739a5736a9d8f0460f670b6f15">S</a> SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
   identifies NRPE 4.1.1 at revision <code>835292739a5736a9d8f0460f670b6f15</code>.
   The <a href="/nrpe-custom/sles12sp3/">native build guide</a> describes the actual policy changes;
   the <a href="/nrpe-custom/field-notes/sles12-handshake/">operator field note</a> separates the
   old server, client/server package confusion, firewall and plugin problems.</li>
-<li><strong>[F] FreeBSD:</strong> the official <a href="https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile">port Makefile</a>
+<li><strong><a href="/nrpe-custom/package-reviews/2026-10-30/#freebsd-official-binary-follow-up">F</a> FreeBSD:</strong> the official <a href="https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile">port Makefile</a>
   identifies version 4.2.0 and an off-by-default <code>ARGS</code> option. The
   <a href="/nrpe-custom/package-reviews/2026-10-30/#freebsd-why-the-first-classification-needed-correction">follow-up</a>
   records why Ports-generated <code>--disable-command-args</code> cannot be assumed to leave
-  the compiled macro disabled in the reviewed upstream configure block.</li>
-<li><strong>[U] Ubuntu:</strong> the official <a href="https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html">4.1.3-1ubuntu1 acceptance record</a>
+  the compiled macro disabled in the reviewed upstream configure block. The
+  <a href="/nrpe-custom/package-reviews/2026-10-30/#freebsd-official-binary-follow-up">official binary follow-up</a>
+  confirms argument-enabled request handling in the reviewed FreeBSD 14 amd64
+  package despite its <code>ARGS=off</code> metadata. No native runtime or TLS pass is claimed.</li>
+<li><strong><a href="https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html">U</a> Ubuntu:</strong> the official <a href="https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html">4.1.3-1ubuntu1 acceptance record</a>
   explicitly records Ubuntu's addition of <code>--enable-command-args</code> and the
   retained disabled runtime default. The record is dated 20 December 2024.</li>
-<li><strong>[A] Alpine:</strong> the official <a href="https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD">APKBUILD</a>
+<li><strong><a href="https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD">A</a> Alpine:</strong> the official <a href="https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD">APKBUILD</a>
   identifies 4.1.3-r0 and passes <code>--enable-command-args</code> to configure.</li>
 <li>
-<p><strong>[R] Arch:</strong> the official <a href="https://bugs.archlinux.org/task/66574">FS#66574 report</a>
+<p><strong><a href="https://bugs.archlinux.org/task/66574">R</a> Arch:</strong> the official <a href="https://bugs.archlinux.org/task/66574">FS#66574 report</a>
   identifies version 4.0.2 and the maintainer's May 2020 decision. It provides
   historical evidence, not an independently checked current package.</p>
 </li>
 <li>
-<p><strong>[P] Runtime/source follow-up:</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/">30 October 2026 review</a>
-  and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/docs/package-reviews/2026-10-30.json">machine-readable identities/results</a>.
+<p><strong><a href="/nrpe-custom/package-reviews/2026-10-30/#tls-follow-up">P</a> Runtime/source follow-up:</strong> <a href="/nrpe-custom/package-reviews/2026-10-30/">30 October 2026 review</a>
+  and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/docs/package-reviews/2026-10-30.json">machine-readable identities/results</a>.
   Five container probes passed; Arch's current AUR evidence is source-only.</p>
 </li>
 </ul>
@@ -276,7 +279,7 @@ source link, relevant configure options and evidence type. Keep source inspectio
 container protocol results and real-host outcomes distinct. Recheck moving
 branches before acting on their entries and update changed findings rather than
 silently extending them to all releases of a distribution.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -301,7 +304,7 @@ silently extending them to all releases of a distribution.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 7258261</span>
+<span>Source 1eddd7b</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

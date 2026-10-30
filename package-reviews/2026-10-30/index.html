@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Distribution NRPE package review: 30 October 2026</h1>
-      <p class="article-meta">Source 7258261</p>
+      <p class="article-meta">Source 1eddd7b</p>
       <article class="prose"><p>This follow-up replaces broad OS-family assumptions with installed-package
 observations. Five regular Linux package installations were tested sequentially
 in disposable x86_64 containers. No custom project package was installed in
@@ -122,15 +122,15 @@ recipe; preserve that distinction in the matrix.</p>
    NRPE. Package authenticity/dependency checks were not disabled.</li>
 <li>Record OS, exact installed versions, package origin/source where exposed,
    daemon/client versions and SHA-256 hashes. The
-   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
+   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
    observed binary hashes. Binary hashes are not package archive signatures.</li>
 <li>Use a real package-provided service account and temporary configuration,
    with a foreground daemon bound only to <code>127.0.0.1:15666</code>. Disable Bash
    command substitution. Test a fixed <code>/bin/echo</code> baseline before each policy,
    then a command with the controlled <code>$ARG1$</code> / <code>$ARG2$</code> pair.</li>
 <li>Stop only the probe's daemon, remove its temporary files and discard the
-   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/validation/probe-installed-nrpe.sh">protocol helper</a>
-   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/validation/README.md">its requirements</a> document the equivalent
+   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/validation/probe-installed-nrpe.sh">protocol helper</a>
+   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/validation/README.md">its requirements</a> document the equivalent
    check without installing packages or changing packaged configuration.</li>
 </ol>
 <p>The base image digest is recorded, but package repositories were live and not
@@ -221,22 +221,62 @@ whether its value is <code>yes</code> or <code>no</code>.</p>
 </tbody>
 </table></div>
 <p>This validates the configure-fragment behavior, not an actual FreeBSD package
-or service. A native package-options, generated-header and protocol check is
-still required. The matrix therefore no longer treats FreeBSD as a confirmed
-argument-disabled binary or a confirmed need for our patch. No upstream bug
+or service. At that stage, native binary and protocol checks were still outstanding.
+The later static binary check below resolves the compiled-feature question for
+one official package; its native protocol and TLS checks remain open. No upstream bug
 report or new security advisory is claimed by this observation.</p>
+<h2 id="freebsd-official-binary-follow-up">FreeBSD official binary follow-up</h2>
+<p>The official <a href="https://pkg.freebsd.org/FreeBSD:14:amd64/latest/All/nrpe-4.2.0.pkg">FreeBSD 14 amd64 latest NRPE 4.2.0 package</a>
+was downloaded over verified HTTPS and inspected without installing or executing
+it. Its manifest identifies <code>net-mgmt/nrpe</code>, ABI <code>FreeBSD:14:amd64</code>, build time
+<code>2026-10-26T17:42:51+0000</code>, <code>ARGS=off</code> and <code>SSL=on</code>. The recorded ports checkout
+is <code>7bbf4905e58740335e0e9c8580ef075c7611ea8a</code>.</p>
+<p>The stripped FreeBSD ELF daemon nevertheless contains all three argument-enabled
+messages guarded by <code>ENABLE_COMMAND_ARGUMENTS</code> in
+<a href="https://github.com/NagiosEnterprises/nrpe/blob/cf47f059637fe4ad23dd4a5f2612e2787ce7c09d/src/nrpe.c#L2807">the upstream source</a>.
+Disassembly also confirms executable references rather than merely unused text:
+the request path calls <code>strchr</code> for <code>!</code>, tests the runtime-policy value, and then
+uses <code>strtok</code> for argument-enabled parsing. At address <code>0x20ceee</code> it loads the
+argument-policy diagnostic at <code>0x205156</code>; at <code>0x20cef3</code> it tests the policy and
+conditionally branches to rejection. The unconditional compile-disabled
+<code>Error: Request contained command arguments!</code> diagnostic is absent.</p>
+<p>This confirms compiled argument handling in <strong>this exact official package</strong>, so
+its compile-option assessment is <strong>No</strong>. It does not demonstrate a successful
+remote request, TLS handshake or service startup. The package's <code>SSL=on</code> setting
+alone is not a TLS runtime test. Other ABIs, quarterly repositories and locally
+built packages need their own check.</p>
+<p>To reproduce the static inspection on a Linux research workstation with GNU
+tar, zstd, binutils and curl:</p>
+<pre class="syntax-block" data-language="Shell"><code class="language-sh"><span class="syntax-fg-ffa657">curl</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--fail</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--location</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">--output</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-4.2.0.pkg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">\</span>
+<span class="syntax-fg-e6edf3">  </span><span class="syntax-fg-a5d6ff">https://pkg.freebsd.org/FreeBSD:14:amd64/latest/All/nrpe-4.2.0.pkg</span>
+<span class="syntax-fg-ffa657">tar</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-xOf</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-4.2.0.pkg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">+COMPACT_MANIFEST</span>
+<span class="syntax-fg-ffa657">tar</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-xOf</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-4.2.0.pkg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">/usr/local/sbin/nrpe</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">&gt;</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.freebsd</span>
+<span class="syntax-fg-ffa657">sha256sum</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe-4.2.0.pkg</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.freebsd</span>
+<span class="syntax-fg-ffa657">strings</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.freebsd</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ff7b72">|</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-ffa657">grep</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-E</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">&#x27;COMMAND ARGUMENTS|Request contained command arguments&#x27;</span>
+<span class="syntax-fg-ffa657">objdump</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-d</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-79c0ff">-M</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">intel</span><span class="syntax-fg-e6edf3"> </span><span class="syntax-fg-a5d6ff">nrpe.freebsd</span>
+</code></pre>
+<p>Do not execute the foreign binary on the workstation. Archive SHA-256:
+<code>59d5a7ed9080ff83845e3c867ae925c5dae95c80622f7441374768fc27116b44</code>.
+Daemon SHA-256:
+<code>6242a6b028df29fc9a45bf3aab481ca6f7dcdc0bdae71ce0bb3354777b28d19c</code>.
+These hashes identify this observation; they are not an independent package
+signature verification. Signed repository metadata was not verified here and no
+native FreeBSD environment was available. For the complete runtime check, use
+a disposable FreeBSD 14 VM, install through its signed repository, record its
+actual package version/hash, and exercise fixed commands plus both argument
+policies over certificate-authenticated TLS with the negative controls above.</p>
 <h2 id="next-checks">Next checks</h2>
 <ul>
 <li>Build and exercise the reviewed Arch AUR recipe and an explicitly
   argument-enabled revision in a disposable native environment before claiming
   runtime compatibility. Preserve source integrity and real package versioning.</li>
-<li>Inspect a native FreeBSD binary/generated header and run both argument policies.
+<li>Run both argument policies and certificate controls in a native FreeBSD VM.
   No BSD VM or access was available here; Linux containers cannot establish it.</li>
 <li>Recheck a specific package version before applying these findings to a new
   release or derivative. Prioritize an actual missing feature over adding targets
   whose regular packages already provide the needed capability.</li>
 </ul></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/725826185903fea84fff93b0f5bd620f7e107a43/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/1eddd7b06b027e7e74887e32b05acf9dc6d5699f/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -246,6 +286,7 @@ report or new security advisory is claimed by this observation.</p>
 <li><a href="#tls-follow-up">TLS follow-up</a></li>
 <li><a href="#arch-current-repository-absence-and-aur-source-review">Arch: current repository absence and AUR source review</a></li>
 <li><a href="#freebsd-why-the-first-classification-needed-correction">FreeBSD: why the first classification needed correction</a></li>
+<li><a href="#freebsd-official-binary-follow-up">FreeBSD official binary follow-up</a></li>
 <li><a href="#next-checks">Next checks</a></li>
 </ul>
 </div>
@@ -261,7 +302,7 @@ report or new security advisory is claimed by this observation.</p>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source 7258261</span>
+<span>Source 1eddd7b</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
