@@ -1,0 +1,55 @@
+name: Optional Arch Linux package
+on:
+  pull_request:
+    branches: [develop, master]
+    paths:
+      - '.github/workflows/archlinux.yml'
+      - 'docker/archlinux/**'
+      - 'packaging/archlinux/**'
+      - 'packaging/archlinux-source.json'
+      - 'scripts/arch_source.py'
+      - 'scripts/build-arch.sh'
+      - 'scripts/integration-test-arch.sh'
+      - 'scripts/test-nrpe-protocol.sh'
+      - 'scripts/install-ca-certificate.sh'
+      - 'nrpe_cli/targets.py'
+      - 'nrpe_cli/release.py'
+      - 'compose*.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: archlinux-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+  dependency-audit:
+    uses: ./.github/workflows/dependency-audit.yml
+  archlinux:
+    needs: [checks, dependency-audit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install native archive inspection tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends zstd
+      - name: Verify optional native package and rejection controls
+        run: python3 nrpe.py verify archlinux --pull
+      - name: Stage verified source-complete archive
+        env:
+          COMMIT: ${{ github.sha }}
+        run: python3 scripts/prepare_release.py target --target archlinux --commit "$COMMIT" --destination .nrpe/arch-release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: optional-archlinux-package
+          path: .nrpe/arch-release/nrpe-custom-archlinux.tar.gz
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

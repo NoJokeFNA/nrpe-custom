@@ -13,6 +13,12 @@ The screenshot is an actual prompt_toolkit render of an empty temporary workspac
 not evidence of a package build. Use direct commands for automation; see the
 [CLI help capture](../website/assets/cli-help.png) for the command list.
 
+The target picker also lists **Arch Linux (optional; argument-policy change)**.
+Selecting all visible targets in the menu includes that optional entry; review
+the selection before running. The CLI shortcut `all` selects only the five regular
+targets. Read the [Arch policy and installation guide](archlinux.md) before opting
+in; the CLI also prints its policy notice when that workflow starts.
+
 ## Install and start
 
 From the repository root, install the pinned host-only dependencies:

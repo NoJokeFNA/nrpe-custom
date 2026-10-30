@@ -65,9 +65,19 @@ than assuming every binary uses the defaults.
 
 | Candidate | Available evidence | Remaining work |
 | --- | --- | --- |
-| Arch Linux / AUR `nrpe 4.1.2-1` | Current AUR recipe omits the configure option; exact upstream source leaves the macro undefined when the option is absent. Official core/extra query found no `nrpe` package [P] | Source-level rebuild candidate; no AUR build/runtime test yet. The old official issue [R] remains historical context |
+| Arch Linux / AUR `nrpe 4.1.2-1` | Inspected AUR recipe omits argument support [AR]. The former official package deliberately disabled it for security reasons [R] [AS] | The separate [optional custom target](archlinux.md) uses reviewed current upstream sources. No automatic patch recommendation; AUR runtime remains untested |
 | Debian-derived distributions using unchanged Debian NRPE packaging | Possible inherited build behavior, not independently confirmed here | Identify the exact release, package source/version and architecture before classifying it; Ubuntu demonstrates why inheritance cannot be assumed |
 | Other distributions/repositories | Not reviewed by this matrix | Review their current recipe and installed package; absence from this page means unknown, not affected or unaffected |
+
+The separate **[optional Arch target](archlinux.md)** is implemented and passed
+native container packaging/install/TLS/rejection checks. It changes the historical
+security policy deliberately, is excluded from `all`, and does not establish the
+behavior or security of an AUR-installed binary.
+
+A disabled feature can be an intentional security restriction. Its absence alone
+is not a packaging defect or a recommendation to enable it. This tool enables
+argument support when explicitly needed; it does not fix the cited vulnerabilities
+by enabling that support. Prefer fixed commands when arguments are unnecessary.
 
 A candidate row adds no CLI target, build recipe or compatibility guarantee.
 FreeBSD requires native BSD build/install/service validation. Existing Debian
@@ -114,8 +124,12 @@ not automatically a rebuilt binary.
 - **[A] Alpine:** the official [APKBUILD](https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD)
   identifies 4.1.3-r0 and passes `--enable-command-args` to configure.
 - **[R] Arch:** the official [FS#66574 report](https://bugs.archlinux.org/task/66574)
-  identifies version 4.0.2 and the maintainer's May 2020 decision. It provides
-  historical evidence, not an independently checked current package.
+  identifies NRPE 4.0.2 and the May 2020 refusal to restore the feature, explicitly
+  citing [AVG-587](https://security.archlinux.org/AVG-587). The
+  [2018 advisory](https://security.archlinux.org/ASA-201801-14) records disabling
+  argument support as the security measure. This establishes the historical
+  official-package decision, not the intent of today's AUR maintainer or a
+  current-version vulnerability assessment.
 
 - **[P] Runtime/source follow-up:** [30 October 2026 review](package-reviews/2026-10-30.md)
   and [machine-readable identities/results](package-reviews/2026-10-30.json).
@@ -155,3 +169,6 @@ silently extending them to all releases of a distribution.
 [U]: https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html
 [A]: https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD
 [R]: https://bugs.archlinux.org/task/66574
+
+[AR]: package-reviews/2026-10-30.md#arch-current-repository-absence-and-aur-source-review
+[AS]: https://security.archlinux.org/AVG-587

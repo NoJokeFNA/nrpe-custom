@@ -1,7 +1,7 @@
 # Third-party provenance and license inventory
 
 This inventory records evidence inspected during release and website preparation
-on 2026-10-27 through 2026-10-29. It is not a completed redistribution approval. The root [MIT
+on 2026-10-27 through 2026-10-30. It is not a completed redistribution approval. The root [MIT
 license](LICENSE) applies to independently authored project code and
 documentation; it does not relicense NRPE, distribution packaging, embedded
 code, dependencies, or public signing keys.
@@ -10,6 +10,21 @@ The SLES target is **SLES 12 SP3**, confirmed from its OS/binary/library identit
 on 2026-10-28. Reviewed NRPE/user sources and build macros are rebuilt natively.
 The macros retain their BSD notice. Original SLE-12 dependency RPMs are verified
 but are not release assets.
+
+## Optional Arch NRPE 4.2.0 review
+
+The optional Arch target uses the official NRPE 4.2.0 release archive, SHA-256
+`0d1eac6845d360b200b037f2b8c0199f1acbe3bea36ad72236ad619e5447e555`.
+Its GPLv2-or-later grant and OpenSSL exemption were checked in the source's
+license output implementation (`src/utils.c:display_license`). The full GPL
+text, LEGAL notice, per-file ACL/snprintf notices and all original source files
+remain in the complete native source package. The binary package also installs
+GPL, LEGAL and actual upstream license-output notices. The independently authored
+Arch recipe, service, sysusers and installation notice are project MIT code;
+they do not copy or relicense the AUR recipe. The AUR paths and historical Arch
+security policy are documented as compatibility context. Source and license
+hashes are bound by [the manifest](packaging/archlinux-source.json) and validated
+before release staging. Future versions require a renewed source/license review.
 
 ## Components in generated packages and sources
 

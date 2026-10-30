@@ -56,6 +56,13 @@ class CliTests(unittest.TestCase):
         self.assertEqual(execute.call_args.args[:2],
                          ('verify', ['debian11', 'debian12', 'debian13', 'debian14', 'sles12sp3']))
 
+    @patch('nrpe_cli.cli.execute', return_value=0)
+    def test_arch_is_explicit_and_displays_policy_notice(self, execute):
+        self.assertEqual(cli.main(['verify', 'archlinux'], self.root), 0)
+        self.assertEqual(execute.call_args.args[:2], ('verify', ['archlinux']))
+        self.assertIn('Optional Arch build', self.output.getvalue())
+        self.assertIn('security policy', self.output.getvalue())
+
     @patch('nrpe_cli.cli.execute')
     def test_unsupported_target_is_not_silently_reinterpreted(self, execute):
         for target in ('unknown-platform', 'sles12sp2', 'sles12sp5'):

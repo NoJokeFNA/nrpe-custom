@@ -27,6 +27,10 @@ case "$ID" in
       cat "$certificate" >> /etc/ssl/certs/ca-certificates.crt
     fi
     ;;
+  arch)
+    install -D -m 0644 "$certificate" /etc/ca-certificates/trust-source/anchors/nrpe-custom-company.pem
+    update-ca-trust
+    ;;
   sles)
     install -D -m 0644 "$certificate" /etc/pki/trust/anchors/nrpe-custom-company.pem
     update-ca-certificates

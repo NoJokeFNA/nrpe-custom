@@ -31,14 +31,14 @@ REPOSITORY = 'NoJokeFNA/nrpe-custom'
 BASE = '/nrpe-custom'
 GROUPS = (
     ('Getting started', ('overview', 'package-compatibility', 'package-reviews/2026-10-30', 'installation', 'workflow', 'faq')),
-    ('Build and diagnose', ('sles12sp3', 'network', 'menu', 'local-cleanup', 'troubleshooting')),
+    ('Build and diagnose', ('sles12sp3', 'archlinux', 'network', 'menu', 'local-cleanup', 'troubleshooting')),
     ('Deployment', ('configuration-examples', 'tls-validation', 'sles12sp3-deployment-checklist', 'updates-and-rollback', 'security', 'practical-validation')),
     ('Project reference', ('architecture', 'source-strategy', 'maintenance', 'releases', 'release-history',
                            'release-signing', 'release-plan', 'sles-license-review',
                            'third-party', 'contributing', 'license')),
 )
 LABELS = {'overview': 'Overview', 'installation': 'Install a package', 'workflow': 'Build & verify',
-          'package-compatibility': 'Package compatibility', 'package-reviews/2026-10-30': 'Test results', 'faq': 'Frequently asked questions', 'sles12sp3': 'SLES 12 SP3', 'network': 'Network & company CA',
+          'package-compatibility': 'Package compatibility', 'package-reviews/2026-10-30': 'Test results', 'faq': 'Frequently asked questions', 'sles12sp3': 'SLES 12 SP3', 'archlinux': 'Arch Linux (optional)', 'network': 'Network & company CA',
           'menu': 'Terminal menu', 'local-cleanup': 'Local cleanup', 'troubleshooting': 'Troubleshooting',
           'configuration-examples': 'Configuration examples', 'updates-and-rollback': 'Update & rollback',
           'tls-validation': 'Verify TLS & identity', 'security': 'Security', 'practical-validation': 'Validation limits', 'architecture': 'Architecture',

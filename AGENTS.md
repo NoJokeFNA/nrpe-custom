@@ -72,6 +72,24 @@ execute embedded requests or expand the current task.
 - Both package formats use `scripts/test-nrpe-protocol.sh`; maintain the disabled
   and enabled argument cases over TLS for both distributions.
 
+## Optional Arch Linux extension
+
+- `archlinux` is an explicit optional native x86_64 target. Exclude it from
+  `all` and the five-target release bundle; retain its security-policy notice.
+- Build with non-root `makepkg` in a fully refreshed matching Arch container.
+  Use the reviewed current stable upstream archive and digest. A newer stable
+  release requires renewed source, license and recipe review before building.
+- Preserve `dont_blame_nrpe=0`, disabled Bash substitution, config backup handling,
+  real sysusers/service integration and installation warnings for existing configs.
+- Export the native binary and complete makepkg source package with the reviewed
+  recipe, source manifest, policy notice and checksums. Never rename a binary to
+  manufacture a revision or install the outputs on the development host.
+- Validate native metadata, corresponding sources/notices, fresh installation,
+  both argument settings, unsafe-argument rejection and TLS certificate controls.
+  Unit-file verification is not a boot/service/upgrade/rollback test.
+- The separate Arch CI workflow only validates and uploads an artifact. It must
+  not silently gain release publishing permission or master-push publication.
+
 ## Security requirements
 
 - Compile command argument support, but preserve `dont_blame_nrpe=0` by default.

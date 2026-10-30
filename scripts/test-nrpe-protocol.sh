@@ -28,6 +28,8 @@ if grep -Eq '^[[:space:]]*dont_blame_nrpe=1[[:space:]]*$' "$installed_config"; t
 fi
 echo "PASS: Installed $package_name $version with arguments disabled by default"
 
+service_user="${NRPE_TEST_USER:-nagios}"
+service_group="$(id -gn "$service_user")"
 runtime="$(mktemp -d /tmp/nrpe-integration.XXXXXXXX)"
 server_pid=''
 stop_server() {
@@ -58,8 +60,8 @@ log_file=$runtime/nrpe.log
 pid_file=$runtime/nrpe.pid
 server_address=127.0.0.1
 server_port=5666
-nrpe_user=nagios
-nrpe_group=nagios
+nrpe_user=$service_user
+nrpe_group=$service_group
 allowed_hosts=127.0.0.1
 dont_blame_nrpe=0
 allow_bash_command_substitution=0
@@ -75,7 +77,7 @@ command[check_ready]=/usr/bin/printf 'NRPE_READY\n'
 command[check_args]=/usr/bin/printf 'NRPE_ARGS:%s:%s\n' '\$ARG1\$' '\$ARG2\$'
 EOF
 touch "$runtime/nrpe.log" "$runtime/server.log" "$runtime/client.log"
-chown -R nagios:nagios "$runtime"
+chown -R "$service_user:$service_group" "$runtime"
 chmod 700 "$runtime"
 chmod 600 "$runtime/key.pem"
 
@@ -120,4 +122,25 @@ reply="$("${client[@]}" -c check_args -a gamma delta)"
   echo "ERROR: Arguments did not reach the check correctly: $reply" >&2; exit 1;
 }
 echo "PASS: Arguments enabled (dont_blame_nrpe=1); check_nrpe receives alpha/beta and gamma/delta over $tls_version with client certificates"
+if [[ "$target" == archlinux ]]; then
+  for payload in '$(printf NRPE_SUBSTITUTION)' $'alpha\nbeta' 'alpha;beta'; do
+    if "${client[@]}" -c check_args -a "$payload" beta > "$runtime/rejected.log" 2>&1; then
+      echo 'ERROR: Unsafe argument unexpectedly accepted' >&2; exit 1
+    fi
+    [[ "$("${client[@]}" -c check_ready)" == NRPE_READY ]]
+  done
+  grep -Eq 'Request contained (illegal metachars|a bash command substitution)' "$runtime/nrpe.log"
+  openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj '/CN=unrelated' \
+    -keyout "$runtime/unrelated.key" -out "$runtime/unrelated.pem" > "$runtime/unrelated.log" 2>&1
+  if "$client_binary" -H 127.0.0.1 -t 5 -d 0 -S "$tls_version" \
+       -A "$runtime/unrelated.pem" -C "$runtime/cert.pem" -K "$runtime/key.pem" -c check_ready > "$runtime/wrong-ca.log" 2>&1; then
+    echo 'ERROR: Unrelated server CA accepted' >&2; exit 1
+  fi
+  if "$client_binary" -H 127.0.0.1 -t 5 -d 0 -S "$tls_version" \
+       -A "$runtime/cert.pem" -c check_ready > "$runtime/missing-client.log" 2>&1; then
+    echo 'ERROR: Missing client certificate accepted' >&2; exit 1
+  fi
+  [[ "$("${client[@]}" -c check_ready)" == NRPE_READY ]]
+  echo 'PASS: Optional Arch argument-rejection and TLS certificate controls'
+fi
 echo "PASS: Integration test completed for ${target} ($version)"
