@@ -129,6 +129,10 @@ alone. It was tested against OpenSSL 3.5.7 with certificate verification intact.
 ### When do I actually need a custom build?
 
 **Use the distribution package when it already provides the required feature.**
+The [package compatibility matrix](package-compatibility.md) records inspected
+versions, sources and review dates, including confirmed cases and open candidates.
+It distinguishes package build options from this tool's supported targets.
+
 A custom build makes sense when a required compiled feature is missing. Before
 rebuilding, distinguish service/configuration problems from missing features:
 

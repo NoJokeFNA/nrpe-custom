@@ -78,7 +78,10 @@ remain disabled. The NRPE CLI and destination servers need none of these tools.
 Diagrams use strict mode and plain SVG text; external resources, active SVG
 content and per-diagram configuration overrides are rejected. Each figure has
 an accessible label, a full-size link and collapsed source. Visitors need no
-Mermaid runtime or JavaScript to see diagrams. Tables expose keyboard-focusable
+Mermaid runtime or JavaScript to see diagrams. Previews retain the SVG's native
+size instead of stretching a narrow flowchart across the article. Tall diagrams
+use a keyboard-scrollable preview capped at 560 pixels or 65% of the viewport;
+the existing full-size link exposes the complete SVG. Tables expose keyboard-focusable
 horizontal scrolling when needed; code and URL tokens stay intact rather than
 wrapping their final characters onto separate lines.
 
