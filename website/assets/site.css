@@ -87,7 +87,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
   width:100%;
   margin:0
 }
-.prose table code,.prose table a,.prose table th{
+.prose table code,.prose table a{
   white-space:nowrap;
   overflow-wrap:normal;
   word-break:normal
@@ -644,6 +644,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
   color:var(--ink)
 }
 .prose td,.prose th{
+  overflow-wrap:normal;
+  word-break:normal;
   text-align:left;
   vertical-align:top;
   min-width:90px;
@@ -1417,10 +1419,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
   border-color:var(--line);
   color:var(--ink)
 }
-@media(min-width:1600px){.document{
-  grid-template-columns:minmax(0,900px) 200px;
+@media(min-width:1600px){.docs-layout{
+  max-width:1920px;
+  margin-inline:auto
+}
+.document{
+  width:100%;
+  max-width:1600px;
+  margin-inline:auto;
+  grid-template-columns:minmax(0,1fr) 220px;
   gap:40px;
-  padding-left:48px
+  padding-inline:48px
+}
+.document .prose>:is(p,ul,ol,blockquote){
+  max-width:80ch
 }
 }
 @media(max-width:1390px){.product-hero-inner,.product-intro-inner{

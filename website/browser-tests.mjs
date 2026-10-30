@@ -160,3 +160,37 @@ test('tall diagrams keep native size in a compact scrollable preview', () => che
     await page.waitForFunction(() => document.querySelector('.diagram-viewport').scrollTop > 0);
   }
 }));
+
+test('wide documents center their content and keep table words readable', () => check('wide-tables', async page => {
+  for (const width of [1440, 1920, 3440]) {
+    await page.setViewport({ width, height: width === 3440 ? 1440 : 1080 });
+    for (const route of ['package-compatibility/', 'package-reviews/2026-10-30/']) {
+      await visit(page, route);
+      const geometry = await page.evaluate(() => {
+        const table = document.querySelector('.prose table');
+        const scroller = table.closest('.table-scroll');
+        const content = document.querySelector('.document');
+        const available = document.querySelector('.docs-layout').getBoundingClientRect();
+        const sidebar = document.querySelector('.sidebar').getBoundingClientRect();
+        const bounds = content.getBoundingClientRect();
+        return { maxRowHeight: Math.max(...Array.from(table.rows, row => row.getBoundingClientRect().height)),
+          scrollWidth: scroller.scrollWidth, clientWidth: scroller.clientWidth,
+          articleWidth: document.querySelector('.document-main').getBoundingClientRect().width,
+          documentWidth: bounds.width,
+          leftSpace: bounds.left - sidebar.right, rightSpace: available.right - bounds.right };
+      });
+      assert.ok(await noOverflow(page), `${route} fits ${width}px`);
+      assert.ok(geometry.scrollWidth <= geometry.clientWidth + 1, 'Evidence table fits without horizontal scrolling');
+      assert.ok(geometry.maxRowHeight < 180, 'Rows avoid excessive height from fragmented words');
+      if (width === 3440) {
+        assert.ok(geometry.articleWidth >= 1100, 'Wide tables have useful space');
+        assert.ok(geometry.documentWidth <= 1600, 'Reading area stays bounded');
+        assert.ok(Math.abs(geometry.leftSpace - geometry.rightSpace) < 2, 'Document is centered beside navigation');
+        assert.ok(geometry.leftSpace <= 24, 'Navigation stays close to the document on ultrawide displays');
+      }
+    }
+  }
+  await page.setViewport({ width: 390, height: 844 });
+  await visit(page, 'package-compatibility/');
+  assert.ok(await noOverflow(page), 'Matrix stays inside the mobile page');
+}));
