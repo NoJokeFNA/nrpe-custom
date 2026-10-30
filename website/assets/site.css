@@ -280,7 +280,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
   align-items:center;
   gap:20px;
   height:70px;
-  padding:0 22px;
+  padding:0 max(22px,calc((100% - 1920px)/2 + 22px));
   background:#303033;
   color:var(--paper);
   border:0

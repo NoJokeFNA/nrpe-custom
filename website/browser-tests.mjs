@@ -194,3 +194,36 @@ test('wide documents center their content and keep table words readable', () => 
   await visit(page, 'package-compatibility/');
   assert.ok(await noOverflow(page), 'Matrix stays inside the mobile page');
 }));
+
+
+test('headers keep visible controls aligned from mobile to 4K', () => check('header-sizes', async page => {
+  for (const width of [390, 768, 1440, 1920, 2560, 3440, 3840]) {
+    await page.setViewport({ width, height: width === 3840 ? 2160 : 1080 });
+    for (const route of ['', 'package-reviews/2026-10-30/', 'field-notes/']) {
+      await visit(page, route);
+      const geometry = await page.evaluate(() => {
+        const header = document.querySelector('.site-header');
+        const controls = [...header.querySelectorAll('a, input')].map(element => element.getBoundingClientRect())
+          .filter(rect => rect.width && rect.height).sort((a, b) => a.left - b.left)
+          .map(rect => ({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom }));
+        const docs = document.querySelector('.docs-layout');
+        return { controls, docsLeft: docs?.getBoundingClientRect().left,
+          brandLeft: header.querySelector('.brand').getBoundingClientRect().left };
+      });
+      assert.ok(await noOverflow(page), `${route} header fits ${width}px`);
+      for (let index = 0; index < geometry.controls.length; index++) {
+        const control = geometry.controls[index];
+        assert.ok(control.left >= 0 && control.right <= width + 1, 'Visible header control stays on screen');
+        for (const other of geometry.controls.slice(0, index)) {
+          const overlapX = Math.min(control.right, other.right) - Math.max(control.left, other.left);
+          const overlapY = Math.min(control.bottom, other.bottom) - Math.max(control.top, other.top);
+          assert.ok(overlapX <= 1 || overlapY <= 1, 'Visible header controls do not overlap');
+        }
+      }
+      if (width >= 1920 && geometry.docsLeft !== undefined) {
+        assert.ok(Math.abs(geometry.brandLeft - geometry.docsLeft - 22) < 2,
+          'Documentation header aligns with the centered navigation');
+      }
+    }
+  }
+}));
