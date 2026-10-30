@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "version": "4.2.0",
+  "pkgrel": "1.1",
+  "archive": "nrpe-4.2.0.tar.gz",
+  "url": "https://github.com/NagiosEnterprises/nrpe/releases/download/nrpe-4.2.0/nrpe-4.2.0.tar.gz",
+  "sha256": "0d1eac6845d360b200b037f2b8c0199f1acbe3bea36ad72236ad619e5447e555",
+  "licenses": {
+    "LICENSE.md": "a343b35d58dccd90b63cd892ce0eae326c796147adaead5057c49b39186388c5",
+    "LEGAL": "ae094e1b4d2dc5c7d8e759365925c934913b1549875bfef90d28da542101352a"
+  }
+}

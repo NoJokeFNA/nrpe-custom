@@ -11,7 +11,7 @@ import tarfile
 import tempfile
 
 from .state import artifact, reports, workflow_identity
-from .targets import TARGETS
+from .targets import TARGETS, DEFAULT_TARGETS
 from scripts.export_debian_sources import source_files
 from scripts.sles_source import patch_spec
 
@@ -126,6 +126,9 @@ def validate_sources(root, target, evidence, notices):
             for name in ('LICENSE.md', 'LEGAL', 'debian/copyright'):
                 data = (extracted / name).read_bytes()
                 (notices / Path(name).name).write_bytes(data)
+    elif target == 'archlinux':
+        from scripts.arch_source import validate_export
+        allowed = validate_export(root, directory, evidence, notices)
     else:
         allowed = {'SHA256SUMS', 'source-manifest.json', 'user-source-manifest.json', 'macros-source-manifest.json', 'bootstrap-manifest.json'}
         pairs = [('nrpe', 'source-manifest.json', 'sles12sp3-source.json'),
@@ -273,6 +276,11 @@ def verify_archive(path, target, commit):
             if not any(n.startswith('sources/') and marker in n for n in assets):
                 raise RuntimeError('Missing corresponding Debian source')
         required = ['licenses/LICENSE.md', 'licenses/LEGAL', 'licenses/copyright']
+    elif target == 'archlinux':
+        required = ['licenses/archlinux/LICENSE.md', 'licenses/archlinux/LEGAL']
+        if ('ARGUMENT-POLICY.md' not in assets or 'source-manifest.json' not in assets
+                or not any(n.startswith('sources/') and n.endswith('.src.tar.gz') for n in assets)):
+            raise RuntimeError('Missing optional Arch policy or corresponding source')
     else:
         required = ['licenses/sles12sp3/' + n for n in (
             'NRPE-GPL-2.0.md', 'NRPE-LEGAL.txt', 'NRPE-license-notice.txt',
@@ -295,10 +303,10 @@ def verify_archive(path, target, commit):
 def assemble(root, incoming, commit, destination):
     if workflow_identity(root) != {'commit': commit, 'dirty': False}:
         raise RuntimeError('Exact clean workflow checkout required')
-    expected = {'nrpe-custom-' + t + '.tar.gz' for t in TARGETS}
+    expected = {'nrpe-custom-' + t + '.tar.gz' for t in DEFAULT_TARGETS}
     if {p.name for p in incoming.iterdir()} != expected:
         raise RuntimeError('All five target archives, and no extra assets, are required')
-    manifests = [verify_archive(incoming / ('nrpe-custom-' + t + '.tar.gz'), t, commit) for t in TARGETS]
+    manifests = [verify_archive(incoming / ('nrpe-custom-' + t + '.tar.gz'), t, commit) for t in DEFAULT_TARGETS]
     destination.mkdir(parents=True, exist_ok=False)
     for name in expected:
         shutil.copyfile(incoming / name, destination / name)
@@ -320,3 +328,36 @@ def assemble(root, incoming, commit, destination):
     (destination / 'RELEASE_NOTES.md').write_text('\n'.join(lines) + '\n')
     (destination / 'SHA256SUMS').write_text(''.join(
         digest(path) + '  ' + path.name + '\n' for path in sorted(destination.iterdir()) if path.is_file()))
+
+
+def assemble_arch(root, commit, destination):
+    """Stage one explicitly optional Arch release; never upload or publish it."""
+    if workflow_identity(root) != {'commit': commit, 'dirty': False}:
+        raise RuntimeError('Exact clean workflow checkout required')
+    destination.mkdir(parents=True, exist_ok=False)
+    archive = prepare_target(root, 'archlinux', commit, destination)
+    manifest = verify_archive(archive, 'archlinux', commit)
+    subprocess.run(['git', 'archive', '--format=tar.gz', '--prefix=nrpe-custom/',
+                    '--output=' + str((destination / 'workflow-source.tar.gz').resolve()), commit],
+                   cwd=root, check=True)
+    for name in ('LICENSE', 'THIRD_PARTY.md'):
+        shutil.copyfile(root / name, destination / name)
+    release = {'schema': 1, 'commit': commit, 'optional_target': 'archlinux', 'targets': [manifest]}
+    (destination / 'release.json').write_text(json.dumps(release, indent=2) + '\n')
+    notes = [
+        'Optional unofficial Arch Linux NRPE ' + manifest['artifact']['version'], '',
+        'Compiles remote arguments contrary to the former official Arch security policy. This is not an Arch security fix.',
+        'Arguments remain disabled by default; Bash substitution is disabled.',
+        'Existing configurations may already set dont_blame_nrpe=1: review before restarting.', '',
+        'Native build, fresh installation, config preservation on reinstallation, unit-file checks, authenticated TLS and argument/certificate rejection controls passed.',
+        'These checks are not a complete security audit or a host startup/real upgrade/reboot/rollback test.',
+        'The target archive includes the native binary, complete corresponding sources, recipe, policy and license notices.',
+        'Native package is unsigned. Unsigned manifest checksums provide integrity, not independent publisher authentication.', '',
+        'Review https://nojokefna.github.io/nrpe-custom/archlinux/ before deployment.',
+        'Provided AS IS under the included licenses.', 'Verified workflow commit: ' + commit,
+    ]
+    (destination / 'RELEASE_NOTES.md').write_text('\n'.join(notes) + '\n')
+    (destination / 'SHA256SUMS').write_text(''.join(
+        digest(path) + '  ' + path.name + '\n' for path in sorted(destination.iterdir()) if path.is_file()))
+    from .signing import check_assets
+    check_assets(destination, profile='archlinux')

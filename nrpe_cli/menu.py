@@ -399,7 +399,7 @@ def browse_certificate(start=None):
 TARGET_LABELS = {
     'debian11': 'Debian 11 / Bullseye', 'debian12': 'Debian 12 / Bookworm',
     'debian13': 'Debian 13 / Trixie', 'debian14': 'Debian 14 / Forky (testing)',
-    'sles12sp3': 'SLES 12 SP3',
+    'sles12sp3': 'SLES 12 SP3', 'archlinux': 'Arch Linux (optional; argument-policy change)',
 }
 
 

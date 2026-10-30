@@ -155,3 +155,11 @@ generated. Complete the workstation key creation/enrollment steps above, retain
 an owner-controlled backup and independently communicate the approved fingerprint
 before activation. Master promotion and the first signed release remain separate
 explicit maintainer actions.
+
+## Optional Arch profile
+
+The optional Arch prerelease has one target archive and the same common source,
+notice and release metadata files. Sign or verify it with `--profile archlinux`.
+The default `regular` profile continues to require the five regular targets;
+it does not silently accept an incomplete bundle or require an optional target.
+The manifest must still be authenticated with an independently trusted signer.

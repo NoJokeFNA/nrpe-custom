@@ -15,7 +15,7 @@ from .targets import TARGETS
 
 
 RUN_ID = re.compile(r'[0-9]{8}T[0-9]{6}-[0-9a-f]{8}')
-IMAGE = re.compile(r'nrpe-custom-(?:builder|test(?:-(?:debian1[1-4]|sles12sp3))?):[A-Za-z0-9_][A-Za-z0-9_.-]*')
+IMAGE = re.compile(r'nrpe-custom-(?:builder|test(?:-(?:debian1[1-4]|sles12sp3|archlinux))?):[A-Za-z0-9_][A-Za-z0-9_.-]*')
 
 
 def ordinary(path):

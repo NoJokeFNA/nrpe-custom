@@ -3,7 +3,18 @@
 Each push to `master` runs the [release workflow](../.github/workflows/release.yml).
 The repository's visibility is unchanged. Topic/develop pushes do not publish
 releases. Release-relevant PRs run the build and archive checks without publishing;
-manual workflow dispatch is also validation-only.
+manual workflow dispatch is validation-only unless the optional Arch publication
+input below is explicitly enabled.
+
+The [optional Arch target](archlinux.md) has a separate validation-only workflow
+and source-complete build artifact. It is excluded from the five-target bundle
+and automatic release publication. Arch publication is an explicit maintainer action: manually dispatch this
+release workflow with `optional_arch_release=true` on `develop` or `master`.
+The default is false, so this never adds Arch publication to ordinary master
+pushes. The optional prerelease retains its argument-policy notice, corresponding
+sources and the exact verified workflow identity. Its archive signing/verifying
+profile is `archlinux`; the regular profile still requires all five regular
+targets.
 
 ## Build and publication gate
 

@@ -1,0 +1,10 @@
+post_install() {
+  printf '%s\n' \
+    'OPTIONAL CUSTOM NRPE: compiled arguments differ from the former Arch security policy.' \
+    'Defaults keep arguments and Bash substitution disabled. No service is started automatically.' \
+    'An existing configuration may already set dont_blame_nrpe=1; review it before restarting NRPE.' \
+    'Read /usr/share/licenses/nrpe/ARGUMENT-POLICY.md and review any .pacnew file.'
+}
+post_upgrade() {
+  post_install
+}

@@ -160,3 +160,70 @@ test('tall diagrams keep native size in a compact scrollable preview', () => che
     await page.waitForFunction(() => document.querySelector('.diagram-viewport').scrollTop > 0);
   }
 }));
+
+test('wide documents center their content and keep table words readable', () => check('wide-tables', async page => {
+  for (const width of [1440, 1920, 3440]) {
+    await page.setViewport({ width, height: width === 3440 ? 1440 : 1080 });
+    for (const route of ['package-compatibility/', 'package-reviews/2026-10-30/']) {
+      await visit(page, route);
+      const geometry = await page.evaluate(() => {
+        const table = document.querySelector('.prose table');
+        const scroller = table.closest('.table-scroll');
+        const content = document.querySelector('.document');
+        const available = document.querySelector('.docs-layout').getBoundingClientRect();
+        const sidebar = document.querySelector('.sidebar').getBoundingClientRect();
+        const bounds = content.getBoundingClientRect();
+        return { maxRowHeight: Math.max(...Array.from(table.rows, row => row.getBoundingClientRect().height)),
+          scrollWidth: scroller.scrollWidth, clientWidth: scroller.clientWidth,
+          articleWidth: document.querySelector('.document-main').getBoundingClientRect().width,
+          documentWidth: bounds.width,
+          leftSpace: bounds.left - sidebar.right, rightSpace: available.right - bounds.right };
+      });
+      assert.ok(await noOverflow(page), `${route} fits ${width}px`);
+      assert.ok(geometry.scrollWidth <= geometry.clientWidth + 1, 'Evidence table fits without horizontal scrolling');
+      assert.ok(geometry.maxRowHeight < 180, 'Rows avoid excessive height from fragmented words');
+      if (width === 3440) {
+        assert.ok(geometry.articleWidth >= 1100, 'Wide tables have useful space');
+        assert.ok(geometry.documentWidth <= 1600, 'Reading area stays bounded');
+        assert.ok(Math.abs(geometry.leftSpace - geometry.rightSpace) < 2, 'Document is centered beside navigation');
+        assert.ok(geometry.leftSpace <= 24, 'Navigation stays close to the document on ultrawide displays');
+      }
+    }
+  }
+  await page.setViewport({ width: 390, height: 844 });
+  await visit(page, 'package-compatibility/');
+  assert.ok(await noOverflow(page), 'Matrix stays inside the mobile page');
+}));
+
+
+test('headers keep visible controls aligned from mobile to 4K', () => check('header-sizes', async page => {
+  for (const width of [390, 768, 1440, 1920, 2560, 3440, 3840]) {
+    await page.setViewport({ width, height: width === 3840 ? 2160 : 1080 });
+    for (const route of ['', 'package-reviews/2026-10-30/', 'field-notes/']) {
+      await visit(page, route);
+      const geometry = await page.evaluate(() => {
+        const header = document.querySelector('.site-header');
+        const controls = [...header.querySelectorAll('a, input')].map(element => element.getBoundingClientRect())
+          .filter(rect => rect.width && rect.height).sort((a, b) => a.left - b.left)
+          .map(rect => ({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom }));
+        const docs = document.querySelector('.docs-layout');
+        return { controls, docsLeft: docs?.getBoundingClientRect().left,
+          brandLeft: header.querySelector('.brand').getBoundingClientRect().left };
+      });
+      assert.ok(await noOverflow(page), `${route} header fits ${width}px`);
+      for (let index = 0; index < geometry.controls.length; index++) {
+        const control = geometry.controls[index];
+        assert.ok(control.left >= 0 && control.right <= width + 1, 'Visible header control stays on screen');
+        for (const other of geometry.controls.slice(0, index)) {
+          const overlapX = Math.min(control.right, other.right) - Math.max(control.left, other.left);
+          const overlapY = Math.min(control.bottom, other.bottom) - Math.max(control.top, other.top);
+          assert.ok(overlapX <= 1 || overlapY <= 1, 'Visible header controls do not overlap');
+        }
+      }
+      if (width >= 1920 && geometry.docsLeft !== undefined) {
+        assert.ok(Math.abs(geometry.brandLeft - geometry.docsLeft - 22) < 2,
+          'Documentation header aligns with the centered navigation');
+      }
+    }
+  }
+}));

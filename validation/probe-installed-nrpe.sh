@@ -7,13 +7,13 @@ if [ "${NRPE_DISPOSABLE_PROBE:-}" != 1 ] || { [ ! -f /.dockerenv ] && [ ! -f /ru
  exit 2
 fi
 [ "$(id -u)" = 0 ] || { echo 'Run as container root to use the package-provided account' >&2; exit 2; }
-nrpe=$(command -v nrpe || true)
+nrpe=${NRPE_PROBE_SERVER:-$(command -v nrpe || true)}
 [ -n "$nrpe" ] || nrpe=/usr/sbin/nrpe
-client=''
+client=${NRPE_PROBE_CLIENT:-}
 for path in /usr/lib/nagios/plugins/check_nrpe /usr/lib64/nagios/plugins/check_nrpe /usr/lib/monitoring-plugins/check_nrpe; do
- if [ -x "$path" ]; then client=$path; break; fi
+ if [ -z "$client" ] && [ -x "$path" ]; then client=$path; break; fi
 done
-[ -x "$nrpe" ] && [ -n "$client" ] || { echo 'NRPE executables unavailable' >&2; exit 1; }
+[ -x "$nrpe" ] && [ -x "$client" ] || { echo 'NRPE executables unavailable' >&2; exit 1; }
 "$nrpe" -V || true
 "$client" -V || true
 sha256sum "$nrpe" "$client"

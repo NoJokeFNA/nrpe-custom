@@ -8,6 +8,16 @@ x-nrpe-build: &nrpe-build
       target: /output
 
 services:
+  archlinux:
+    <<: *nrpe-build
+    profiles: [optional]
+    build:
+      context: .
+      dockerfile: docker/archlinux/build.Dockerfile
+      secrets: [nrpe_ca_cert]
+      args:
+        NRPE_CA_SHA256: ${NRPE_CA_SHA256:-none}
+    image: nrpe-custom-builder:archlinux
   sles12sp3:
     <<: *nrpe-build
     build:

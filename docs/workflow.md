@@ -57,7 +57,9 @@ messages are in English. Use `--help` or `<command> --help` for command-specific
 | `logs --last` | Display output from the latest recorded workflow run |
 | `logs --run <id>` | Display output from a particular recorded workflow run |
 
-Select one target, multiple targets, or `all` by itself:
+Select one target, multiple targets, or `all` by itself. `all` includes only
+the five regular targets; [optional Arch](archlinux.md) requires explicit
+`archlinux` selection and displays its argument-policy notice:
 
 ```sh
 python3 nrpe.py verify debian12 debian13
@@ -82,6 +84,7 @@ See the [SLES guide](sles12sp3.md).
 | `debian13` | Debian 13 Trixie | amd64 | `output/debian13/` |
 | `debian14` | Debian 14 Forky | amd64 | `output/debian14/` |
 | `sles12sp3` | SLES 12 SP3 | x86_64 | `output/sles12sp3/` |
+| `archlinux` (optional) | Arch Linux rolling | x86_64 | `output/archlinux/` |
 
 `all` includes every target, including the SLES target. To validate
 only Debian, list `debian11 debian12 debian13 debian14` explicitly.

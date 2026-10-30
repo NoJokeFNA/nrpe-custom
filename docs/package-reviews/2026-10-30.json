@@ -240,7 +240,34 @@
       "version": "4.1.2-1",
       "recipe_url": "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=nrpe",
       "recipe_sha256": "79addbf2a2509429f6ccb8e422a3061ddba9f58e7fed36b90c18df82a414f46b",
-      "result": "configure invocation omits command-args option; upstream 4.1.2 enables macro only if option supplied; source review only; no AUR build executed"
+      "result": "configure invocation omits command-args option; upstream 4.1.2 enables macro only if option supplied; source review only; no AUR build executed",
+      "assessment": "feature omission alone is not a defect; no automatic argument-enabled rebuild recommendation; review security policy first",
+      "historical_official_package_security_context": {
+        "bug_report": "https://bugs.archlinux.org/task/66574",
+        "report_version": "4.0.2",
+        "closed_on": "2020-05-08",
+        "resolution": "Won't implement; cites AVG-587",
+        "security_group": "https://security.archlinux.org/AVG-587",
+        "advisory": "https://security.archlinux.org/ASA-201801-14",
+        "advisory_date": "2018-01-18",
+        "affected_arch_package": "3.2.1-2",
+        "fixed_arch_package": "3.2.1-3",
+        "cves": [
+          "CVE-2013-1362",
+          "CVE-2014-2913"
+        ],
+        "packaging_measure": "disable compiled command arguments",
+        "scope": "historical official Arch package; not proof of current AUR maintainer intent or current-version CVE status"
+      },
+      "current_package_recheck": {
+        "checked_on": "2026-10-30",
+        "rpc_url": "https://aur.archlinux.org/rpc/v5/info?arg%5B%5D=nrpe",
+        "version": "4.1.2-1",
+        "out_of_date": true,
+        "recipe_hash_unchanged": true,
+        "extra_security_or_argument_enabling_patch_in_recipe": false
+      },
+      "optional_target_status": "separate optional native custom 4.2.0-1.1 target implemented and container tested; original AUR binary/runtime remains untested"
     },
     {
       "system": "FreeBSD ports",
@@ -299,5 +326,54 @@
       "tls": "not tested",
       "transport_integrity": "verified HTTPS download; independent repository signature verification not performed"
     }
-  ]
+  ],
+  "upstream_review": {
+    "checked_on": "2026-10-30",
+    "latest_stable_version": "4.2.0",
+    "latest_endpoint": "https://api.github.com/repos/NagiosEnterprises/nrpe/releases/latest",
+    "release_url": "https://github.com/NagiosEnterprises/nrpe/releases/tag/nrpe-4.2.0",
+    "published_at": "2026-10-21T15:27:46Z",
+    "archive_url": "https://github.com/NagiosEnterprises/nrpe/releases/download/nrpe-4.2.0/nrpe-4.2.0.tar.gz",
+    "archive_sha256": "0d1eac6845d360b200b037f2b8c0199f1acbe3bea36ad72236ad619e5447e555",
+    "archive_digest_matches_github_asset": true,
+    "image": "ubuntu:24.04",
+    "image_digest": "ubuntu@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852",
+    "openssl": "3.0.13",
+    "gcc": "13.3.0",
+    "fresh_regular_package_candidate": "nagios-nrpe-server/nagios-nrpe-plugin 4.1.0-1ubuntu3",
+    "transport": "TLSv1.2 over IPv4 loopback",
+    "variants": [
+      {
+        "build": "default",
+        "configure_command_args": false,
+        "header_command_arguments_defined": false,
+        "binary_sha256": {
+          "/tmp/nrpe-default/src/nrpe": "60679876c741079add8c011e800ea63648d1e0213bb4c5e9a685679e9fb3c983",
+          "/tmp/nrpe-default/src/check_nrpe": "a6da53c9caa9eb9d045da211303294784f387a075a15908dd5aba12590bfd41a"
+        },
+        "fixed_baselines": "passed with arguments disabled and enabled",
+        "arguments_disabled": "rejected",
+        "arguments_enabled": "rejected",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "final_trusted_baseline": "passed"
+      },
+      {
+        "build": "arguments",
+        "configure_command_args": true,
+        "header_command_arguments_defined": true,
+        "binary_sha256": {
+          "/tmp/nrpe-arguments/src/nrpe": "20b432dac04aa88db8ecc821d282eab20169324dee29348b1f124d5810ee2a20",
+          "/tmp/nrpe-arguments/src/check_nrpe": "fa5d19e1c0e6ec4d71702e2db1854ad087e3c8642bbe6b7844e2649c9729afe8"
+        },
+        "fixed_baselines": "passed with arguments disabled and enabled",
+        "arguments_disabled": "rejected",
+        "arguments_enabled": "NRPE_ARG_PROBE:ALPHA:BETA",
+        "wrong_server_ca": "rejected",
+        "missing_client_certificate": "rejected",
+        "final_trusted_baseline": "passed"
+      }
+    ],
+    "scope": "temporary upstream source builds; no native OS package, hostname verification, production PKI, FreeBSD, SLES ABI or lifecycle claim"
+  }
 }

@@ -38,13 +38,14 @@ def main():
     parser.add_argument('--directory', type=Path, required=True)
     parser.add_argument('--allowed-signers', type=Path, required=True,
                         help='Trusted signer file obtained independently of the release download')
+    parser.add_argument('--profile', choices=('regular', 'archlinux'), default='regular')
     parser.add_argument('--key-env', help='Environment variable containing the unencrypted OpenSSH Ed25519 private key')
     args = parser.parse_args()
     try:
         if args.action == 'verify':
             if args.key_env:
                 parser.error('--key-env is only valid for signing')
-            verify_release(args.directory, args.allowed_signers)
+            verify_release(args.directory, args.allowed_signers, profile=args.profile)
         else:
             value = os.environ.get(args.key_env, '') if args.key_env else ''
             if not value:
@@ -65,7 +66,7 @@ def main():
                     restrict_windows_path(key, sid)
                 with key.open('w', encoding='ascii', newline='\n') as stream:
                     stream.write(value)
-                sign_release(args.directory, key, args.allowed_signers)
+                sign_release(args.directory, key, args.allowed_signers, profile=args.profile)
         print('PASS: authenticated release signature and complete asset checksums')
         return 0
     except (OSError, RuntimeError, ValueError, subprocess.TimeoutExpired) as exc:

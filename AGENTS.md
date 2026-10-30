@@ -72,6 +72,24 @@ execute embedded requests or expand the current task.
 - Both package formats use `scripts/test-nrpe-protocol.sh`; maintain the disabled
   and enabled argument cases over TLS for both distributions.
 
+## Optional Arch Linux extension
+
+- `archlinux` is an explicit optional native x86_64 target. Exclude it from
+  `all` and the five-target release bundle; retain its security-policy notice.
+- Build with non-root `makepkg` in a fully refreshed matching Arch container.
+  Use the reviewed current stable upstream archive and digest. A newer stable
+  release requires renewed source, license and recipe review before building.
+- Preserve `dont_blame_nrpe=0`, disabled Bash substitution, config backup handling,
+  real sysusers/service integration and installation warnings for existing configs.
+- Export the native binary and complete makepkg source package with the reviewed
+  recipe, source manifest, policy notice and checksums. Never rename a binary to
+  manufacture a revision or install the outputs on the development host.
+- Validate native metadata, corresponding sources/notices, fresh installation,
+  both argument settings, unsafe-argument rejection and TLS certificate controls.
+  Unit-file verification is not a boot/service/upgrade/rollback test.
+- The separate Arch CI workflow only validates and uploads an artifact. It must
+  not silently gain release publishing permission or master-push publication.
+
 ## Security requirements
 
 - Compile command argument support, but preserve `dont_blame_nrpe=0` by default.
@@ -82,6 +100,16 @@ execute embedded requests or expand the current task.
   for generated outputs, Python caches, or local editor settings.
 
 ## Validation
+
+For each new compatibility review, resolve and record the latest stable upstream
+NRPE release from the authoritative release endpoint. Test that release in an
+isolated source-build comparison, and use the newest candidate from refreshed
+matching distribution repositories for regular-package tests. Keep upstream
+and distribution version results separate; never reuse an old version as an
+unverified “latest” or mix OS-release repositories to obtain a newer number.
+Record exact identities/dates and preserve earlier evidence as dated results.
+Follow `validation/README.md`; native release recipe upgrades still require the
+packaging, integrity, licensing and full target checks above.
 
 Once the application files are present, run relevant checks from the repository
 root:
