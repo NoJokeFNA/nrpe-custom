@@ -46,15 +46,21 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Per-push package releases</h1>
-      <p class="article-meta">Source d6cb301</p>
-      <article class="prose"><p>Each push to <code>master</code> runs the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/.github/workflows/release.yml">release workflow</a>.
+      <p class="article-meta">Source f3ccf8f</p>
+      <article class="prose"><p>Each push to <code>master</code> runs the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/.github/workflows/release.yml">release workflow</a>.
 The repository's visibility is unchanged. Topic/develop pushes do not publish
 releases. Release-relevant PRs run the build and archive checks without publishing;
-manual workflow dispatch is also validation-only.</p>
+manual workflow dispatch is validation-only unless the optional Arch publication
+input below is explicitly enabled.</p>
 <p>The <a href="/nrpe-custom/archlinux/">optional Arch target</a> has a separate validation-only workflow
 and source-complete build artifact. It is excluded from the five-target bundle
-and automatic release publication. Arch publication is an explicit maintainer
-action, with its argument-policy difference clearly retained in the archive.</p>
+and automatic release publication. Arch publication is an explicit maintainer action: manually dispatch this
+release workflow with <code>optional_arch_release=true</code> on <code>develop</code> or <code>master</code>.
+The default is false, so this never adds Arch publication to ordinary master
+pushes. The optional prerelease retains its argument-policy notice, corresponding
+sources and the exact verified workflow identity. Its archive signing/verifying
+profile is <code>archlinux</code>; the regular profile still requires all five regular
+targets.</p>
 <h2 id="build-and-publication-gate">Build and publication gate</h2>
 <ol>
 <li>Run the Linux/Windows unit matrix, shell/Compose checks and dependency audit.</li>
@@ -134,7 +140,7 @@ it does not trigger an insecure fallback. Successful container tests do not prov
 production systemd, TLS, firewall or monitoring configuration is correct. Follow
 <a href="/nrpe-custom/installation/">installation</a>, <a href="/nrpe-custom/updates-and-rollback/">rollback</a> and the
 <a href="/nrpe-custom/maintenance/">support policy</a> on real systems.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/releases.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/docs/releases.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -156,7 +162,7 @@ production systemd, TLS, firewall or monitoring configuration is correct. Follow
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d6cb301</span>
+<span>Source f3ccf8f</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

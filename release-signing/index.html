@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Release signature setup and verification</h1>
-      <p class="article-meta">Source d6cb301</p>
+      <p class="article-meta">Source f3ccf8f</p>
       <article class="prose"><p>SSH Ed25519 signatures authenticate the release's <code>SHA256SUMS</code> manifest using an
 independently trusted maintainer key. That manifest covers all five target
 archives, workflow sources, notices, metadata and notes. This signs the release
@@ -166,8 +166,14 @@ from insufficient permission. No setting was changed and no production key was
 generated. Complete the workstation key creation/enrollment steps above, retain
 an owner-controlled backup and independently communicate the approved fingerprint
 before activation. Master promotion and the first signed release remain separate
-explicit maintainer actions.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/release-signing.md">View this page on GitHub ↗︎</a>
+explicit maintainer actions.</p>
+<h2 id="optional-arch-profile">Optional Arch profile</h2>
+<p>The optional Arch prerelease has one target archive and the same common source,
+notice and release metadata files. Sign or verify it with <code>--profile archlinux</code>.
+The default <code>regular</code> profile continues to require the five regular targets;
+it does not silently accept an incomplete bundle or require an optional target.
+The manifest must still be authenticated with an independently trusted signer.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/docs/release-signing.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -177,6 +183,7 @@ explicit maintainer actions.</p></article>
 <li><a href="#consumer-verification">Consumer verification</a></li>
 <li><a href="#local-signing-check">Local signing check</a></li>
 <li><a href="#check-readiness-without-accessing-private-keys">Check readiness without accessing private keys</a></li>
+<li><a href="#optional-arch-profile">Optional Arch profile</a></li>
 </ul>
 </div>
 </aside>
@@ -191,7 +198,7 @@ explicit maintainer actions.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d6cb301</span>
+<span>Source f3ccf8f</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

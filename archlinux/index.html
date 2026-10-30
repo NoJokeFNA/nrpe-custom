@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Optional Arch Linux package</h1>
-      <p class="article-meta">Source d6cb301</p>
+      <p class="article-meta">Source f3ccf8f</p>
       <article class="prose"><p><code>archlinux</code> builds a native x86_64 package from the latest reviewed stable NRPE
 release, currently <strong>4.2.0</strong>, with compiled command-argument support. It is an
 explicit opt-in target and is <strong>excluded from <code>all</code> and the five-target release
@@ -78,7 +78,7 @@ repository-signature checks. Company CAs can remain in local builder/test image
 layers; do not distribute those images without the appropriate approval.</p>
 <p>The builder uses the official Arch base-devel image, fully refreshes its matching
 rolling repositories, and runs <code>makepkg</code> as an unprivileged account. It compares
-the latest stable upstream release with <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/packaging/archlinux-source.json">the reviewed manifest</a>.
+the latest stable upstream release with <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/packaging/archlinux-source.json">the reviewed manifest</a>.
 A new upstream release fails for source, license and native-package review; it
 does not silently keep using a stale version or publish unreviewed sources.
 No packages are installed on the workstation host.</p>
@@ -107,8 +107,12 @@ results cannot be used to stage a release.</p>
 <p>The separate <strong>Optional Arch Linux package</strong> CI workflow runs on relevant PRs
 and can be dispatched manually. It uploads a source-complete archive as a build
 artifact; it has no release publishing permissions and does not automatically
-create GitHub Releases. Public release publication remains an explicit maintainer
-action. The native package is unsigned; checksums alone do not authenticate a
+create GitHub Releases. Public release publication remains an explicit maintainer action through the
+existing <strong>Build and release packages</strong> workflow: select <code>develop</code> or <code>master</code>
+and set <strong>optional_arch_release</strong> to true. The default is false; PRs and master
+pushes never invoke the optional Arch publisher. It rebuilds/verifies Arch,
+stages exact source-complete assets and publishes a separate prerelease using
+GitHub's workflow token. The regular five-target release is unaffected. The native package is unsigned; checksums alone do not authenticate a
 publisher. A signed archive manifest does not create a pacman package signature.</p>
 <h2 id="install-or-replace-an-existing-package">Install or replace an existing package</h2>
 <p>Use a fully updated, isolated <strong>Arch Linux x86_64</strong> host first. Arch is rolling;
@@ -175,7 +179,7 @@ reboot, rollback, firewall and production Nagios/plugin behavior remain separate
 <a href="/nrpe-custom/practical-validation/">host validation</a> tasks. These tests are not a complete
 security audit. The build is repeatable, not bit-for-bit reproducible: live Arch
 repository transactions and base images can change.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/archlinux.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/docs/archlinux.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -199,7 +203,7 @@ repository transactions and base images can change.</p></article>
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d6cb301</span>
+<span>Source f3ccf8f</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

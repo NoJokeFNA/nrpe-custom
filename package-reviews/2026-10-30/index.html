@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>Distribution NRPE package review: 30 October 2026</h1>
-      <p class="article-meta">Source d6cb301</p>
+      <p class="article-meta">Source f3ccf8f</p>
       <article class="prose"><p>Use <strong><a href="/nrpe-custom/package-compatibility/">Package compatibility</a></strong> for the patch decision.
 This dated test report records exact versions, methods, results and remaining
 limits; it is the evidence behind that overview, not a second support matrix.</p>
@@ -170,7 +170,7 @@ packages and regular NRPE packages through normal verified APT repositories.
 Extract the verified release into two separate temporary directories. Run
 <code>./configure --with-nrpe-user=nagios --with-nrpe-group=nagios --with-ssl-lib=/usr/lib/x86_64-linux-gnu</code>,
 adding <code>--enable-command-args</code> only for the second build, then <code>make -j2 all</code>.
-Run the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/validation/README.md#version-selection-for-each-new-review">probe</a>
+Run the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/validation/README.md#version-selection-for-each-new-review">probe</a>
 with explicit server/client paths to each build's <code>src/nrpe</code> and <code>src/check_nrpe</code>.
 No command-argument option is passed for the default build; the earlier FreeBSD
 finding explains why an explicit disable option is not an equivalent control in
@@ -188,15 +188,15 @@ identities in the JSON evidence and discard the container after the probe.</p>
    NRPE. Package authenticity/dependency checks were not disabled.</li>
 <li>Record OS, exact installed versions, package origin/source where exposed,
    daemon/client versions and SHA-256 hashes. The
-   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
+   <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/docs/package-reviews/2026-10-30.json">machine-readable record</a> retains image identities and these
    observed binary hashes. Binary hashes are not package archive signatures.</li>
 <li>Use a real package-provided service account and temporary configuration,
    with a foreground daemon bound only to <code>127.0.0.1:15666</code>. Disable Bash
    command substitution. Test a fixed <code>/bin/echo</code> baseline before each policy,
    then a command with the controlled <code>$ARG1$</code> / <code>$ARG2$</code> pair.</li>
 <li>Stop only the probe's daemon, remove its temporary files and discard the
-   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/validation/probe-installed-nrpe.sh">protocol helper</a>
-   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/validation/README.md">its requirements</a> document the equivalent
+   container. The reusable <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/validation/probe-installed-nrpe.sh">protocol helper</a>
+   and <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/validation/README.md">its requirements</a> document the equivalent
    check without installing packages or changing packaged configuration.</li>
 </ol>
 <p>The base image digest is recorded, but package repositories were live and not
@@ -382,7 +382,7 @@ policies over certificate-authenticated TLS with the negative controls above.</p
   release or derivative. Prioritize an actual missing feature over adding targets
   whose regular packages already provide the needed capability.</li>
 </ul></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d6cb301233d66a51ba64675a0362f1557744fcd6/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/f3ccf8fda3c101f084c2d117e89d91e1125f7278/docs/package-reviews/2026-10-30.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -412,7 +412,7 @@ policies over certificate-authenticated TLS with the negative controls above.</p
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d6cb301</span>
+<span>Source f3ccf8f</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>
