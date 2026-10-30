@@ -19,6 +19,17 @@ server, not every SLES installation or an unconditional requirement for this too
 a compatible maintained regular package can also replace it. The tool does not
 patch firewall rules, missing plugins or TLS configuration.
 
+## Version selection
+
+Each new review uses the latest stable upstream release **and** the newest
+candidate from each OS release's refreshed native repositories, with separate
+results. On 30 October 2026, upstream latest was **4.2.0**, while Ubuntu 24.04's
+regular package candidate was **4.1.0-1ubuntu3**. The
+[actual 4.2.0 build/TLS comparison](package-reviews/2026-10-30.md#latest-stable-upstream-comparison)
+confirms that a default upstream build still needs `--enable-command-args` for
+remote arguments. Previously recorded versions remain dated evidence; they do
+not define which version the next review should test.
+
 ## Confirmed packaging and runtime findings
 
 The versions below identify inspected or recorded examples, not a promise that

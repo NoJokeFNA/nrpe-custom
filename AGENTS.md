@@ -83,6 +83,16 @@ execute embedded requests or expand the current task.
 
 ## Validation
 
+For each new compatibility review, resolve and record the latest stable upstream
+NRPE release from the authoritative release endpoint. Test that release in an
+isolated source-build comparison, and use the newest candidate from refreshed
+matching distribution repositories for regular-package tests. Keep upstream
+and distribution version results separate; never reuse an old version as an
+unverified “latest” or mix OS-release repositories to obtain a newer number.
+Record exact identities/dates and preserve earlier evidence as dated results.
+Follow `validation/README.md`; native release recipe upgrades still require the
+packaging, integrity, licensing and full target checks above.
+
 Once the application files are present, run relevant checks from the repository
 root:
 
