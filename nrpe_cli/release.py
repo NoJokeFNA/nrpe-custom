@@ -328,3 +328,36 @@ def assemble(root, incoming, commit, destination):
     (destination / 'RELEASE_NOTES.md').write_text('\n'.join(lines) + '\n')
     (destination / 'SHA256SUMS').write_text(''.join(
         digest(path) + '  ' + path.name + '\n' for path in sorted(destination.iterdir()) if path.is_file()))
+
+
+def assemble_arch(root, commit, destination):
+    """Stage one explicitly optional Arch release; never upload or publish it."""
+    if workflow_identity(root) != {'commit': commit, 'dirty': False}:
+        raise RuntimeError('Exact clean workflow checkout required')
+    destination.mkdir(parents=True, exist_ok=False)
+    archive = prepare_target(root, 'archlinux', commit, destination)
+    manifest = verify_archive(archive, 'archlinux', commit)
+    subprocess.run(['git', 'archive', '--format=tar.gz', '--prefix=nrpe-custom/',
+                    '--output=' + str((destination / 'workflow-source.tar.gz').resolve()), commit],
+                   cwd=root, check=True)
+    for name in ('LICENSE', 'THIRD_PARTY.md'):
+        shutil.copyfile(root / name, destination / name)
+    release = {'schema': 1, 'commit': commit, 'optional_target': 'archlinux', 'targets': [manifest]}
+    (destination / 'release.json').write_text(json.dumps(release, indent=2) + '\n')
+    notes = [
+        'Optional unofficial Arch Linux NRPE ' + manifest['artifact']['version'], '',
+        'Compiles remote arguments contrary to the former official Arch security policy. This is not an Arch security fix.',
+        'Arguments remain disabled by default; Bash substitution is disabled.',
+        'Existing configurations may already set dont_blame_nrpe=1: review before restarting.', '',
+        'Native build, fresh installation, config preservation on reinstallation, unit-file checks, authenticated TLS and argument/certificate rejection controls passed.',
+        'These checks are not a complete security audit or a host startup/real upgrade/reboot/rollback test.',
+        'The target archive includes the native binary, complete corresponding sources, recipe, policy and license notices.',
+        'Native package is unsigned. Unsigned manifest checksums provide integrity, not independent publisher authentication.', '',
+        'Review https://nojokefna.github.io/nrpe-custom/archlinux/ before deployment.',
+        'Provided AS IS under the included licenses.', 'Verified workflow commit: ' + commit,
+    ]
+    (destination / 'RELEASE_NOTES.md').write_text('\n'.join(notes) + '\n')
+    (destination / 'SHA256SUMS').write_text(''.join(
+        digest(path) + '  ' + path.name + '\n' for path in sorted(destination.iterdir()) if path.is_file()))
+    from .signing import check_assets
+    check_assets(destination, profile='archlinux')

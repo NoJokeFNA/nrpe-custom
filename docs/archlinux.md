@@ -77,8 +77,12 @@ results cannot be used to stage a release.
 The separate **Optional Arch Linux package** CI workflow runs on relevant PRs
 and can be dispatched manually. It uploads a source-complete archive as a build
 artifact; it has no release publishing permissions and does not automatically
-create GitHub Releases. Public release publication remains an explicit maintainer
-action. The native package is unsigned; checksums alone do not authenticate a
+create GitHub Releases. Public release publication remains an explicit maintainer action through the
+existing **Build and release packages** workflow: select `develop` or `master`
+and set **optional_arch_release** to true. The default is false; PRs and master
+pushes never invoke the optional Arch publisher. It rebuilds/verifies Arch,
+stages exact source-complete assets and publishes a separate prerelease using
+GitHub's workflow token. The regular five-target release is unaffected. The native package is unsigned; checksums alone do not authenticate a
 publisher. A signed archive manifest does not create a pacman package signature.
 
 ## Install or replace an existing package
