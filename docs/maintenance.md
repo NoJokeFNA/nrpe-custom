@@ -131,3 +131,7 @@ real server is distinct from rebuilding a package in a container.
 For the evaluated upstream-clone alternative and future C changes, follow the
 [source and patch strategy](source-strategy.md). A newer upstream tag alone does
 not establish compatibility with a legacy target.
+
+Review the [package compatibility matrix](package-compatibility.md) when native
+recipes change. Record exact package versions and evidence dates; do not infer
+argument support from the OS family alone.
