@@ -135,3 +135,7 @@ not establish compatibility with a legacy target.
 Review the [package compatibility matrix](package-compatibility.md) when native
 recipes change. Record exact package versions and evidence dates; do not infer
 argument support from the OS family alone.
+
+The [30 October 2026 package review](package-reviews/2026-10-30.md) adds five
+regular-package runtime probes and records current Arch/FreeBSD source findings.
+These are separate from the project custom-package release matrix.
