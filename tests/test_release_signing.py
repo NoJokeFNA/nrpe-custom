@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 import unittest
 
-from nrpe_cli.signing import PAYLOADS, check_assets, sign_release, verify_release
+from nrpe_cli.signing import ARCH_PAYLOADS, PAYLOADS, check_assets, sign_release, verify_release
 
 
 @unittest.skipUnless(shutil.which('ssh-keygen'), 'OpenSSH ssh-keygen is not installed')
@@ -36,13 +36,35 @@ class ReleaseSigningTests(unittest.TestCase):
         subprocess.run(['ssh-keygen', '-q', '-t', 'ed25519', '-N', '', '-f', str(path)],
                        check=True, stdin=subprocess.DEVNULL, capture_output=True)
 
-    def write_checksums(self):
+    def write_checksums(self, names=PAYLOADS):
         (self.assets / 'SHA256SUMS').write_text(''.join(
             hashlib.sha256((self.assets / name).read_bytes()).hexdigest() + '  ' + name + '\n'
-            for name in sorted(PAYLOADS)))
+            for name in sorted(names)))
 
     def sign(self):
         sign_release(self.assets, self.key, self.signers)
+
+    def test_regular_profile_requires_five_targets_and_excludes_optional_arch(self):
+        archives = {name for name in PAYLOADS if name.startswith('nrpe-custom-')}
+        self.assertEqual(archives, {'nrpe-custom-' + target + '.tar.gz' for target in
+                                   ('debian11', 'debian12', 'debian13', 'debian14', 'sles12sp3')})
+        self.assertNotIn('nrpe-custom-archlinux.tar.gz', PAYLOADS)
+
+    def test_optional_arch_signature_requires_explicit_profile(self):
+        for name in PAYLOADS - ARCH_PAYLOADS:
+            (self.assets / name).unlink()
+        for name in ARCH_PAYLOADS - PAYLOADS:
+            (self.assets / name).write_bytes(b'optional native Arch fixture')
+        self.write_checksums(ARCH_PAYLOADS)
+        with self.assertRaises(RuntimeError):
+            check_assets(self.assets)
+        sign_release(self.assets, self.key, self.signers, profile='archlinux')
+        verify_release(self.assets, self.signers, profile='archlinux')
+        with self.assertRaisesRegex(RuntimeError, 'expected regular asset files'):
+            verify_release(self.assets, self.signers)
+        (self.assets / 'nrpe-custom-archlinux.tar.gz').write_bytes(b'tampered')
+        with self.assertRaisesRegex(RuntimeError, 'checksum mismatch'):
+            verify_release(self.assets, self.signers, profile='archlinux')
 
     def test_offline_round_trip_and_refusal_to_overwrite_signature(self):
         self.sign()

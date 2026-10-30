@@ -6,15 +6,24 @@ import re
 import shutil
 import subprocess
 
-from .targets import TARGETS
+from .targets import DEFAULT_TARGETS
 
 
 IDENTITY = 'nrpe-custom-release'
 NAMESPACE = 'nrpe-custom-release'
-PAYLOADS = {'nrpe-custom-' + target + '.tar.gz' for target in TARGETS} | {
+PAYLOADS = {'nrpe-custom-' + target + '.tar.gz' for target in DEFAULT_TARGETS} | {
     'workflow-source.tar.gz', 'LICENSE', 'THIRD_PARTY.md', 'release.json',
     'RELEASE_NOTES.md',
 }
+ARCH_PAYLOADS = (PAYLOADS - {'nrpe-custom-' + target + '.tar.gz' for target in DEFAULT_TARGETS}) | {'nrpe-custom-archlinux.tar.gz'}
+
+
+def payloads(profile):
+    if profile == 'regular':
+        return PAYLOADS
+    if profile == 'archlinux':
+        return ARCH_PAYLOADS
+    raise RuntimeError('Unknown release profile')
 
 
 def ssh(*args, input=None):
@@ -35,10 +44,11 @@ def ssh(*args, input=None):
     return result.stdout
 
 
-def check_assets(directory, signed=False):
+def check_assets(directory, signed=False, profile='regular'):
     """Require the fixed flat release layout and hash every payload before use."""
     directory = Path(directory)
-    expected = PAYLOADS | {'SHA256SUMS'}
+    selected = payloads(profile)
+    expected = selected | {'SHA256SUMS'}
     if signed:
         expected |= {'SHA256SUMS.sig'}
     entries = list(directory.iterdir())
@@ -47,10 +57,10 @@ def check_assets(directory, signed=False):
     checksums = {}
     for line in (directory / 'SHA256SUMS').read_text(encoding='ascii').splitlines():
         match = re.fullmatch(r'([0-9a-f]{64})  ([A-Za-z0-9][A-Za-z0-9._-]*)', line)
-        if not match or match[2] not in PAYLOADS or match[2] in checksums:
+        if not match or match[2] not in selected or match[2] in checksums:
             raise RuntimeError('Invalid, duplicate or unexpected checksum entry')
         checksums[match[2]] = match[1]
-    if set(checksums) != PAYLOADS:
+    if set(checksums) != selected:
         raise RuntimeError('Release checksum manifest is incomplete')
     for name, expected_hash in checksums.items():
         digest = hashlib.sha256()
@@ -61,7 +71,7 @@ def check_assets(directory, signed=False):
             raise RuntimeError('Release checksum mismatch: ' + name)
 
 
-def verify_release(directory, allowed_signers):
+def verify_release(directory, allowed_signers, profile='regular'):
     directory = Path(directory).resolve()
     # Authenticate the manifest before trusting any filenames or checksum claims.
     manifest = directory / 'SHA256SUMS'
@@ -70,12 +80,12 @@ def verify_release(directory, allowed_signers):
         raise RuntimeError('Regular SHA256SUMS and SHA256SUMS.sig files are required')
     ssh('-Y', 'verify', '-f', Path(allowed_signers).resolve(), '-I', IDENTITY,
         '-n', NAMESPACE, '-s', signature, input=manifest.read_bytes())
-    check_assets(directory, signed=True)
+    check_assets(directory, signed=True, profile=profile)
 
 
-def sign_release(directory, key, allowed_signers):
+def sign_release(directory, key, allowed_signers, profile='regular'):
     directory = Path(directory).resolve()
-    check_assets(directory)
+    check_assets(directory, profile=profile)
     public_key = ssh('-y', '-f', Path(key).resolve())
     if not public_key.startswith(b'ssh-ed25519 '):
         raise RuntimeError('Release signing requires an Ed25519 key')
@@ -83,7 +93,7 @@ def sign_release(directory, key, allowed_signers):
     try:
         ssh('-Y', 'sign', '-q', '-f', Path(key).resolve(), '-n', NAMESPACE,
             directory / 'SHA256SUMS')
-        verify_release(directory, allowed_signers)
+        verify_release(directory, allowed_signers, profile=profile)
     except Exception:
         signature.unlink(missing_ok=True)
         raise

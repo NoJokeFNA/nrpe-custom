@@ -17,6 +17,11 @@ on:
       - 'docker/**'
       - 'compose*.yaml'
   workflow_dispatch:
+    inputs:
+      optional_arch_release:
+        description: Explicitly publish the optional Arch prerelease from develop or master
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -30,6 +35,7 @@ jobs:
   dependency-audit:
     uses: ./.github/workflows/dependency-audit.yml
   build:
+    if: github.event_name != 'workflow_dispatch' || !inputs.optional_arch_release
     name: Verify and package ${{ matrix.target }}
     needs: [checks, dependency-audit]
     runs-on: ubuntu-24.04
@@ -175,3 +181,51 @@ jobs:
           else
             gh release edit "$tag" --draft=false --latest=false
           fi
+
+  optional-arch-publication:
+    if: github.event_name == 'workflow_dispatch' && inputs.optional_arch_release && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
+    needs: [checks, dependency-audit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install archive inspection tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends zstd
+      - name: Build and verify optional native Arch package
+        run: python3 nrpe.py verify archlinux --pull
+      - name: Stage exact source-complete optional release
+        env:
+          COMMIT: ${{ github.sha }}
+        run: python3 scripts/prepare_release.py arch --commit "$COMMIT" --destination .nrpe/arch-publication
+      - name: Verify and sign when configured
+        env:
+          SIGNING_MODE: ${{ vars.NRPE_RELEASE_SIGNING }}
+          NRPE_RELEASE_SIGNING_KEY: ${{ secrets.NRPE_RELEASE_SIGNING_KEY }}
+        run: |
+          (cd .nrpe/arch-publication && sha256sum --check SHA256SUMS)
+          case "${SIGNING_MODE:-off}" in
+            off) echo 'Checksum integrity only; release signing is not enabled.' ;;
+            ssh-ed25519) python3 scripts/release_signature.py sign --profile archlinux --directory .nrpe/arch-publication --allowed-signers packaging/release-allowed-signers --key-env NRPE_RELEASE_SIGNING_KEY ;;
+            *) echo 'Unsupported signing mode' >&2; exit 1 ;;
+          esac
+      - name: Publish the explicitly requested optional prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          tag="arch-build-${GITHUB_RUN_NUMBER}-${COMMIT:0:12}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo 'Release already exists; refusing replacement' >&2; exit 1
+          fi
+          gh release create "$tag" .nrpe/arch-publication/* --draft --prerelease --target "$COMMIT" --title "Optional Arch NRPE build ${GITHUB_RUN_NUMBER}" --notes-file .nrpe/arch-publication/RELEASE_NOTES.md
+          gh release edit "$tag" --draft=false --latest=false
