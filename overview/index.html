@@ -35,7 +35,7 @@
   <aside class="sidebar" id="doc-nav">
     <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
     <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
-    <details class="nav-group" open><summary>Getting started</summary><a aria-current="page" href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    <details class="nav-group" open><summary>Getting started</summary><a aria-current="page" href="/nrpe-custom/overview/">Overview</a><a href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
     </div>
   </aside>
   <main id="main" class="document">
@@ -46,7 +46,7 @@
 <a href="/nrpe-custom/overview/">Documentation</a>
 </div>
       <h1>nrpe-custom</h1>
-      <p class="article-meta">Source d9a8e6e</p>
+      <p class="article-meta">Source 9f3fcd5</p>
       <article class="prose"><p>Build and test custom NRPE packages for Debian and SUSE Linux Enterprise Server
 (SLES). Use a keyboard-driven menu or scriptable CLI to rebuild distribution
 packages with command argument support, then verify the result in an isolated
@@ -156,6 +156,9 @@ for the native rebuild and TLS/service diagnosis.</p>
 </tr>
 </tbody>
 </table></div>
+<p>The <a href="/nrpe-custom/package-compatibility/">package compatibility matrix</a> distinguishes
+systems that need an argument-enabled build, packages that already enable it,
+and unverified candidates. A matrix entry is not an additional supported target.</p>
 <p>Target availability depends on distribution repositories and image availability.
 A listed target is not a promise of ongoing upstream security maintenance. In
 particular, historical archives do not extend a distribution's support period.
@@ -223,7 +226,7 @@ when building; SLES sources stay pinned until reviewed and updated.</p>
 <a href="/nrpe-custom/workflow/">workflow reference</a> for flags, outputs, caching, logs,
 checksums, locks, and interruption handling.</p>
 <h2 id="how-it-works">How it works</h2>
-<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="How it works"><a href="/nrpe-custom/assets/diagram-e33981e7fd6526f3685a.svg"><img src="/nrpe-custom/assets/diagram-e33981e7fd6526f3685a.svg" alt="How it works diagram"></a></div><figcaption>How it works · <a href="/nrpe-custom/assets/diagram-e33981e7fd6526f3685a.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">flowchart TD
+<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="How it works"><a href="/nrpe-custom/assets/diagram-e33981e7fd6526f3685a.svg"><img src="/nrpe-custom/assets/diagram-e33981e7fd6526f3685a.svg" width="309" height="1424" alt="How it works diagram"></a></div><figcaption>How it works · <a href="/nrpe-custom/assets/diagram-e33981e7fd6526f3685a.svg">Open full size</a></figcaption><details class="diagram-source"><summary>View diagram source</summary><pre><code class="language-mermaid">flowchart TD
     U[Menu or direct CLI] --&gt; C[Controller: Docker checks and target lock]
     C --&gt; A{Action}
     A --&gt;|build or verify| B[Builder: fetch, build, validate, and export]
@@ -316,7 +319,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <li><a href="/nrpe-custom/updates-and-rollback/">Updates and rollback</a>: retain packages/configuration and recover deployments.</li>
 <li><a href="/nrpe-custom/configuration-examples/">Configuration examples</a>: fixed checks, TLS and restricted argument profiles.</li>
 <li><a href="/nrpe-custom/maintenance/">Support and maintenance</a>: verification boundaries, dependencies and source updates.</li>
-<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
+<li><a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/docker/README.md">Container layout</a>: separate build/test recipes under <code>docker/</code>.</li>
 <li><a href="/nrpe-custom/git-workflow/">Git workflow</a>: human authorship, integration, promotion and guarded branch cleanup.</li>
 <li><a href="/nrpe-custom/releases/">Release automation</a>: per-master-push packages, sources, licenses and verification.</li>
 <li><a href="/nrpe-custom/architecture/">Architecture</a>: control flow and every script's purpose.</li>
@@ -335,7 +338,7 @@ These checks do not replace package builds and runtime integration tests.</p>
 <p>These recipes provide a repeatable workflow, not a claim of bit-for-bit
 reproducibility. Sources, image tags, and repositories can change. Review
 upstream security updates and retain provenance with the artifacts you deploy.</p></article>
-      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/d9a8e6e96dd60d4568d821da47c8d997cd70571c/README.md">View this page on GitHub ↗︎</a>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/README.md">View this page on GitHub ↗︎</a>
     </div>
     <aside class="page-toc">
 <span>On this page</span><div class="toc">
@@ -362,7 +365,7 @@ upstream security updates and retain provenance with the artifacts you deploy.</
 <a href="/nrpe-custom/license/">License</a>
 <a href="/nrpe-custom/third-party/">Third-party notices</a>
 <a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
-<span>Source d9a8e6e</span>
+<span>Source 9f3fcd5</span>
 </div>
 <p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
 </footer>

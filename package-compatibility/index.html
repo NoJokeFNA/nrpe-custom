@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Practical documentation for unofficial NRPE builds: Debian, SLES 12 SP3, TLS and lessons from real troubleshooting.">
+<title>NRPE package compatibility matrix · NRPE Custom</title>
+<link rel="icon" href="/nrpe-custom/assets/icon.svg?v=2" type="image/svg+xml">
+<link rel="stylesheet" href="/nrpe-custom/assets/site.css">
+<link rel="stylesheet" href="/nrpe-custom/assets/highlight.css">
+</head>
+<body data-base="/nrpe-custom">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="brand" href="/nrpe-custom/">
+<span class="project-mark" aria-hidden="true">N_</span>
+<span>NRPE Custom</span>
+</a>
+<a class="collection-link" href="/nrpe-custom/overview/">Documentation <span aria-hidden="true">▾</span>
+</a>
+<div class="header-tools">
+<a class="header-source" href="https://github.com/NoJokeFNA/nrpe-custom">Source code ↗</a>
+<a class="header-download" href="https://github.com/NoJokeFNA/nrpe-custom/releases/latest">Get NRPE packages</a><label class="search-label" for="site-search">
+<span class="sr-only">Search documentation</span>
+<input id="site-search" type="search" placeholder="Search" autocomplete="off" aria-controls="search-results" aria-expanded="false">
+<kbd>Ctrl K</kbd>
+</label>
+<div id="search-results" hidden>
+</div>
+</div>
+</header>
+<button class="docs-toggle" aria-controls="doc-nav" aria-expanded="false">Browse documentation <span>＋</span></button><div class="docs-layout">
+  <aside class="sidebar" id="doc-nav">
+    <div class="sidebar-content" tabindex="0" aria-label="Scrollable documentation navigation">
+    <a class="sidebar-title" href="/nrpe-custom/overview/">NRPE Custom Help</a>
+    <details class="nav-group" open><summary>Getting started</summary><a href="/nrpe-custom/overview/">Overview</a><a aria-current="page" href="/nrpe-custom/package-compatibility/">Package compatibility</a><a href="/nrpe-custom/installation/">Install a package</a><a href="/nrpe-custom/workflow/">Build &amp; verify</a><a href="/nrpe-custom/faq/">Frequently asked questions</a></details><details class="nav-group" open><summary>Build and diagnose</summary><a href="/nrpe-custom/sles12sp3/">SLES 12 SP3</a><a href="/nrpe-custom/network/">Network &amp; company CA</a><a href="/nrpe-custom/menu/">Terminal menu</a><a href="/nrpe-custom/local-cleanup/">Local cleanup</a><a href="/nrpe-custom/troubleshooting/">Troubleshooting</a></details><details class="nav-group" open><summary>Deployment</summary><a href="/nrpe-custom/configuration-examples/">Configuration examples</a><a href="/nrpe-custom/tls-validation/">Verify TLS &amp; identity</a><a href="/nrpe-custom/sles12sp3-deployment-checklist/">SLES deployment checklist</a><a href="/nrpe-custom/updates-and-rollback/">Update &amp; rollback</a><a href="/nrpe-custom/security/">Security</a><a href="/nrpe-custom/practical-validation/">Validation limits</a></details><details class="nav-group"><summary>Project reference</summary><a href="/nrpe-custom/architecture/">Architecture</a><a href="/nrpe-custom/source-strategy/">Source &amp; patch strategy</a><a href="/nrpe-custom/maintenance/">Maintenance</a><a href="/nrpe-custom/releases/">Release workflow</a><a href="/nrpe-custom/release-history/">Release history</a><a href="/nrpe-custom/release-signing/">Release signatures</a><a href="/nrpe-custom/release-plan/">Open work</a><a href="/nrpe-custom/sles-license-review/">SLES license review</a><a href="/nrpe-custom/third-party/">Third-party notices</a><a href="/nrpe-custom/contributing/">Contributing</a><a href="/nrpe-custom/license/">Project license</a></details>
+    </div>
+  </aside>
+  <main id="main" class="document">
+    <div class="document-main">
+      <div class="doc-breadcrumb">
+<a href="/nrpe-custom/">NRPE Custom</a>
+<span>/</span>
+<a href="/nrpe-custom/overview/">Documentation</a>
+</div>
+      <h1>NRPE package compatibility matrix</h1>
+      <p class="article-meta">Source 9f3fcd5</p>
+      <article class="prose"><p>Reviewed: <strong>30 October 2026</strong>. This is a package/build-feature matrix, not a list
+of operating systems that universally need a patch. A custom argument-enabled
+build is relevant only when remote arguments are required and the installed
+server package lacks compiled argument support. Fixed local commands do not
+require that feature.</p>
+<p>The project changes native packaging options rather than implementing an OS
+patch. Argument support needs both <code>--enable-command-args</code> at build time and a
+deliberate runtime policy (<code>dont_blame_nrpe=1</code>). A disabled runtime setting alone
+does not establish that compilation is missing. Keep Bash command substitution
+disabled and use <a href="/nrpe-custom/configuration-examples/">reviewed command definitions</a>.</p>
+<h2 id="confirmed-packaging-findings">Confirmed packaging findings</h2>
+<p>The versions below identify inspected or recorded examples, not a promise that
+they are the latest packages in every repository. Source review establishes the
+listed build options; it is not an installation/TLS test on those other systems.
+Only the targets marked <strong>supported</strong> are implemented by this tool.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Confirmed packaging findings table"><table>
+<thead>
+<tr>
+<th>System / inspected package</th>
+<th>Compiled arguments</th>
+<th>Assessment</th>
+<th>Tool support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debian 11; recorded source <code>4.0.3-1</code></td>
+<td>Not enabled by the distribution recipe</td>
+<td>Argument-enabled rebuild needed if remote arguments are required [D]</td>
+<td><strong>Supported:</strong> <code>debian11</code>, amd64</td>
+</tr>
+<tr>
+<td>Debian 12; recorded source <code>4.1.0-1</code></td>
+<td>Not enabled by the distribution recipe</td>
+<td>Same build-option requirement [D]</td>
+<td><strong>Supported:</strong> <code>debian12</code>, amd64</td>
+</tr>
+<tr>
+<td>Debian 13; recorded source <code>4.1.3-1</code></td>
+<td>Not enabled by the inspected distribution recipe</td>
+<td>Same build-option requirement [D]</td>
+<td><strong>Supported:</strong> <code>debian13</code>, amd64</td>
+</tr>
+<tr>
+<td>Debian 14 / Forky; recorded source <code>4.1.3-1</code></td>
+<td>Not enabled by that recorded recipe</td>
+<td>Moving suite: inspect the actual newly selected source before rebuilding [D]</td>
+<td><strong>Supported:</strong> <code>debian14</code>, amd64</td>
+</tr>
+<tr>
+<td>SLES 12 SP3; installed old server <code>2.15-4.24</code>, project recipe <code>4.1.1</code></td>
+<td>The pinned OBS 4.1.1 recipe already enables arguments</td>
+<td>Distinct case: native newer daemon, preserved OpenSSL ABI, Bash substitution disabled; not simply the Debian option change [S]</td>
+<td><strong>Supported:</strong> <code>sles12sp3</code>, x86_64</td>
+</tr>
+<tr>
+<td>FreeBSD; current inspected <code>net-mgmt/nrpe</code> port <code>4.2.0</code></td>
+<td><code>ARGS</code> exists but is absent from <code>OPTIONS_DEFAULT</code></td>
+<td>A port build with <code>ARGS</code> enabled is the existing packaging mechanism if arguments are needed [F]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>Ubuntu; inspected <code>plucky-proposed</code> source <code>4.1.3-1ubuntu1</code></td>
+<td>Explicitly enabled by Ubuntu's packaging change</td>
+<td>This example does not need our compile-option change; runtime arguments remain disabled by default [U]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+<tr>
+<td>Alpine; inspected <code>aports</code> master recipe <code>nrpe 4.1.3-r0</code></td>
+<td>Explicit <code>--enable-command-args</code></td>
+<td>This recipe does not need our compile-option change [A]</td>
+<td><strong>Not supported</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>For Debian, recorded versions come from the
+<a href="/nrpe-custom/release-history/#sles-12-sp3-release-2026-10-28">published package evidence</a>.
+The builder discovers the actual source from the selected suite; this matrix
+does not pin a future build to those examples. It fails for review if arguments
+are already enabled in a changed Debian configure recipe. Repository availability
+and <a href="/nrpe-custom/maintenance/">upstream support lifecycles</a> are separate concerns.</p>
+<p>The Ubuntu finding applies to the cited package, not automatically every Ubuntu
+release, derivative, PPA or locally rebuilt binary. The Alpine master recipe is
+not a verification of every stable branch. FreeBSD Ports options may be changed
+locally or by a package builder; inspect the installed package's options rather
+than assuming every binary uses the defaults.</p>
+<h2 id="historical-evidence-and-open-candidates">Historical evidence and open candidates</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Historical evidence and open candidates table"><table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Available evidence</th>
+<th>Remaining work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arch Linux</td>
+<td>Official issue FS#66574 records NRPE <code>4.0.2</code> built without arguments in May 2020; the request to enable them was closed as “Won't implement” [R]</td>
+<td>Inspect today's official PKGBUILD and actual package options; do not present the 2020 report as a current runtime test</td>
+</tr>
+<tr>
+<td>Debian-derived distributions using unchanged Debian NRPE packaging</td>
+<td>Possible inherited build behavior, not independently confirmed here</td>
+<td>Identify the exact release, package source/version and architecture before classifying it; Ubuntu demonstrates why inheritance cannot be assumed</td>
+</tr>
+<tr>
+<td>Other distributions/repositories</td>
+<td>Not reviewed by this matrix</td>
+<td>Review their current recipe and installed package; absence from this page means unknown, not affected or unaffected</td>
+</tr>
+</tbody>
+</table></div>
+<p>A candidate row adds no CLI target, build recipe or compatibility guarantee.
+FreeBSD requires native BSD build/install/service validation. Existing Debian
+or SLES packages must not be installed on another distribution or architecture;
+our amd64 outputs are not ARM packages for a Raspberry Pi.</p>
+<h2 id="evidence-sources">Evidence sources</h2>
+<ul>
+<li><strong>[D] Debian:</strong> inspected <a href="https://sources.debian.org/src/nagios-nrpe/4.1.3-1/debian/rules/">4.1.3-1 build rules</a>
+  omit <code>--enable-command-args</code>. Recorded Debian 11–14 source/custom versions and
+  actual project build/install/TLS evidence are in the linked release history.
+  The <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/scripts/enable_command_args.py">Debian transformation</a> makes the narrow
+  option insertion and rejects an already-enabled recipe.</li>
+<li><strong>[S] SLES:</strong> the <a href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/packaging/sles12sp3-source.json">pinned OBS source manifest</a>
+  identifies NRPE 4.1.1 at revision <code>835292739a5736a9d8f0460f670b6f15</code>.
+  The <a href="/nrpe-custom/sles12sp3/">native build guide</a> describes the actual policy changes;
+  the <a href="/nrpe-custom/field-notes/sles12-handshake/">operator field note</a> separates the
+  old server, client/server package confusion, firewall and plugin problems.</li>
+<li><strong>[F] FreeBSD:</strong> the official <a href="https://github.com/freebsd/freebsd-ports/blob/main/net-mgmt/nrpe/Makefile">port Makefile</a>
+  identifies version 4.2.0, defines <code>ARGS</code>, maps it to <code>command-args</code> and defaults
+  to SSL plus the selected plugin flavor, without <code>ARGS</code>.</li>
+<li><strong>[U] Ubuntu:</strong> the official <a href="https://lists.ubuntu.com/archives/plucky-changes/2024-December/003845.html">4.1.3-1ubuntu1 acceptance record</a>
+  explicitly records Ubuntu's addition of <code>--enable-command-args</code> and the
+  retained disabled runtime default. The record is dated 20 December 2024.</li>
+<li><strong>[A] Alpine:</strong> the official <a href="https://github.com/alpinelinux/aports/blob/master/main/nrpe/APKBUILD">APKBUILD</a>
+  identifies 4.1.3-r0 and passes <code>--enable-command-args</code> to configure.</li>
+<li><strong>[R] Arch:</strong> the official <a href="https://bugs.archlinux.org/task/66574">FS#66574 report</a>
+  identifies version 4.0.2 and the maintainer's May 2020 decision. It provides
+  historical evidence, not an independently checked current package.</li>
+</ul>
+<h2 id="classify-a-real-installation">Classify a real installation</h2>
+<ol>
+<li>Record OS/release/architecture, package name/version, repository origin and
+   the daemon executable's version/owner. Distinguish <code>nrpe</code> from <code>check_nrpe</code>.
+   The <a href="/nrpe-custom/troubleshooting/#read-only-target-server-inspection">read-only diagnostic</a>
+   can help inventory an existing Linux host.</li>
+<li>Inspect the exact package's build recipe/options for compiled argument support.
+   A generic comment in <code>nrpe.cfg</code> or a version number alone is not evidence.</li>
+<li>Review the main configuration and includes for the intended runtime argument
+   policy. Keep arguments disabled when fixed commands meet the requirement.</li>
+<li>On an isolated target, verify an actual permitted argument-bearing request
+   over the intended TLS connection and compare it with the local plugin result.
+   A rejected request can also result from runtime policy, access or bad command
+   definitions; a timeout or TLS failure does not prove a missing build option.</li>
+<li>Before adding a new supported target, implement matching native packaging,
+   source/license export, fresh installation and protocol tests, then the
+   <a href="/nrpe-custom/practical-validation/">separate host lifecycle checks</a>.</li>
+</ol>
+<h2 id="keep-the-matrix-current">Keep the matrix current</h2>
+<p>During the <a href="/nrpe-custom/maintenance/#human-review-cadence">maintenance review</a>, record the
+review date, exact package/repository and recipe revision or immutable version,
+source link, relevant configure options and evidence type. Keep source inspection,
+container protocol results and real-host outcomes distinct. Recheck moving
+branches before acting on their entries and update changed findings rather than
+silently extending them to all releases of a distribution.</p></article>
+      <a class="source-link" href="https://github.com/NoJokeFNA/nrpe-custom/blob/9f3fcd51e40dfc844b798bfdeb95abc741bdc637/docs/package-compatibility.md">View this page on GitHub ↗︎</a>
+    </div>
+    <aside class="page-toc">
+<span>On this page</span><div class="toc">
+<ul>
+<li><a href="#confirmed-packaging-findings">Confirmed packaging findings</a></li>
+<li><a href="#historical-evidence-and-open-candidates">Historical evidence and open candidates</a></li>
+<li><a href="#evidence-sources">Evidence sources</a></li>
+<li><a href="#classify-a-real-installation">Classify a real installation</a></li>
+<li><a href="#keep-the-matrix-current">Keep the matrix current</a></li>
+</ul>
+</div>
+</aside>
+  </main>
+</div>
+<footer class="site-footer">
+<div>
+<a class="footer-brand" href="/nrpe-custom/">NRPE Custom</a>
+
+</div>
+<div class="footer-links">
+<a href="/nrpe-custom/license/">License</a>
+<a href="/nrpe-custom/third-party/">Third-party notices</a>
+<a href="/nrpe-custom/overview/#warranty-and-responsibility">Warranty & responsibility</a>
+<span>Source 9f3fcd5</span>
+</div>
+<p class="footer-note">Unofficial project, independent of Nagios and SUSE. Provided AS IS under the included terms. No analytics. Self-hosted assets.</p>
+</footer>
+<script type="module" src="/nrpe-custom/assets/site.js">
+</script>
+</body>
+</html>
