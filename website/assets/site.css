@@ -98,14 +98,21 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
 }
 .diagram-viewport{
   overflow:auto;
-  max-width:100%
+  max-width:100%;
+  max-height:min(65vh,560px);
+  scrollbar-width:thin;
+  scrollbar-color:#b7b7bf #f7f7f9
+}
+.diagram-viewport>a{
+  display:block;
+  width:max-content;
+  min-width:100%
 }
 .diagram-viewport img{
   display:block;
-  width:100%;
-  min-width:640px;
+  min-width:0;
   max-width:none;
-  height:auto
+  margin-inline:auto
 }
 .diagram-source summary{
   cursor:pointer

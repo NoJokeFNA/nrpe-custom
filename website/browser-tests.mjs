@@ -138,3 +138,25 @@ test('documentation search and mobile navigation work from the keyboard', () => 
   await page.keyboard.press('Enter');
   assert.equal(await page.$eval('.docs-toggle', e => e.getAttribute('aria-expanded')), 'false');
 }));
+
+
+test('tall diagrams keep native size in a compact scrollable preview', () => check('diagram-size', async page => {
+  for (const width of [1440, 390]) {
+    await page.setViewport({ width, height: 900 });
+    await visit(page, 'overview/');
+    const geometry = await page.$eval('.diagram-viewport', element => {
+      const image = element.querySelector('img');
+      return { height: element.clientHeight, scrollHeight: element.scrollHeight,
+        imageWidth: image.getBoundingClientRect().width,
+        nativeWidth: Number(image.getAttribute('width')) };
+    });
+    assert.ok(geometry.height <= 560, 'Preview stays compact');
+    assert.ok(geometry.scrollHeight > geometry.height, 'Full diagram remains scrollable');
+    assert.ok(geometry.imageWidth <= geometry.nativeWidth + 1, 'Small SVG is not stretched');
+    assert.ok(await noOverflow(page));
+    assert.ok(await page.$eval('.diagram figcaption a', element => element.href.endsWith('.svg')));
+    await page.focus('.diagram-viewport');
+    await page.keyboard.press('ArrowDown');
+    await page.waitForFunction(() => document.querySelector('.diagram-viewport').scrollTop > 0);
+  }
+}));

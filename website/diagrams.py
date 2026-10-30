@@ -4,6 +4,7 @@ from functools import lru_cache
 import hashlib
 import html
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -75,6 +76,13 @@ def render_diagrams(content, base, assets, title):
     def replace(match):
         source = html.unescape(match[1])
         data = svg(source)
+        try:
+            viewbox = [float(value) for value in ET.fromstring(data).get('viewBox', '').split()]
+            if len(viewbox) != 4 or not all(math.isfinite(value) for value in viewbox) or min(viewbox[2:]) <= 0:
+                raise ValueError('Invalid diagram viewBox')
+            width, height = (math.ceil(value) for value in viewbox[2:])
+        except (ValueError, OverflowError) as exc:
+            raise ValueError('Diagram must provide finite positive viewBox dimensions') from exc
         filename = 'diagram-' + hashlib.sha256(data).hexdigest()[:20] + '.svg'
         assets[filename] = data
         headings = re.findall(r'<h[23][^>]*>(.*?)</h[23]>', content[:match.start()], re.S)
@@ -82,7 +90,8 @@ def render_diagrams(content, base, assets, title):
         url = base + '/assets/' + filename
         return ('<figure class="diagram"><div class="diagram-viewport" tabindex="0" role="region" '
                 'aria-label="' + html.escape(label, quote=True) + '"><a href="' + url + '">'
-                '<img src="' + url + '" alt="' + html.escape(label + ' diagram', quote=True) + '"></a></div>'
+                '<img src="' + url + '" width="' + str(width) + '" height="' + str(height)
+                + '" alt="' + html.escape(label + ' diagram', quote=True) + '"></a></div>'
                 '<figcaption>' + html.escape(label) + ' · <a href="' + url + '">Open full size</a></figcaption>'
                 '<details class="diagram-source"><summary>View diagram source</summary>'
                 + match[0] + '</details></figure>')
