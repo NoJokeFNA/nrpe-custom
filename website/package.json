@@ -8,6 +8,6 @@
   "devDependencies": {
     "shiki": "4.6.0",
     "mermaid": "12.3.0",
-    "puppeteer": "25.16.0"
+    "puppeteer": "25.17.0"
   }
 }
